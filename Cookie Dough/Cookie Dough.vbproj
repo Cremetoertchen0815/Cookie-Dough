@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1B6C48F8-991E-487D-A6EE-18F9368EE925}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cookie_Dough</RootNamespace>
+    <AssemblyName>Cookie Dough</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MonoGamePlatform>Windows</MonoGamePlatform>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Framwork\Graphics\Keyframe3D.vb" />
+    <Compile Include="Framwork\Misc\INIReader.vb" />
+    <Compile Include="Framwork\Misc\VertexExtractor.vb" />
+    <Compile Include="Framwork\Networking\IPlayer.vb" />
+    <Compile Include="Enums.vb" />
+    <Compile Include="Game\Betreten Verboten\Networking\ExtGame.vb" />
+    <Compile Include="Game\Betreten Verboten\Renderers\GameRenderable.vb" />
+    <Compile Include="Framwork\Graphics\PsygroundRenderer.vb" />
+    <Compile Include="Framwork\Graphics\STL.vb" />
+    <Compile Include="Framwork\Graphics\VertexPositionColorNormal.vb" />
+    <Compile Include="Framwork\Misc\ErrorLogger.vb" />
+    <Compile Include="Framwork\Misc\StaticFunctions.vb" />
+    <Compile Include="Framwork\Misc\TestState.vb" />
+    <Compile Include="Framwork\Tweening\IManagedType.vb" />
+    <Compile Include="Framwork\Tweening\ITransition.vb" />
+    <Compile Include="Framwork\Tweening\ITransitionType.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_CamKeyframe.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_Color.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_Double.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_Int.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_Single.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_String.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_Vector2.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_Vector3.vb" />
+    <Compile Include="Framwork\Tweening\ManagedTypes\ManagedType_Vector4.vb" />
+    <Compile Include="Framwork\Tweening\PropertyTransition.vb" />
+    <Compile Include="Framwork\Tweening\ShaderTransition.vb" />
+    <Compile Include="Framwork\Tweening\Transition.vb" />
+    <Compile Include="Framwork\Tweening\TransitionChain.vb" />
+    <Compile Include="Framwork\Tweening\TransitionElement.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_Acceleration.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_Bounce.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_CriticalDamping.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_Deceleration.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_EaseInEaseOut.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_Flash.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_Linear.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_Parabole.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_Swing.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_ThrowAndCatch.vb" />
+    <Compile Include="Framwork\Tweening\TransitionTypes\TransitionType_UserDefined.vb" />
+    <Compile Include="Framwork\Tweening\TweenManager.vb" />
+    <Compile Include="Framwork\UI\ControlBorder.vb" />
+    <Compile Include="Framwork\UI\Controls\Button.vb" />
+    <Compile Include="Framwork\UI\Controls\CustomControl.vb" />
+    <Compile Include="Framwork\UI\Controls\FoldableContainer.vb" />
+    <Compile Include="Framwork\UI\Controls\Label.vb" />
+    <Compile Include="Framwork\UI\Controls\ListBox.vb" />
+    <Compile Include="Framwork\UI\Controls\NumericUpDown.vb" />
+    <Compile Include="Framwork\UI\Controls\SimpleContainer.vb" />
+    <Compile Include="Framwork\UI\Controls\Textbox.vb" />
+    <Compile Include="Framwork\UI\Controls\TextscrollBox.vb" />
+    <Compile Include="Framwork\UI\Controls\VerticalAlignContainer.vb" />
+    <Compile Include="Framwork\UI\GuiControl.vb" />
+    <Compile Include="Framwork\UI\GuiInput.vb" />
+    <Compile Include="Framwork\UI\GuiSystem.vb" />
+    <Compile Include="Framwork\UI\IParent.vb" />
+    <Compile Include="Game1.vb" />
+    <Compile Include="Game\Betreten Verboten\Enums.vb" />
+    <Compile Include="Game\Betreten Verboten\GameInstance.vb" />
+    <Compile Include="Game\Betreten Verboten\GameRoom.vb" />
+    <Compile Include="Game\Betreten Verboten\IGameWindow.vb" />
+    <Compile Include="Game\Betreten Verboten\Maps.vb" />
+    <Compile Include="Game\Betreten Verboten\Player.vb" />
+    <Compile Include="Game\Betreten Verboten\Renderers\Renderer3D.vb" />
+    <Compile Include="Game\Betreten Verboten\SlaveWindow.vb" />
+    <Compile Include="Game\Megäa\Enums.vb" />
+    <Compile Include="Game\Megäa\IObject3D.vb" />
+    <Compile Include="Game\Megäa\GameRoom.vb" />
+    <Compile Include="Game\Megäa\Networking\ExtGame.vb" />
+    <Compile Include="Game\Megäa\Object3DHandler.vb" />
+    <Compile Include="Game\Megäa\Player.vb" />
+    <Compile Include="Game\Megäa\Renderers\CrosshairRenderable.vb" />
+    <Compile Include="Game\Megäa\Renderers\Renderer3D.vb" />
+    <Compile Include="Game\Megäa\Table.vb" />
+    <Compile Include="Game\Megäa\Totem.vb" />
+    <Compile Include="Menu\Intro\IntroScene.vb" />
+    <Compile Include="Menu\MainMenu\MainMenuScene.vb" />
+    <Compile Include="Menu\MainMenu\Splashscreen.vb" />
+    <Compile Include="Framwork\Networking\Client.vb" />
+    <Compile Include="Framwork\Networking\Connection.vb" />
+    <Compile Include="Framwork\Networking\IGame.vb" />
+    <Compile Include="Framwork\Networking\OnlineGameInstance.vb" />
+    <Compile Include="Framwork\Networking\Server.vb" />
+    <Compile Include="Game\Betreten Verboten\Networking\SyncMessage.vb" />
+    <Compile Include="Program.vb" />
+    <Compile Include="Properties\AssemblyInfo.vb" />
+    <Compile Include="Properties\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework, Version=3.8.0.1641, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\lib\net452\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\source\repos\Nez\Nez\Nez.Portable\Nez.csproj">
+      <Project>{2fe5159d-83cf-4d22-a26d-d725c5f257d5}</Project>
+      <Name>Nez</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Import Include="Cookie_Dough" />
+    <Import Include="Cookie_Dough.Cookie_Dough.Program" />
+    <Import Include="Cookie_Dough.Framework.Graphics" />
+    <Import Include="Cookie_Dough.Framework.Misc" />
+    <Import Include="Cookie_Dough.Framework.Tweening" />
+    <Import Include="Cookie_Dough.Program" />
+    <Import Include="Nez" />
+    <Import Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
+  <Import Project="..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets" Condition="Exists('..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
