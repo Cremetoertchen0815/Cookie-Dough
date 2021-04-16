@@ -444,23 +444,23 @@ Namespace Game.BetretenVerboten
                         Else
                             Status = SpielStatus.Waitn
                         End If
-                    Case "r"c 'Player returned
+                    Case "r"c 'Player returned and sync every player
                         Dim source As Integer = CInt(element(1).ToString)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         HUDInstructions.Text = "Welcome back!"
-                        If UserIndex = source Then
-                            Dim str As String = element.Substring(2)
-                            Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
-                            For i As Integer = 0 To PlCount - 1
-                                For j As Integer = 0 To 3
-                                    Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
-                                Next
-                                Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
-                                Spielers(i).Kicks = sp.Spielers(i).Kicks
+                        Dim str As String = element.Substring(2)
+                        Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
+                        For i As Integer = 0 To PlCount - 1
+                            For j As Integer = 0 To 3
+                                Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
-                            SaucerFields = sp.SaucerFields
-                        End If
+                            Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
+                            Spielers(i).Kicks = sp.Spielers(i).Kicks
+                            Spielers(i).Angered = sp.Spielers(i).Angered
+                        Next
+                        If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
+                        SaucerFields = sp.SaucerFields
                         StopUpdating = False
                     Case "s"c 'Create transition
                         Dim playr As Integer = CInt(element(1).ToString)
@@ -519,6 +519,9 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendGameClosed()
             LocalClient.WriteStream("e")
+        End Sub
+        Private Sub SendAngered()
+            LocalClient.WriteStream("p")
         End Sub
 
         Private Sub SubmitResults(figur As Integer, destination As Integer)
@@ -848,17 +851,18 @@ Namespace Game.BetretenVerboten
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                    Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum)", "You suck!")
+                    Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum and -3 the minimum)", "You suck!")
                     Try
                         Dim aim As Integer = CInt(res)
-                        Do Until aim < 13
-                            res = Microsoft.VisualBasic.InputBox("Screw you! I said AT MAXIMUM 12 FIELDS!", "You suck!")
+                        Do Until aim < 13 And aim > -3
+                            res = Microsoft.VisualBasic.InputBox("Screw you! I said -3 <= x <= 12 FIELDS!", "You suck!")
                             aim = CInt(res)
                         Loop
                         WürfelWerte(0) = If(aim > 6, 6, aim)
                         WürfelWerte(1) = If(aim > 6, aim - 6, 0)
                         CalcMoves()
                         HUDBtnC.Active = False
+                        SendAngered()
                         SFX(2).Play()
                     Catch
                         Microsoft.VisualBasic.MsgBox("Alright, then don't.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")

@@ -1,5 +1,4 @@
 ﻿Imports Cookie_Dough.Framework.Networking
-Imports Cookie_Dough.Game.BetretenVerboten.Networking
 
 Namespace Game.BetretenVerboten
     ''' <summary>
@@ -43,6 +42,11 @@ Namespace Game.BetretenVerboten
         ''' Gibt an, ob der Spieler die Verbindung korrekt hergestellt hat
         ''' </summary>
         Public Property Bereit As Boolean = True Implements IPlayer.Bereit
+
+        ''' <summary>
+        ''' Gibt an, ob der Spieler seinen Angerbutton benutzt hat
+        ''' </summary>
+        Public Property Angered As Boolean = False
 
         Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)
             Me.Typ = typ

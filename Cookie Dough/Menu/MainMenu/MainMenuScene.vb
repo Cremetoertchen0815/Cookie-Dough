@@ -390,7 +390,7 @@ Namespace Menu.MainMenu
                                 Dim gameNameA As String = CounterScene.ConnectedUsers(i)
                                 Dim color As Color = If(My.Settings.Username = gameNameA, Color.Cyan, Color.Lime)
                                 batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.SM4Scroll, 800, 100), color)
-                                batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.SM4Scroll), color)
+                                If gameNameA IsNot Nothing Then batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.SM4Scroll), color)
                             Next
                         Else
                             'Draw servers
