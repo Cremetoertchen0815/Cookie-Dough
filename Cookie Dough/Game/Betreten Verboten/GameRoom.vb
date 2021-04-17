@@ -841,11 +841,11 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function GetScore(pl As Integer) As Integer
-            Dim ret As Integer = Spielers(pl).Kicks * 2
+            Dim ret As Single = Spielers(pl).Kicks * 2.5F + If(Spielers(pl).Angered, 0, 5)
             For Each element In Spielers(pl).Spielfiguren
                 ret += element
             Next
-            Return ret * 10
+            Return CInt(ret * 10)
         End Function
 
         Private Function IsÜberholingInSeHaus(defaultmov As Integer) As Boolean
