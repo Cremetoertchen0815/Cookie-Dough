@@ -393,7 +393,7 @@ Namespace Game.BetretenVerboten
                 HUDChatBtn.Color = HUDColor : HUDChatBtn.Border = New ControlBorder(HUDColor, HUDChatBtn.Border.Width)
                 HUDFullscrBtn.Color = HUDColor : HUDFullscrBtn.Border = New ControlBorder(HUDColor, HUDFullscrBtn.Border.Width)
                 HUDMusicBtn.Color = HUDColor : HUDMusicBtn.Border = New ControlBorder(HUDColor, HUDMusicBtn.Border.Width)
-                HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name, "")
+                HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
                 HUDNameBtn.Color = If(SpielerIndex > -1, Renderer3D.playcolor(SpielerIndex), Color.White)
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex = UserIndex)
             End If
@@ -849,7 +849,7 @@ Namespace Game.BetretenVerboten
         Private Function GetScore(pl As Integer) As Integer
             Dim ret As Single = Spielers(pl).Kicks * 2.5F + If(Spielers(pl).Angered, 0, 5)
             For Each element In Spielers(pl).Spielfiguren
-                ret += element
+                If element >= 0 Then ret += element
             Next
             Return CInt(ret * 10)
         End Function
