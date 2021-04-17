@@ -126,10 +126,11 @@ Namespace Game.BetretenVerboten
             MoveActive = False
 
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
+
+            LoadContent()
         End Sub
 
-        Public Overrides Sub Initialize()
-            MyBase.Initialize()
+        Public Sub LoadContent()
 
             'Lade Assets
             ButtonFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font\ButtonText"))
@@ -162,7 +163,7 @@ Namespace Game.BetretenVerboten
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(Tweens.LoopType.PingPong, -1).Start()
         End Sub
         Public Overrides Sub Unload()
-            Framework.Networking.Client.OutputDelegate = Sub(x) Return
+            Client.OutputDelegate = Sub(x) Return
         End Sub
 
         Private Sub StartMoverSub(destination As Integer)
