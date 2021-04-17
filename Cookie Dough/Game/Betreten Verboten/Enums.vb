@@ -8,6 +8,7 @@
         WarteAufOnlineSpieler = 4
         Waitn = 5
         SaucerFlight = 6
+        WähleOpfer = 7
     End Enum
 
     Public Enum PlayFieldPos

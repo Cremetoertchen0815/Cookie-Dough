@@ -94,6 +94,7 @@ Namespace Game.BetretenVerboten
             MyBase.Update()
         End Sub
 
+        Dim farben As String() = {"Magenta", "Green", "Cyan", "Yellow", "Red", "Blue"}
         Private Sub StartNewRound(servername As String)
             If Not MenuAktiviert Then Return
 
@@ -113,7 +114,7 @@ Namespace Game.BetretenVerboten
                     Case SpielerTyp.Local
                         AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local, My.Settings.Schwierigkeitsgrad) With {.Name = My.Settings.Username & "-" & (i + 1).ToString}
                     Case SpielerTyp.CPU
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU, Difficulty.Smart) With {.Name = "CPU " & (i + 1).ToString}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU, Difficulty.Smart) With {.Name = farben(i)}
                     Case SpielerTyp.Online
                         AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Online, My.Settings.Schwierigkeitsgrad) With {.Bereit = False}
                     Case SpielerTyp.None

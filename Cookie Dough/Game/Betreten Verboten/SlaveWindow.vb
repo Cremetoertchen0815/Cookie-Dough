@@ -56,9 +56,9 @@ Namespace Game.BetretenVerboten
 
         'HUD
         Private WithEvents HUD As GuiSystem
-        Private WithEvents HUDBtnA As Controls.Button
         Private WithEvents HUDBtnB As Controls.Button
         Private WithEvents HUDBtnC As Controls.Button
+        Private WithEvents HUDBtnD As Controls.Button
         Private WithEvents HUDChat As Controls.TextscrollBox
         Private WithEvents HUDChatBtn As Controls.Button
         Private WithEvents HUDInstructions As Controls.Label
@@ -137,9 +137,9 @@ Namespace Game.BetretenVerboten
 
             'Lade HUD
             HUD = New GuiSystem
-            HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnA)
-            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnB)
-            HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnC)
+            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnC)
+            HUDBtnD = New Controls.Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnD)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Controls.Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
@@ -338,15 +338,57 @@ Namespace Game.BetretenVerboten
                                 End If
                             Next
                         End If
+                    Case SpielStatus.WähleOpfer
+
+                        Dim pl As Player = Spielers(SpielerIndex)
+
+                        Dim ichmagzüge As New List(Of Integer)
+                            Dim defaultmov As Integer
+                            For i As Integer = 0 To 3
+                                defaultmov = pl.Spielfiguren(i)
+                                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 Then ichmagzüge.Add(i)
+                            Next
+
+                        If ichmagzüge.Count = 1 Then
+                            StopUpdating = True
+                            SendGod(ichmagzüge(0))
+                            'Move camera
+                            FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
+                        ElseIf ichmagzüge.Count = 0 Then
+                            StopUpdating = True
+                            HUDInstructions.Text = "No sacrificable piece!"
+                            Core.Schedule(1, Sub()
+                                                 SubmitResults(0, -2)
+                                                 StopUpdating = False
+                                             End Sub)
+                            'Move camera
+                            FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
+                        Else
+                            'Manuelle Auswahl für lokale Spieler
+                            For k As Integer = 0 To 3
+                                'Prüfe Figur nach Mouse-Klick
+                                If GetFigureRectangle(Map, SpielerIndex, k, Spielers, Center).Contains(mpos) And Spielers(SpielerIndex).Spielfiguren(k) > -1 And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                                    If Not ichmagzüge.Contains(k) Then
+                                        HUDInstructions.Text = "Can't select this piece!"
+                                    Else
+                                        StopUpdating = True
+                                        SendGod(k)
+                                        'Move camera
+                                        FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
+                                    End If
+                                    Exit For
+                                End If
+                            Next
+                        End If
                     Case SpielStatus.SpielZuEnde
                         StopUpdating = True
                 End Select
 
                 'Set HUD color
                 HUDColor = Renderer3D.playcolor(UserIndex)
-                HUDBtnA.Color = HUDColor : HUDBtnA.Border = New ControlBorder(HUDColor, HUDBtnA.Border.Width)
                 HUDBtnB.Color = HUDColor : HUDBtnB.Border = New ControlBorder(HUDColor, HUDBtnB.Border.Width)
                 HUDBtnC.Color = HUDColor : HUDBtnC.Border = New ControlBorder(HUDColor, HUDBtnC.Border.Width)
+                HUDBtnD.Color = HUDColor : HUDBtnD.Border = New ControlBorder(HUDColor, HUDBtnD.Border.Width)
                 HUDChat.Color = HUDColor : HUDChat.Border = New ControlBorder(HUDColor, HUDChat.Border.Width)
                 HUDChatBtn.Color = HUDColor : HUDChatBtn.Border = New ControlBorder(HUDColor, HUDChatBtn.Border.Width)
                 HUDFullscrBtn.Color = HUDColor : HUDFullscrBtn.Border = New ControlBorder(HUDColor, HUDFullscrBtn.Border.Width)
@@ -433,6 +475,10 @@ Namespace Game.BetretenVerboten
                     Case "g"c 'Generate flying saucer field
                         Dim pos As Integer = CInt(element.Substring(1))
                         SaucerFields.Add(pos)
+                    Case "k"c 'Kick player by god
+                        Dim pl As Integer = CInt(element(1).ToString)
+                        Dim fig As Integer = CInt(element(2).ToString)
+                        KickedByGod(pl, fig)
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
@@ -500,6 +546,19 @@ Namespace Game.BetretenVerboten
                         FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
                         Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1000, Nothing)
                         Automator.Add(Renderer.AdditionalZPos)
+                    Case "y"c 'Synchronisiere Daten
+                        Dim str As String = element.Substring(1)
+                        Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
+                        For i As Integer = 0 To PlCount - 1
+                            For j As Integer = 0 To 3
+                                Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
+                            Next
+                            Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
+                            Spielers(i).Kicks = sp.Spielers(i).Kicks
+                            Spielers(i).Angered = sp.Spielers(i).Angered
+                        Next
+                        If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
+                        SaucerFields = sp.SaucerFields
                 End Select
             Next
         End Sub
@@ -519,6 +578,9 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendGameClosed()
             LocalClient.WriteStream("e")
+        End Sub
+        Private Sub SendGod(figur As Integer)
+            LocalClient.WriteStream("j" & figur.ToString)
         End Sub
         Private Sub SendAngered()
             LocalClient.WriteStream("p")
@@ -637,6 +699,19 @@ Namespace Game.BetretenVerboten
             Next
             Return -1
         End Function
+        Private Sub KickedByGod(player As Integer, figur As Integer)
+            Dim key = (player, figur)
+            If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
+            Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
+                                                                                                                          Spielers(player).Spielfiguren(figur) = -1
+                                                                                                                          If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
+                                                                                                                          Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
+                                                                                                                          Automator.Add(transB)
+                                                                                                                          FigurFaderScales.Add(key, transB)
+                                                                                                                      End Sub)
+            Automator.Add(trans)
+            FigurFaderScales.Add(key, trans)
+        End Sub
 
         Private Function GetNormalDiceSum() As Integer
             Dim sum As Integer = 0
@@ -805,14 +880,6 @@ Namespace Game.BetretenVerboten
 #End Region
 
 #Region "Knopfgedrücke"
-        Private Sub ExitButton() Handles HUDBtnA.Clicked
-            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SendGameClosed()
-                NetworkMode = False
-                LocalClient.blastmode = False
-                Core.Exit()
-            End If
-        End Sub
 
         Dim chatbtnpressed As Boolean = False
 
@@ -867,6 +934,23 @@ Namespace Game.BetretenVerboten
                     Catch
                         Microsoft.VisualBasic.MsgBox("Alright, then don't.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                     End Try
+                End If
+                StopUpdating = False
+            Else
+                SFX(0).Play()
+            End If
+        End Sub
+
+        Private Sub SacrificeButton() Handles HUDBtnD.Clicked
+            If Status = SpielStatus.Würfel And Not StopUpdating Then
+                StopUpdating = True
+                Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
+                If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
+                    Status = SpielStatus.WähleOpfer
+                    'Move camera
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                Else
+                    Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If
                 StopUpdating = False
             Else

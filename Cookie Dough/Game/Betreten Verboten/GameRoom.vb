@@ -34,7 +34,6 @@ Namespace Game.BetretenVerboten
         Private DreifachWürfeln As Boolean 'Gibt an(am Anfang des Spiels), dass ma drei Versuche hat um eine 6 zu bekommen
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
-        Private JokerListe As New List(Of Integer) 'Gibt an, welche Spieler ihren Joker bereits eingelöst haben
         Private MoveActive As Boolean = False
         Private RNG As System.Random 'Zufallsgenerator
         Private SaucerFields As New List(Of Integer)
@@ -53,9 +52,9 @@ Namespace Game.BetretenVerboten
 
         'HUD
         Private WithEvents HUD As GuiSystem
-        Private WithEvents HUDBtnA As Controls.Button
         Private WithEvents HUDBtnB As Controls.Button
         Private WithEvents HUDBtnC As Controls.Button
+        Private WithEvents HUDBtnD As Controls.Button
         Private WithEvents HUDChat As Controls.TextscrollBox
         Private WithEvents HUDChatBtn As Controls.Button
         Private WithEvents HUDInstructions As Controls.Label
@@ -129,9 +128,9 @@ Namespace Game.BetretenVerboten
 
             'Lade HUD
             HUD = New GuiSystem
-            HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnA)
-            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnB)
-            HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnC)
+            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnC)
+            HUDBtnD = New Controls.Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnD)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Controls.Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
@@ -444,6 +443,49 @@ Namespace Game.BetretenVerboten
                                 End If
                         End Select
 
+                    Case SpielStatus.WähleOpfer
+
+                        Dim pl As Player = Spielers(SpielerIndex)
+                        If pl.Typ = SpielerTyp.Local Then
+
+                            Dim ichmagzüge As New List(Of Integer)
+                            Dim defaultmov As Integer
+                            For i As Integer = 0 To 3
+                                defaultmov = pl.Spielfiguren(i)
+                                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 Then ichmagzüge.Add(i)
+                            Next
+
+                            If ichmagzüge.Count = 1 Then
+                                Sacrifice(SpielerIndex, ichmagzüge(0))
+                                'Move camera
+                                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
+                            ElseIf ichmagzüge.Count = 0 Then
+                                StopUpdating = True
+                                HUDInstructions.Text = "No sacrificable piece!"
+                                Core.Schedule(1, Sub()
+                                                     SwitchPlayer()
+                                                     StopUpdating = False
+                                                 End Sub)
+                                'Move camera
+                                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
+                            Else
+                                'Manuelle Auswahl für lokale Spieler
+                                For k As Integer = 0 To 3
+                                    'Prüfe Figur nach Mouse-Klick
+                                    If GetFigureRectangle(Map, SpielerIndex, k, Spielers, Center).Contains(mpos) And Spielers(SpielerIndex).Spielfiguren(k) > -1 And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                                        If Not ichmagzüge.Contains(k) Then
+                                            HUDInstructions.Text = "Can't select this piece!"
+                                        Else
+                                            Sacrifice(SpielerIndex, k)
+                                            'Move camera
+                                            FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
+                                        End If
+                                        Exit For
+                                    End If
+                                Next
+                            End If
+                        End If
+
                     Case SpielStatus.WarteAufOnlineSpieler
                         HUDInstructions.Text = "Waiting for all players to connect..."
 
@@ -480,9 +522,9 @@ Namespace Game.BetretenVerboten
 
                 'Set HUD color
                 HUDColor = Renderer3D.playcolor(UserIndex)
-                HUDBtnA.Color = HUDColor : HUDBtnA.Border = New ControlBorder(HUDColor, HUDBtnA.Border.Width)
                 HUDBtnB.Color = HUDColor : HUDBtnB.Border = New ControlBorder(HUDColor, HUDBtnB.Border.Width)
                 HUDBtnC.Color = HUDColor : HUDBtnC.Border = New ControlBorder(HUDColor, HUDBtnC.Border.Width)
+                HUDBtnD.Color = HUDColor : HUDBtnD.Border = New ControlBorder(HUDColor, HUDBtnD.Border.Width)
                 HUDChat.Color = HUDColor : HUDChat.Border = New ControlBorder(HUDColor, HUDChat.Border.Width)
                 HUDChatBtn.Color = HUDColor : HUDChatBtn.Border = New ControlBorder(HUDColor, HUDChatBtn.Border.Width)
                 HUDFullscrBtn.Color = HUDColor : HUDFullscrBtn.Border = New ControlBorder(HUDColor, HUDFullscrBtn.Border.Width)
@@ -542,9 +584,12 @@ Namespace Game.BetretenVerboten
                         PostChat(Spielers(source).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
                         SendPlayerLeft(source)
-                    Case "n"c
+                    Case "j"c 'God got activated
+                        Dim figur As Integer = CInt(element(2).ToString)
+                        Sacrifice(source, figur)
+                    Case "n"c 'Switch player
                         SwitchPlayer()
-                    Case "p"c
+                    Case "p"c 'Player angered
                         Spielers(source).Angered = True
                     Case "r"c 'Player is back
                         Spielers(source).Bereit = True
@@ -552,7 +597,7 @@ Namespace Game.BetretenVerboten
                         SendPlayerBack(source)
                         StopUpdating = False
                         If SpielerIndex = source Then SendNewPlayerActive(SpielerIndex)
-                    Case "s"c
+                    Case "s"c 'Move figure
                         Dim figur As Integer = CInt(element(2).ToString)
                         Dim destination As Integer = CInt(element.Substring(3).ToString)
                         SendFigureTransition(source, figur, destination)
@@ -584,6 +629,9 @@ Namespace Game.BetretenVerboten
         Private Sub SendFlyingSaucerAdded(fields As Integer)
             SendNetworkMessageToAll("g" & fields.ToString)
         End Sub
+        Private Sub SendKick(player As Integer, figur As Integer)
+            SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
+        End Sub
         Private Sub SendGameClosed()
             SendNetworkMessageToAll("l")
         End Sub
@@ -603,6 +651,11 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendWinFlag()
             SendNetworkMessageToAll("w")
+        End Sub
+
+        Private Sub SendSync()
+            Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))
+            SendNetworkMessageToAll("y" & str)
         End Sub
 
         Private Sub SendNetworkMessageToAll(message As String)
@@ -664,7 +717,6 @@ Namespace Game.BetretenVerboten
                                      StopUpdating = False
                                  End Sub)
             Else 'Ansonsten fahre x Felder nach vorne mit der Figur, die anschließend ausgewählt wird
-                'TODO: Add code for handling normal dice rolls and movement, as well as kicking
                 HUDInstructions.Text = "Select piece to be moved " & Fahrzahl & " spaces!"
                 Status = SpielStatus.WähleFigur
 
@@ -674,10 +726,9 @@ Namespace Game.BetretenVerboten
         End Sub
 
 #Region "Hilfsfunktionen"
-        Private Function CheckKick(Optional Increment As Integer = 0) As Integer
+        Private Function CheckKick(playerA As Integer, figur As Integer, Optional Increment As Integer = 0) As Integer
             'Berechne globale Spielfeldposition der rauswerfenden Figur
-            Dim playerA As Integer = FigurFaderZiel.Item1
-            Dim fieldA As Integer = Spielers(playerA).Spielfiguren(FigurFaderZiel.Item2) + Increment
+            Dim fieldA As Integer = Spielers(playerA).Spielfiguren(figur) + Increment
             Dim fa As Integer = PlayerFieldToGlobalField(fieldA, playerA)
             'Loope durch andere Spieler
             For i As Integer = playerA + 1 To playerA + PlCount - 1
@@ -699,6 +750,20 @@ Namespace Game.BetretenVerboten
             Next
             Return -1
         End Function
+        Private Sub KickedByGod(player As Integer, figur As Integer)
+            Dim key = (player, figur)
+            If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
+            Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
+                                                                                                                          Spielers(player).Spielfiguren(figur) = -1
+                                                                                                                          If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
+                                                                                                                          Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
+                                                                                                                          Automator.Add(transB)
+                                                                                                                          FigurFaderScales.Add(key, transB)
+                                                                                                                      End Sub)
+            Automator.Add(trans)
+            FigurFaderScales.Add(key, trans)
+            SendKick(player, figur)
+        End Sub
 
         Private Function GetKickFigur(player As Integer, figur As Integer, Optional Increment As Integer = 0) As (Integer, Integer)
             'Berechne globale Spielfeldposition der rauswerfenden Figur
@@ -903,7 +968,7 @@ Namespace Game.BetretenVerboten
             If IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1) Then
                 Dim key As (Integer, Integer) = GetFieldID(FigurFaderZiel.Item1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1)
                 If (Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1) Or (Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1 = 0) Then
-                    Dim kickID As Integer = CheckKick(1)
+                    Dim kickID As Integer = CheckKick(FigurFaderZiel.Item1, FigurFaderZiel.Item2, 1)
                     Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
                                                                                                                                   SFX(4).Play()
                                                                                                                                   If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1
@@ -932,7 +997,7 @@ Namespace Game.BetretenVerboten
                 If IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1) Then
                     Dim key As (Integer, Integer) = GetFieldID(FigurFaderZiel.Item1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1)
                     If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1 Then
-                        Dim kickID As Integer = CheckKick(1)
+                        Dim kickID As Integer = CheckKick(FigurFaderZiel.Item1, FigurFaderZiel.Item2, 1)
                         PlayStompSound = True
                         Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
                                                                                                                                       SFX(4).Play()
@@ -999,6 +1064,98 @@ Namespace Game.BetretenVerboten
             HUDChat.ScrollDown = True
         End Sub
 
+        Private Sub Sacrifice(pl As Integer, figur As Integer)
+            StopUpdating = True
+            Status = SpielStatus.Waitn
+            PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
+            SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
+            KickedByGod(pl, figur) 'Kick sacrifice
+            Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * 10.0F)
+            Dim pogfactor = progress * 0.5F + 0.3F 'Field 0: Chance of sth good: 30%;  Field max.: Chance of sth good: 80%
+            Core.Schedule(2, Sub() 'Wait a sec
+                                 Dim plsdont As Boolean = False
+
+                                 Do
+                                     Dim RNG = Nez.Random.NextFloat
+                                     If RNG <= pogfactor Then 'Positive effect
+                                         Select Case Nez.Random.Range(0, 3)
+                                             Case 0
+                                                 'Boost random figure
+                                                 Dim fig = Nez.Random.Range(0, 4)
+                                                 Dim boost = Nez.Random.Range(1, PlCount * 5)
+                                                 Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
+                                                 If futurefield < PlCount * 10 AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                                     PostChat("You're lucky! A random figure of yours is being boosted!", Color.White)
+                                                     SendMessage("You're lucky! A random figure of yours is being boosted!")
+                                                     plsdont = True
+                                                     FigurFaderZiel = (pl, fig)
+                                                     StartMoverSub(futurefield)
+                                                     SendFigureTransition(pl, fig, futurefield)
+                                                     Exit Do
+                                                 End If
+                                             Case 1
+                                                 'Kick random enemy figure
+                                                 Dim pla = Nez.Random.Range(0, 4)
+                                                 Dim fig = Nez.Random.Range(0, 4)
+                                                 If pla <> pl Then
+                                                     PostChat("You're lucky! A random enemy figure got kicked!", Color.White)
+                                                     SendMessage("You're lucky! A random enemy figure got kicked!")
+                                                     KickedByGod(pla, fig)
+                                                     Exit Do
+                                                 End If
+                                             Case 2
+                                                 'Reset anger button
+                                                 PostChat("You're lucky! Your anger button got reset!", Color.White)
+                                                 SendMessage("You're lucky! Your anger button got reset!")
+                                                 Spielers(pl).Angered = False
+                                                 SendSync()
+                                                 Exit Do
+                                         End Select
+                                     ElseIf RNG > pogfactor + (1 - pogfactor) / 5 * 3 Then 'Negative effect
+                                         Select Case Nez.Random.Range(0, 3)
+                                             Case 0
+                                                   ''Boost random figure
+                                                   'Dim fig = Nez.Random.Range(0, 4)
+                                                   '    Dim boost = Nez.Random.Range(1, PlCount * 5)
+                                                   '    Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
+                                                   '    If futurefield < PlCount * 10 AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                                   '        PostChat("Oh ooh! Another one of your piece died!", Color.White)
+                                                   '        SendMessage("Oh ooh! A random figure of yours is being boosted!")
+                                                   '        plsdont = True
+                                                   '        FigurFaderZiel = (pl, fig)
+                                                   '        StartMoverSub(futurefield)
+                                                   '        SendFigureTransition(pl, fig, futurefield)
+                                                   '        Exit Do
+                                                   '    End If
+                                             Case 1
+                                                 'Kick random figure
+                                                 Dim fig = Nez.Random.Range(0, 4)
+                                                 If Spielers(pl).Spielfiguren(fig) >= 0 Then
+                                                     PostChat("Oh ooh! Another one of your piece died!", Color.White)
+                                                     SendMessage("Oh ooh! Another one of your piece died!")
+                                                     KickedByGod(pl, fig)
+                                                     Exit Do
+                                                 End If
+                                             Case 2
+                                                 'Set anger button
+                                                 PostChat("Oh ooh! Your anger button got deleteted!", Color.White)
+                                                 SendMessage("Oh ooh! Another one of your piece died!")
+                                                 Spielers(pl).Angered = True
+                                                 SendSync()
+                                                 Exit Do
+                                         End Select
+                                     Else
+                                         PostChat("You got spared.", Color.White)
+                                         SendMessage("You got spared.")
+                                         Exit Do
+                                     End If
+                                 Loop
+
+                                 'Switch player
+                                 If Not plsdont Then Core.Schedule(2, Sub() SwitchPlayer())
+                             End Sub)
+        End Sub
+
         Private Sub SwitchPlayer()
             'Generate SaucerFields
             If RNG.Next(0, SaucerChance) = 5 Then
@@ -1017,7 +1174,7 @@ Namespace Game.BetretenVerboten
             Do While Spielers(SpielerIndex).Typ = SpielerTyp.None
                 SpielerIndex = (SpielerIndex + 1) Mod PlCount
             Loop
-            HUDBtnC.Active = Not JokerListe.Contains(SpielerIndex)
+            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered
             If Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then Status = SpielStatus.Würfel Else Status = SpielStatus.Waitn
             SendNewPlayerActive(SpielerIndex)
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
@@ -1035,14 +1192,6 @@ Namespace Game.BetretenVerboten
 #End Region
 
 #Region "Knopfgedrücke"
-        Private Sub ExitButton() Handles HUDBtnA.Clicked
-            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SFX(2).Play()
-                SendGameClosed()
-                NetworkMode = False
-                Core.Exit()
-            End If
-        End Sub
 
         Dim chatbtnpressed As Boolean = False
 
@@ -1094,6 +1243,23 @@ Namespace Game.BetretenVerboten
                     Catch
                         Microsoft.VisualBasic.MsgBox("Alright, then don't.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                     End Try
+                End If
+                StopUpdating = False
+            Else
+                SFX(0).Play()
+            End If
+        End Sub
+
+        Private Sub SacrificeButton() Handles HUDBtnD.Clicked
+            If Status = SpielStatus.Würfel And Not StopUpdating Then
+                StopUpdating = True
+                Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
+                If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
+                    Status = SpielStatus.WähleOpfer
+                    'Move camera
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                Else
+                    Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If
                 StopUpdating = False
             Else

@@ -151,7 +151,7 @@ Namespace Game.BetretenVerboten.Renderers
             For j = 0 To Game.Spielers.Length - 1
                 Dim pl As Player = Game.Spielers(j)
                 If pl.Typ = SpielerTyp.None Then Continue For
-                Dim color As Color = playcolor(j) * If(Game.Status = SpielStatus.WähleFigur And j = Game.SpielerIndex And (pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.Online), Game.SelectFader, 1.0F)
+                Dim color As Color = playcolor(j) * If((Game.Status = SpielStatus.WähleFigur Or Game.Status = SpielStatus.WähleOpfer) And j = Game.SpielerIndex And (pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.Online), Game.SelectFader, 1.0F)
                 For k As Integer = 0 To 3
                     Dim scale As Single = If(Game.FigurFaderScales.ContainsKey((j, k)), Game.FigurFaderScales((j, k)).Value, 1)
 

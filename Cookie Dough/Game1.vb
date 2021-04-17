@@ -25,10 +25,16 @@ Namespace Cookie_Dough
             Scene.SetDefaultDesignResolution(1920, 1080, Scene.SceneResolutionPolicy.BestFit)
             Window.AllowUserResizing = True
 
-
+            My.Settings.Thumbnail = 0
+            My.Settings.Sound = 0
+            Dim arg As String() = Environment.GetCommandLineArgs()
             LocalClient = New Client
-            StartServer()
-            LocalClient.Connect("127.0.0.1", "soos")
+            If (arg.Length > 1 AndAlso arg(1) = "-launchserver") Then
+                StartServer()
+                LocalClient.Connect("127.0.0.1", My.Settings.Username)
+            Else
+                LocalClient.Connect("127.0.0.1", My.Settings.Username & "a")
+            End If
 
             ReferencePixel = New Texture2D(GraphicsDevice, 1, 1)
             ReferencePixel.SetData({Color.White})
