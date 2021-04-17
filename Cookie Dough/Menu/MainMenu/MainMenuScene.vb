@@ -1,6 +1,7 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Nez
@@ -157,8 +158,21 @@ Namespace Menu.MainMenu
                                                                                                                                                                                          My.Settings.Username = x
                                                                                                                                                                                          My.Settings.Save()
                                                                                                                                                                                      End Sub, My.Settings.Username)
-                    If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then My.Settings.Thumbnail = (My.Settings.Thumbnail + 1) Mod 5 : My.Settings.Save()
-                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then My.Settings.Sound = (My.Settings.Sound + 1) Mod 5 : My.Settings.Save()
+                    If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        My.Settings.Thumbnail = (My.Settings.Thumbnail + 1) Mod 6
+                        My.Settings.Save()
+                        If My.Settings.Thumbnail = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\pp.png") Then IO.File.Copy("Content\prep\plc.png", "Cache\client\pp.png")
+                    End If
+                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        My.Settings.Sound = (My.Settings.Sound + 1) Mod 6
+                        My.Settings.Save()
+                        If My.Settings.Sound = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\sound.audio") Then IO.File.Copy("Content\prep\plc.wav", "Cache\client\sound.audio")
+                        Try
+                            PlayAudio(My.Settings.Sound)
+                        Catch ex As Exception
+                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                        End Try
+                    End If
                     If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
 
                     If New Rectangle(1400, 455, 100, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
@@ -168,12 +182,18 @@ Namespace Menu.MainMenu
                         End If
                     End If
                     If New Rectangle(1400, 605, 100, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
-                        Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Soundfiles(*.mp3,*.ogg,*.wav)|*.mp3;*.ogg;*.wav", .Title = "Select profile picture"}
+                        Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select profile picture"}
                         If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
                             IO.File.Copy(ofd.FileName, "Cache\client\sound.audio", True)
                         End If
+                        Try
+                            PlayAudio(IdentType.Custom)
+                        Catch ex As Exception
+                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                        End Try
                     End If
             End Select
+
 
 
             'Wechsel Benutzername
@@ -230,6 +250,14 @@ Namespace Menu.MainMenu
                                                                                                                     Automator.Add(Schwarzblende)
                                                                                                                 End Sub)
             Automator.Add(Schwarzblende)
+        End Sub
+
+        Private Sub PlayAudio(ident As IdentType)
+            If ident <> IdentType.Custom Then
+                SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav").Play()
+            Else
+                SoundEffect.FromFile("Cache\client\sound.audio").Play()
+            End If
         End Sub
 
         Private Sub UpdateServerList()
@@ -434,7 +462,7 @@ Namespace Menu.MainMenu
                         batcher.DrawString(MediumFont, str(1), New Vector2(1920.0F / 2 - MediumFont.MeasureString(str(1)).X / 2, 450), FgColor)
                         batcher.DrawString(MediumFont, str(2), New Vector2(1920.0F / 2 - MediumFont.MeasureString(str(2)).X / 2, 600), FgColor)
 
-                        batcher.DrawString(MediumFont, "Exit Game", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Exit Game").X / 2, 750), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Exit Game").X / 2, 750), FgColor)
                 End Select
 
 

@@ -1,10 +1,13 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
+Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Game.Megäa
     Public Class Player
         Implements IPlayer
+
         Public Property Connection As Connection Implements IPlayer.Connection
         Public Property Bereit As Boolean = True Implements IPlayer.Bereit
         Public Property Typ As SpielerTyp = SpielerTyp.Local Implements IPlayer.Typ
@@ -18,6 +21,9 @@ Namespace Game.Megäa
         Public Property HandCardTransform As New Transition(Of Keyframe3D)
         Public Property TableCard As Card = Card.NoCard
         Public Property TableCardTransform As New Keyframe3D
+
+        Public Property CustomSound As SoundEffect Implements IPlayer.CustomSound
+        Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
 
         Private HandTransformOrigin As Keyframe3D
 

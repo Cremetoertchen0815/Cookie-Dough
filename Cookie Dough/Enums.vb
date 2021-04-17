@@ -20,5 +20,6 @@ Public Enum IdentType
     TypeB
     TypeC
     TypeD
+    TypeE
     Custom
 End Enum

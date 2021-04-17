@@ -1,4 +1,6 @@
 ﻿Imports Cookie_Dough.Framework.Networking
+Imports Microsoft.Xna.Framework.Audio
+Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Game.BetretenVerboten
     ''' <summary>
@@ -6,6 +8,7 @@ Namespace Game.BetretenVerboten
     ''' </summary>
     Public Class Player
         Implements IPlayer
+
         ''' <summary>
         ''' Identifiziert den Spieler in der Anwendung
         ''' </summary>
@@ -47,6 +50,16 @@ Namespace Game.BetretenVerboten
         ''' Gibt an, ob der Spieler seinen Angerbutton benutzt hat
         ''' </summary>
         Public Property Angered As Boolean = False
+
+        ''' <summary>
+        ''' Der Sound, der abgespielt wird, wenn man gekickt wird
+        ''' </summary>
+        Public Property CustomSound As SoundEffect Implements IPlayer.CustomSound
+
+        ''' <summary>
+        ''' Das Thumbnail des Spielers
+        ''' </summary>
+        Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
 
         Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)
             Me.Typ = typ
