@@ -1,5 +1,4 @@
 ﻿BV:
 -Kick ppl from a round
--Fix UFO camera and UFO rotation
 -Implement backwards movement
 -Implement custom sounds

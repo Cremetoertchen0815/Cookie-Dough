@@ -36,7 +36,7 @@ Namespace Game.BetretenVerboten
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
         Private MoveActive As Boolean = False
         Private RNG As System.Random 'Zufallsgenerator
-        Private SaucerFields As New List(Of Integer)
+        Private SaucerFields As New List(Of Integer) From {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
         Private Timer As TimeSpan
         Private LastTimer As TimeSpan
         Private TimeOver As Boolean = False

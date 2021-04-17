@@ -88,7 +88,7 @@ Namespace Game.BetretenVerboten.Renderers
 
             Dim cam = Game.GetCamPos
             CamMatrix = Matrix.CreateFromYawPitchRoll(cam.Yaw, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
-            If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.DeltaTime / 6 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
+            If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(dev.Viewport.Width, dev.Viewport.Height, 1, 100000)
 
@@ -173,7 +173,7 @@ Namespace Game.BetretenVerboten.Renderers
             For Each mesh As ModelMesh In SaucerModel.Meshes
 
                 For Each effect As BasicEffect In mesh.Effects
-                    Dim rotato As Matrix = Matrix.CreateRotationZ(MathHelper.ToRadians(Time.DeltaTime / 3 * 360))
+                    Dim rotato As Matrix = Matrix.CreateRotationZ(MathHelper.ToRadians(Time.TotalTime / 15 * 360))
                     effect.World = rotato * Matrix.CreateTranslation(New Vector3(-SaucerMover.Value.X, -SaucerMover.Value.Y, -182 - SaucerLift.Value))
                     effect.View = View
                     effect.Projection = Projection
