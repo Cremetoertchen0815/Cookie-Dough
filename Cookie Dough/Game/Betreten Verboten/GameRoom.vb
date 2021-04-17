@@ -800,7 +800,18 @@ Namespace Game.BetretenVerboten
             Renderer.TriggerSaucerAnimation(FigurFaderZiel, Sub()
                                                                 Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = nr
                                                                 HUDInstructions.Text = If(distance > 0, "+", "") & distance
-                                                            End Sub, AddressOf SwitchPlayer)
+                                                            End Sub, Sub()
+                                                                         Dim saucertrigger As Boolean = False
+                                                                         For Each element In SaucerFields
+                                                                             If PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = element Then
+                                                                                 saucertrigger = True
+                                                                                 nr = element
+                                                                             End If
+                                                                         Next
+
+                                                                         'Trigger UFO, falls auf Feld gelandet
+                                                                         If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * 10 Then TriggerSaucer(nr) Else SwitchPlayer()
+                                                                     End Sub)
         End Sub
 
         Private Function GetNormalDiceSum() As Integer

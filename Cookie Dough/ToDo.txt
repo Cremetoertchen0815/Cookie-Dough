@@ -2,6 +2,5 @@
 -Kick ppl from a round
 -Cascade UFOs
 -Fix UFO camera and UFO rotation
--Show score in title
 -Implement backwards movement
--Add bonus for not using anger button
+-Fix 6 player map texture
