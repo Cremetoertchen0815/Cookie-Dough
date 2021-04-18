@@ -2,10 +2,9 @@
 
 Namespace Game.BetretenVerboten
     Module Maps
-        Private RNG As New System.Random
         Friend Function RollDice(Optional hard As Boolean = False) As Integer
-            If hard Then Return (RNG.Next(0, 17) Mod 6) + 1
-            Return RNG.Next(1, 7)
+            If hard Then Return (Nez.Random.Range(0, 17) Mod 6) + 1
+            Return Nez.Random.Range(1, 7)
         End Function
 
         Public Function GetMapName(map As GaemMap) As String
@@ -31,10 +30,11 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private FDist0 As Integer = 85
-        Private FDist1 As Integer = 57
-        Private Opos1 As Integer = 400
+        Private FDist1 As Integer = 65
+        Private Opos1 As Integer = 420
 
         Friend Function GetMapVectorPos(map As GaemMap, player As Integer, figur As Integer, pos As Integer) As Vector2
+
             Select Case map
                 Case GaemMap.Default4Players
                     Select Case pos
@@ -50,11 +50,11 @@ Namespace Game.BetretenVerboten
                     Select Case pos
                         Case -1 'Zeichne Figur in Homebase
                             Return Vector2.Transform(Map1GetLocalPos(figur), transmatrices1(player))
-                        Case 60, 61, 62, 63 'Zeichne Figur in Haus
-                            Return Vector2.Transform(Map1GetLocalPos(pos - 46), transmatrices1(player))
+                        Case 48, 49, 50, 51 'Zeichne Figur in Haus
+                            Return Vector2.Transform(Map1GetLocalPos(pos - 34), transmatrices1(player))
                         Case Else 'Zeichne Figur auf Feld
-                            Dim matrx As Matrix = transmatrices1((player + Math.Floor(pos / 10)) Mod 6)
-                            Return Vector2.Transform(Map1GetLocalPos((pos Mod 10) + 4), matrx)
+                            Dim matrx As Matrix = transmatrices1((player + Math.Floor(pos / 8)) Mod 6)
+                            Return Vector2.Transform(Map1GetLocalPos((pos Mod 8) + 4), matrx)
                     End Select
             End Select
         End Function
@@ -76,8 +76,8 @@ Namespace Game.BetretenVerboten
                     Dim matrx As Matrix = transmatrices0(Math.Floor(pos / 10) Mod 4)
                     Return Vector2.Transform(Map0GetLocalPos((pos Mod 10) + 4), matrx)
                 Case GaemMap.Default6Players
-                    Dim matrx As Matrix = transmatrices1(Math.Floor(pos / 10) Mod 6)
-                    Return Vector2.Transform(Map1GetLocalPos((pos Mod 10) + 4), matrx)
+                    Dim matrx As Matrix = transmatrices1(Math.Floor(pos / 8) Mod 6)
+                    Return Vector2.Transform(Map1GetLocalPos((pos Mod 8) + 4), matrx)
                 Case Else
                     Return Vector2.Zero
             End Select
@@ -142,20 +142,21 @@ Namespace Game.BetretenVerboten
         Private Function Map1GetLocalPos(ps As PlayFieldPos) As Vector2
             transmatrices1 = {Matrix.CreateRotationZ(MathHelper.TwoPi * 2 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 3 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 4 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 5 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 6 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 7 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 1 / 6)} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
             Dim defvec As New Vector2(Opos1, 0)
-            Dim angvecA As Vector2 = RotateVector(Vector2.UnitX * (FDist1), MathHelper.TwoPi / 5.8)
+            Dim angvecA As Vector2 = RotateVector(Vector2.UnitX * (FDist1), MathHelper.TwoPi / 5)
             Dim angvecB As Vector2 = RotateVector(Vector2.UnitY * FDist1, MathHelper.TwoPi / 5.8)
-            Dim angvecC As Vector2 = RotateVector(Vector2.UnitY * FDist1, MathHelper.TwoPi / 5.8)
-            Dim angvecD As Vector2 = RotateVector(-Vector2.UnitY * FDist1, MathHelper.TwoPi / 20)
+            Dim angvecC As Vector2 = RotateVector(Vector2.UnitY * FDist1, MathHelper.TwoPi / 6)
+            Dim angvecD As Vector2 = New Vector2(-25, -16)
             Dim angvecE As Vector2 = RotateVector(-Vector2.UnitX * FDist1, MathHelper.TwoPi)
+            Dim angvecF As Vector2 = RotateVector(Vector2.UnitX * (FDist1), MathHelper.TwoPi / 6)
             Select Case ps
                 Case PlayFieldPos.Home1
-                    Return defvec + angvecA
+                    Return defvec + angvecF
                 Case PlayFieldPos.Home2
-                    Return defvec + angvecC + angvecA
+                    Return defvec + angvecC + angvecF
                 Case PlayFieldPos.Home3
-                    Return defvec + angvecA * 2
+                    Return defvec + angvecF * 2
                 Case PlayFieldPos.Home4
-                    Return defvec + angvecC + angvecA * 2
+                    Return defvec + angvecC + angvecF * 2
                 Case PlayFieldPos.Haus1
                     Return defvec + angvecD + angvecE
                 Case PlayFieldPos.Haus2
@@ -216,8 +217,8 @@ Namespace Game.BetretenVerboten
                         Case 60, 61, 62, 63 'Figur in Haus
                             vec = Map1GetLocalPos(chr - 46)
                         Case Else 'Figur auf Feld
-                            vec = Map1GetLocalPos((chr Mod 10) + 4)
-                            matrx = transmatrices1((pl + Math.Floor(chr / 10)) Mod 6)
+                            vec = Map1GetLocalPos((chr Mod 8) + 4)
+                            matrx = transmatrices1((pl + Math.Floor(chr / 8)) Mod 6)
                     End Select
 
                     Return GetChrRect(Center + Vector2.Transform(vec, matrx))

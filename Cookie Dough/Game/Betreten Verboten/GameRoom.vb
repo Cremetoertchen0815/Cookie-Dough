@@ -20,6 +20,8 @@ Namespace Game.BetretenVerboten
         'Spiele-Flags und Variables
         Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer
+        Friend FigCount As Integer
+        Friend SpceCount As Integer
         Friend NetworkMode As Boolean = False
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
@@ -106,19 +108,26 @@ Namespace Game.BetretenVerboten
             SpielerIndex = -1
             MoveActive = False
             Me.Map = Map
-            PlCount = 4
 
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
-            If Spielers Is Nothing Then Spielers = {New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart)}
             Select Case Map
                 Case GaemMap.Default4Players
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
+                    Player.DefaultArray = {-1, -1, -1, -1}
+                    FigCount = 4
+                    PlCount = 4
+                    SpceCount = 10
                 Case GaemMap.Default6Players
                     Timer = New TimeSpan(0, 2, 22, 22, 22)
+                    Player.DefaultArray = {46, 47}
+                    FigCount = 2
+                    PlCount = 6
+                    SpceCount = 8
             End Select
             LastTimer = Timer
 
+            If Spielers Is Nothing Then Spielers = {New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart)}
         End Sub
 
         Public Sub LoadContent()
@@ -287,9 +296,9 @@ Namespace Game.BetretenVerboten
 
                                 Dim ichmagzüge As New List(Of Integer)
                                 Dim defaultmov As Integer
-                                For i As Integer = 0 To 3
+                                For i As Integer = 0 To FigCount - 1
                                     defaultmov = pl.Spielfiguren(i)
-                                    If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
+                                    If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
                                 Next
 
                                 If ichmagzüge.Count = 1 Then
@@ -315,7 +324,7 @@ Namespace Game.BetretenVerboten
                                                      End Sub)
                                 Else
                                     'Manuelle Auswahl für lokale Spieler
-                                    For k As Integer = 0 To 3
+                                    For k As Integer = 0 To FigCount - 1
                                         defaultmov = Spielers(SpielerIndex).Spielfiguren(k)
 
                                         'Prüfe Figur nach Mouse-Klick
@@ -349,9 +358,9 @@ Namespace Game.BetretenVerboten
                                     Dim k As Integer
                                     Dim ichmagzüge As New List(Of Integer)
                                     Dim defaultmov As Integer
-                                    For i As Integer = 0 To 3
+                                    For i As Integer = 0 To FigCount - 1
                                         defaultmov = pl.Spielfiguren(i)
-                                        If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
+                                        If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
                                     Next
                                     'Prüfe ob Zug möglich
                                     If ichmagzüge.Count = 0 Then SwitchPlayer() : Exit Select
@@ -383,15 +392,15 @@ Namespace Game.BetretenVerboten
                                                 ' Safety:ist eine Figur höchstens 6 felder vor einer Feindlichen Figur entfernt, ist sie in einer Gefahrenzone die avoidet werden soll
                                                 Dim locpos As Integer() = {Spielers(SpielerIndex).Spielfiguren(element), Spielers(SpielerIndex).Spielfiguren(element) + Fahrzahl}
                                                 Dim Globpos As Integer() = {PlayerFieldToGlobalField(locpos(0), SpielerIndex), PlayerFieldToGlobalField(locpos(1), SpielerIndex)}
-                                                For ALVSP As Integer = 0 To 3
+                                                For ALVSP As Integer = 0 To FigCount - 1
                                                     If ALVSP <> SpielerIndex Then
-                                                        For ALVSPF As Integer = 0 To 3
+                                                        For ALVSPF As Integer = 0 To FigCount - 1
                                                             Dim locposB As Integer = Spielers(ALVSP).Spielfiguren(ALVSPF)
                                                             Dim GlobposB As Integer = PlayerFieldToGlobalField(locposB, ALVSP)
                                                             'Falls momentane Position in Feindlichiem Feld, verbessere Score(fliehen)
                                                             If GlobposB < Globpos(0) And GlobposB >= Globpos(0) - 6 Then
                                                                 Scores(element) *= 1.4F
-                                                            ElseIf GlobposB < Globpos(1) And GlobposB >= Globpos(1) - 6 And locpos(1) < PlCount * 10 And locposB > -1 And Not (GlobposB < Globpos(0) And GlobposB >= Globpos(0) - 6) Then
+                                                            ElseIf GlobposB < Globpos(1) And GlobposB >= Globpos(1) - 6 And locpos(1) < PlCount * SpceCount And locposB > -1 And Not (GlobposB < Globpos(0) And GlobposB >= Globpos(0) - 6) Then
                                                                 'Falls momentanes Feld nicht in feindlichem Gebiet, aber zukünftiges, verschlechtere Score
                                                                 Scores(element) /= 1.5F
                                                             End If
@@ -400,7 +409,7 @@ Namespace Game.BetretenVerboten
                                                 Next
 
                                                 ' Destiny: landet der zug im Haus? 
-                                                If locpos(1) >= PlCount * 10 Then
+                                                If locpos(1) >= PlCount * SpceCount Then
                                                     Scores(element) *= 3.5F
                                                 End If
 
@@ -412,14 +421,14 @@ Namespace Game.BetretenVerboten
 
 
                                                 'Risk: nicht auf das Startfeld/den Eingangsbereich eines gegners stellen da eine neue figur erscheinen könnte.
-                                                If locpos(1) > 0 And (locpos(1) Mod 10) = 0 Then
+                                                If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 Then
                                                     Scores(element) /= 4
-                                                ElseIf locpos(1) > 6 And (locpos(1) Mod 10) < 7 And Not (locpos(0) Mod 10) < 7 Then
+                                                ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 Then
                                                     Scores(element) /= 2
                                                 End If
 
                                                 'Flee: führt der Zug die Figur aus einem Startbereich heraus
-                                                If locpos(0) > 6 And (locpos(0) Mod 10) < 7 And (locpos(1) Mod 10) > 6 Then
+                                                If locpos(0) > 6 And (locpos(0) Mod SpceCount) < 7 And (locpos(1) Mod SpceCount) > 6 Then
                                                     Scores(element) *= 1.3F
                                                 End If
                                             Next
@@ -457,9 +466,9 @@ Namespace Game.BetretenVerboten
 
                             Dim ichmagzüge As New List(Of Integer)
                             Dim defaultmov As Integer
-                            For i As Integer = 0 To 3
+                            For i As Integer = 0 To FigCount - 1
                                 defaultmov = pl.Spielfiguren(i)
-                                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 Then ichmagzüge.Add(i)
+                                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 Then ichmagzüge.Add(i)
                             Next
 
                             If ichmagzüge.Count = 1 Then
@@ -477,7 +486,7 @@ Namespace Game.BetretenVerboten
                                 FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
                             Else
                                 'Manuelle Auswahl für lokale Spieler
-                                For k As Integer = 0 To 3
+                                For k As Integer = 0 To FigCount - 1
                                     'Prüfe Figur nach Mouse-Klick
                                     If GetFigureRectangle(Map, SpielerIndex, k, Spielers, Center).Contains(mpos) And Spielers(SpielerIndex).Spielfiguren(k) > -1 And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                                         If Not ichmagzüge.Contains(k) Then
@@ -766,12 +775,12 @@ Namespace Game.BetretenVerboten
                 Dim playerB As Integer = i Mod PlCount
                 If Spielers(playerB).Typ = SpielerTyp.None Then Continue For
                 'Loope durch alle Spielfiguren eines jeden Spielers
-                For j As Integer = 0 To 3
+                For j As Integer = 0 To FigCount - 1
                     'Berechne globale Spielfeldposition der rauszuwerfenden Spielfigur
                     Dim fieldB As Integer = Spielers(playerB).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB >= 0 And fieldB < PlCount * 10 And fb = fa Then
+                    If fieldB >= 0 And fieldB < PlCount * SpceCount And fb = fa Then
                         Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
                         Spielers(playerA).Kicks += 1
                         Return j
@@ -806,12 +815,12 @@ Namespace Game.BetretenVerboten
                 Dim playerB As Integer = i Mod PlCount
                 If Spielers(playerB).Typ = SpielerTyp.None Then Continue For
                 'Loope durch alle Spielfiguren eines jeden Spielers
-                For j As Integer = 0 To 3
+                For j As Integer = 0 To FigCount - 1
                     'Berechne globale Spielfeldposition der rauszuwerfenden Spielfigur
                     Dim fieldB As Integer = Spielers(playerB).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB >= 0 And fieldB <= PlCount * 10 And fb = fa Then Return (i, j)
+                    If fieldB >= 0 And fieldB <= PlCount * SpceCount And fb = fa Then Return (i, j)
                 Next
             Next
             Return (-1, -1)
@@ -821,11 +830,11 @@ Namespace Game.BetretenVerboten
             SaucerFields.Remove(last)
             Status = SpielStatus.SaucerFlight
             Dim distance As Integer = RNG.Next(-6, 7)
-            Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or ((Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Mod 10) = 0 Or distance = 0
+            Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or ((Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Mod SpceCount) = 0 Or distance = 0
                 distance += 1
             Loop
 
-            Dim nr As Integer = Math.Min(Math.Max(distance + Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), 0), PlCount * 10 + 3)
+            Dim nr As Integer = Math.Min(Math.Max(distance + Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), 0), PlCount * SpceCount + FigCount - 1)
             If NetworkMode Then SendFlyingSaucerActive(last, nr)
             Renderer.TriggerSaucerAnimation(FigurFaderZiel, Sub()
                                                                 Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = nr
@@ -840,7 +849,7 @@ Namespace Game.BetretenVerboten
                                                                          Next
 
                                                                          'Trigger UFO, falls auf Feld gelandet
-                                                                         If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * 10 Then TriggerSaucer(nr) Else SwitchPlayer()
+                                                                         If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * SpceCount Then TriggerSaucer(nr) Else SwitchPlayer()
                                                                      End Sub)
         End Sub
 
@@ -857,8 +866,8 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To PlCount - 1
                 Dim pl As Player = Spielers(i)
                 Dim check As Boolean = True
-                For j As Integer = 0 To 3
-                    If pl.Spielfiguren(j) < PlCount * 10 Then check = False
+                For j As Integer = 0 To FigCount - 1
+                    If pl.Spielfiguren(j) < PlCount * SpceCount Then check = False
                 Next
                 If check Then Return i
             Next
@@ -871,10 +880,10 @@ Namespace Game.BetretenVerboten
             'Wähle alle möglichen Zügen aus
             Dim ichmagzüge As New List(Of Integer)
             Dim defaultmov As Integer
-            For i As Integer = 0 To 3
+            For i As Integer = 0 To FigCount - 1
                 defaultmov = pl.Spielfiguren(i)
                 'Prüfe ob Zug mit dieser Figur möglich ist(Nicht in homebase, nicht über Ziel hinaus und Zielfeld nicht mit eigener Figur belegt
-                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
+                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
             Next
 
             'Prüfe ob Zug möglich
@@ -890,10 +899,10 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function IsÜberholingInSeHaus(defaultmov As Integer) As Boolean
-            If defaultmov + Fahrzahl < PlCount * 10 Then Return False
+            If defaultmov + Fahrzahl < PlCount * SpceCount Then Return False
 
             For i As Integer = defaultmov + 1 To defaultmov + Fahrzahl
-                If IsFieldCovered(SpielerIndex, -1, i) And i >= PlCount * 10 Then Return True
+                If IsFieldCovered(SpielerIndex, -1, i) And i >= PlCount * SpceCount Then Return True
             Next
 
             Return False
@@ -906,12 +915,12 @@ Namespace Game.BetretenVerboten
             Dim fa As Integer = PlayerFieldToGlobalField(fieldA, player)
             For i As Integer = 0 To PlCount - 1
                 'Loope durch alle Spielfiguren eines jeden Spielers
-                For j As Integer = 0 To 3
+                For j As Integer = 0 To FigCount - 1
                     'Berechne globale Spielfeldposition der rauszuwerfenden Spielfigur
                     Dim fieldB As Integer = Spielers(i).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, i)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB > -1 And ((fieldA < PlCount * 10 AndAlso (player <> i Or figur <> j) And fb = fa) OrElse (fieldB < PlCount * 10 + 5 And player = i And figur <> j And fieldA = fieldB)) Then Return True
+                    If fieldB > -1 And ((fieldA < PlCount * SpceCount AndAlso (player <> i Or figur <> j) And fb = fa) OrElse (fieldB < PlCount * SpceCount + 5 And player = i And figur <> j And fieldA = fieldB)) Then Return True
                 Next
             Next
 
@@ -921,9 +930,9 @@ Namespace Game.BetretenVerboten
         Private Function GetFieldID(player As Integer, field As Integer) As (Integer, Integer)
             Dim fa As Integer = PlayerFieldToGlobalField(field, player)
             For j As Integer = 0 To PlCount - 1
-                For i As Integer = 0 To 3
+                For i As Integer = 0 To FigCount - 1
                     Dim fieldB As Integer = Spielers(j).Spielfiguren(i)
-                    If fieldB >= 0 And fieldB < PlCount * 10 And fa = PlayerFieldToGlobalField(fieldB, j) Then Return (j, i)
+                    If fieldB >= 0 And fieldB < PlCount * SpceCount And fa = PlayerFieldToGlobalField(fieldB, j) Then Return (j, i)
                 Next
             Next
             Return (-1, -1)
@@ -939,14 +948,14 @@ Namespace Game.BetretenVerboten
         'Prüft, ob man dreimal würfeln darf
         Private Function CanRollThrice(player As Integer) As Boolean
             Dim fieldlst As New List(Of Integer)
-            For i As Integer = 0 To 3
+            For i As Integer = 0 To FigCount - 1
                 Dim tm As Integer = Spielers(player).Spielfiguren(i)
-                If tm >= 0 And tm < PlCount * 10 Then Return False 'Falls sich Spieler auf dem Spielfeld befindet, ist dreimal würfeln unmöglich
-                If tm > PlCount * 10 - 1 Then fieldlst.Add(tm) 'Merke FIguren, die sich im Haus befinden
+                If tm >= 0 And tm < PlCount * SpceCount Then Return False 'Falls sich Spieler auf dem Spielfeld befindet, ist dreimal würfeln unmöglich
+                If tm > PlCount * SpceCount - 1 Then fieldlst.Add(tm) 'Merke FIguren, die sich im Haus befinden
             Next
 
             'Wenn nicht alle FIguren bis an den Anschlag gefahren wurden, darf man nicht dreifach würfeln
-            For i As Integer = PlCount * 10 + 3 To (PlCount * 10 + 4 - fieldlst.Count) Step -1
+            For i As Integer = PlCount * SpceCount + FigCount - 1 To (PlCount * SpceCount + 4 - fieldlst.Count) Step -1
                 If Not fieldlst.Contains(i) Then Return False
             Next
 
@@ -954,14 +963,14 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function IsFieldCoveredByOwnFigure(player As Integer, field As Integer) As Boolean
-            For i As Integer = 0 To 3
+            For i As Integer = 0 To FigCount - 1
                 If Spielers(player).Spielfiguren(i) = field Then Return True
             Next
             Return False
         End Function
 
         Private Function IsFutureFieldCoveredByOwnFigure(player As Integer, futurefield As Integer, fieldindx As Integer) As Boolean
-            For i As Integer = 0 To 3
+            For i As Integer = 0 To FigCount - 1
                 If Spielers(player).Spielfiguren(i) = futurefield And i <> fieldindx Then Return True
             Next
             Return False
@@ -969,7 +978,7 @@ Namespace Game.BetretenVerboten
 
         'Gibt den Index ein Spielfigur zurück, die sich noch in der Homebase befindet. Falls keine Figur mehr in der Homebase, gibt die Fnkt. -1 zurück.
         Private Function GetHomebaseIndex(player As Integer) As Integer
-            For i As Integer = 0 To 3
+            For i As Integer = 0 To FigCount - 1
                 If Spielers(player).Spielfiguren(i) = -1 Then Return i
             Next
             Return -1
@@ -977,7 +986,7 @@ Namespace Game.BetretenVerboten
 
         Private Function GetHomebaseCount(player As Integer) As Integer
             Dim count As Integer = 0
-            For i As Integer = 0 To 3
+            For i As Integer = 0 To FigCount - 1
                 If Spielers(player).Spielfiguren(i) = -1 Then count += 1
             Next
             Return count
@@ -991,7 +1000,7 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function PlayerFieldToGlobalField(field As Integer, player As Integer) As Integer
-            Return (field + player * 10) Mod (PlCount * 10)
+            Return (field + player * SpceCount) Mod (PlCount * SpceCount)
         End Function
 
         Private Function GetSecondDiceAfterSix(player As Integer) As Integer
@@ -1081,7 +1090,7 @@ Namespace Game.BetretenVerboten
                 Next
 
                 'Trigger UFO, falls auf Feld gelandet
-                If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * 10 Then TriggerSaucer(nr) Else SwitchPlayer()
+                If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * SpceCount Then TriggerSaucer(nr) Else SwitchPlayer()
 
                 MoveActive = False
             End If
@@ -1123,7 +1132,7 @@ Namespace Game.BetretenVerboten
             PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
             SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
             KickedByGod(pl, figur) 'Kick sacrifice
-            Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * 10.0F)
+            Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
             Dim pogfactor = progress * 0.5F + 0.3F 'Field 0: Chance of sth good: 30%;  Field max.: Chance of sth good: 80%
             Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
@@ -1137,7 +1146,7 @@ Namespace Game.BetretenVerboten
                                                  Dim fig = Nez.Random.Range(0, 4)
                                                  Dim boost = Nez.Random.Range(1, PlCount * 5)
                                                  Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
-                                                 If futurefield < PlCount * 10 AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                                 If futurefield < PlCount * SpceCount AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
                                                      PostChat("You're lucky! A random figure of yours is being boosted!", Color.White)
                                                      SendMessage("You're lucky! A random figure of yours is being boosted!")
                                                      plsdont = True
@@ -1172,7 +1181,7 @@ Namespace Game.BetretenVerboten
                                                    'Dim fig = Nez.Random.Range(0, 4)
                                                    '    Dim boost = Nez.Random.Range(1, PlCount * 5)
                                                    '    Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
-                                                   '    If futurefield < PlCount * 10 AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                                   '    If futurefield < PlCount * SpceCount AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
                                                    '        PostChat("Oh ooh! Another one of your piece died!", Color.White)
                                                    '        SendMessage("Oh ooh! A random figure of yours is being boosted!")
                                                    '        plsdont = True
@@ -1214,8 +1223,8 @@ Namespace Game.BetretenVerboten
         Private Sub SwitchPlayer()
             'Generate SaucerFields
             If RNG.Next(0, SaucerChance) = 5 Then
-                Dim nr As Integer = RNG.Next(0, PlCount * 10)
-                Do While ((nr Mod 10) = 0 Or SaucerFields.Contains(nr) Or IsFieldCovered(SpielerIndex, -1, nr)) And nr > 0
+                Dim nr As Integer = RNG.Next(0, PlCount * SpceCount)
+                Do While ((nr Mod SpceCount) = 0 Or SaucerFields.Contains(nr) Or IsFieldCovered(SpielerIndex, -1, nr)) And nr > 0
                     nr -= 1
                 Loop
                 If nr >= 0 Then

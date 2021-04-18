@@ -105,7 +105,6 @@ Namespace Game.BetretenVerboten
             If Internetz Then LocalClient.AutomaticRefresh = False
 
             Dim AktuellesSpiel As New GameRoom(Map)
-            AktuellesSpiel.PlCount = GetMapSize(Map)
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.NetworkMode = False
             AktuellesSpiel.Spielers(0) = New Player(NewGamePlayers(0), Difficulty.Smart) With {.Name = If(NewGamePlayers(0) = SpielerTyp.Local, My.Settings.Username, "CPU 1")}

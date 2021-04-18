@@ -2,9 +2,8 @@
 -Kick ppl from a round and from the server
 -(Implement backwards movement)
 -Implement custom sounds
--Change 6 player map into 2(or 3?) figures and shorten map (to 8 spaces)
+-
 -Sacrifice-BUtton 5 Züge Cooldown
 -Implement command to immediately place figure
 -Implement cheat code to place figures
--Make CPU more aggressive towards kicking
 -Fix rejoining

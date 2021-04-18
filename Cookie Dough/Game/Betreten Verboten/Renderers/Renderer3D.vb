@@ -29,6 +29,8 @@ Namespace Game.BetretenVerboten.Renderers
 
         Friend Shared playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, Color.Maroon, Color.Blue, Color.Gray}
         Private Game As IGameWindow
+        Private FigCount As Integer
+        Private SpceCount As Integer
         Private Feld As Rectangle
         Private Center As Vector2
         Private transmatrices As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)}
@@ -57,6 +59,8 @@ Namespace Game.BetretenVerboten.Renderers
             MapBuffer = New VertexBuffer(dev, GetType(VertexPositionColorTexture), vertices.Count, BufferUsage.WriteOnly)
             MapBuffer.SetData(vertices.ToArray)
 
+            FigCount = If(Game.Map = GaemMap.Default6Players, 2, 4)
+            SpceCount = If(Game.Map = GaemMap.Default6Players, 8, 10)
             Feld = New Rectangle(500, 70, 950, 950)
             Center = Feld.Center.ToVector2
 
@@ -106,18 +110,20 @@ Namespace Game.BetretenVerboten.Renderers
                     Dim loc As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, i, j)
                     Select Case i
                         Case PlayFieldPos.Haus1, PlayFieldPos.Haus2, PlayFieldPos.Haus3, PlayFieldPos.Haus4, PlayFieldPos.Home1, PlayFieldPos.Home2, PlayFieldPos.Home3, PlayFieldPos.Home4
+                            If FigCount = 2 AndAlso (i = PlayFieldPos.Haus4 Or i = PlayFieldPos.Haus3 Or i = PlayFieldPos.Home3 Or i = PlayFieldPos.Home4) Then Continue For 'Skip houses and homes 3 + 4 is 6 player map is selected
                             batchlor.DrawCircle(loc, sizes.Item2, playcolor(j), 2, 25)
                         Case PlayFieldPos.Feld1
                             batchlor.DrawCircle(loc, sizes.Item1, playcolor(j), 3, 30)
                             DrawArrow(loc, playcolor(j), j)
                         Case Else
+                            If i - 4 >= SpceCount Then Continue For
                             batchlor.DrawCircle(loc, sizes.Item1, Color.White, 3, 30)
                     End Select
                 Next
             Next
 
             'Zeichne Verbindungen
-            batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
+            'batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
             batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             'Zeichne UFO-Felder
@@ -152,7 +158,7 @@ Namespace Game.BetretenVerboten.Renderers
                 Dim pl As Player = Game.Spielers(j)
                 If pl.Typ = SpielerTyp.None Then Continue For
                 Dim color As Color = playcolor(j) * If((Game.Status = SpielStatus.WähleFigur Or Game.Status = SpielStatus.WähleOpfer) And j = Game.SpielerIndex And (pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.Online), Game.SelectFader, 1.0F)
-                For k As Integer = 0 To 3
+                For k As Integer = 0 To FigCount - 1
                     Dim scale As Single = If(Game.FigurFaderScales.ContainsKey((j, k)), Game.FigurFaderScales((j, k)).Value, 1)
 
                     If SaucerPickedUp And SaucerTarget.Item1 = j And SaucerTarget.Item2 = k Then 'UFO hat Spielfigur aufgenommen
