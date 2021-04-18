@@ -169,12 +169,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\repos\Nez\Nez\Nez.Portable\Nez.csproj">
-      <Project>{2fe5159d-83cf-4d22-a26d-d725c5f257d5}</Project>
+    <ProjectReference Include="..\Nez\Nez.Portable\Nez.csproj">
+      <Project>{d62d916d-0c23-45e6-8abc-3769a71d49a9}</Project>
       <Name>Nez</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Import Include="Cookie_Dough" />
     <Import Include="Cookie_Dough.Cookie_Dough.Program" />
