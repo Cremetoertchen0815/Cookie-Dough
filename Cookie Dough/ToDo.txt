@@ -1,4 +1,4 @@
 ﻿BV:
 -(Implement backwards movement)
--Implement command to immediately place figure
 -Implement cheat code to place figures
+-Fix score syncing

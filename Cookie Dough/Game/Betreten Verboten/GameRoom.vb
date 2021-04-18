@@ -74,6 +74,7 @@ Namespace Game.BetretenVerboten
         Private ButtonStack As New List(Of Keys)
         Private oldpress As New List(Of Keys)
         Private Shared kickuser As String = ""
+        Private Shared ExecSync As Boolean = False
 
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
@@ -206,6 +207,12 @@ Namespace Game.BetretenVerboten
                 Next
                 If everythere Then StopUpdating = False : SendGameActive()
                 kickuser = ""
+            End If
+
+            'Sync command
+            If ExecSync Then
+                ExecSync = False
+                SendSync()
             End If
 
 
@@ -1387,6 +1394,11 @@ Namespace Game.BetretenVerboten
         <Command("network-eject", "Removes a specific user from the game.")>
         Public Shared Sub EjectUser(nick As String)
             kickuser = nick
+        End Sub
+
+        <Command("network-sync", "Removes a specific user from the game.")>
+        Public Shared Sub EjectUser()
+            ExecSync = True
         End Sub
 #End Region
 
