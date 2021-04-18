@@ -251,7 +251,7 @@ Namespace Framework.Networking
             WriteString("Damit keine ReadLine-Commands offen bleiben.")
         End Sub
 
-        <Command("network-log", "Enables the logging of any network traffic to the ")>
+        <Command("network-log", "Enables the logging of any network traffic to the in-game chat")>
         Public Shared Sub SetNetworkLog(Optional enable As Boolean = Nothing)
             Select Case enable
                 Case Nothing

@@ -127,6 +127,7 @@ Namespace Game.BetretenVerboten
             LocalClient.IsHost = False
             Chat = New List(Of (String, Color))
             MoveActive = False
+            Spielers(UserIndex).CustomSound = GetLocalAudio(My.Settings.Sound)
 
             Select Case Map
                 Case GaemMap.Default4Players
@@ -221,7 +222,7 @@ Namespace Game.BetretenVerboten
             If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < FigurFaderEnd Then
                 'Play sound
                 If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = 0 Then
-                    'Spielers(FigurFaderZiel.Item1).CustomSound.Play()
+                    Spielers(FigurFaderZiel.Item1).CustomSound.Play()
                 Else
                     SFX(3).Play()
                 End If
@@ -475,6 +476,11 @@ Namespace Game.BetretenVerboten
                     Case "c"c 'Sent chat message
                         Dim source As Integer = CInt(element(1).ToString)
                         PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), Renderer3D.playcolor(source))
+                    Case "d"c
+                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim figure As Integer = CInt(element(2).ToString)
+                        Dim aim As Integer = CInt(element.Substring(3))
+                        Spielers(source).Spielfiguren(figure) = aim
                     Case "e"c 'Suspend gaem
                         Dim who As Integer = CInt(element(1).ToString)
                         StopUpdating = True
@@ -532,7 +538,6 @@ Namespace Game.BetretenVerboten
                         If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
                         SendSoundFile()
-                        StopUpdating = False
                     Case "s"c 'Create transition
                         Dim playr As Integer = CInt(element(1).ToString)
                         Dim figur As Integer = CInt(element(2).ToString)
@@ -571,6 +576,8 @@ Namespace Game.BetretenVerboten
                         FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
                         Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1000, Nothing)
                         Automator.Add(Renderer.AdditionalZPos)
+                    Case "x"c 'Continue with game
+                        StopUpdating = False
                     Case "y"c 'Synchronisiere Daten
                         Dim str As String = element.Substring(1)
                         Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
@@ -588,6 +595,7 @@ Namespace Game.BetretenVerboten
                         Dim source As Integer = CInt(element(1).ToString)
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
                         Dim dat As String = element.Substring(3)
+                        If source = UserIndex Then Continue For
 
                         If IdentSound = IdentType.Custom Then
                             File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Convert.FromBase64String(dat))
@@ -817,6 +825,13 @@ Namespace Game.BetretenVerboten
                 Next
             Next
             Return (-1, -1)
+        End Function
+        Private Function GetLocalAudio(ident As IdentType) As SoundEffect
+            If ident <> IdentType.Custom Then
+                Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
+            Else
+                Return SoundEffect.FromFile("Cache\client\sound.audio")
+            End If
         End Function
 
         'Prüft, ob man dreimal würfeln darf

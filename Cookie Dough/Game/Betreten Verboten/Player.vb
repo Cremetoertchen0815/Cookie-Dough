@@ -24,6 +24,7 @@ Namespace Game.BetretenVerboten
         ''' Positionen der vier Spielfiguren.<br></br>
         ''' Positionen der Spielfiguren relativ zur Homebase angegeben(-1 = Homebase, 0 = Start-Feld, 1 = erstes Feld nach Start-Feld, ..., 39 = letztes Feld vor Start-Feld, 40 = erstes Feld im Haus, ..., 43 = letztes Feld in Haus)!
         ''' </summary>
+        <Newtonsoft.Json.JsonIgnore>
         Public Shared DefaultArray As Integer() = {-1, -1, -1, -1}
         Public Property Spielfiguren As Integer() = CType(DefaultArray.Clone, Integer())
 
@@ -56,11 +57,13 @@ Namespace Game.BetretenVerboten
         ''' <summary>
         ''' Der Sound, der abgespielt wird, wenn man gekickt wird
         ''' </summary>
+        <Newtonsoft.Json.JsonIgnore>
         Public Property CustomSound As SoundEffect Implements IPlayer.CustomSound
 
         ''' <summary>
         ''' Das Thumbnail des Spielers
         ''' </summary>
+        <Newtonsoft.Json.JsonIgnore>
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
 
         Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)

@@ -4,6 +4,7 @@ Imports System.Net
 Imports System.Net.Sockets
 Imports System.Text
 Imports System.Threading
+Imports Nez.Console
 
 Namespace Framework.Networking
     Module Server
@@ -50,6 +51,7 @@ Namespace Framework.Networking
                         c.Stream = client.GetStream
                         c.StreamR = New StreamReader(c.Stream)
                         c.StreamW = New StreamWriter(c.Stream) With {.AutoFlush = True}
+                        c.Client = client
                         list.Add(c) ' und fügen sie der liste der clients hinzu.
                         ' falls alle anderen das auch lesen sollen können, an alle clients weiterleiten. siehe SendToAllClients
                         Dim t As New Thread(AddressOf ListenToConnection)
@@ -239,6 +241,9 @@ Namespace Framework.Networking
                             'If host sends that the game shall begin, unlist round
                             If games.ContainsKey(gaem.Key) Then games.Remove(gaem.Key)
                             gaem.Active = True
+                            For i As Integer = 1 To gaem.Players.Length - 1
+                                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, nl)
+                            Next
                         Case "l"c, "I"c
                             'If host left, end game for everyone
                             SendToAllGameClients(gaem)
@@ -287,5 +292,12 @@ Namespace Framework.Networking
             Next
             Return False
         End Function
+
+        <Command("network-kick", "Kicks a specific user from the server.")>
+        Public Sub KickUser(nick As String)
+            For Each element In list
+                If element.Nick = nick Then element.Client.Close()
+            Next
+        End Sub
     End Module
 End Namespace

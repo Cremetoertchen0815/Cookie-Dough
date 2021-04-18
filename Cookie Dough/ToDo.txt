@@ -1,9 +1,5 @@
 ﻿BV:
--Kick ppl from a round and from the server
 -(Implement backwards movement)
--Implement custom sounds
--
 -Sacrifice-BUtton 5 Züge Cooldown
 -Implement command to immediately place figure
 -Implement cheat code to place figures
--Fix rejoining

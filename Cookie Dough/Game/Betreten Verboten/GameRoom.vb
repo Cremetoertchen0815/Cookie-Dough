@@ -7,6 +7,7 @@ Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
+Imports Nez.Console
 Imports Nez.Tweens
 
 Namespace Game.BetretenVerboten
@@ -69,10 +70,11 @@ Namespace Game.BetretenVerboten
         Private HUDColor As Color
         Private Chat As List(Of (String, Color))
 
-        'Keystack
+        'Keystack & other debug shit
         Private keysa As New List(Of Keys)
         Private ButtonStack As New List(Of Keys)
         Private oldpress As New List(Of Keys)
+        Private Shared kickuser As String = ""
 
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
@@ -120,7 +122,7 @@ Namespace Game.BetretenVerboten
                     SpceCount = 10
                 Case GaemMap.Default6Players
                     Timer = New TimeSpan(0, 2, 22, 22, 22)
-                    Player.DefaultArray = {46, 47}
+                    Player.DefaultArray = {-1, -1}
                     FigCount = 2
                     PlCount = 6
                     SpceCount = 8
@@ -181,6 +183,32 @@ Namespace Game.BetretenVerboten
             Dim mstate As MouseState = Mouse.GetState()
             Dim kstate As KeyboardState = Keyboard.GetState()
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
+
+            'Eject player from game
+            If kickuser <> "" Then
+                Dim everythere As Boolean = StopUpdating
+                For i As Integer = 0 To Spielers.Length - 1
+                    Dim pl = Spielers(i)
+                    If pl.Name = kickuser Then
+                        pl.Typ = SpielerTyp.None
+                        For j As Integer = 0 To pl.Spielfiguren.Length - 1
+                            SendSetFigurePosition(i, j, -1)
+                            pl.Spielfiguren(j) = -1
+                        Next
+                        ' "Bring player back to the game" if left
+                        If Not pl.Bereit Then
+                            pl.Bereit = True
+                            SendPlayerBack(i)
+                        End If
+                        If SpielerIndex = i Then SwitchPlayer()
+                    ElseIf pl.Bereit = False Then
+                        everythere = False
+                    End If
+                Next
+                If everythere Then StopUpdating = False : SendGameActive()
+                kickuser = ""
+            End If
+
 
             If Not StopUpdating Then
 
@@ -596,6 +624,7 @@ Namespace Game.BetretenVerboten
                         PostChat("[" & Spielers(source).Name & "]: " & text, Renderer3D.playcolor(source))
                         SendChatMessage(source, text)
                     Case "e"c 'Suspend gaem
+                        If Spielers(source).Typ = SpielerTyp.None Then Continue For
                         If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
                         PostChat(Spielers(source).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
@@ -613,6 +642,12 @@ Namespace Game.BetretenVerboten
                         SendPlayerBack(source)
                         StopUpdating = False
                         If SpielerIndex = source Then SendNewPlayerActive(SpielerIndex)
+                        'Check if players are still missing, if not, send the signal to continue the game
+                        Dim everythere As Boolean = True
+                        For Each pl In Spielers
+                            If Not pl.Bereit Then everythere = False
+                        Next
+                        If everythere Then StopUpdating = False : SendGameActive()
                     Case "s"c 'Move figure
                         Dim figur As Integer = CInt(element(2).ToString)
                         Dim destination As Integer = CInt(element.Substring(3).ToString)
@@ -648,6 +683,9 @@ Namespace Game.BetretenVerboten
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
         End Sub
+        Private Sub SendSetFigurePosition(pl As Integer, fig As Integer, pos As Integer)
+            SendNetworkMessageToAll("d" & pl.ToString & fig.ToString & pos.ToString)
+        End Sub
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
         End Sub
@@ -680,6 +718,9 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendWinFlag()
             SendNetworkMessageToAll("w")
+        End Sub
+        Private Sub SendGameActive()
+            SendNetworkMessageToAll("x")
         End Sub
 
         Private Sub SendSync()
@@ -1052,7 +1093,7 @@ Namespace Game.BetretenVerboten
             If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < FigurFaderEnd Then
                 'Play sound
                 If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = 0 Then
-                    'Spielers(FigurFaderZiel.Item1).CustomSound.Play()
+                    Spielers(FigurFaderZiel.Item1).CustomSound.Play()
                 Else
                     SFX(3).Play()
                 End If
@@ -1329,6 +1370,11 @@ Namespace Game.BetretenVerboten
             Else
                 SFX(0).Play()
             End If
+        End Sub
+
+        <Command("network-eject", "Removes a specific user from the game.")>
+        Public Shared Sub EjectUser(nick As String)
+            kickuser = nick
         End Sub
 #End Region
 
