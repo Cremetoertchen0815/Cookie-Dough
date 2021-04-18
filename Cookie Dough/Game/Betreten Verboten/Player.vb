@@ -55,6 +55,11 @@ Namespace Game.BetretenVerboten
         Public Property Angered As Boolean = False
 
         ''' <summary>
+        ''' Gibt an, wie viele Züge der Spieler warten muss, bis er seinen Sacrifice-Button wieder nuitzen darf
+        ''' </summary>
+        Public Property SacrificeCounter As Integer = 0
+
+        ''' <summary>
         ''' Der Sound, der abgespielt wird, wenn man gekickt wird
         ''' </summary>
         <Newtonsoft.Json.JsonIgnore>

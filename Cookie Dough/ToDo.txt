@@ -1,5 +1,4 @@
 ﻿BV:
 -(Implement backwards movement)
--Sacrifice-BUtton 5 Züge Cooldown
 -Implement command to immediately place figure
 -Implement cheat code to place figures

@@ -100,6 +100,7 @@ Namespace Game.BetretenVerboten
         Private Const CPUThinkingTime As Integer = 600
         Private Const DopsHöhe As Integer = 150
         Private Const CamSpeed As Integer = 1300
+        Private Const SacrificeWait As Integer = 5
 
         Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
@@ -515,6 +516,8 @@ Namespace Game.BetretenVerboten
                     Case "n"c 'Next player
                         Dim who As Integer = CInt(element(1).ToString)
                         SpielerIndex = who
+                        HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
+                        HUDBtnD.Active = SpielerIndex = UserIndex
                         If who = UserIndex Then
                             PrepareMove()
                         Else
@@ -925,6 +928,8 @@ Namespace Game.BetretenVerboten
             ShowDice = True
             StopUpdating = False
             HUDInstructions.Text = "Roll the Dice!"
+            HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
+            If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter
             DreifachWürfeln = CanRollThrice(SpielerIndex) 'Falls noch alle Figuren un der Homebase sind
             WürfelTimer = 0
             WürfelAktuelleZahl = 0
@@ -963,6 +968,8 @@ Namespace Game.BetretenVerboten
             If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                 SFX(2).Play()
                 SendGameClosed()
+                Spielers(UserIndex).SacrificeCounter = SacrificeWait
+                HUDBtnD.Text = "(" & SacrificeWait & ")"
                 LocalClient.blastmode = False
                 NetworkMode = False
                 Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
@@ -970,7 +977,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub AngerButton() Handles HUDBtnC.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating Then
+            If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then

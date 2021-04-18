@@ -20,10 +20,10 @@ Namespace Game.BetretenVerboten
 
         'Spiele-Flags und Variables
         Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
-        Friend PlCount As Integer
-        Friend FigCount As Integer
-        Friend SpceCount As Integer
-        Friend NetworkMode As Boolean = False
+        Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
+        Friend FigCount As Integer 'Gibt an wieviele Figuren jeder Spieler hat
+        Friend SpceCount As Integer 'Gibt an wieviele Felder jeder Spieler besitzt
+        Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
@@ -38,12 +38,11 @@ Namespace Game.BetretenVerboten
         Private DreifachWürfeln As Boolean 'Gibt an(am Anfang des Spiels), dass ma drei Versuche hat um eine 6 zu bekommen
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
-        Private MoveActive As Boolean = False
-        Private RNG As System.Random 'Zufallsgenerator
+        Private MoveActive As Boolean = False 'Gibt an, ob eine Figuranimation in Gange ist
         Private SaucerFields As New List(Of Integer)
-        Private Timer As TimeSpan
-        Private LastTimer As TimeSpan
-        Private TimeOver As Boolean = False
+        Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
+        Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
+        Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
 
         'Assets
         Private SpielfeldVerbindungen As Texture2D
@@ -99,6 +98,7 @@ Namespace Game.BetretenVerboten
         Private Const DopsHöhe As Integer = 150
         Private Const CamSpeed As Integer = 1300
         Private Const SaucerChance As Integer = 25
+        Private Const SacrificeWait As Integer = 1
         Sub New(Map As GaemMap)
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
@@ -137,7 +137,6 @@ Namespace Game.BetretenVerboten
             'Lade Assets
             ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
             ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
-            RNG = New System.Random()
 
             'Lade HUD
             HUD = New GuiSystem
@@ -397,7 +396,7 @@ Namespace Game.BetretenVerboten
                                         Case Difficulty.Brainless
 
                                             'Berechne zufällig das zu fahrende Feld
-                                            k = ichmagzüge(RNG.Next(0, ichmagzüge.Count))
+                                            k = ichmagzüge(Nez.Random.Range(0, ichmagzüge.Count))
 
                                         Case Difficulty.Smart
 
@@ -870,7 +869,7 @@ Namespace Game.BetretenVerboten
         Private Sub TriggerSaucer(last As Integer)
             SaucerFields.Remove(last)
             Status = SpielStatus.SaucerFlight
-            Dim distance As Integer = RNG.Next(-6, 7)
+            Dim distance As Integer = Nez.Random.Range(-6, 7)
             Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or ((Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Mod SpceCount) = 0 Or distance = 0
                 distance += 1
             Loop
@@ -1198,8 +1197,15 @@ Namespace Game.BetretenVerboten
                                                  End If
                                              Case 1
                                                  'Kick random enemy figure
-                                                 Dim pla = Nez.Random.Range(0, 4)
-                                                 Dim fig = Nez.Random.Range(0, 4)
+                                                 Dim pla = Nez.Random.Range(0, PlCount - 1)
+                                                 Dim fig = Nez.Random.Range(0, FigCount - 1)
+                                                 Dim count = 0
+                                                 Do While Spielers(pla).Spielfiguren(fig) < 0
+                                                     pla = Nez.Random.Range(0, PlCount - 1)
+                                                     fig = Nez.Random.Range(0, FigCount - 1)
+                                                     count += 1
+                                                     If count > 10 Then Exit Do
+                                                 Loop
                                                  If pla <> pl Then
                                                      PostChat("You're lucky! A random enemy figure got kicked!", Color.White)
                                                      SendMessage("You're lucky! A random enemy figure got kicked!")
@@ -1263,8 +1269,8 @@ Namespace Game.BetretenVerboten
 
         Private Sub SwitchPlayer()
             'Generate SaucerFields
-            If RNG.Next(0, SaucerChance) = 5 Then
-                Dim nr As Integer = RNG.Next(0, PlCount * SpceCount)
+            If Nez.Random.Range(0, SaucerChance) = 5 Then
+                Dim nr As Integer = Nez.Random.Range(0, PlCount * SpceCount)
                 Do While ((nr Mod SpceCount) = 0 Or SaucerFields.Contains(nr) Or IsFieldCovered(SpielerIndex, -1, nr)) And nr > 0
                     nr -= 1
                 Loop
@@ -1279,10 +1285,14 @@ Namespace Game.BetretenVerboten
             Do While Spielers(SpielerIndex).Typ = SpielerTyp.None
                 SpielerIndex = (SpielerIndex + 1) Mod PlCount
             Loop
-            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered
+            'Setze HUD flags
+            If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter
             If Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then Status = SpielStatus.Würfel Else Status = SpielStatus.Waitn
             SendNewPlayerActive(SpielerIndex)
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
+            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
+            HUDBtnD.Active = SpielerIndex = UserIndex
+            HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             ShowDice = True
             StopUpdating = False
             HUDInstructions.Text = "Roll the Dice!"
@@ -1356,11 +1366,13 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub SacrificeButton() Handles HUDBtnD.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating Then
+            If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
                 If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                     Status = SpielStatus.WähleOpfer
+                    Spielers(UserIndex).SacrificeCounter = SacrificeWait
+                    HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
                 Else
