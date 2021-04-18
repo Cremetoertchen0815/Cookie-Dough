@@ -3,6 +3,7 @@ Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.BetretenVerboten.Renderers
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
@@ -36,7 +37,7 @@ Namespace Game.BetretenVerboten
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
         Private MoveActive As Boolean = False
         Private RNG As System.Random 'Zufallsgenerator
-        Private SaucerFields As New List(Of Integer) From {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+        Private SaucerFields As New List(Of Integer)
         Private Timer As TimeSpan
         Private LastTimer As TimeSpan
         Private TimeOver As Boolean = False
@@ -117,6 +118,7 @@ Namespace Game.BetretenVerboten
                     Timer = New TimeSpan(0, 2, 22, 22, 22)
             End Select
             LastTimer = Timer
+
         End Sub
 
         Public Sub LoadContent()
@@ -152,6 +154,11 @@ Namespace Game.BetretenVerboten
             Center = New Rectangle(500, 70, 950, 950).Center.ToVector2
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(Tweens.LoopType.PingPong, -1).Start()
 
+            Dim sf As SoundEffect = GetLocalAudio(My.Settings.Sound)
+            For i As Integer = 0 To Spielers.Length - 1
+                Dim pl = Spielers(i)
+                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
+            Next
         End Sub
 
         Public Overrides Sub Unload()
@@ -606,6 +613,17 @@ Namespace Game.BetretenVerboten
                         Status = SpielStatus.FahreFelder
                         FigurFaderZiel = (source, figur)
                         StartMoverSub(destination)
+                    Case "z"c
+                        Dim IdentSound As IdentType = CInt(element(2).ToString)
+                        Dim dat As String = element.Substring(3)
+
+                        If IdentSound = IdentType.Custom Then
+                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Convert.FromBase64String(dat))
+                            Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
+                        Else
+                            Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                        End If
+                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dat)
                 End Select
             Next
         End Sub
@@ -616,6 +634,7 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendBeginGaem()
             SendNetworkMessageToAll("b")
+            SendSoundFile()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
@@ -644,6 +663,7 @@ Namespace Game.BetretenVerboten
         Private Sub SendPlayerBack(index As Integer)
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))
             SendNetworkMessageToAll("r" & index.ToString & str)
+            SendSoundFile()
         End Sub
 
         Private Sub SendFigureTransition(who As Integer, figur As Integer, destination As Integer)
@@ -656,6 +676,16 @@ Namespace Game.BetretenVerboten
         Private Sub SendSync()
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))
             SendNetworkMessageToAll("y" & str)
+        End Sub
+        Private Sub SendSoundFile()
+            For i As Integer = 0 To Spielers.Length - 1
+                Dim pl = Spielers(i)
+                If pl.Typ = SpielerTyp.Local Then
+                    Dim txt As String = ""
+                    If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(IO.File.ReadAllBytes("Cache\client\sound.audio"))
+                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & txt)
+                End If
+            Next
         End Sub
 
         Private Sub SendNetworkMessageToAll(message As String)
@@ -898,6 +928,13 @@ Namespace Game.BetretenVerboten
             Next
             Return (-1, -1)
         End Function
+        Private Function GetLocalAudio(ident As IdentType) As SoundEffect
+            If ident <> IdentType.Custom Then
+                Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
+            Else
+                Return SoundEffect.FromFile("Cache\client\sound.audio")
+            End If
+        End Function
 
         'Prüft, ob man dreimal würfeln darf
         Private Function CanRollThrice(player As Integer) As Boolean
@@ -1004,7 +1041,12 @@ Namespace Game.BetretenVerboten
             Dim FigurFaderVectors = (GetSpielfeldVector(FigurFaderZiel.Item1, FigurFaderZiel.Item2, 0), GetSpielfeldVector(FigurFaderZiel.Item1, FigurFaderZiel.Item2, 1))
 
             If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < FigurFaderEnd Then
-                SFX(3).Play()
+                'Play sound
+                If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = 0 Then
+                    'Spielers(FigurFaderZiel.Item1).CustomSound.Play()
+                Else
+                    SFX(3).Play()
+                End If
                 If IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1) Then
                     Dim key As (Integer, Integer) = GetFieldID(FigurFaderZiel.Item1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1)
                     If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1 Then

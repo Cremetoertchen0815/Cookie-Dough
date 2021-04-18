@@ -1,10 +1,12 @@
 ﻿Imports System.Collections.Generic
+Imports System.IO
 Imports System.Linq
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.BetretenVerboten.Networking
 Imports Cookie_Dough.Game.BetretenVerboten.Renderers
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
@@ -180,6 +182,7 @@ Namespace Game.BetretenVerboten
                 If (Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1) Or (Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1 = 0) Then
                     Dim kickID As Integer = CheckKick(1)
                     Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
+                                                                                                                                  SFX(4).Play()
                                                                                                                                   If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1
                                                                                                                                   If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
                                                                                                                                   Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
@@ -202,7 +205,12 @@ Namespace Game.BetretenVerboten
             Dim FigurFaderVectors = (GetSpielfeldVector(FigurFaderZiel.Item1, FigurFaderZiel.Item2), GetSpielfeldVector(FigurFaderZiel.Item1, FigurFaderZiel.Item2, 1))
 
             If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < FigurFaderEnd Then
-                SFX(3).Play()
+                'Play sound
+                If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = 0 Then
+                    'Spielers(FigurFaderZiel.Item1).CustomSound.Play()
+                Else
+                    SFX(3).Play()
+                End If
                 If IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1) Then
                     Dim key As (Integer, Integer) = GetFieldID(FigurFaderZiel.Item1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1)
                     If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1 Then
@@ -344,11 +352,11 @@ Namespace Game.BetretenVerboten
                         Dim pl As Player = Spielers(SpielerIndex)
 
                         Dim ichmagzüge As New List(Of Integer)
-                            Dim defaultmov As Integer
-                            For i As Integer = 0 To 3
-                                defaultmov = pl.Spielfiguren(i)
-                                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 Then ichmagzüge.Add(i)
-                            Next
+                        Dim defaultmov As Integer
+                        For i As Integer = 0 To 3
+                            defaultmov = pl.Spielfiguren(i)
+                            If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * 10 + 3 Then ichmagzüge.Add(i)
+                        Next
 
                         If ichmagzüge.Count = 1 Then
                             StopUpdating = True
@@ -446,6 +454,7 @@ Namespace Game.BetretenVerboten
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
+                        SendSoundFile()
                         StopUpdating = False
                         Status = SpielStatus.Waitn
                         PostChat("The game has started!", Color.White)
@@ -508,6 +517,7 @@ Namespace Game.BetretenVerboten
                         Next
                         If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
+                        SendSoundFile()
                         StopUpdating = False
                     Case "s"c 'Create transition
                         Dim playr As Integer = CInt(element(1).ToString)
@@ -560,6 +570,17 @@ Namespace Game.BetretenVerboten
                         Next
                         If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
+                    Case "z"c
+                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim IdentSound As IdentType = CInt(element(2).ToString)
+                        Dim dat As String = element.Substring(3)
+
+                        If IdentSound = IdentType.Custom Then
+                            File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Convert.FromBase64String(dat))
+                            Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
+                        Else
+                            Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                        End If
                 End Select
             Next
         End Sub
@@ -585,6 +606,11 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendAngered()
             LocalClient.WriteStream("p")
+        End Sub
+        Private Sub SendSoundFile()
+            Dim txt As String = ""
+            If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(IO.File.ReadAllBytes("Cache\client\sound.audio"))
+            LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & txt)
         End Sub
 
         Private Sub SubmitResults(figur As Integer, destination As Integer)

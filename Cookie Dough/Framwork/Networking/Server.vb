@@ -89,22 +89,6 @@ Namespace Framework.Networking
                 If AlreadyContainsNickname(tmpusr) Then WriteString(con, "Sorry m8! Username already taken") : Exit Try
                 If Not FilenameIsOK(tmpusr) Then WriteString(con, "Sorry m8! Invalid username") : Exit Try
                 con.Nick = tmpusr
-                WriteString(con, "Okeydokey!")
-                'Grab thumbnail
-                WriteString(con, "What's your thumbnail?")
-                con.IdentThumbnail = CType(ReadString(con), IdentType)
-                If con.IdentThumbnail = IdentType.Custom Then
-                    Dim data = ReadString(con)
-                    File.WriteAllBytes("Cache\server\" & con.Nick & ".png", Convert.FromBase64String(data))
-                End If
-                'Grab ident sound
-                WriteString(con, "What's your sound?")
-                con.IdentSound = CType(ReadString(con), IdentType)
-                If con.IdentSound = IdentType.Custom Then
-                    Dim len = CInt(ReadString(con))
-                    Dim data = ReadString(con)
-                    File.WriteAllBytes("Cache\server\" & con.Nick & ".wav", Convert.FromBase64String(data))
-                End If
                 WriteString(con, "Alrighty!")
 
                 Do

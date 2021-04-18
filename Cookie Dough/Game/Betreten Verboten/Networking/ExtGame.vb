@@ -1,6 +1,4 @@
-﻿Imports System.Collections
-Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
+﻿Imports Cookie_Dough.Framework.Networking
 
 Namespace Game.BetretenVerboten.Networking
     Public Class ExtGame

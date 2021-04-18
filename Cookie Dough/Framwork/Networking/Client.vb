@@ -3,6 +3,7 @@ Imports System.IO
 Imports System.Net.Sockets
 Imports System.Text
 Imports System.Threading
+Imports Microsoft.Xna.Framework.Audio
 Imports Nez.Console
 
 Namespace Framework.Networking
@@ -63,13 +64,6 @@ Namespace Framework.Networking
                         Microsoft.VisualBasic.MsgBox("Username invalid! Please change username!")
                         Exit Sub
                 End Select
-                If Not ReadString() = "What's your thumbnail?" Then Throw New NotImplementedException()
-                WriteString(My.Settings.Thumbnail.ToString)
-                If CType(My.Settings.Thumbnail, IdentType) = IdentType.Custom Then WriteData("Cache\client\pp.png")
-                If Not ReadString() = "What's your sound?" Then Throw New NotImplementedException()
-                WriteString(My.Settings.Sound.ToString)
-                If CType(My.Settings.Sound, IdentType) = IdentType.Custom Then WriteData("Cache\client\sound.audio")
-                If Not ReadString() = "Alrighty!" Then Throw New NotImplementedException()
                 Connected = True
                 blastmode = False
                 Me.Hostname = hostname
@@ -143,10 +137,30 @@ Namespace Framework.Networking
             If Connected Then WriteString(msg)
         End Sub
 
-        Friend Sub WriteData(path As String)
-            Dim data As Byte() = File.ReadAllBytes(path)
-            streamw.WriteLine(Convert.ToBase64String(data))
-        End Sub
+        'Friend Sub WriteSound(ident As IdentType)
+        '    WriteString(CInt(ident).ToString)
+        '    If ident = IdentType.Custom Then
+        '        Dim data As Byte() = File.ReadAllBytes("Cache\client\sound.audio")
+        '        streamw.WriteLine(Convert.ToBase64String(data))
+        '    End If
+        'End Sub
+        'Friend Sub WriteSoundRaw(ident As IdentType, data As String)
+        '    WriteString(CInt(ident).ToString)
+        '    If ident = IdentType.Custom Then
+        '        streamw.WriteLine(data)
+        '    End If
+        'End Sub
+
+        'Friend Function ReadSound(nick As String, ByRef IdentSound As IdentType, ByRef data As String) As SoundEffect
+        '    IdentSound = CType(ReadString(), IdentType)
+        '    If IdentSound = IdentType.Custom Then
+        '        data = streamr.ReadLine
+        '        File.WriteAllBytes("Cache\server\" & nick & ".wav", Convert.FromBase64String(data))
+        '        Return SoundEffect.FromFile("Cache\server\" & nick & ".wav")
+        '    Else
+        '        Return SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+        '    End If
+        'End Function
 
         Public Function GetGamesList() As OnlineGameInstance()
             'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt

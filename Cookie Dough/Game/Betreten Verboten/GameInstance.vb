@@ -94,7 +94,7 @@ Namespace Game.BetretenVerboten
             MyBase.Update()
         End Sub
 
-        Dim farben As String() = {"Magenta", "Green", "Cyan", "Yellow", "Red", "Blue"}
+        Dim farben As String() = {"Magenta", "Lime", "Cyan", "Yellow", "Red", "Blue"}
         Private Sub StartNewRound(servername As String)
             If Not MenuAktiviert Then Return
 
