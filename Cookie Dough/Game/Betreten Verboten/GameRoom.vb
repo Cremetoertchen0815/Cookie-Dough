@@ -401,13 +401,13 @@ Namespace Game.BetretenVerboten
 
                                                 ' Destiny: landet der zug im Haus? 
                                                 If locpos(1) >= PlCount * 10 Then
-                                                    Scores(element) *= 2.8F
+                                                    Scores(element) *= 3.5F
                                                 End If
 
                                                 ' Attackopportunity: kann der zug einen Feindlichen spieler eleminieren? 
                                                 Dim Ergebnis As (Integer, Integer) = GetKickFigur(SpielerIndex, element, Fahrzahl)
                                                 If Ergebnis.Item1 <> -1 And Ergebnis.Item2 <> -1 Then
-                                                    Scores(element) *= 1.8F
+                                                    Scores(element) *= 2.2F
                                                 End If
 
 
