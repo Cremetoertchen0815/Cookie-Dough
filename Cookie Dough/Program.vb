@@ -11,6 +11,7 @@ Namespace Cookie_Dough
     ' </summary>
     Public Module Program
         'Old Beacon-tweening system for backwards compatibility for BV
+        Friend Property VersionString As String = "Cookie Dough V0.08"
         Friend Property Automator As TweenManager
         Friend Property ReferencePixel As Texture2D
         Friend Property Dev As GraphicsDevice
@@ -27,13 +28,13 @@ Namespace Cookie_Dough
         <STAThread>
         Friend Sub Main()
             'Using-Block gibt nach Beendigung des Spiels Resourcen frei und ruft game.Dispose() auf.
-            'Try
-            Using game As New Game1
-                game.Run()
-            End Using
-            'Catch ex As Exception
-            '    NoteError(ex, True)
-            'End Try
+            Try
+                Using game As New Game1
+                    game.Run()
+                End Using
+            Catch ex As Exception
+                NoteError(ex, True)
+            End Try
             StopServer()
             Process.GetCurrentProcess.Kill()
         End Sub

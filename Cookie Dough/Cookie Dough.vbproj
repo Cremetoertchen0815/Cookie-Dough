@@ -50,6 +50,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Framwork\Graphics\Keyframe3D.vb" />
+    <Compile Include="Framwork\Misc\Compress.vb" />
     <Compile Include="Framwork\Misc\INIReader.vb" />
     <Compile Include="Framwork\Misc\VertexExtractor.vb" />
     <Compile Include="Framwork\Networking\IPlayer.vb" />

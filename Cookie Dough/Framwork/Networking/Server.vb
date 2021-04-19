@@ -84,6 +84,7 @@ Namespace Framework.Networking
 
         Private Sub ListenToConnection(con As Connection)
             Try
+                WriteString(con, VersionString)
                 WriteString(con, "Hello there!")
                 If Not ReadString(con) = "Wassup?" Then Exit Try
                 WriteString(con, "What's your name?")
@@ -252,12 +253,13 @@ Namespace Framework.Networking
                         Case "e"c
                             'If remote client lost connection, send to all other remotes and add relist game
                             Dim who As Integer = CInt(nl(1).ToString)
-                            If gaem.Players(who) IsNot Nothing Then gaem.Players(who).Bereit = False
                             If Not games.ContainsKey(gaem.Key) Then games.Add(gaem.Key, gaem)
 
                             For i As Integer = 1 To gaem.Players.Length - 1
                                 If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, nl)
                             Next
+
+                            If gaem.Players(who) IsNot Nothing Then gaem.Players(who).Bereit = False : gaem.Players(who).Connection = Nothing
                         Case Else
                             For i As Integer = 1 To gaem.Players.Length - 1
                                 If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, nl)
@@ -296,7 +298,9 @@ Namespace Framework.Networking
         <Command("network-kick", "Kicks a specific user from the server.")>
         Public Sub KickUser(nick As String)
             For Each element In list
-                If element.Nick = nick Then element.Client.Close()
+                If element.Nick = nick Then
+                    element.Client.Close()
+                End If
             Next
         End Sub
     End Module

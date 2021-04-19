@@ -1,6 +1,7 @@
 ﻿Imports Cookie_Dough.Framework.Networking
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
+Imports Newtonsoft.Json
 
 Namespace Game.BetretenVerboten
     ''' <summary>
@@ -42,6 +43,7 @@ Namespace Game.BetretenVerboten
         ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server
         ''' </summary>
+        <JsonIgnore>
         Public Property Connection As Connection Implements IPlayer.Connection
 
         ''' <summary>
@@ -62,13 +64,13 @@ Namespace Game.BetretenVerboten
         ''' <summary>
         ''' Der Sound, der abgespielt wird, wenn man gekickt wird
         ''' </summary>
-        <Newtonsoft.Json.JsonIgnore>
-        Public Property CustomSound As SoundEffect Implements IPlayer.CustomSound
+        <JsonIgnore>
+        Public Property CustomSound As SoundEffect = SFX(3) Implements IPlayer.CustomSound
 
         ''' <summary>
         ''' Das Thumbnail des Spielers
         ''' </summary>
-        <Newtonsoft.Json.JsonIgnore>
+        <JsonIgnore>
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
 
         Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)

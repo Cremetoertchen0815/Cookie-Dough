@@ -485,7 +485,7 @@ Namespace Game.BetretenVerboten
                     Case "e"c 'Suspend gaem
                         Dim who As Integer = CInt(element(1).ToString)
                         StopUpdating = True
-                        Spielers(who).Bereit = True
+                        Spielers(who).Bereit = False
                         PostChat(Spielers(who).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
                     Case "f"c 'Trigger flying saucer field
@@ -601,7 +601,7 @@ Namespace Game.BetretenVerboten
                         If source = UserIndex Then Continue For
 
                         If IdentSound = IdentType.Custom Then
-                            File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Convert.FromBase64String(dat))
+                            File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
                             Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
                         Else
                             Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
@@ -634,7 +634,7 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendSoundFile()
             Dim txt As String = ""
-            If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(IO.File.ReadAllBytes("Cache\client\sound.audio"))
+            If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
             LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & txt)
         End Sub
 
@@ -926,7 +926,6 @@ Namespace Game.BetretenVerboten
             SpielerIndex = UserIndex
             Status = SpielStatus.Würfel
             ShowDice = True
-            StopUpdating = False
             HUDInstructions.Text = "Roll the Dice!"
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter

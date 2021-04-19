@@ -99,7 +99,7 @@ Namespace Game.BetretenVerboten
         Private Const DopsHöhe As Integer = 150
         Private Const CamSpeed As Integer = 1300
         Private Const SaucerChance As Integer = 25
-        Private Const SacrificeWait As Integer = 1
+        Private Const SacrificeWait As Integer = 5
         Sub New(Map As GaemMap)
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
@@ -632,6 +632,7 @@ Namespace Game.BetretenVerboten
                     Case "e"c 'Suspend gaem
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
                         If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
+                        Spielers(source).Bereit = False
                         PostChat(Spielers(source).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
                         SendPlayerLeft(source)
@@ -646,7 +647,6 @@ Namespace Game.BetretenVerboten
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         SendPlayerBack(source)
-                        StopUpdating = False
                         If SpielerIndex = source Then SendNewPlayerActive(SpielerIndex)
                         'Check if players are still missing, if not, send the signal to continue the game
                         Dim everythere As Boolean = True
@@ -668,7 +668,7 @@ Namespace Game.BetretenVerboten
                         Dim dat As String = element.Substring(3)
 
                         If IdentSound = IdentType.Custom Then
-                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Convert.FromBase64String(dat))
+                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
                             Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
                         Else
                             Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
@@ -738,7 +738,7 @@ Namespace Game.BetretenVerboten
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Then
                     Dim txt As String = ""
-                    If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(IO.File.ReadAllBytes("Cache\client\sound.audio"))
+                    If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
                     SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & txt)
                 End If
             Next

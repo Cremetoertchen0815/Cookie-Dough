@@ -2,3 +2,4 @@
 -(Implement backwards movement)
 -Implement cheat code to place figures
 -Fix score syncing
+-Fix sounds

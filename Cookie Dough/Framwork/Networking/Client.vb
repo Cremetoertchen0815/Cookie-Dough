@@ -52,6 +52,8 @@ Namespace Framework.Networking
                 stream = client.GetStream
                 streamw = New StreamWriter(stream) With {.AutoFlush = True}
                 streamr = New StreamReader(stream)
+                Dim vv As String = ReadString()
+                If Not vv = VersionString Then Microsoft.VisualBasic.MsgBox("Your client's version (" & VersionString & ") differs from the server's (" & vv & ")!") : Throw New NotImplementedException()
                 If Not ReadString() = "Hello there!" Then Throw New NotImplementedException()
                 WriteString("Wassup?")
                 If Not ReadString() = "What's your name?" Then Throw New NotImplementedException()
