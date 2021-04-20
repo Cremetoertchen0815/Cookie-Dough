@@ -1,9 +1,9 @@
 ﻿BV:
 -Add cheat code to place figure
--Fix score syncing
 -8-player version
+-Fix score syncing(Fixed, test!)
 -Fixed sacrifice button freezing the game after getting an anger button donated for slaves and fixed slaves getting the anger button reset every round(Fixed, test!)
+-Kick-Anzaeichen wenn man auf Startfeld landet und Figuren im Haus sind(Fixed, test!)
 -Rebecca's Problem
 -Siegersound
--Kick-Anzaeichen wenn man auf Startfeld landet und Figuren im Haus sind
 -Add an options menu

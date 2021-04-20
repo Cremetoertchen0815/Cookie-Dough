@@ -73,8 +73,11 @@ Namespace Game.BetretenVerboten
         Private keysa As New List(Of Keys)
         Private ButtonStack As New List(Of Keys)
         Private oldpress As New List(Of Keys)
-        Private Shared kickuser As String = ""
-        Private Shared ExecSync As Boolean = False
+        Private Shared dbgKickuser As Integer = -1
+        Private Shared dbgExecSync As Boolean = False
+        Private Shared dbgPlaceCmd As (Integer, Integer, Integer)
+        Private Shared dbgPlaceSet As Boolean = False
+        Private Shared dbgLoguser As Integer = -1
 
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
@@ -184,12 +187,12 @@ Namespace Game.BetretenVerboten
             Dim kstate As KeyboardState = Keyboard.GetState()
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
 
-            'Eject player from game
-            If kickuser <> "" Then
+            'Eject command
+            If dbgKickuser > -1 Then
                 Dim everythere As Boolean = StopUpdating
                 For i As Integer = 0 To Spielers.Length - 1
                     Dim pl = Spielers(i)
-                    If pl.Name = kickuser Then
+                    If i = dbgKickuser Then
                         pl.Typ = SpielerTyp.None
                         For j As Integer = 0 To pl.Spielfiguren.Length - 1
                             SendSetFigurePosition(i, j, -1)
@@ -206,13 +209,26 @@ Namespace Game.BetretenVerboten
                     End If
                 Next
                 If everythere Then StopUpdating = False : SendGameActive()
-                kickuser = ""
-            End If
+                dbgKickuser = -1
+           End If
 
             'Sync command
-            If ExecSync Then
-                ExecSync = False
+            If dbgExecSync Then
+                dbgExecSync = False
                 SendSync()
+            End If
+
+            'Place command
+            If dbgPlaceSet Then
+                Spielers(dbgPlaceCmd.Item1).Spielfiguren(dbgPlaceCmd.Item2) = dbgPlaceCmd.Item3
+                SendSync()
+                dbgPlaceSet = False
+            End If
+
+            'Log command
+            If dbgLoguser > 0 Then
+                DebugConsole.Instance.Log(Newtonsoft.Json.JsonConvert.SerializeObject(Spielers(dbgLoguser)))
+                dbgLoguser = -1
             End If
 
 
@@ -1321,7 +1337,6 @@ Namespace Game.BetretenVerboten
             Next
         End Sub
 #End Region
-
 #Region "Knopfgedrücke"
 
         Dim chatbtnpressed As Boolean = False
@@ -1399,18 +1414,30 @@ Namespace Game.BetretenVerboten
                 SFX(0).Play()
             End If
         End Sub
+#End Region
+#Region "Debug Commands"
 
         <Command("network-eject", "Removes a specific user from the game.")>
-        Public Shared Sub EjectUser(nick As String)
-            kickuser = nick
+        Public Shared Sub dbgEjectUser(nr As Integer)
+            dbgKickuser = nr
         End Sub
 
         <Command("network-sync", "Removes a specific user from the game.")>
-        Public Shared Sub EjectUser()
-            ExecSync = True
+        Public Shared Sub dbgEjectUser()
+            dbgExecSync = True
+        End Sub
+
+        <Command("network-place", "Places a player's figure on a certain position.")>
+        Public Shared Sub dbgPlaceFigure(player As Integer, figure As Integer, value As Integer)
+            dbgPlaceCmd = (player, figure, value)
+            dbgPlaceSet = True
+        End Sub
+
+        <Command("network-info", "Gives information over a specific player.")>
+        Public Shared Sub dbgPlayerInfo(nr As Integer)
+            dbgLoguser = nr
         End Sub
 #End Region
-
 #Region "Schnittstellenimplementation"
 
 
