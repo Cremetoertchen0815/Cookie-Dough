@@ -1,5 +1,4 @@
 ﻿BV:
--In an only-cpu round Magenta is called CPU1
 -Change Red and Blue Color to be better visible as HUD colors
 -Musik bleibt aus bei toggle Music
 -Siegersound
