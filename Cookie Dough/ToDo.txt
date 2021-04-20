@@ -2,8 +2,6 @@
 -Add cheat code to place figure
 -Fix score syncing
 -8-player version
--
--Increase UFO count
 -Fix sac button and fix having multiple anger bnuttons for some reason
 -Rebecca's Problem
 -Zählt die Zeit weiter, wenn jemand geleaved ist?

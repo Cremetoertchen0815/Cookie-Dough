@@ -98,7 +98,7 @@ Namespace Game.BetretenVerboten
         Private Const CPUThinkingTime As Single = 0.6
         Private Const DopsHöhe As Integer = 150
         Private Const CamSpeed As Integer = 1300
-        Private Const SaucerChance As Integer = 25
+        Private Const SaucerChance As Integer = 18
         Private Const SacrificeWait As Integer = 5
         Sub New(Map As GaemMap)
             'Bereite Flags und Variablen vor
