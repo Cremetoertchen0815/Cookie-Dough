@@ -1,9 +1,9 @@
 ﻿BV:
--Add cheat code to place figure
--8-player version
--Fix score syncing(Fixed, test!)
--Fixed sacrifice button freezing the game after getting an anger button donated for slaves and fixed slaves getting the anger button reset every round(Fixed, test!)
--Kick-Anzaeichen wenn man auf Startfeld landet und Figuren im Haus sind(Fixed, test!)
--Rebecca's Problem
+-In an only-cpu round Magenta is called CPU1
+-Change Red and Blue Color to be better visible as HUD colors
+-Musik bleibt aus bei toggle Music
 -Siegersound
+-UFO glitcht ins Haus rein auf andere Figur
+-Rebecca's Problem
 -Add an options menu
+-8-player version

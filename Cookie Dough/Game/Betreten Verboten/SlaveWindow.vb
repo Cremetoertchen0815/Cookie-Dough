@@ -45,13 +45,9 @@ Namespace Game.BetretenVerboten
         Private SaucerFields As New List(Of Integer)
 
         'Assets
-        Private WürfelAugen As Texture2D
-        Private WürfelRahmen As Texture2D
+        Private Fanfare As Song
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
-        Private bgm As Song
-        Private Lalala As Song
-        Private IsLala As Boolean = False
 
 
         'Renderer
@@ -153,6 +149,7 @@ Namespace Game.BetretenVerboten
             'Lade Assets
             ButtonFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font\ButtonText"))
             ChatFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font\ChatText"))
+            Fanfare = Content.Load(Of Song)("bgm\fanfare")
 
             'Lade HUD
             HUD = New GuiSystem
@@ -441,17 +438,6 @@ Namespace Game.BetretenVerboten
 
             If NetworkMode Then ReadAndProcessInputData()
 
-            If GetStackKeystroke({Keys.L, Keys.A, Keys.L, Keys.A, Keys.L, Keys.A, Keys.L, Keys.A}) Then
-                If IsLala Then
-                    MediaPlayer.Play(bgm)
-                    MediaPlayer.Volume = 0.1
-                Else
-                    MediaPlayer.Play(Lalala)
-                    MediaPlayer.Volume = 0.6
-                End If
-                IsLala = Not IsLala
-            End If
-
             'Misc stuff
             If kstate.IsKeyDown(Keys.Escape) And lastkstate.IsKeyUp(Keys.Escape) Then MenuButton()
             lastmstate = mstate
@@ -553,6 +539,8 @@ Namespace Game.BetretenVerboten
                     Case "w"c 'Spieler hat gewonnen
                         ShowDice = False
                         HUDInstructions.Text = "Game over!"
+                        MediaPlayer.Play(Fanfare)
+                        MediaPlayer.Volume = 0.3
 
                         'Berechne Rankings
                         Core.Schedule(1, Sub()

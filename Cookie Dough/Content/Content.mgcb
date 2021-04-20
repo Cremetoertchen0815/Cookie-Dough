@@ -73,6 +73,12 @@
 /processorParam:Quality=Best
 /build:bgm/acc_4.wav
 
+#begin bgm/fanfare.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:bgm/fanfare.ogg
+
 #begin dbg1.jpg
 /importer:TextureImporter
 /processor:TextureProcessor

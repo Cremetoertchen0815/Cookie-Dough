@@ -45,7 +45,7 @@ Namespace Game.BetretenVerboten
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
 
         'Assets
-        Private SpielfeldVerbindungen As Texture2D
+        Private Fanfare As Song
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
 
@@ -120,7 +120,7 @@ Namespace Game.BetretenVerboten
             Select Case Map
                 Case GaemMap.Default4Players
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
-                    Player.DefaultArray = {-1, -1, -1, -1}
+                    Player.DefaultArray = {39, 41, 42, 43} '{-1, -1, -1, -1}
                     FigCount = 4
                     PlCount = 4
                     SpceCount = 10
@@ -141,6 +141,7 @@ Namespace Game.BetretenVerboten
             'Lade Assets
             ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
             ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
+            Fanfare = Content.Load(Of Song)("bgm\fanfare")
 
             'Lade HUD
             HUD = New GuiSystem
@@ -237,7 +238,8 @@ Namespace Game.BetretenVerboten
                 'Prüfe, ob die Runde gewonnen wurde und beende gegebenenfalls die Runde
                 Dim win As Integer = CheckWin()
                 If win > -1 Or TimeOver Then
-
+                    MediaPlayer.Play(Fanfare)
+                    MediaPlayer.Volume = 0.3
                     StopUpdating = True
                     ShowDice = False
                     HUDInstructions.Text = "Game over!"
@@ -332,7 +334,7 @@ Namespace Game.BetretenVerboten
                                         WürfelWerte(it) = WürfelAktuelleZahl
                                         StopUpdating = False
                                         'Prüfe, ob Würfeln beendet werden soll
-                                        If it >= WürfelWerte.Length - 1 Or (Not DreifachWürfeln And WürfelAktuelleZahl < 6) Or ((DreifachWürfeln Or GetHomebaseCount(SpielerIndex) > 0) And it > 0 AndAlso WürfelWerte(it - 1) >= 6) Or (DreifachWürfeln And it >= 2 And WürfelWerte(2) < 6) Then CalcMoves() : Exit For
+                                        If it >= WürfelWerte.Length - 1 Or (Not DreifachWürfeln And WürfelAktuelleZahl < 6) Or ((DreifachWürfeln Or GetHomebaseCount(SpielerIndex) > 0) And it > 0 And WürfelAktuelleZahl < 6 AndAlso WürfelWerte(it - 1) >= 6) Or (DreifachWürfeln And it >= 2 And WürfelWerte(2) < 6) Then CalcMoves() : Exit For
                                     Next
                                 End If
                         End Select
@@ -1270,7 +1272,7 @@ Namespace Game.BetretenVerboten
                                              '    End If
                                              Case 1
                                                  'Kick random figure
-                                                 Dim fig = Nez.Random.Range(0, 4)
+                                                 Dim fig = Nez.Random.Range(0, FigCount)
                                                  If Spielers(pl).Spielfiguren(fig) >= 0 Then
                                                      PostChat("Oh ooh! Another one of your piece died!", Color.White)
                                                      SendMessage("Oh ooh! Another one of your piece died!")
