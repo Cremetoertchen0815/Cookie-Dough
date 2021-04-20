@@ -117,7 +117,7 @@ Namespace Game.BetretenVerboten
             Select Case Map
                 Case GaemMap.Default4Players
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
-                    Player.DefaultArray = {41, 42, 43, 29} '{-1, -1, -1, -1}
+                    Player.DefaultArray = {-1, -1, -1, -1}
                     FigCount = 4
                     PlCount = 4
                     SpceCount = 10

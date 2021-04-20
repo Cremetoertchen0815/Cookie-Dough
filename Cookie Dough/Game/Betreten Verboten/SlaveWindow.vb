@@ -745,7 +745,7 @@ Namespace Game.BetretenVerboten
                     Dim fieldB As Integer = Spielers(playerB).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB >= 0 And fieldB <= PlCount * SpceCount And fb = fa Then
+                    If fieldB >= 0 And fieldB < PlCount * SpceCount And fb = fa Then
                         Spielers(playerA).Kicks += 1
                         PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White)
                         Return j
