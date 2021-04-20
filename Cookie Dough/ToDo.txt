@@ -1,5 +1,4 @@
 ﻿BV:
--Musik bleibt aus bei toggle Music
 -UFO glitcht ins Haus rein auf andere Figur
 -Rebecca's Problem
 -Add an options menu

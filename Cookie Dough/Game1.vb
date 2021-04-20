@@ -112,12 +112,12 @@ Namespace Cookie_Dough
         Private Sub UpdateMusic()
             If GetStackKeystroke({Keys.L, Keys.A, Keys.L, Keys.A, Keys.L, Keys.A, Keys.L, Keys.A}) Then
                 MediaPlayer.Play(Lalala)
-                MediaPlayer.Volume = 0.6
+                If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.6
             End If
 
             If MediaPlayer.State = MediaState.Stopped Then
                 MediaPlayer.Play(Content.Load(Of Song)("bgm/acc_" & (MusicCounter + 1).ToString))
-                MediaPlayer.Volume = 0.1
+                If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.1
                 MediaPlayer.IsRepeating = False
                 MusicCounter = (MusicCounter + 1) Mod 4
             End If
