@@ -206,13 +206,13 @@ Namespace Framework.Networking
 
         Private Function ReadString(con As Connection) As String
             Dim tmp As String = con.StreamR.ReadLine
-            Console.WriteLine("[I]" & tmp)
+            If Not tmp.Contains("_TATA_") Then Console.WriteLine("[I]" & tmp)
             If tmp = "I'm outta here!" Then Throw New Exception("Client disconnected!")
             Return tmp
         End Function
 
         Private Sub WriteString(con As Connection, str As String)
-            Console.WriteLine("[O]" & str)
+            If Not str.Contains("_TATA_") Then Console.WriteLine("[O]" & str)
             con.StreamW.WriteLine(str)
         End Sub
 

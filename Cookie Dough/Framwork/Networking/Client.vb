@@ -104,7 +104,7 @@ Namespace Framework.Networking
         Private Function ReadString() As String
             Try
                 Dim tmp As String = streamr.ReadLine
-                If Not Server.ServerActive Then Console.WriteLine("[Client/I]" & tmp)
+                If Not Server.ServerActive And Not tmp.Contains("_TATA_") Then Console.WriteLine("[Client/I]" & tmp)
                 If NetworkLog Then OutputDelegate.Invoke("[Client/I]" & tmp)
                 Return tmp
             Catch ex As Exception
@@ -116,7 +116,7 @@ Namespace Framework.Networking
 
         Friend Sub WriteString(str As String)
             Try
-                If Not Server.ServerActive Then Console.WriteLine("[Client/O]" & str)
+                If Not Server.ServerActive And Not str.Contains("_TATA_") Then Console.WriteLine("[Client/O]" & str)
                 If NetworkLog Then OutputDelegate.Invoke("[Client/O]" & str)
                 If str = "Ich putz hier mal durch." Then Console.WriteLine()
                 streamw.WriteLine(str)

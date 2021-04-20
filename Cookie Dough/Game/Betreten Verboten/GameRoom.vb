@@ -665,7 +665,7 @@ Namespace Game.BetretenVerboten
                         StartMoverSub(destination)
                     Case "z"c
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim dat As String = element.Substring(3)
+                        Dim dat As String = element.Substring(3).Replace("_TATA_", "")
 
                         If IdentSound = IdentType.Custom Then
                             IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
@@ -673,7 +673,7 @@ Namespace Game.BetretenVerboten
                         Else
                             Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
                         End If
-                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dat)
+                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & "_TATA_" & dat)
                 End Select
             Next
         End Sub
@@ -739,7 +739,7 @@ Namespace Game.BetretenVerboten
                 If pl.Typ = SpielerTyp.Local Then
                     Dim txt As String = ""
                     If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & txt)
+                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
                 End If
             Next
         End Sub

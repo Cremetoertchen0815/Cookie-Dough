@@ -4,7 +4,6 @@
 -8-player version
 -Fix sac button and fix having multiple anger bnuttons for some reason
 -Rebecca's Problem
--Zählt die Zeit weiter, wenn jemand geleaved ist?
 -Siegersound
 -Kick-Anzaeichen wenn man auf Startfeld landet und Figuren im Haus sind
 -Don't post audio data to chat

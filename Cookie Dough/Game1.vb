@@ -26,8 +26,6 @@ Namespace Cookie_Dough
             Window.AllowUserResizing = True
             Core.ExitOnEscapeKeypress = False
 
-            My.Settings.Thumbnail = 0
-            My.Settings.Sound = 0
             Dim arg As String() = Environment.GetCommandLineArgs()
             LocalClient = New Client
             If (arg.Length > 1 AndAlso arg(1) = "-launchserver") Then

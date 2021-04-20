@@ -597,7 +597,7 @@ Namespace Game.BetretenVerboten
                     Case "z"c
                         Dim source As Integer = CInt(element(1).ToString)
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim dat As String = element.Substring(3)
+                        Dim dat As String = element.Substring(3).Replace("_TATA_", "")
                         If source = UserIndex Then Continue For
 
                         If IdentSound = IdentType.Custom Then
@@ -635,7 +635,7 @@ Namespace Game.BetretenVerboten
         Private Sub SendSoundFile()
             Dim txt As String = ""
             If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-            LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & txt)
+            LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & "_TATA_" & txt)
         End Sub
 
         Private Sub SubmitResults(figur As Integer, destination As Integer)
