@@ -589,7 +589,7 @@ Namespace Game.BetretenVerboten
                 LastTimer = Timer
 
                 'Set HUD color
-                HUDColor = Renderer3D.playcolor(UserIndex)
+                HUDColor = Renderer3D.hudcolors(UserIndex)
                 HUDBtnB.Color = HUDColor : HUDBtnB.Border = New ControlBorder(HUDColor, HUDBtnB.Border.Width)
                 HUDBtnC.Color = HUDColor : HUDBtnC.Border = New ControlBorder(HUDColor, HUDBtnC.Border.Width)
                 HUDBtnD.Color = HUDColor : HUDBtnD.Border = New ControlBorder(HUDColor, HUDBtnD.Border.Width)
@@ -598,7 +598,7 @@ Namespace Game.BetretenVerboten
                 HUDFullscrBtn.Color = HUDColor : HUDFullscrBtn.Border = New ControlBorder(HUDColor, HUDFullscrBtn.Border.Width)
                 HUDMusicBtn.Color = HUDColor : HUDMusicBtn.Border = New ControlBorder(HUDColor, HUDMusicBtn.Border.Width)
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
-                HUDNameBtn.Color = If(SpielerIndex > -1, Renderer3D.playcolor(SpielerIndex), Color.White)
+                HUDNameBtn.Color = If(SpielerIndex > -1, Renderer3D.hudcolors(SpielerIndex), Color.White)
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (Spielers(SpielerIndex).Typ = SpielerTyp.Local)
             End If
 

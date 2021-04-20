@@ -1,7 +1,5 @@
 ﻿BV:
--Change Red and Blue Color to be better visible as HUD colors
 -Musik bleibt aus bei toggle Music
--Siegersound
 -UFO glitcht ins Haus rein auf andere Figur
 -Rebecca's Problem
 -Add an options menu
