@@ -1180,14 +1180,14 @@ Namespace Game.BetretenVerboten
             SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
             KickedByGod(pl, figur) 'Kick sacrifice
             Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
-            Dim pogfactor = progress * 0.5F + 0.3F 'Field 0: Chance of sth good: 30%;  Field max.: Chance of sth good: 80%
+            Dim pogfactor = progress * 0.5F + 0.35F 'Field 0: Chance of sth good: 35%;  Field max.: Chance of sth good: 85%
             Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
 
                                  Do
                                      Dim RNG = Nez.Random.NextFloat
                                      If RNG <= pogfactor Then 'Positive effect
-                                         Select Case Nez.Random.Range(0, 3)
+                                         Select Case Nez.Random.Range(0, 4)
                                              Case 0
                                                  'Boost random figure
                                                  Dim fig = Nez.Random.Range(0, 4)
@@ -1227,23 +1227,31 @@ Namespace Game.BetretenVerboten
                                                  Spielers(pl).Angered = False
                                                  SendSync()
                                                  Exit Do
+                                             Case 3
+                                                 'Reset anger button
+                                                 If Not Spielers(pl).Angered Then Continue Do
+                                                 PostChat("You're lucky! Your sacrifice button got reset!", Color.White)
+                                                 SendMessage("You're lucky! Your sacrifice button got reset!")
+                                                 Spielers(pl).SacrificeCounter = 0
+                                                 SendSync()
+                                                 Exit Do
                                          End Select
                                      ElseIf RNG > pogfactor + (1 - pogfactor) / 5 * 3 Then 'Negative effect
                                          Select Case Nez.Random.Range(0, 3)
-                                             Case 0
-                                                   ''Boost random figure
-                                                   'Dim fig = Nez.Random.Range(0, 4)
-                                                   '    Dim boost = Nez.Random.Range(1, PlCount * 5)
-                                                   '    Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
-                                                   '    If futurefield < PlCount * SpceCount AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
-                                                   '        PostChat("Oh ooh! Another one of your piece died!", Color.White)
-                                                   '        SendMessage("Oh ooh! A random figure of yours is being boosted!")
-                                                   '        plsdont = True
-                                                   '        FigurFaderZiel = (pl, fig)
-                                                   '        StartMoverSub(futurefield)
-                                                   '        SendFigureTransition(pl, fig, futurefield)
-                                                   '        Exit Do
-                                                   '    End If
+                                             'Case 0
+                                             '    'Boost random figure
+                                             '    Dim fig = Nez.Random.Range(0, 4)
+                                             '    Dim boost = Nez.Random.Range(1, PlCount * 5)
+                                             '    Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
+                                             '    If futurefield < PlCount * SpceCount AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                             '        PostChat("Oh ooh! Another one of your piece died!", Color.White)
+                                             '        SendMessage("Oh ooh! A random figure of yours is being boosted!")
+                                             '        plsdont = True
+                                             '        FigurFaderZiel = (pl, fig)
+                                             '        StartMoverSub(futurefield)
+                                             '        SendFigureTransition(pl, fig, futurefield)
+                                             '        Exit Do
+                                             '    End If
                                              Case 1
                                                  'Kick random figure
                                                  Dim fig = Nez.Random.Range(0, 4)
@@ -1257,7 +1265,7 @@ Namespace Game.BetretenVerboten
                                                  'Set anger button
                                                  If Spielers(pl).Angered Then Continue Do
                                                  PostChat("Oh ooh! Your anger button got deleteted!", Color.White)
-                                                 SendMessage("Oh ooh! Another one of your piece died!")
+                                                 SendMessage("Oh ooh! Your anger button got deleteted!")
                                                  Spielers(pl).Angered = True
                                                  SendSync()
                                                  Exit Do
