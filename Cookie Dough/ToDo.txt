@@ -1,5 +1,12 @@
 ﻿BV:
--(Implement backwards movement)
--Implement cheat code to place figures
+-Add cheat code to place figure
 -Fix score syncing
--Fix sounds
+-8-player version
+-Add to sacrifice: Reset sacrifice counter immediately
+-Increase UFO count
+-Fix sac button and fix having multiple anger bnuttons for some reason
+-Rebecca's Problem
+-Zählt die Zeit weiter, wenn jemand geleaved ist?
+-Siegersound
+-Kick-Anzaeichen wenn man auf Startfeld landet und Figuren im Haus sind
+-Don't post audio data to chat

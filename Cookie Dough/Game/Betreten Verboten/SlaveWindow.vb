@@ -138,7 +138,7 @@ Namespace Game.BetretenVerboten
                     SpceCount = 10
                 Case GaemMap.Default6Players
                     Player.DefaultArray = {-1, -1}
-                    FigCount = 3
+                    FigCount = 2
                     PlCount = 6
                     SpceCount = 8
             End Select

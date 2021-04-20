@@ -24,6 +24,7 @@ Namespace Cookie_Dough
             Screen.SetSize(1280, 720)
             Scene.SetDefaultDesignResolution(1920, 1080, Scene.SceneResolutionPolicy.BestFit)
             Window.AllowUserResizing = True
+            Core.ExitOnEscapeKeypress = False
 
             My.Settings.Thumbnail = 0
             My.Settings.Sound = 0

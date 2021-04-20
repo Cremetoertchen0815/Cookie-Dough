@@ -129,6 +129,7 @@ Namespace Framework.Networking
         Friend Function ReadStream() As String()
             SyncLock data
                 Dim dataS As String() = data.ToArray
+                If dataS.Length > 0 Then Console.WriteLine()
                 data.Clear()
                 Return dataS
             End SyncLock
@@ -138,31 +139,6 @@ Namespace Framework.Networking
             If (msg(0) = "l"c And IsHost) Or (msg(0) = "e"c And Not IsHost) Then blastmode = False
             If Connected Then WriteString(msg)
         End Sub
-
-        'Friend Sub WriteSound(ident As IdentType)
-        '    WriteString(CInt(ident).ToString)
-        '    If ident = IdentType.Custom Then
-        '        Dim data As Byte() = File.ReadAllBytes("Cache\client\sound.audio")
-        '        streamw.WriteLine(Convert.ToBase64String(data))
-        '    End If
-        'End Sub
-        'Friend Sub WriteSoundRaw(ident As IdentType, data As String)
-        '    WriteString(CInt(ident).ToString)
-        '    If ident = IdentType.Custom Then
-        '        streamw.WriteLine(data)
-        '    End If
-        'End Sub
-
-        'Friend Function ReadSound(nick As String, ByRef IdentSound As IdentType, ByRef data As String) As SoundEffect
-        '    IdentSound = CType(ReadString(), IdentType)
-        '    If IdentSound = IdentType.Custom Then
-        '        data = streamr.ReadLine
-        '        File.WriteAllBytes("Cache\server\" & nick & ".wav", Convert.FromBase64String(data))
-        '        Return SoundEffect.FromFile("Cache\server\" & nick & ".wav")
-        '    Else
-        '        Return SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-        '    End If
-        'End Function
 
         Public Function GetGamesList() As OnlineGameInstance()
             'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
