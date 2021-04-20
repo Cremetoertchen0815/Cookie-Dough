@@ -117,7 +117,7 @@ Namespace Game.BetretenVerboten
             Select Case Map
                 Case GaemMap.Default4Players
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
-                    Player.DefaultArray = {-1, -1, -1, -1}
+                    Player.DefaultArray = {41, 42, 43, 29} '{-1, -1, -1, -1}
                     FigCount = 4
                     PlCount = 4
                     SpceCount = 10
@@ -1310,6 +1310,7 @@ Namespace Game.BetretenVerboten
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             ShowDice = True
             StopUpdating = False
+            SendGameActive()
             HUDInstructions.Text = "Roll the Dice!"
             DreifachWürfeln = CanRollThrice(SpielerIndex) 'Falls noch alle Figuren un der Homebase sind
             WürfelTimer = 0
