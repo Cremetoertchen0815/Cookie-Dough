@@ -650,10 +650,10 @@ Namespace Game.BetretenVerboten
                         SendChatMessage(source, text)
                     Case "e"c 'Suspend gaem
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
-                        If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
                         Spielers(source).Bereit = False
                         PostChat(Spielers(source).Name & " left!", Color.White)
-                        PostChat("The game is being suspended!", Color.White)
+                        If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
+                        If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
                         SendPlayerLeft(source)
                     Case "j"c 'God got activated
                         Dim figur As Integer = CInt(element(2).ToString)
@@ -1207,7 +1207,7 @@ Namespace Game.BetretenVerboten
                                  Do
                                      Dim RNG = Nez.Random.NextFloat
                                      If RNG <= pogfactor Then 'Positive effect
-                                         Select Case Nez.Random.Range(0, 4)
+                                         Select Case Nez.Random.Range(0, 5)
                                              Case 0
                                                  'Boost random figure
                                                  Dim fig = Nez.Random.Range(0, 4)
