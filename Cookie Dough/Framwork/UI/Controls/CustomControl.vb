@@ -13,7 +13,7 @@ Namespace Framework.UI.Controls
             End Get
         End Property
 
-        Public Delegate Sub ExternalDraw(batcher As Batcher, InnerBounds As Rectangle)
+        Public Delegate Sub ExternalDraw(batcher As Batcher, InnerBounds As Rectangle, color As Color)
         Public Delegate Sub ExternalUpdate(mstate As GuiInput, InnerBounds As Rectangle)
 
         Dim rect As Rectangle
@@ -33,8 +33,8 @@ Namespace Framework.UI.Controls
             par = system
         End Sub
 
-        Public Overrides Sub Render(batcher As Batcher)
-            DrawSubroutine(batcher, InnerBounds)
+        Public Overrides Sub Render(batcher As Batcher, color As Color)
+            DrawSubroutine(batcher, InnerBounds, color)
         End Sub
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)

@@ -43,13 +43,13 @@ Namespace Framework.UI.Controls
             End If
         End Sub
 
-        Public Overrides Sub Render(batcher As Batcher)
+        Public Overrides Sub Render(batcher As Batcher, color As Color)
             batcher.DrawRect(rect, BackgroundColor)
-            batcher.DrawHollowRect(rect, Border.Color, Border.Width)
+            batcher.DrawHollowRect(rect, color, Border.Width)
             For i As Integer = 0 To workingtext.Length - 1
                 Dim lv As Vector2 = rect.Location.ToVector2 + New Vector2(0, i * 30 + offsetY)
                 Dim rc As New Rectangle(lv.X, lv.Y, Size.X, 20)
-                If rc.Top >= rect.Top And rc.Bottom <= rect.Bottom Then batcher.DrawString(Font, workingtext(i), lv, Color)
+                If rc.Top >= rect.Top And rc.Bottom <= rect.Bottom Then batcher.DrawString(Font, workingtext(i), lv, Color.White)
                 If i = SelectedIndex And EnableSelect Then batcher.DrawHollowRect(New Rectangle(rect.Location + New Point(0, i * 30 + offsetY), New Point(Size.X, 30)), Color.CornflowerBlue, 2)
             Next
 

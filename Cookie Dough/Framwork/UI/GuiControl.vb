@@ -28,6 +28,6 @@ Namespace Framework.UI
         Public Overridable Sub Unload()
         End Sub
         Public MustOverride Sub Update(cstate As GuiInput, offset As Vector2) Implements IParent.Update
-        Public MustOverride Sub Render(batcher As Batcher) Implements IParent.Render
+        Public MustOverride Sub Render(batcher As Batcher, color As Color) Implements IParent.Render
     End Class
 End Namespace

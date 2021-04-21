@@ -29,13 +29,13 @@ Namespace Framework.UI.Controls
         Sub New(text As String, location As Vector2)
             Me.Text = text
             Me.Location = location
-            Me.Color = Color.White
+            Me.Color = Color.Transparent
             workingtext = ""
         End Sub
         Sub New(output As Func(Of String), location As Vector2)
             Me.OutputFormat = output
             Me.Location = location
-            Me.Color = Color.White
+            Me.Color = Color.Transparent
             workingtext = ""
         End Sub
 
@@ -44,10 +44,10 @@ Namespace Framework.UI.Controls
             par = system
         End Sub
 
-        Public Overrides Sub Render(batcher As Batcher)
+        Public Overrides Sub Render(batcher As Batcher, color As Color)
             batcher.DrawRect(rect, BackgroundColor)
-            batcher.DrawHollowRect(rect, Border.Color, Border.Width)
-            batcher.DrawString(Font, workingtext, rect.Location.ToVector2, Color)
+            batcher.DrawHollowRect(rect, color, Border.Width)
+            batcher.DrawString(Font, workingtext, rect.Location.ToVector2, If(Me.Color = Color.Transparent, color, Me.Color))
         End Sub
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)

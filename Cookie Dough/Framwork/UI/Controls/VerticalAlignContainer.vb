@@ -36,12 +36,12 @@ Namespace Framework.UI.Controls
             Next
         End Sub
 
-        Public Overrides Sub Render(batcher As Batcher)
+        Public Overrides Sub Render(batcher As Batcher, color As Color)
             batcher.DrawRect(rect, BackgroundColor)
-            batcher.DrawHollowRect(rect, Border.Color, Border.Width)
+            batcher.DrawHollowRect(rect, color, Border.Width)
 
             For Each element In Children
-                If element.Active Then element.Render(batcher)
+                If element.Active Then element.Render(batcher, color)
             Next
         End Sub
 

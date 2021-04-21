@@ -37,6 +37,7 @@ Namespace Framework.UI
 
         Public Overrides Sub OnAddedToEntity()
             GlobalFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/fnt_HKG_17_M"))
+            Material = New Material(DepthStencilState.None)
             For Each element In Controls
                 element.Init(Me)
             Next
@@ -54,13 +55,15 @@ Namespace Framework.UI
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, camera As Camera)
-            RenderInternal(batcher)
+            RenderInternal(batcher, Color)
         End Sub
-        Private Sub RenderInternal(batcher As Batcher) Implements IParent.Render
-
+        Private Sub RenderInternal(batcher As Batcher, color As Color) Implements IParent.Render
+            batcher.End()
+            batcher.Begin(Material, Transform.LocalToWorldTransform)
+            SetLayerDepth(0)
             Core.GraphicsDevice.DepthStencilState = DepthStencilState.None
             For Each element In Controls
-                If element.Active Then element.Render(batcher)
+                If element.Active Then element.Render(batcher, color)
             Next
         End Sub
 

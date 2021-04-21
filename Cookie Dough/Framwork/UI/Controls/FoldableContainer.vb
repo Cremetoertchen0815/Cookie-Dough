@@ -48,19 +48,19 @@ Namespace Framework.UI.Controls
             Next
         End Sub
 
-        Public Overrides Sub Render(batcher As Batcher)
+        Public Overrides Sub Render(batcher As Batcher, color As Color)
 
             If Checked Then
                 batcher.DrawRect(InnerBounds, BackgroundColor)
                 batcher.DrawHollowRect(InnerBounds, Border.Color, Border.Width)
                 For Each element In Children
-                    If element.Active Then element.Render(batcher)
+                    If element.Active Then element.Render(batcher, color)
                 Next
             End If
 
             batcher.DrawRect(header, Color.DarkMagenta)
             batcher.DrawHollowRect(header, Color.White, 2)
-            batcher.DrawString(DefaultFont, Text, header.Location.ToVector2 - New Vector2(-3, 3), Color)
+            batcher.DrawString(DefaultFont, Text, header.Location.ToVector2 - New Vector2(-3, 3), color)
         End Sub
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)

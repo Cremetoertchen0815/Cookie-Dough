@@ -58,9 +58,9 @@ Namespace Framework.UI.Controls
             End If
         End Sub
 
-        Public Overrides Sub Render(batcher As Batcher)
+        Public Overrides Sub Render(batcher As Batcher, color As Color)
             batcher.DrawRect(bgrect, BackgroundColor)
-            batcher.DrawHollowRect(bgrect, Border.Color, Border.Width)
+            batcher.DrawHollowRect(bgrect, color, Border.Width)
 
             Dim cc As String = OutputFormat(Value)
             batcher.Draw(ArrowA, New Rectangle(rect.Location, New Point(15)), Color.White)

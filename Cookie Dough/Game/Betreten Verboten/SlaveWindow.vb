@@ -65,6 +65,7 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDNameBtn As Controls.Button
         Private WithEvents HUDFullscrBtn As Controls.Button
         Private WithEvents HUDMusicBtn As Controls.Button
+        Private WithEvents HUDDiceBtn As GameRenderable
         Private InstructionFader As PropertyTransition
         Private ShowDice As Boolean = False
         Private HUDColor As Color
@@ -153,6 +154,7 @@ Namespace Game.BetretenVerboten
 
             'Lade HUD
             HUD = New GuiSystem
+            HUDDiceBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDDiceBtn)
             HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnB)
             HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnC)
             HUDBtnD = New Controls.Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnD)
@@ -164,6 +166,7 @@ Namespace Game.BetretenVerboten
             HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
+            HUD.Color = Renderer3D.hudcolors(UserIndex)
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0))
@@ -173,7 +176,6 @@ Namespace Game.BetretenVerboten
             ClearColor = Color.Black
             Material.DefaultMaterial.SamplerState = SamplerState.AnisotropicClamp
 
-            CreateEntity("HUDRenderable").AddComponent(New GameRenderable(Me))
             Center = New Rectangle(500, 70, 950, 950).Center.ToVector2
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(Tweens.LoopType.PingPong, -1).Start()
         End Sub
@@ -407,16 +409,7 @@ Namespace Game.BetretenVerboten
                 End Select
 
                 'Set HUD color
-                HUDColor = Renderer3D.hudcolors(UserIndex)
-                HUDBtnB.Color = HUDColor : HUDBtnB.Border = New ControlBorder(HUDColor, HUDBtnB.Border.Width)
-                HUDBtnC.Color = HUDColor : HUDBtnC.Border = New ControlBorder(HUDColor, HUDBtnC.Border.Width)
-                HUDBtnD.Color = HUDColor : HUDBtnD.Border = New ControlBorder(HUDColor, HUDBtnD.Border.Width)
-                HUDChat.Color = HUDColor : HUDChat.Border = New ControlBorder(HUDColor, HUDChat.Border.Width)
-                HUDChatBtn.Color = HUDColor : HUDChatBtn.Border = New ControlBorder(HUDColor, HUDChatBtn.Border.Width)
-                HUDFullscrBtn.Color = HUDColor : HUDFullscrBtn.Border = New ControlBorder(HUDColor, HUDFullscrBtn.Border.Width)
-                HUDMusicBtn.Color = HUDColor : HUDMusicBtn.Border = New ControlBorder(HUDColor, HUDMusicBtn.Border.Width)
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
-                HUDNameBtn.Color = If(SpielerIndex > -1, Renderer3D.hudcolors(SpielerIndex), Color.White)
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex = UserIndex)
             End If
 

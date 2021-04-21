@@ -36,9 +36,9 @@ Namespace Framework.UI.Controls
             par = system
         End Sub
 
-        Public Overrides Sub Render(batcher As Batcher)
+        Public Overrides Sub Render(batcher As Batcher, color As Color)
             batcher.DrawRect(rect, BackgroundColor)
-            batcher.DrawHollowRect(rect, Border.Color, Border.Width)
+            batcher.DrawHollowRect(rect, color, Border.Width)
 
             For i As Integer = scrolloffset To Math.Min(scrolloffset + maxlines, workingtext.Length - 1)
                 batcher.DrawString(Font, workingtext(i).Item1, rect.Location.ToVector2 + New Vector2(10, Font.LineSpacing * (i - scrolloffset) + 5), workingtext(i).Item2)
