@@ -521,7 +521,7 @@ Namespace Game.BetretenVerboten
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
-                            Spielers(i).Kicks = sp.Spielers(i).Kicks
+                            Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
                         Next
                         If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
@@ -580,7 +580,7 @@ Namespace Game.BetretenVerboten
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
-                            Spielers(i).Kicks = sp.Spielers(i).Kicks
+                            Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
                         Next
                         If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
@@ -734,7 +734,7 @@ Namespace Game.BetretenVerboten
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
                     If fieldB >= 0 And fieldB < PlCount * SpceCount And fb = fa Then
-                        Spielers(playerA).Kicks += 1
+                        Spielers(playerA).AdditionalPoints += 25
                         PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White)
                         Return j
                     End If
@@ -897,11 +897,11 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function GetScore(pl As Integer) As Integer
-            Dim ret As Single = Spielers(pl).Kicks * 2.5F + If(Spielers(pl).Angered, 0, 5)
+            Dim ret As Single = If(Spielers(pl).Angered, 0, 5)
             For Each element In Spielers(pl).Spielfiguren
                 If element >= 0 Then ret += element
             Next
-            Return CInt(ret * 10)
+            Return CInt(ret * 10) + Spielers(pl).AdditionalPoints
         End Function
         Private Function GetSpielfeldVector(player As Integer, figur As Integer, Optional increment As Integer = 0) As Vector2
             Return GetMapVectorPos(Map, player, figur, Spielers(player).Spielfiguren(figur) + increment)

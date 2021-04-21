@@ -847,7 +847,7 @@ Namespace Game.BetretenVerboten
                     'Falls globale Spielfeldposition identisch und 
                     If fieldB >= 0 And fieldB < PlCount * SpceCount And fb = fa Then
                         Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
-                        Spielers(playerA).Kicks += 1
+                        Spielers(playerA).AdditionalPoints += 25
                         Return j
                     End If
                 Next
@@ -956,11 +956,11 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function GetScore(pl As Integer) As Integer
-            Dim ret As Single = Spielers(pl).Kicks * 2.5F + If(Spielers(pl).Angered, 0, 5)
+            Dim ret As Single = If(Spielers(pl).Angered, 0, 5)
             For Each element In Spielers(pl).Spielfiguren
                 If element >= 0 Then ret += element
             Next
-            Return CInt(ret * 10)
+            Return CInt(ret * 10) + Spielers(pl).AdditionalPoints
         End Function
 
         Private Function IsÜberholingInSeHaus(defaultmov As Integer) As Boolean
@@ -1192,6 +1192,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub Sacrifice(pl As Integer, figur As Integer)
+            Spielers(pl).AdditionalPoints += 50
             StopUpdating = True
             Status = SpielStatus.Waitn
             PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
@@ -1248,28 +1249,28 @@ Namespace Game.BetretenVerboten
                                              Case 3
                                                  'Reset anger button
                                                  If Not Spielers(pl).Angered Then Continue Do
-                                                 PostChat("You're lucky! Your sacrifice button got reset!", Color.White)
-                                                 SendMessage("You're lucky! Your sacrifice button got reset!")
-                                                 Spielers(pl).SacrificeCounter = 0
+                                                 PostChat("You're lucky! You can try again for free next round!", Color.White)
+                                                 SendMessage("You're lucky! You can try again for free next round!")
+                                                 Spielers(pl).SacrificeCounter = -1
+                                                 SendSync()
+                                                 Exit Do
+                                             Case 4
+                                                 'Add points
+                                                 PostChat("You're lucky! You gained 75 points!", Color.White)
+                                                 SendMessage("You're lucky! You gained 75 points!")
+                                                 Spielers(pl).AdditionalPoints += 75
                                                  SendSync()
                                                  Exit Do
                                          End Select
                                      ElseIf RNG > pogfactor + (1 - pogfactor) / 5 * 3 Then 'Negative effect
                                          Select Case Nez.Random.Range(0, 3)
-                                             'Case 0
-                                             '    'Boost random figure
-                                             '    Dim fig = Nez.Random.Range(0, 4)
-                                             '    Dim boost = Nez.Random.Range(1, PlCount * 5)
-                                             '    Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
-                                             '    If futurefield < PlCount * SpceCount AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
-                                             '        PostChat("Oh ooh! Another one of your piece died!", Color.White)
-                                             '        SendMessage("Oh ooh! A random figure of yours is being boosted!")
-                                             '        plsdont = True
-                                             '        FigurFaderZiel = (pl, fig)
-                                             '        StartMoverSub(futurefield)
-                                             '        SendFigureTransition(pl, fig, futurefield)
-                                             '        Exit Do
-                                             '    End If
+                                             Case 0
+                                                 'Subtract points
+                                                 PostChat("Oh ooh! You lost 75 points!", Color.White)
+                                                 SendMessage("Oh ooh! You lost 75 points!")
+                                                 Spielers(pl).AdditionalPoints -= 75
+                                                 SendSync()
+                                                 Exit Do
                                              Case 1
                                                  'Kick random figure
                                                  Dim fig = Nez.Random.Range(0, FigCount)
