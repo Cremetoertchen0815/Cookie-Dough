@@ -31,7 +31,7 @@ Namespace Framework.UI.Controls
         Public Overrides Sub Render(batcher As Batcher, color As Color)
             batcher.DrawRect(rect, BackgroundColor)
             batcher.DrawHollowRect(rect, color, Border.Width)
-            batcher.DrawString(Font, Text, rect.Center.ToVector2 - Font.MeasureString(Text) / 2, color)
+            batcher.DrawString(Font, Text, rect.Center.ToVector2 - Font.MeasureString(Text) / 2, If(Me.Color = Color.Transparent, color, Me.Color))
         End Sub
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)
