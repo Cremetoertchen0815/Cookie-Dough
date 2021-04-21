@@ -20,6 +20,7 @@ Namespace Cookie_Dough
             MyBase.Initialize()
 
             'Prepare program
+            IO.Directory.CreateDirectory("Cache\server\")
             PauseOnFocusLost = False
             Screen.SetSize(1280, 720)
             Scene.SetDefaultDesignResolution(1920, 1080, Scene.SceneResolutionPolicy.BestFit)

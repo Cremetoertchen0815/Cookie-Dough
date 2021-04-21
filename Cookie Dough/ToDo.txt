@@ -1,4 +1,10 @@
 ﻿BV:
+-fix once/thrice dicing
+-Sacrificing shall give you as many point as one or two kicks
+-No "player left" text after completing the game
+-Sacrifice button can sacrifice for free as bonus 
+-Sacrifice button to get/loose points
+-Fix slave not joining when Chache folder missing(sound always custom?)
 -UFO glitcht ins Haus rein auf andere Figur
 -Rebecca's Problem
 -Add an options menu

@@ -124,7 +124,7 @@ Namespace Game.BetretenVerboten.Renderers
             Next
 
             'Zeichne Verbindungen
-            'batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
+            If Game.Map = 0 Then batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
             batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             'Zeichne UFO-Felder

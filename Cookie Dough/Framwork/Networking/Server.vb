@@ -20,7 +20,6 @@ Namespace Framework.Networking
         Private RNG As New System.Random
 
         Public Sub StartServer()
-            Directory.CreateDirectory("Cache\server\")
             MainThread = New Thread(AddressOf ServerMainSub)
             MainThread.Start()
             ServerActive = True

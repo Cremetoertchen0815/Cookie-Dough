@@ -120,12 +120,12 @@ Namespace Game.BetretenVerboten
             Select Case Map
                 Case GaemMap.Default4Players
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
-                    Player.DefaultArray = {39, 41, 42, 43} '{-1, -1, -1, -1}
+                    Player.DefaultArray = {-1, -1, -1, -1}
                     FigCount = 4
                     PlCount = 4
                     SpceCount = 10
                 Case GaemMap.Default6Players
-                    Timer = New TimeSpan(0, 2, 22, 22, 22)
+                    Timer = New TimeSpan(0, 1, 11, 11, 11)
                     Player.DefaultArray = {-1, -1}
                     FigCount = 2
                     PlCount = 6
@@ -227,7 +227,7 @@ Namespace Game.BetretenVerboten
             End If
 
             'Log command
-            If dbgLoguser > 0 Then
+            If dbgLoguser > -1 Then
                 DebugConsole.Instance.Log(Newtonsoft.Json.JsonConvert.SerializeObject(Spielers(dbgLoguser)))
                 dbgLoguser = -1
             End If
@@ -1425,7 +1425,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         <Command("network-sync", "Removes a specific user from the game.")>
-        Public Shared Sub dbgEjectUser()
+        Public Shared Sub dbgSyncData()
             dbgExecSync = True
         End Sub
 
