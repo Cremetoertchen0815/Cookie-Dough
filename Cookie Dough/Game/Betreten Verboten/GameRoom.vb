@@ -35,6 +35,7 @@ Namespace Game.BetretenVerboten
         Private WürfelTriggered As Boolean 'Gibt an ob gerade gewürfelt wird
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
         Private Fahrzahl As Integer 'Anzahl der Felder die gefahren werden kann
+        Private DontKickSacrifice As Boolean 'Gibt an, ob die zu opfernde Figur nicht gekickt werden soll
         Private DreifachWürfeln As Boolean 'Gibt an(am Anfang des Spiels), dass ma drei Versuche hat um eine 6 zu bekommen
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
@@ -1197,7 +1198,7 @@ Namespace Game.BetretenVerboten
             Status = SpielStatus.Waitn
             PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
             SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
-            KickedByGod(pl, figur) 'Kick sacrifice
+            If Not DontKickSacrifice Then KickedByGod(pl, figur) 'Kick sacrifice
             Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
             Dim pogfactor = progress * 0.5F + 0.35F 'Field 0: Chance of sth good: 35%;  Field max.: Chance of sth good: 85%
             Core.Schedule(2, Sub() 'Wait a sec
@@ -1405,6 +1406,7 @@ Namespace Game.BetretenVerboten
                 Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
                 If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                     Status = SpielStatus.WähleOpfer
+                    DontKickSacrifice = Spielers(UserIndex).SacrificeCounter < 0
                     Spielers(UserIndex).SacrificeCounter = SacrificeWait
                     HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
