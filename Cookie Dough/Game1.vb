@@ -19,20 +19,10 @@ Namespace Cookie_Dough
         Protected Overrides Sub Initialize()
             MyBase.Initialize()
 
-            'List resolutions
-            Dim modelist As New List(Of DisplayMode)
-            For Each mode As DisplayMode In GraphicsAdapter.DefaultAdapter.SupportedDisplayModes
-                Dim exists As Boolean = False
-                For Each element In modelist
-                    If element.Width = mode.Width And element.Height = mode.Height Then exists = True
-                Next
-                If Not exists Then modelist.Add(mode)
-            Next
-
             'Prepare program
             IO.Directory.CreateDirectory("Cache\server\")
             PauseOnFocusLost = False
-            Screen.SetSize(modelist(modelist.Count - 1).Width, modelist(modelist.Count - 1).Height)
+            Screen.SetSize(1280, 720)
             Scene.SetDefaultDesignResolution(1920, 1080, Scene.SceneResolutionPolicy.BestFit)
             Window.AllowUserResizing = True
             ExitOnEscapeKeypress = False

@@ -956,7 +956,7 @@ Namespace Game.BetretenVerboten
                 HUDBtnD.Text = "(" & SacrificeWait & ")"
                 LocalClient.blastmode = False
                 NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
             End If
         End Sub
 

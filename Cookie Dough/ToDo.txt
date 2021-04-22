@@ -1,7 +1,15 @@
 ﻿BV:
+-Bei schlussanimation figuren etwas höher
+-Fix slave being able to sacrifice from own house
+-Fix being able to kick someone in their house via sacrifice
+-Fix score syncing
+-Fix free sacrifice button
+-Fix skipping when sacrificing doesn't work
+-Can't click on join round
 -Fix slave not joining when Chache folder missing(sound always custom?)
 -UFO glitcht ins Haus rein auf andere Figur
 -fix once/thrice dicing
+-Fix 6 player connection texture
 -Rebecca's Problem
 -Add an options menu
 -8-player version
