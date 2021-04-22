@@ -890,7 +890,7 @@ Namespace Game.BetretenVerboten
             SaucerFields.Remove(last)
             Status = SpielStatus.SaucerFlight
             Dim distance As Integer = Nez.Random.Range(-6, 7)
-            Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or ((Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Mod SpceCount) = 0 Or distance = 0
+            Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or distance = 0 Or Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance < 0 ' Or ((Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Mod SpceCount) = 0
                 distance += 1
             Loop
 
@@ -909,7 +909,7 @@ Namespace Game.BetretenVerboten
                                                                          Next
 
                                                                          'Trigger UFO, falls auf Feld gelandet
-                                                                         If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * SpceCount Then TriggerSaucer(nr) Else SwitchPlayer()
+                                                                         If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * SpceCount Then TriggerSaucer(nr) Else If Status <> SpielStatus.SpielZuEnde Then SwitchPlayer()
                                                                      End Sub)
         End Sub
 
@@ -980,7 +980,7 @@ Namespace Game.BetretenVerboten
                     Dim fieldB As Integer = Spielers(i).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, i)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB > -1 And ((fieldA < PlCount * SpceCount AndAlso (player <> i Or figur <> j) And fb = fa) OrElse (fieldB < PlCount * SpceCount + 5 And player = i And figur <> j And fieldA = fieldB)) Then Return True
+                    If fieldB > -1 And ((fieldA < PlCount * SpceCount AndAlso (player <> i Or figur <> j) And fb = fa) OrElse (player = i And figur <> j And fieldA = fieldB)) Then Return True
                 Next
             Next
 

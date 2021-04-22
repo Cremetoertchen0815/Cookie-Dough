@@ -1,5 +1,4 @@
 ﻿BV:
--UFO glitcht ins Haus rein auf andere Figur
 -fix once/thrice dicing
 -Add an options menu
 -8-player version
