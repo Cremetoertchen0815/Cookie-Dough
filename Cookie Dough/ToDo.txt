@@ -1,7 +1,4 @@
 ﻿BV:
--Bei schlussanimation figuren etwas höher
--Fix slave being able to sacrifice from own house
--Fix being able to kick someone in their house via sacrifice
 -Fix score syncing
 -Fix free sacrifice button
 -Fix skipping when sacrificing doesn't work

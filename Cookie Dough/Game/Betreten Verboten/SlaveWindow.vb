@@ -370,7 +370,7 @@ Namespace Game.BetretenVerboten
                         Dim defaultmov As Integer
                         For i As Integer = 0 To FigCount - 1
                             defaultmov = pl.Spielfiguren(i)
-                            If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 Then ichmagzüge.Add(i)
+                            If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount Then ichmagzüge.Add(i)
                         Next
 
                         If ichmagzüge.Count = 1 Then
@@ -562,7 +562,7 @@ Namespace Game.BetretenVerboten
                                          End Sub)
                         Status = SpielStatus.SpielZuEnde
                         FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
-                        Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1000, Nothing)
+                        Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)
                         Automator.Add(Renderer.AdditionalZPos)
                     Case "x"c 'Continue with game
                         StopUpdating = False

@@ -523,7 +523,7 @@ Namespace Game.BetretenVerboten
                             Dim defaultmov As Integer
                             For i As Integer = 0 To FigCount - 1
                                 defaultmov = pl.Spielfiguren(i)
-                                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 Then ichmagzüge.Add(i)
+                                If defaultmov > -1 And defaultmov + Fahrzahl < PlCount * SpceCount Then ichmagzüge.Add(i)
                             Next
 
                             If ichmagzüge.Count = 1 Then
@@ -1187,7 +1187,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub Sacrifice(pl As Integer, figur As Integer)
-            Spielers(pl).AdditionalPoints += 50
+            Spielers(pl).AdditionalPoints += 25
             StopUpdating = True
             Status = SpielStatus.Waitn
             PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
@@ -1221,7 +1221,7 @@ Namespace Game.BetretenVerboten
                                                  Dim pla = Nez.Random.Range(0, PlCount - 1)
                                                  Dim fig = Nez.Random.Range(0, FigCount - 1)
                                                  Dim count = 0
-                                                 Do While Spielers(pla).Spielfiguren(fig) < 0
+                                                 Do While Spielers(pla).Spielfiguren(fig) < 0 And Spielers(pla).Spielfiguren(fig) >= PlCount * SpceCount
                                                      pla = Nez.Random.Range(0, PlCount - 1)
                                                      fig = Nez.Random.Range(0, FigCount - 1)
                                                      count += 1
@@ -1239,7 +1239,6 @@ Namespace Game.BetretenVerboten
                                                  PostChat("You're lucky! Your anger button got reset!", Color.White)
                                                  SendMessage("You're lucky! Your anger button got reset!")
                                                  Spielers(pl).Angered = False
-                                                 SendSync()
                                                  Exit Do
                                              Case 3
                                                  'Reset anger button
@@ -1247,14 +1246,12 @@ Namespace Game.BetretenVerboten
                                                  PostChat("You're lucky! You can try again for free next round!", Color.White)
                                                  SendMessage("You're lucky! You can try again for free next round!")
                                                  Spielers(pl).SacrificeCounter = -1
-                                                 SendSync()
                                                  Exit Do
                                              Case 4
                                                  'Add points
                                                  PostChat("You're lucky! You gained 75 points!", Color.White)
                                                  SendMessage("You're lucky! You gained 75 points!")
                                                  Spielers(pl).AdditionalPoints += 75
-                                                 SendSync()
                                                  Exit Do
                                          End Select
                                      ElseIf RNG > pogfactor + (1 - pogfactor) / 5 * 3 Then 'Negative effect
@@ -1264,7 +1261,6 @@ Namespace Game.BetretenVerboten
                                                  PostChat("Oh ooh! You lost 75 points!", Color.White)
                                                  SendMessage("Oh ooh! You lost 75 points!")
                                                  Spielers(pl).AdditionalPoints -= 75
-                                                 SendSync()
                                                  Exit Do
                                              Case 1
                                                  'Kick random figure
@@ -1281,7 +1277,6 @@ Namespace Game.BetretenVerboten
                                                  PostChat("Oh ooh! Your anger button got deleteted!", Color.White)
                                                  SendMessage("Oh ooh! Your anger button got deleteted!")
                                                  Spielers(pl).Angered = True
-                                                 SendSync()
                                                  Exit Do
                                          End Select
                                      Else
@@ -1290,6 +1285,7 @@ Namespace Game.BetretenVerboten
                                          Exit Do
                                      End If
                                  Loop
+                                 SendSync()
 
                                  'Switch player
                                  If Not plsdont Then Core.Schedule(2, Sub() SwitchPlayer())
