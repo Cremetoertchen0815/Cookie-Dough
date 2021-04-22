@@ -1,7 +1,5 @@
 ﻿BV:
 -UFO glitcht ins Haus rein auf andere Figur
 -fix once/thrice dicing
--Fix 6 player connection texture
--Rebecca's Problem
 -Add an options menu
 -8-player version

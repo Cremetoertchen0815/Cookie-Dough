@@ -104,6 +104,11 @@ Namespace Game.BetretenVerboten.Renderers
             Dim sizes As (Integer, Integer, Single) = GetFieldSizes(Game.Map)
 
             batchlor.Begin()
+
+            'Zeichne Verbindungen
+            batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
+            batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
+
             'Draw fields
             For j = 0 To Game.Spielers.Length - 1
                 'Zeichne Spielfeld
@@ -122,10 +127,6 @@ Namespace Game.BetretenVerboten.Renderers
                     End Select
                 Next
             Next
-
-            'Zeichne Verbindungen
-            If Game.Map = 0 Then batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
-            batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             'Zeichne UFO-Felder
             For Each element In Game.SaucerFields
