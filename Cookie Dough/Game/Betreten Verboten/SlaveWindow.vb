@@ -382,10 +382,7 @@ Namespace Game.BetretenVerboten
                         ElseIf ichmagzüge.Count = 0 Then
                             StopUpdating = True
                             HUDInstructions.Text = "No sacrificable piece!"
-                            Core.Schedule(1, Sub()
-                                                 SubmitResults(0, -2)
-                                                 StopUpdating = False
-                                             End Sub)
+                            Core.Schedule(1, Sub() SubmitResults(0, -2))
                             'Move camera
                             FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
                         Else

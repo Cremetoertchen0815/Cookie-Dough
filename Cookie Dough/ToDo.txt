@@ -1,9 +1,4 @@
 ﻿BV:
--Fix score syncing
--Fix free sacrifice button
--Fix skipping when sacrificing doesn't work
--Can't click on join round
--Fix slave not joining when Chache folder missing(sound always custom?)
 -UFO glitcht ins Haus rein auf andere Figur
 -fix once/thrice dicing
 -Fix 6 player connection texture

@@ -283,7 +283,7 @@ Namespace Menu.MainMenu
                     Try
                         BlockOnlineJoin = True
                         Dim client As New Game.BetretenVerboten.SlaveWindow(ins)
-                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnScreenObscured = AddressOf client.SendArrived : BlockOnlineJoin = True Else Microsoft.VisualBasic.MsgBox("Error connecting!")
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnScreenObscured = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False
                         Microsoft.VisualBasic.MsgBox("Error connecting!")
