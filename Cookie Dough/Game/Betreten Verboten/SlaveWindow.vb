@@ -38,6 +38,7 @@ Namespace Game.BetretenVerboten
         Private WürfelTriggered As Boolean 'Gibt an ob gerade gewürfelt wird
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
         Private Fahrzahl As Integer 'Anzahl der Felder die gefahren werden kann
+        Private DontKickSacrifice As Boolean 'Gibt an, ob die zu opfernde Figur nicht gekickt werden soll
         Private DreifachWürfeln As Boolean 'Gibt an(am Anfang des Spiels), dass ma drei Versuche hat um eine 6 zu bekommen
         Private lastmstate As MouseState
         Private lastkstate As KeyboardState
@@ -952,8 +953,6 @@ Namespace Game.BetretenVerboten
             If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                 SFX(2).Play()
                 SendGameClosed()
-                Spielers(UserIndex).SacrificeCounter = SacrificeWait
-                HUDBtnD.Text = "(" & SacrificeWait & ")"
                 LocalClient.blastmode = False
                 NetworkMode = False
                 Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
@@ -994,6 +993,9 @@ Namespace Game.BetretenVerboten
                 Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
                 If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                     Status = SpielStatus.WähleOpfer
+                    DontKickSacrifice = Spielers(UserIndex).SacrificeCounter < 0
+                    Spielers(UserIndex).SacrificeCounter = SacrificeWait
+                    HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
                 Else

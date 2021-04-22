@@ -182,7 +182,7 @@ Namespace Menu.MainMenu
                         End If
                     End If
                     If New Rectangle(1400, 605, 100, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
-                        Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select profile picture"}
+                        Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
                         If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
                             IO.File.Copy(ofd.FileName, "Cache\client\sound.audio", True)
                         End If
