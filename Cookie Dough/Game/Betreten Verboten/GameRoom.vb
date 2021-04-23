@@ -651,6 +651,8 @@ Namespace Game.BetretenVerboten
                         SendPlayerLeft(source)
                     Case "j"c 'God got activated
                         Dim figur As Integer = CInt(element(2).ToString)
+                        DontKickSacrifice = Spielers(source).SacrificeCounter < 0
+                        Spielers(source).SacrificeCounter = SacrificeWait
                         Sacrifice(source, figur)
                     Case "n"c 'Switch player
                         SwitchPlayer()

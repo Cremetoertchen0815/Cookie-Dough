@@ -957,7 +957,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub AngerButton() Handles HUDBtnC.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 Then
+            If Status = SpielStatus.Würfel And Not StopUpdating Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
@@ -985,7 +985,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub SacrificeButton() Handles HUDBtnD.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating Then
+            If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
                 If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then

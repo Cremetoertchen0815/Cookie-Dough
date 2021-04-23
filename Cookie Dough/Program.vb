@@ -28,14 +28,14 @@ Namespace Cookie_Dough
         <STAThread>
         Friend Sub Main()
             'Using-Block gibt nach Beendigung des Spiels Resourcen frei und ruft game.Dispose() auf.
-            Try
-                Using game As New Game1
+            'Try
+            Using game As New Game1
                     game.Run()
                 End Using
-            Catch ex As Exception
-                NoteError(ex, True)
-            End Try
-            StopServer()
+                'Catch ex As Exception
+                '    NoteError(ex, True)
+                'End Try
+                StopServer()
             Process.GetCurrentProcess.Kill()
         End Sub
     End Module

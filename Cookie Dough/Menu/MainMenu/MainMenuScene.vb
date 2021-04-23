@@ -41,7 +41,7 @@ Namespace Menu.MainMenu
 
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
-            GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", False), ("pain.", "Schlafmütze", False), ("Wonderkat", "Uno", False),
+            GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", False), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", False),
                         ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Guess Shit", "Stadt, Land, Fluss", False), ("Mondayn Painter", "Skribbl", False)}
         End Sub
 
