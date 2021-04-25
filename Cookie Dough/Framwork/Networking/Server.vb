@@ -18,11 +18,26 @@ Namespace Framework.Networking
         Private list As New List(Of Connection)
         Private games As New Dictionary(Of Integer, IGame)
         Private RNG As New System.Random
+        Private LogPath As String = "Log\server.log"
+        Private streamw As StreamWriter
 
         Public Sub StartServer()
             MainThread = New Thread(AddressOf ServerMainSub)
             MainThread.Start()
             ServerActive = True
+
+            Try
+                'Create file stream
+                If Not File.Exists(LogPath) Then
+                    streamw = File.CreateText(LogPath)
+                Else
+                    Dim oldtxt As String = File.ReadAllText(LogPath)
+                    streamw = New StreamWriter(LogPath) With {.AutoFlush = True}
+                    streamw.Write(oldtxt)
+                End If
+            Catch x As Exception
+                Console.WriteLine("Error logging file blocked!")
+            End Try
         End Sub
 
         Private Sub SendToAllClients(ByVal s As String)
@@ -70,6 +85,9 @@ Namespace Framework.Networking
                 If ServerActive Then
                     ServerActive = False
                     server.Stop()
+                    streamw.WriteLine()
+                    streamw.Close()
+                    streamw.Dispose()
                 End If
             Catch
             End Try
@@ -205,13 +223,13 @@ Namespace Framework.Networking
 
         Private Function ReadString(con As Connection) As String
             Dim tmp As String = con.StreamR.ReadLine
-            If Not tmp.Contains("_TATA_") Then Console.WriteLine("[I]" & tmp)
+            If Not tmp.Contains("_TATA_") Then Console.WriteLine("[I]" & tmp) : streamw.WriteLine("[" & con.Nick & "]: " & tmp)
             If tmp = "I'm outta here!" Then Throw New Exception("Client disconnected!")
             Return tmp
         End Function
 
         Private Sub WriteString(con As Connection, str As String)
-            If Not str.Contains("_TATA_") Then Console.WriteLine("[O]" & str)
+            If Not str.Contains("_TATA_") Then Console.WriteLine("[O]" & str) : streamw.WriteLine("[Server]: " & str)
             con.StreamW.WriteLine(str)
         End Sub
 

@@ -1,7 +1,5 @@
 ﻿BV:
--Log server conversation
 -NO ERROR LOGGING WHEN DEBUGGING
--Sacrfice you shouldn't be able to kick in the house
 -Johannes
 -fix once/thrice dicing
 -Add an options menu
