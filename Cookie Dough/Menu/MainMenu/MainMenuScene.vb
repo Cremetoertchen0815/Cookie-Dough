@@ -74,6 +74,8 @@ Namespace Menu.MainMenu
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.BetretenVerboten.GameInstance))
                                 Case GameType.Megäa
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Megäa.GameRoom))
+                                Case GameType.DuoCard
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.GameRoom))
                                 Case GameList.Length
                                     SwitchToSubmenu(0)
                             End Select

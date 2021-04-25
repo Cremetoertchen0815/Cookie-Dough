@@ -3,7 +3,7 @@
     Timestein
     Corridor
     Pain
-    Wonderkat
+    DuoCard
     DooDooHead
     Megäa
     GuessSHit

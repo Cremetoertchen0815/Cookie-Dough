@@ -21,6 +21,8 @@ Namespace Cookie_Dough
         Friend Property SFX As SoundEffect()
         Friend Property ScaleMatrix As Matrix
         Friend Property FgColor As Color = Color.Lime
+        Friend Property hudcolors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Gray}
+        Friend Property playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, Color.Maroon * 1.5F, Color.Blue, Color.Gray}
 
         ' <summary>
         ' The main entry point for the application.

@@ -2,7 +2,6 @@
 -Log server conversation
 -NO ERROR LOGGING WHEN DEBUGGING
 -Sacrfice you shouldn't be able to kick in the house
--Geschenkter Angerbutton funzt nicht
 -Johannes
 -fix once/thrice dicing
 -Add an options menu

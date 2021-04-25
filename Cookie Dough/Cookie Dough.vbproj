@@ -116,6 +116,15 @@
     <Compile Include="Game\Betreten Verboten\Player.vb" />
     <Compile Include="Game\Betreten Verboten\Renderers\Renderer3D.vb" />
     <Compile Include="Game\Betreten Verboten\SlaveWindow.vb" />
+    <Compile Include="Game\DuoCard\Enums.vb" />
+    <Compile Include="Game\DuoCard\GameRoom.vb" />
+    <Compile Include="Game\DuoCard\IGameWindow.vb" />
+    <Compile Include="Game\DuoCard\Networking\ExtGame.vb" />
+    <Compile Include="Game\DuoCard\Networking\SyncMessage.vb" />
+    <Compile Include="Game\DuoCard\Player.vb" />
+    <Compile Include="Game\DuoCard\Renderers\GameRenderable.vb" />
+    <Compile Include="Game\DuoCard\Renderers\Renderer3D.vb" />
+    <Compile Include="Game\DuoCard\SlaveWindow.vb" />
     <Compile Include="Game\Megäa\Enums.vb" />
     <Compile Include="Game\Megäa\IObject3D.vb" />
     <Compile Include="Game\Megäa\GameRoom.vb" />
@@ -185,9 +194,7 @@
     <Import Include="Nez" />
     <Import Include="System" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Game\DuoCard\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <Import Project="..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets" Condition="Exists('..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets')" />
