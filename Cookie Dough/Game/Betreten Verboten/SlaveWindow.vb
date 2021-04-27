@@ -517,6 +517,7 @@ Namespace Game.BetretenVerboten
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
+                            Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
                         Next
                         If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
@@ -576,6 +577,7 @@ Namespace Game.BetretenVerboten
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
+                            Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
                         Next
                         If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
