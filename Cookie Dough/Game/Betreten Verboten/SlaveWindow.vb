@@ -106,6 +106,21 @@ Namespace Game.BetretenVerboten
 
             If Not LocalClient.JoinGame(ins, Sub(x)
                                                  Map = CInt(x())
+
+                                                 Select Case Map
+                                                     Case GaemMap.Default4Players
+                                                         Player.DefaultArray = {30, -1} '{-1, -1, -1, -1}
+                                                         'FigCount = 4
+                                                         FigCount = 2
+                                                         PlCount = 4
+                                                         SpceCount = 10
+                                                     Case GaemMap.Default6Players
+                                                         Player.DefaultArray = {-1, -1}
+                                                         FigCount = 2
+                                                         PlCount = 6
+                                                         SpceCount = 8
+                                                 End Select
+
                                                  ReDim Spielers(GetMapSize(Map) - 1)
                                                  UserIndex = CInt(x())
                                                  For i As Integer = 0 To GetMapSize(Map) - 1
@@ -127,19 +142,6 @@ Namespace Game.BetretenVerboten
             Chat = New List(Of (String, Color))
             MoveActive = False
             Spielers(UserIndex).CustomSound = GetLocalAudio(My.Settings.Sound)
-
-            Select Case Map
-                Case GaemMap.Default4Players
-                    Player.DefaultArray = {-1, -1, -1, -1}
-                    FigCount = 4
-                    PlCount = 4
-                    SpceCount = 10
-                Case GaemMap.Default6Players
-                    Player.DefaultArray = {-1, -1}
-                    FigCount = 2
-                    PlCount = 6
-                    SpceCount = 8
-            End Select
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
@@ -300,7 +302,7 @@ Namespace Game.BetretenVerboten
                                                                             WürfelWerte(it) = WürfelAktuelleZahl
                                                                             StopUpdating = False
                                                                             'Prüfe, ob Würfeln beendet werden soll
-                                                                            If it >= WürfelWerte.Length - 1 Or (Not DreifachWürfeln And WürfelAktuelleZahl < 6) Or ((DreifachWürfeln Or GetHomebaseCount(SpielerIndex) > 0) And it > 0 And WürfelAktuelleZahl < 6 AndAlso WürfelWerte(it - 1) >= 6) Or (DreifachWürfeln And it >= 2 And WürfelWerte(2) < 6) Then CalcMoves()
+                                                                            If it >= WürfelWerte.Length - 1 Or (Not DreifachWürfeln And WürfelAktuelleZahl < 6) Or (DreifachWürfeln And it > 0 And WürfelAktuelleZahl < 6 AndAlso WürfelWerte(it - 1) >= 6) Or (DreifachWürfeln And it >= 2 And WürfelWerte(2) < 6) Then CalcMoves()
                                                                             WürfelAktuelleZahl = 0
                                                                         End Sub)
 
@@ -683,7 +685,7 @@ Namespace Game.BetretenVerboten
                 Status = SpielStatus.WähleFigur
                 StopUpdating = True
                 Core.Schedule(ErrorCooldown, Sub() StopUpdating = False)
-            ElseIf (GetHomebaseCount(SpielerIndex) = 4 And Not Is6InDiceList()) OrElse Not CanDoAMove() Then 'Falls Homebase komplett voll ist(keine Figur auf Spielfeld) und keine 6 gewürfelt wurde(oder generell kein Zug mehr möglich ist), ist kein Zug möglich und der nächste Spieler ist an der Reihe
+            ElseIf (GetHomebaseCount(SpielerIndex) = FigCount And Not Is6InDiceList()) OrElse Not CanDoAMove() Then 'Falls Homebase komplett voll ist(keine Figur auf Spielfeld) und keine 6 gewürfelt wurde(oder generell kein Zug mehr möglich ist), ist kein Zug möglich und der nächste Spieler ist an der Reihe
                 StopUpdating = True
                 HUDInstructions.Text = "No move possible!"
                 Core.Schedule(ErrorCooldown, Sub()
@@ -826,11 +828,11 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To FigCount - 1
                 Dim tm As Integer = Spielers(player).Spielfiguren(i)
                 If tm >= 0 And tm < PlCount * SpceCount Then Return False 'Falls sich Spieler auf dem Spielfeld befindet, ist dreimal würfeln unmöglich
-                If tm > PlCount * SpceCount - 1 Then fieldlst.Add(tm) 'Merke FIguren, die sich im Haus befinden
+                If tm >= PlCount * SpceCount Then fieldlst.Add(tm) 'Merke Figuren, die sich im Haus befinden
             Next
 
             'Wenn nicht alle FIguren bis an den Anschlag gefahren wurden, darf man nicht dreifach würfeln
-            For i As Integer = PlCount * SpceCount + FigCount - 1 To (PlCount * SpceCount + 4 - fieldlst.Count) Step -1
+            For i As Integer = PlCount * SpceCount + FigCount - 1 To (PlCount * SpceCount + FigCount - fieldlst.Count) Step -1
                 If Not fieldlst.Contains(i) Then Return False
             Next
 

@@ -61,6 +61,7 @@ Namespace Game.BetretenVerboten.Renderers
             MapBuffer.SetData(vertices.ToArray)
 
             FigCount = If(Game.Map = GaemMap.Default6Players, 2, 4)
+            FigCount = 2
             SpceCount = If(Game.Map = GaemMap.Default6Players, 8, 10)
             Feld = New Rectangle(500, 70, 950, 950)
             Center = Feld.Center.ToVector2
