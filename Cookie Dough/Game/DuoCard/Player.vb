@@ -20,15 +20,6 @@ Namespace Game.DuoCard
         ''' </summary>
         Public Property Typ As SpielerTyp = SpielerTyp.CPU Implements IPlayer.Typ
 
-
-        ''' <summary>
-        ''' Positionen der vier Spielfiguren.<br></br>
-        ''' Positionen der Spielfiguren relativ zur Homebase angegeben(-1 = Homebase, 0 = Start-Feld, 1 = erstes Feld nach Start-Feld, ..., 39 = letztes Feld vor Start-Feld, 40 = erstes Feld im Haus, ..., 43 = letztes Feld in Haus)!
-        ''' </summary>
-        <Newtonsoft.Json.JsonIgnore>
-        Public Property Spielfiguren As Integer()
-
-
         ''' <summary>
         ''' Gibt an, wieviele Zusatzpunkte der Spieler hat.
         ''' </summary>

@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Generic
-Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.DuoCard.Renderers
 Imports Cookie_Dough.Menu.MainMenu
@@ -8,7 +7,6 @@ Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
-Imports Nez.Console
 Imports Nez.Tweens
 
 Namespace Game.DuoCard
@@ -20,7 +18,7 @@ Namespace Game.DuoCard
         Implements IGameWindow
 
         'Spiele-Flags und Variables
-        Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As List(Of Player) 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
@@ -57,6 +55,7 @@ Namespace Game.DuoCard
         Private WithEvents HUDDiceBtn As GameRenderable
         Private InstructionFader As ITween(Of Color)
         Private HUDColor As Color
+        Private InputBoxFlag As Boolean = False
         Private Chat As List(Of (String, Color))
 
         'Keystack & other debug shit
@@ -83,16 +82,26 @@ Namespace Game.DuoCard
         Private Const SacrificeWait As Integer = 5
         Sub New()
             'Bereite Flags und Variablen vor
-            Status = SpielStatus.WarteAufOnlineSpieler
-            LocalClient.LeaveFlag = False
-            LocalClient.IsHost = True
             Chat = New List(Of (String, Color))
-            Status = SpielStatus.WarteAufOnlineSpieler
             SpielerIndex = -1
-
+            SwitchPlayer()
+            Status = SpielStatus.WarteAufOnlineSpieler
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
-            If Spielers Is Nothing Then Spielers = {New Player(SpielerTyp.Local), New Player(SpielerTyp.Local), New Player(SpielerTyp.Local), New Player(SpielerTyp.Local)}
+#If DEBUG Then
+            Networking.ExtGame.CreateGame(LocalClient, "Soosenbinder")
+#Else
+            If LocalClient.Connected Then
+                Dim name As String = ""
+                OpenInputbox("Enter a name for the round:", "Start Round", Sub(x) Networking.ExtGame.CreateGame(LocalClient, x))
+                NetworkMode = True
+            Else
+                NetworkMode = False
+                Microsoft.VisualBasic.MsgBox("Client not connected!")
+            End If
+#End If
+
+            If Spielers Is Nothing Then Spielers = New List(Of Player) From {New Player(SpielerTyp.Local)}
 
             LoadContent()
         End Sub
@@ -132,7 +141,7 @@ Namespace Game.DuoCard
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
             Dim sf As SoundEffect = GetLocalAudio(My.Settings.Sound)
-            For i As Integer = 0 To Spielers.Length - 1
+            For i As Integer = 0 To Spielers.Count - 1
                 Dim pl = Spielers(i)
                 If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
             Next
@@ -284,7 +293,7 @@ Namespace Game.DuoCard
             SendNetworkMessageToAll("y" & str)
         End Sub
         Private Sub SendSoundFile()
-            For i As Integer = 0 To Spielers.Length - 1
+            For i As Integer = 0 To Spielers.Count - 1
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Then
                     Dim txt As String = ""
@@ -309,6 +318,16 @@ Namespace Game.DuoCard
                 Return SoundEffect.FromFile("Cache\client\sound.audio")
             End If
         End Function
+        Private Sub OpenInputbox(message As String, title As String, finalaction As Action(Of String), Optional defaultvalue As String = "")
+            If Not InputBoxFlag Then
+                InputBoxFlag = True
+                Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
+                If txt <> "" Then
+                    finalaction.Invoke(txt)
+                End If
+                InputBoxFlag = False
+            End If
+        End Sub
 #End Region
 #Region "Knopfgedrücke"
         Private Sub PostChat(txt As String, color As Color)
@@ -349,7 +368,7 @@ Namespace Game.DuoCard
 #Region "Schnittstellenimplementation"
 
 
-        Private ReadOnly Property IGameWindow_Spielers As Player() Implements IGameWindow.Spielers
+        Private ReadOnly Property IGameWindow_Spielers As List(Of Player) Implements IGameWindow.Spielers
             Get
                 Return Spielers
             End Get

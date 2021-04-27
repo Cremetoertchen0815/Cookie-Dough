@@ -30,12 +30,14 @@ Namespace Cookie_Dough
 
             Dim arg As String() = Environment.GetCommandLineArgs()
             LocalClient = New Client
+#If DEBUG Then
             If (arg.Length > 1 AndAlso arg(1) = "-launchserver") Then
                 StartServer()
                 LocalClient.Connect("127.0.0.1", My.Settings.Username)
             Else
                 LocalClient.Connect("127.0.0.1", My.Settings.Username & "a")
             End If
+#End If
 
             ReferencePixel = New Texture2D(GraphicsDevice, 1, 1)
             ReferencePixel.SetData({Color.White})

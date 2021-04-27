@@ -1,6 +1,9 @@
 ﻿BV:
--NO ERROR LOGGING WHEN DEBUGGING
--Johannes
+-Rename server logs by date and time
+-Free sacrifice doesn't work on slave(counter doesn't go down)
+-Fix when one is in house(2nd last field) and the other one is out in the wild, you can't move by one to go to end of house(6pl, slave)
+-Fix players not syncing
+-Johannes(Fix player switching not working)
 -fix once/thrice dicing
 -Add an options menu
 -8-player version

@@ -1205,19 +1205,24 @@ Namespace Game.BetretenVerboten
                                      If RNG <= pogfactor Then 'Positive effect
                                          Select Case Nez.Random.Range(0, 5)
                                              Case 0
-                                                 'Boost random figure
-                                                 Dim fig = Nez.Random.Range(0, 4)
-                                                 Dim boost = Nez.Random.Range(1, PlCount * 5)
-                                                 Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
-                                                 If futurefield < PlCount * SpceCount AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
-                                                     PostChat("You're lucky! A random figure of yours is being boosted!", Color.White)
-                                                     SendMessage("You're lucky! A random figure of yours is being boosted!")
-                                                     plsdont = True
-                                                     FigurFaderZiel = (pl, fig)
-                                                     StartMoverSub(futurefield)
-                                                     SendFigureTransition(pl, fig, futurefield)
-                                                     Exit Do
-                                                 End If
+                                                 Try
+
+                                                     'Boost random figure
+                                                     Dim fig = Nez.Random.Range(0, FigCount)
+                                                     Dim boost = Nez.Random.Range(1, PlCount * 5)
+                                                     Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
+                                                     If futurefield < PlCount * SpceCount AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                                         PostChat("You're lucky! A random figure of yours is being boosted!", Color.White)
+                                                         SendMessage("You're lucky! A random figure of yours is being boosted!")
+                                                         plsdont = True
+                                                         FigurFaderZiel = (pl, fig)
+                                                         StartMoverSub(futurefield)
+                                                         SendFigureTransition(pl, fig, futurefield)
+                                                         Exit Do
+                                                     End If
+                                                 Catch ex As Exception
+
+                                                 End Try
                                              Case 1
                                                  'Kick random enemy figure
                                                  Dim pla = Nez.Random.Range(0, PlCount)

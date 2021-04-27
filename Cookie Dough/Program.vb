@@ -21,8 +21,8 @@ Namespace Cookie_Dough
         Friend Property SFX As SoundEffect()
         Friend Property ScaleMatrix As Matrix
         Friend Property FgColor As Color = Color.Lime
-        Friend Property hudcolors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Gray}
-        Friend Property playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, Color.Maroon * 1.5F, Color.Blue, Color.Gray}
+        Friend Property hudcolors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Gray, Color.DarkGreen}
+        Friend Property playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, Color.Maroon * 1.5F, Color.Blue, Color.Gray, Color.DarkGreen}
 
         ' <summary>
         ' The main entry point for the application.
@@ -30,14 +30,20 @@ Namespace Cookie_Dough
         <STAThread>
         Friend Sub Main()
             'Using-Block gibt nach Beendigung des Spiels Resourcen frei und ruft game.Dispose() auf.
-            'Try
+#If DEBUG Then
             Using game As New Game1
+                game.Run()
+            End Using
+#Else
+            Try
+                Using game As New Game1
                     game.Run()
                 End Using
-                'Catch ex As Exception
-                '    NoteError(ex, True)
-                'End Try
-                StopServer()
+            Catch ex As Exception
+                NoteError(ex, True)
+            End Try
+#End If
+            StopServer()
             Process.GetCurrentProcess.Kill()
         End Sub
     End Module

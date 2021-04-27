@@ -207,6 +207,8 @@ Namespace Framework.Networking
                     Return Game.BetretenVerboten.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case GameType.Megäa
                     Return Game.Megäa.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
+                Case GameType.DuoCard
+                    Return Game.DuoCard.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case Else
                     Return Nothing
             End Select
@@ -223,13 +225,13 @@ Namespace Framework.Networking
 
         Private Function ReadString(con As Connection) As String
             Dim tmp As String = con.StreamR.ReadLine
-            If Not tmp.Contains("_TATA_") Then Console.WriteLine("[I]" & tmp) : streamw.WriteLine("[" & con.Nick & "]: " & tmp)
+            If Not tmp.Contains("_TATA_") Then Console.WriteLine("[I/" & con.Nick & "]" & tmp) : streamw.WriteLine("[" & con.Nick & "]: " & tmp)
             If tmp = "I'm outta here!" Then Throw New Exception("Client disconnected!")
             Return tmp
         End Function
 
         Private Sub WriteString(con As Connection, str As String)
-            If Not str.Contains("_TATA_") Then Console.WriteLine("[O]" & str) : streamw.WriteLine("[Server]: " & str)
+            If Not str.Contains("_TATA_") Then Console.WriteLine("[O/" & con.Nick & "]" & str)
             con.StreamW.WriteLine(str)
         End Sub
 

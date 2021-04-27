@@ -194,6 +194,7 @@ Namespace Menu.MainMenu
                             Microsoft.VisualBasic.MsgBox("Invalid sound file!")
                         End Try
                     End If
+                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
             End Select
 
 
