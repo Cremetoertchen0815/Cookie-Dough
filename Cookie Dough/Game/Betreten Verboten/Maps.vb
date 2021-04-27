@@ -214,8 +214,8 @@ Namespace Game.BetretenVerboten
                     Dim matrx As Matrix = transmatrices1(pl)
                     Select Case chr
                         Case -1
-                        Case 60, 61, 62, 63 'Figur in Haus
-                            vec = Map1GetLocalPos(chr - 46)
+                        Case 48, 49 'Figur in Haus
+                            vec = Map1GetLocalPos(chr - 34)
                         Case Else 'Figur auf Feld
                             vec = Map1GetLocalPos((chr Mod 8) + 4)
                             matrx = transmatrices1((pl + Math.Floor(chr / 8)) Mod 6)

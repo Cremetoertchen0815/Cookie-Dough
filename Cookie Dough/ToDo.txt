@@ -1,4 +1,5 @@
 ﻿BV:
+-Sacrifice: Allows you to double move count
 -Rename server logs by date and time
 -Johannes(Fix player switching not working)
 -Add an options menu

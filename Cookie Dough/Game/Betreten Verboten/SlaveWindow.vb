@@ -109,7 +109,7 @@ Namespace Game.BetretenVerboten
 
                                                  Select Case Map
                                                      Case GaemMap.Default4Players
-                                                         Player.DefaultArray = {30, -1} '{-1, -1, -1, -1}
+                                                         Player.DefaultArray = {-1, -1} '{-1, -1, -1, -1}
                                                          'FigCount = 4
                                                          FigCount = 2
                                                          PlCount = 4
@@ -440,6 +440,9 @@ Namespace Game.BetretenVerboten
 
 #Region "Netzwerkfunktionen"
         Private Sub ReadAndProcessInputData()
+            If MoveActive Then Return
+
+            'Implement move active
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
                 Dim command As Char = element(0)
