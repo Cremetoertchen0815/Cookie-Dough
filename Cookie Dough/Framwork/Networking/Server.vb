@@ -18,7 +18,7 @@ Namespace Framework.Networking
         Private list As New List(Of Connection)
         Private games As New Dictionary(Of Integer, IGame)
         Private RNG As New System.Random
-        Private LogPath As String = "Log\server.log"
+        Private LogPath As String = "Log\" & Date.Now.ToShortDateString & ".log"
         Private streamw As StreamWriter
 
         Public Sub StartServer()
