@@ -22,7 +22,6 @@ Namespace Game.Megäa.Renderers
         Private QuadEffect As BasicEffect
 
         'Player
-        Friend Shared PlayerColors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, Color.Maroon, Color.Blue, Color.Gray}
         Private PlayerModel As Model
         Private PlayerModelHeadless As Model
         Friend PlayerTransform As Matrix
@@ -166,14 +165,14 @@ Namespace Game.Megäa.Renderers
                     'Draw local player
                     For i As Integer = 0 To PlayerModelHeadless.Meshes.Count - 1
                         Dim element As ModelMesh = PlayerModelHeadless.Meshes(If(i = 2, 1, i))
-                        ApplyFX(element, PlayerColors(p), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * player.GetWorldMatrix)
+                        ApplyFX(element, playcolor(p), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * player.GetWorldMatrix)
                         element.Draw()
                     Next
                 Else
                     'Draw other player
                     For i As Integer = 0 To PlayerModel.Meshes.Count - 1
                         Dim element As ModelMesh = PlayerModel.Meshes(i)
-                        ApplyFX(element, If(i = 2, Color.White, PlayerColors(p)), element.ParentBone.ModelTransform * PlayerTransform * player.GetWorldMatrix)
+                        ApplyFX(element, If(i = 2, Color.White, playcolor(p)), element.ParentBone.ModelTransform * PlayerTransform * player.GetWorldMatrix)
                         element.Draw()
                     Next
                 End If

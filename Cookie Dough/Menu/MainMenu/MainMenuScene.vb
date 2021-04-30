@@ -41,8 +41,8 @@ Namespace Menu.MainMenu
 
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
-            GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", False), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", False),
-                        ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Guess Shit", "Stadt, Land, Fluss", False), ("Mondayn Painter", "Skribbl", False)}
+            GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", False), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
+                        ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Guess Shit", "Stadt, Land, Fluss", False), ("Drop Trop", "Just try it out already.", True)}
         End Sub
 
         Public Overrides Sub Update()
@@ -75,7 +75,9 @@ Namespace Menu.MainMenu
                                 Case GameType.Megäa
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Megäa.GameRoom))
                                 Case GameType.DuoCard
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.GameRoom))
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.GameInstance))
+                                Case GameType.DropTrop
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.GameInstance))
                                 Case GameList.Length
                                     SwitchToSubmenu(0)
                             End Select
@@ -491,8 +493,8 @@ Namespace Menu.MainMenu
                         Return "Megäaaa"
                     Case GameType.GuessSHit
                         Return "Guess Shitn"
-                    Case GameType.MondaynPainter
-                        Return "Mondayn Painter"
+                    Case GameType.DropTrop
+                        Return "Drop Trop"
                     Case Else
                         Return gaem.ToString
                 End Select

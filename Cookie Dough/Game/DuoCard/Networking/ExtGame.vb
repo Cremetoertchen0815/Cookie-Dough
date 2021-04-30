@@ -71,13 +71,17 @@ Namespace Game.DuoCard.Networking
         '-----CLIENT-----
 
         'Create new game and transmit to server(in this case, no extra data in being sent, only the default header)
-        Public Shared Function CreateGame(client As Client, name As String) As Boolean
+        Public Shared Function CreateGame(client As Client, name As String, types As Player()) As Boolean
             'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
             If client.blastmode Or Not client.Connected Then Return False
 
             client.WriteString("create")
             client.WriteString(name)
             client.WriteString(GameType.DuoCard.ToString)
+            For i As Integer = 0 To types.Length - 1
+                client.WriteString(CInt(types(i).Typ).ToString)
+                If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name)
+            Next
             Return client.CreateGameFinal()
         End Function
 

@@ -10,9 +10,9 @@ Namespace Game.BetretenVerboten
         Public Function GetMapName(map As GaemMap) As String
             Select Case map
                 Case GaemMap.Default4Players
-                    Return "Classic"
+                    Return "Plus"
                 Case GaemMap.Default6Players
-                    Return "Big"
+                    Return "Star"
                 Case Else
                     Return "Invalid Map"
             End Select

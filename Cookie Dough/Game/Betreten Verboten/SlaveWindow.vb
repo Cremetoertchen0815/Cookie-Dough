@@ -169,7 +169,7 @@ Namespace Game.BetretenVerboten
             HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
-            HUD.Color = Renderer3D.hudcolors(UserIndex)
+            HUD.Color = hudcolors(UserIndex)
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0))
@@ -410,7 +410,7 @@ Namespace Game.BetretenVerboten
 
                 'Set HUD color
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
-                HUDNameBtn.Color = Renderer3D.hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
+                HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex = UserIndex)
             End If
 
@@ -459,7 +459,7 @@ Namespace Game.BetretenVerboten
                         PostChat("The game has started!", Color.White)
                     Case "c"c 'Sent chat message
                         Dim source As Integer = CInt(element(1).ToString)
-                        PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), Renderer3D.playcolor(source))
+                        PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
                     Case "d"c
                         Dim source As Integer = CInt(element(1).ToString)
                         Dim figure As Integer = CInt(element(2).ToString)
@@ -554,13 +554,13 @@ Namespace Game.BetretenVerboten
 
                                                  Select Case i
                                                      Case 0
-                                                         Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                                         Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                                                      Case 1
-                                                         Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                                         Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                                                      Case 2
-                                                         Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                                         Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                                                      Case Else
-                                                         Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                                         Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                                                  End Select
                                              Next
                                          End Sub)

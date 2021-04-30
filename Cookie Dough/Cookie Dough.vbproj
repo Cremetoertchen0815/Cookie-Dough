@@ -60,6 +60,15 @@
     <Compile Include="Framwork\Misc\VertexExtractor.vb" />
     <Compile Include="Framwork\Networking\IPlayer.vb" />
     <Compile Include="Enums.vb" />
+    <Compile Include="Game\Drop Trop\Enums.vb" />
+    <Compile Include="Game\Drop Trop\GameInstance.vb" />
+    <Compile Include="Game\Drop Trop\GameRoom.vb" />
+    <Compile Include="Game\Drop Trop\IGameWindow.vb" />
+    <Compile Include="Game\Drop Trop\Networking\ExtGame.vb" />
+    <Compile Include="Game\Drop Trop\Networking\SyncMessage.vb" />
+    <Compile Include="Game\Drop Trop\Player.vb" />
+    <Compile Include="Game\Drop Trop\Renderers\GameRenderable.vb" />
+    <Compile Include="Game\Drop Trop\Renderers\Renderer3D.vb" />
     <Compile Include="Game\Betreten Verboten\Networking\ExtGame.vb" />
     <Compile Include="Game\Betreten Verboten\Renderers\GameRenderable.vb" />
     <Compile Include="Framwork\Graphics\PsygroundRenderer.vb" />
@@ -122,6 +131,7 @@
     <Compile Include="Game\Betreten Verboten\Renderers\Renderer3D.vb" />
     <Compile Include="Game\Betreten Verboten\SlaveWindow.vb" />
     <Compile Include="Game\DuoCard\Enums.vb" />
+    <Compile Include="Game\DuoCard\GameInstance.vb" />
     <Compile Include="Game\DuoCard\GameRoom.vb" />
     <Compile Include="Game\DuoCard\IGameWindow.vb" />
     <Compile Include="Game\DuoCard\Networking\ExtGame.vb" />

@@ -7,7 +7,7 @@
     DooDooHead
     Megäa
     GuessSHit
-    MondaynPainter
+    DropTrop
 End Enum
 Public Enum SpielerTyp
     Local = 0

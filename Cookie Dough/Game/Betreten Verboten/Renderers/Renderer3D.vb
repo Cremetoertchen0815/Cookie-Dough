@@ -27,8 +27,6 @@ Namespace Game.BetretenVerboten.Renderers
         Private Projection As Matrix
         Private CamMatrix As Matrix
 
-        Friend Shared hudcolors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Gray}
-        Friend Shared playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, Color.Maroon * 1.5F, Color.Blue, Color.Gray}
         Private Game As IGameWindow
         Private FigCount As Integer
         Private SpceCount As Integer

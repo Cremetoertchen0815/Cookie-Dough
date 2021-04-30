@@ -257,7 +257,7 @@ Namespace Game.Megäa
             ReadAndProcessInputData()
 
             'Set HUD color
-            HUDColor = Renderer3D.PlayerColors(UserIndex)
+            HUDColor = playcolor(UserIndex)
             HUDBtnA.Color = HUDColor : HUDBtnA.Border = New ControlBorder(HUDColor, HUDBtnA.Border.Width)
             HUDBtnB.Color = HUDColor : HUDBtnB.Border = New ControlBorder(HUDColor, HUDBtnB.Border.Width)
             HUDBtnC.Color = HUDColor : HUDBtnC.Border = New ControlBorder(HUDColor, HUDBtnC.Border.Width)
@@ -266,7 +266,7 @@ Namespace Game.Megäa
             HUDFullscrBtn.Color = HUDColor : HUDFullscrBtn.Border = New ControlBorder(HUDColor, HUDFullscrBtn.Border.Width)
             HUDMusicBtn.Color = HUDColor : HUDMusicBtn.Border = New ControlBorder(HUDColor, HUDMusicBtn.Border.Width)
             HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name, "")
-            HUDNameBtn.Color = If(SpielerIndex > -1, Renderer3D.PlayerColors(SpielerIndex), Color.White)
+            HUDNameBtn.Color = If(SpielerIndex > -1, playcolor(SpielerIndex), Color.White)
             HUDInstructions.Active = Status <> GameStatus.GameActive OrElse (Spielers(SpielerIndex).Typ = SpielerTyp.Local)
 
             lastmstate = Mouse.GetState
@@ -293,7 +293,7 @@ Namespace Game.Megäa
                         SendPlayerArrived(source, Spielers(source).Name)
                     Case "c"c 'Sent chat message
                         Dim text As String = element.Substring(2)
-                        PostChat("[" & Spielers(source).Name & "]: " & text, Renderer3D.PlayerColors(source))
+                        PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
                         SendChatMessage(source, text)
                     Case "e"c 'Suspend gaem
                         If Status <> GameStatus.WaitingForOnlinePlayers Then StopUpdating = True

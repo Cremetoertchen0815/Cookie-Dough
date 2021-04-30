@@ -18,7 +18,7 @@ Namespace Game.DuoCard
         Implements IGameWindow
 
         'Spiele-Flags und Variables
-        Friend Spielers As List(Of Player) 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
@@ -88,20 +88,7 @@ Namespace Game.DuoCard
             Status = SpielStatus.WarteAufOnlineSpieler
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
-#If DEBUG Then
-            Networking.ExtGame.CreateGame(LocalClient, "Soosenbinder")
-#Else
-            If LocalClient.Connected Then
-                Dim name As String = ""
-                OpenInputbox("Enter a name for the round:", "Start Round", Sub(x) Networking.ExtGame.CreateGame(LocalClient, x))
-                NetworkMode = True
-            Else
-                NetworkMode = False
-                Microsoft.VisualBasic.MsgBox("Client not connected!")
-            End If
-#End If
-
-            If Spielers Is Nothing Then Spielers = New List(Of Player) From {New Player(SpielerTyp.Local)}
+            If Spielers Is Nothing Then Spielers = {New Player(SpielerTyp.Local), New Player(SpielerTyp.CPU)}
 
             LoadContent()
         End Sub
@@ -141,7 +128,7 @@ Namespace Game.DuoCard
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
             Dim sf As SoundEffect = GetLocalAudio(My.Settings.Sound)
-            For i As Integer = 0 To Spielers.Count - 1
+            For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
                 If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
             Next
@@ -293,7 +280,7 @@ Namespace Game.DuoCard
             SendNetworkMessageToAll("y" & str)
         End Sub
         Private Sub SendSoundFile()
-            For i As Integer = 0 To Spielers.Count - 1
+            For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Then
                     Dim txt As String = ""
@@ -368,7 +355,7 @@ Namespace Game.DuoCard
 #Region "Schnittstellenimplementation"
 
 
-        Private ReadOnly Property IGameWindow_Spielers As List(Of Player) Implements IGameWindow.Spielers
+        Private ReadOnly Property IGameWindow_Spielers As Player() Implements IGameWindow.Spielers
             Get
                 Return Spielers
             End Get

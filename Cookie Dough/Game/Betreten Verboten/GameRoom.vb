@@ -159,7 +159,7 @@ Namespace Game.BetretenVerboten
             HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
-            HUD.Color = Renderer3D.hudcolors(0)
+            HUD.Color = hudcolors(0)
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
@@ -258,13 +258,13 @@ Namespace Game.BetretenVerboten
                         Dim ia As Integer = i
                         Select Case i
                             Case 0
-                                Core.Schedule(1 + i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                Core.Schedule(1 + i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                             Case 1
-                                Core.Schedule(1 + i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                Core.Schedule(1 + i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                             Case 2
-                                Core.Schedule(1 + i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                Core.Schedule(1 + i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                             Case Else
-                                Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", Renderer3D.playcolor(ranks(ia).Item1)))
+                                Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                         End Select
                     Next
                     SendWinFlag()
@@ -593,7 +593,7 @@ Namespace Game.BetretenVerboten
 
                 'Set HUD color
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
-                HUDNameBtn.Color = Renderer3D.hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
+                HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (Spielers(SpielerIndex).Typ = SpielerTyp.Local)
             End If
 
@@ -640,7 +640,7 @@ Namespace Game.BetretenVerboten
                         SendPlayerArrived(source, Spielers(source).Name)
                     Case "c"c 'Sent chat message
                         Dim text As String = element.Substring(2)
-                        PostChat("[" & Spielers(source).Name & "]: " & text, Renderer3D.playcolor(source))
+                        PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
                         SendChatMessage(source, text)
                     Case "e"c 'Suspend gaem
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
@@ -1333,7 +1333,7 @@ Namespace Game.BetretenVerboten
             HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
             HUDBtnD.Active = SpielerIndex = UserIndex
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
-            HUD.Color = Renderer3D.hudcolors(UserIndex)
+            HUD.Color = hudcolors(UserIndex)
             ShowDice = True
             StopUpdating = False
             SendGameActive()

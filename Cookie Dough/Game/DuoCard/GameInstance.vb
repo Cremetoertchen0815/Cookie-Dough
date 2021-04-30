@@ -1,9 +1,9 @@
-﻿Imports Cookie_Dough.Game.BetretenVerboten.Networking
+﻿Imports Cookie_Dough.Game.DuoCard.Networking
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 
-Namespace Game.BetretenVerboten
+Namespace Game.DuoCard
     ''' <summary>
     ''' Enthällt das Menu des Spiels und verwaltet die Spiele-Session
     ''' </summary>
@@ -13,11 +13,10 @@ Namespace Game.BetretenVerboten
         'Menü Flags
         Private MenuAktiviert As Boolean = True
         Private lastmstate As MouseState
-        Private NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
+        Private NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.None, SpielerTyp.None, SpielerTyp.None}
         Private ChangeNameButtonPressed As Boolean = False
         Private PlayerCount As Integer = 4
         Private PlayerSel As Integer = 0
-        Private Map As GaemMap = 0
         Protected Schwarzblende As New Transition(Of Single)
 
         'Konstanten
@@ -34,7 +33,6 @@ Namespace Game.BetretenVerboten
 
             'Init values
             NewGamePlayers = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
-            Map = GaemMap.Default4Players
             PlayerCount = 4
             PlayerSel = 0
             MenuAktiviert = True
@@ -55,11 +53,6 @@ Namespace Game.BetretenVerboten
             Dim OneshotPressed As Boolean = mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released
 
             If MenuAktiviert And Not ChangeNameButtonPressed Then
-                If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
-                    Map = (Map + 1) Mod 2
-                    ReDim NewGamePlayers(GetMapSize(Map) - 1)
-                    SFX(2).Play()
-                End If
                 If New Rectangle(560, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel -= 1 : SFX(2).Play()
                 If New Rectangle(960, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel += 1 : SFX(2).Play()
                 If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then
@@ -75,7 +68,7 @@ Namespace Game.BetretenVerboten
                     SFX(2).Play()
 
                     Dim Internetz As Boolean = False
-                    For i As Integer = 0 To GetMapSize(Map) - 1
+                    For i As Integer = 0 To PlayerCount - 1
                         If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
                     Next
 
@@ -86,36 +79,36 @@ Namespace Game.BetretenVerboten
                     End If
                 End If
 
-                PlayerCount = GetMapSize(Map)
                 PlayerSel = Math.Min(Math.Max(PlayerSel, 0), PlayerCount - 1)
             End If
 
             lastmstate = mstate
             MyBase.Update()
         End Sub
+
         Private Sub StartNewRound(servername As String)
             If Not MenuAktiviert Then Return
 
             Dim Internetz As Boolean = False
-            For i As Integer = 0 To GetMapSize(Map) - 1
+            For i As Integer = 0 To PlayerCount - 1
                 If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
             Next
             If Internetz Then LocalClient.AutomaticRefresh = False
 
-            Dim AktuellesSpiel As New GameRoom(Map)
+            Dim AktuellesSpiel As New GameRoom() With {.PlCount = PlayerCount}
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.NetworkMode = False
-            AktuellesSpiel.Spielers(0) = New Player(NewGamePlayers(0), Difficulty.Smart) With {.Name = If(NewGamePlayers(0) = SpielerTyp.Local, My.Settings.Username, farben(0))}
+            AktuellesSpiel.Spielers(0) = New Player(NewGamePlayers(0)) With {.Name = If(NewGamePlayers(0) = SpielerTyp.Local, My.Settings.Username, farben(0))}
             For i As Integer = 1 To AktuellesSpiel.PlCount - 1
                 Select Case NewGamePlayers(i)
                     Case SpielerTyp.Local
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local, My.Settings.Schwierigkeitsgrad) With {.Name = My.Settings.Username & "-" & (i + 1).ToString}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local) With {.Name = My.Settings.Username & "-" & (i + 1).ToString}
                     Case SpielerTyp.CPU
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU, Difficulty.Smart) With {.Name = farben(i)}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU) With {.Name = farben(i)}
                     Case SpielerTyp.Online
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Online, My.Settings.Schwierigkeitsgrad) With {.Bereit = False}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Online) With {.Bereit = False}
                     Case SpielerTyp.None
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.None, My.Settings.Schwierigkeitsgrad) With {.Bereit = True}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.None) With {.Bereit = True}
                 End Select
             Next
 
@@ -123,7 +116,7 @@ Namespace Game.BetretenVerboten
             Core.StartSceneTransition(New FadeTransition(Function() AktuellesSpiel)).OnScreenObscured = Sub()
                                                                                                             AktuellesSpiel.LoadContent()
                                                                                                             If Internetz Then
-                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
+                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, AktuellesSpiel.Spielers) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                             End If
                                                                                                         End Sub
 
@@ -188,7 +181,6 @@ Namespace Game.BetretenVerboten
                 batcher.DrawLine(New Vector2(1920.0F / 2, 500), New Vector2(1920.0F / 2, 600), FgColor)
                 batcher.DrawString(MediumFont, "←", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("←").X / 2, 525), FgColor)
                 batcher.DrawString(MediumFont, "→", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("→").X / 2, 525), FgColor)
-                batcher.DrawString(MediumFont, "Map: " & GetMapName(instance.Map), New Vector2(1920.0F / 2 - MediumFont.MeasureString("Map: " & GetMapName(instance.Map)).X / 2, 225), FgColor)
                 batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 375), FgColor)
                 batcher.DrawString(MediumFont, "Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString).X / 2, 675), FgColor)
                 batcher.DrawHollowRect(New Rectangle(560, 900, 800, 100), FgColor)
