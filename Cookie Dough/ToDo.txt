@@ -1,5 +1,4 @@
 ﻿BV:
--Fix BV Cpu to ignore empty homebases and to not be scared of homebase
 -Add Jakob Sounds as Easter eggs(Victory Jingle as music + scream when kicked)
 -Sacrifice: Allows you to double move count
 -Rename server logs by date and time

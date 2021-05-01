@@ -476,9 +476,11 @@ Namespace Game.BetretenVerboten
 
 
                                                 'Risk: nicht auf das Startfeld/den Eingangsbereich eines gegners stellen da eine neue figur erscheinen könnte.
-                                                If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 Then
+                                                Dim aimpl As Integer = Math.Floor(Globpos(1) / SpceCount)
+                                                Dim ishomeregionbusy As Boolean = locpos(1) < PlCount * SpceCount And aimpl <> SpielerIndex AndAlso GetHomebaseIndex(aimpl) > -1
+                                                If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 And ishomeregionbusy Then
                                                     Scores(element) /= 4
-                                                ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 Then
+                                                ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 And ishomeregionbusy Then
                                                     Scores(element) /= 2
                                                 End If
 
