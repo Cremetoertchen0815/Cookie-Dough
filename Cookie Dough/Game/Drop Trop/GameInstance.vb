@@ -159,7 +159,16 @@ Namespace Game.DropTrop
         End Property
 
         Public Shared Function GetMapSize(map As GaemMap) As Vector2
-            Return Vector2.One * 12
+            Select Case map
+                Case GaemMap.Smol
+                    Return Vector2.One * 10
+                Case GaemMap.Big
+                    Return Vector2.One * 12
+                Case GaemMap.Huuuge
+                    Return Vector2.One * 14
+                Case GaemMap.TREMENNNDOUS
+                    Return Vector2.One * 16
+            End Select
         End Function
 
         Public Class MenuRenderer

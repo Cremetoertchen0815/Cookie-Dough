@@ -11,7 +11,7 @@ Namespace Game.DropTrop.Networking
         Public Property Ended As Boolean = False Implements IGame.Ended
         Public Property Active As Boolean = False Implements IGame.Active
         Public Property HostConnection As Connection Implements IGame.HostConnection
-        Public ReadOnly Property Type As GameType = GameType.BetretenVerboten Implements IGame.Type
+        Public ReadOnly Property Type As GameType = GameType.DropTrop Implements IGame.Type
         Private ReadOnly Property IGame_Players As IPlayer() Implements IGame.Players
             Get
                 Return Players
@@ -73,8 +73,9 @@ Namespace Game.DropTrop.Networking
 
             client.WriteString("create")
             client.WriteString(name)
-            client.WriteString(GameType.BetretenVerboten.ToString)
+            client.WriteString(GameType.DropTrop.ToString)
             client.WriteString(CInt(map).ToString)
+            client.WriteString(types.Length)
             For i As Integer = 0 To types.Length - 1
                 client.WriteString(CInt(types(i).Typ).ToString)
                 If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name)

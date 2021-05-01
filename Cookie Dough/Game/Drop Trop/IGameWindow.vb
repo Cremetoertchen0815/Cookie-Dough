@@ -11,6 +11,7 @@ Namespace Game.DropTrop
         ReadOnly Property SpielerIndex As Integer 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         ReadOnly Property UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         ReadOnly Property HUDColor As Color
+        ReadOnly Property Map As GaemMap
         ReadOnly Property BGTexture As Texture2D
         ReadOnly Property CurrentCursor As Vector2
         ReadOnly Property Spielfeld As Dictionary(Of Vector2, Integer)

@@ -1,6 +1,9 @@
 ﻿Imports System.Collections.Generic
+Imports System.IO
 Imports System.Linq
+Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
+Imports Cookie_Dough.Game.DropTrop.Networking
 Imports Cookie_Dough.Game.DropTrop.Renderers
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
@@ -14,15 +17,16 @@ Namespace Game.DropTrop
     ''' <summary>
     ''' Enthällt den eigentlichen Code für das Basis-Spiel
     ''' </summary>
-    Public Class GameRoom
+    Public Class SlaveWindow
         Inherits Scene
         Implements IGameWindow
 
         'Spiele-Flags und Variables
         Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer
+        Friend Rejoin As Boolean = False
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
-        Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
+        Friend SpielerIndex As Integer = 0 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
@@ -74,7 +78,6 @@ Namespace Game.DropTrop
         Private rects As Dictionary(Of Vector2, Rectangle)
         Private Map As GaemMap
         Friend Spielfeld As New Dictionary(Of Vector2, Integer)
-        Friend SpielfeldUpdates As New List(Of (Vector2, Integer))
         Friend SpielfeldSize As Vector2
         Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)} 'Bewegt die Kamera 
         Friend CPUTimer As Single 'Timer-Flag um der CPU etwas "Überlegzeit" zu geben
@@ -84,22 +87,51 @@ Namespace Game.DropTrop
         Private CPUThinkingTime As Single = 0.6
         Private CPUMoveTime As Integer = 100
         Private CamSpeed As Integer = 1300
-        Sub New(map As GaemMap)
+        Sub New(ins As OnlineGameInstance)
+            LocalClient.AutomaticRefresh = False
+            NetworkMode = False
+
+            If Not LocalClient.JoinGame(ins, Sub(x)
+                                                 Map = CInt(x())
+                                                 SpielfeldSize = GameInstance.GetMapSize(Map)
+                                                 Select Case Map
+                                                     Case GaemMap.Smol
+                                                         PlCount = 2
+                                                     Case GaemMap.Big
+                                                         PlCount = 4
+                                                     Case GaemMap.Huuuge
+                                                         PlCount = 6
+                                                     Case GaemMap.TREMENNNDOUS
+                                                         PlCount = 8
+                                                 End Select
+                                                 ReDim Spielers(PlCount - 1)
+                                                 UserIndex = CInt(x())
+                                                 For i As Integer = 0 To PlCount - 1
+                                                     Dim type As SpielerTyp = CInt(x())
+                                                     Dim name As String = x()
+                                                     Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
+                                                 Next
+
+                                                 Rejoin = x() = "Rejoin"
+                                             End Sub) Then LocalClient.AutomaticRefresh = True : Return
+
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
-            SpielfeldSize = GameInstance.GetMapSize(map)
             LocalClient.LeaveFlag = False
             LocalClient.IsHost = True
+            NetworkMode = True
+            StopUpdating = True
             Chat = New List(Of (String, Color))
             Status = SpielStatus.WarteAufOnlineSpieler
-            SpielerIndex = -1
             MoveActive = False
-            Me.Map = map
+            Me.Map = Map
             CoreInstance = CType(Core.Instance, Cookie_Dough.Game1)
             Timer = New TimeSpan(0, 0, 22, 22, 22)
             LastTimer = Timer
 
-            Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
+            LoadContent()
+
+            Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
         End Sub
 
         Public Sub LoadContent()
@@ -136,13 +168,7 @@ Namespace Game.DropTrop
             Feld = New Rectangle(500, 70, 950, 950)
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
-
-
-            Dim sf As SoundEffect = GetLocalAudio(My.Settings.Sound)
-            For i As Integer = 0 To Spielers.Length - 1
-                Dim pl = Spielers(i)
-                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
-            Next
+            Spielers(UserIndex).CustomSound = GetLocalAudio(My.Settings.Sound)
 
             'Generate Spielfeld
             For x As Integer = 0 To SpielfeldSize.X - 1
@@ -166,11 +192,11 @@ Namespace Game.DropTrop
                     Spielfeld(CurrentCursor + New Vector2(x, y)) = (x + y) Mod PlCount
                 Next
             Next
-            CalcScore
+            CalcScore()
         End Sub
 
         Public Overrides Sub Unload()
-            Framework.Networking.Client.OutputDelegate = Sub(x) Return
+            Client.OutputDelegate = Sub(x) Return
         End Sub
 
         ''' <summary>
@@ -198,10 +224,10 @@ Namespace Game.DropTrop
                     Case SpielStatus.SpielAktiv
 
                         'Check if action was being performed and calculate moves
-                        If GetPlayerInput() AndAlso CalcMove() Then
+                        If UserIndex = SpielerIndex AndAlso GetPlayerInput() AndAlso CalcMove() Then
                             StopUpdating = True
                             SendMoves()
-                            Core.Schedule(CPUThinkingTime, AddressOf SwitchPlayer)
+                            Core.Schedule(CPUThinkingTime, AddressOf SendSwitch)
                         End If
 
 
@@ -212,36 +238,9 @@ Namespace Game.DropTrop
                     Case SpielStatus.WarteAufOnlineSpieler
                         HUDInstructions.Text = "Waiting for all players to connect..."
 
-                        'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
-                        For Each sp In Spielers
-                            If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein SPieler noch nicht belegt/bereit, breche Spielstart ab
-                        Next
-
-                        'Falls vollzählig, starte Spiel
-                        StopUpdating = True
-                        Core.Schedule(0.8, Sub()
-                                               PostChat("The game has started!", Color.White)
-                                               SendBeginGaem()
-                                               SwitchPlayer()
-                                           End Sub)
                     Case SpielStatus.SpielZuEnde
                         StopUpdating = True
                 End Select
-
-                'Implement timer
-                Timer -= TimeSpan.FromSeconds(Time.DeltaTime)
-                If Timer.Hours <> LastTimer.Hours And LastTimer.Hours > 0 Then
-                    PostChat(LastTimer.Hours.ToString & " hours left!", Color.White)
-                    SendMessage(LastTimer.Hours.ToString & " hours left!")
-                ElseIf Timer.Minutes <> LastTimer.Minutes And LastTimer.Hours = 0 And (LastTimer.Minutes = 15 Or LastTimer.Minutes = 30 Or LastTimer.Minutes = 5 Or LastTimer.Minutes = 1) Then
-                    PostChat(LastTimer.Minutes.ToString & " minutes left!", Color.White)
-                    SendMessage(LastTimer.Minutes.ToString & " minutes left!")
-                ElseIf Timer.TotalSeconds <> LastTimer.TotalSeconds And LastTimer.Hours = 0 And LastTimer.Minutes = 0 And LastTimer.Seconds = 0 And Not TimeOver Then
-                    PostChat("Time over!", Color.White)
-                    SendMessage("Time over!")
-                    TimeOver = True
-                End If
-                LastTimer = Timer
 
                 'Set HUD color
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name, "")
@@ -277,116 +276,174 @@ Namespace Game.DropTrop
         ''' Liest die Daten aus dem Stream des Servers
         ''' </summary>
         Private Sub ReadAndProcessInputData()
-            If MoveActive Then Return
 
+            'Implement move active
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
-                Dim source As Integer = CInt(element(0).ToString)
-                Dim command As Char = element(1)
+                Dim command As Char = element(0)
                 Select Case command
                     Case "a"c 'Player arrived
+                        Dim source As Integer = CInt(element(1).ToString)
                         Spielers(source).Name = element.Substring(2)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
-                        SendPlayerArrived(source, Spielers(source).Name)
+                    Case "b"c 'Begin gaem
+                        SendSoundFile()
+                        StopUpdating = False
+                        Status = SpielStatus.Waitn
+                        PostChat("The game has started!", Color.White)
                     Case "c"c 'Sent chat message
-                        Dim text As String = element.Substring(2)
-                        PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
-                        SendChatMessage(source, text)
+                        Dim source As Integer = CInt(element(1).ToString)
+                        PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
                     Case "e"c 'Suspend gaem
-                        If Spielers(source).Typ = SpielerTyp.None Then Continue For
-                        Spielers(source).Bereit = False
-                        PostChat(Spielers(source).Name & " left!", Color.White)
-                        If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
-                        If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
-                        SendPlayerLeft(source)
-                    Case "n"c 'Switch player
-                        SwitchPlayer()
-                    Case "p"c 'Pressed on piece
-                        If SpielerIndex = source Then NetworkLocation = JsonConvert.DeserializeObject(Of Vector2)(element.Substring(2))
-                    Case "r"c 'Player is back
+                        Dim who As Integer = CInt(element(1).ToString)
+                        StopUpdating = True
+                        Spielers(who).Bereit = False
+                        PostChat(Spielers(who).Name & " left!", Color.White)
+                        PostChat("The game is being suspended!", Color.White)
+                    Case "m"c 'Sent chat message
+                        Dim msg As String = element.Substring(1)
+                        PostChat(msg, Color.White)
+                    Case "n"c 'Next player
+                        Dim who As Integer = CInt(element(1).ToString)
+                        SpielerIndex = who
+                        If who = UserIndex Then
+                            PrepareMove()
+                        Else
+                            Status = SpielStatus.Waitn
+                        End If
+                    Case "r"c 'Player returned and sync every player
+                        Dim source As Integer = CInt(element(1).ToString)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
-                        SendPlayerBack(source)
-                        If SpielerIndex = source Then SendNewPlayerActive(SpielerIndex)
-                        'Check if players are still missing, if not, send the signal to continue the game
-                        Dim everythere As Boolean = True
-                        For Each pl In Spielers
-                            If Not pl.Bereit Then everythere = False
+                        HUDInstructions.Text = "Welcome back!"
+                        Dim str As String = element.Substring(2)
+                        Dim sp As SyncMessage = JsonConvert.DeserializeObject(Of SyncMessage)(str)
+                        For i As Integer = 0 To PlCount - 1
+                            Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                         Next
-                        If everythere Then StopUpdating = False : SendGameActive()
-                    Case "z"c 'Sound recieved
+                        Spielfeld.Clear()
+                        For x As Integer = 0 To SpielfeldSize.X - 1
+                            For y As Integer = 0 To SpielfeldSize.Y - 1
+                                Spielfeld.Add(New Vector2(x, y), -1)
+                            Next
+                        Next
+
+                        For Each el In sp.Fields
+                            Spielfeld(el.Key) = el.Value
+                        Next
+                        SendSoundFile()
+                    Case "s"c 'Create transition
+                        Dim dat As String = element.Substring(1)
+                        Dim movs As List(Of (Vector2, Integer)) = JsonConvert.DeserializeObject(Of List(Of (Vector2, Integer)))(dat)
+                        For Each el In movs
+                            Spielfeld(el.Item1) = el.Item2
+                        Next
+                    Case "w"c 'Spieler hat gewonnen
+                        HUDInstructions.Text = "Game over!"
+                        MediaPlayer.Play(Fanfare)
+                        MediaPlayer.Volume = 0.3
+
+                        'Berechne Rankings
+                        Core.Schedule(1, Sub()
+                                             Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
+                                             For i As Integer = 0 To PlCount - 1
+                                                 ranks.Add((i, Spielers(i).AdditionalPoints))
+                                             Next
+                                             ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
+                                             ranks.Reverse()
+
+                                             For i As Integer = 0 To ranks.Count - 1
+                                                 Dim ia As Integer = i
+
+                                                 Select Case i
+                                                     Case 0
+                                                         Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                     Case 1
+                                                         Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                     Case 2
+                                                         Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                     Case Else
+                                                         Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                 End Select
+                                             Next
+                                         End Sub)
+                        Status = SpielStatus.SpielZuEnde
+                        FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                        Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)
+                        Automator.Add(Renderer.AdditionalZPos)
+                    Case "x"c 'Continue with game
+                        StopUpdating = False
+                    Case "y"c 'Synchronisiere Daten
+                        Dim str As String = element.Substring(1)
+                        Dim sp As SyncMessage = JsonConvert.DeserializeObject(Of SyncMessage)(str)
+                        For i As Integer = 0 To PlCount - 1
+                            Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
+                        Next
+                        Spielfeld.Clear()
+                        For x As Integer = 0 To SpielfeldSize.X - 1
+                            For y As Integer = 0 To SpielfeldSize.Y - 1
+                                Spielfeld.Add(New Vector2(x, y), -1)
+                            Next
+                        Next
+
+                        For Each el In sp.Fields
+                            Spielfeld(el.Key) = el.Value
+                        Next
+                    Case "z"c
+                        Dim source As Integer = CInt(element(1).ToString)
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
                         Dim dat As String = element.Substring(3).Replace("_TATA_", "")
+                        If source = UserIndex Then Continue For
+                        Dim sound As SoundEffect
 
                         If IdentSound = IdentType.Custom Then
-                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
+                            File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                            sound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
                         Else
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                            sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
                         End If
-                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & "_TATA_" & dat)
+
+                        If Spielers(source).Typ = SpielerTyp.Local Then
+                            'Set sound for every local player
+                            For Each pl In Spielers
+                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound = sound
+                            Next
+                        Else
+                            'Set sound for player
+                            Spielers(source).CustomSound = sound
+                        End If
                 End Select
             Next
         End Sub
 
-        ' ---Methoden um Daten via den Server an die Clients zu senden---
-        Private Sub SendPlayerArrived(index As Integer, name As String)
-            SendNetworkMessageToAll("a" & index.ToString & name)
+        'BOOTI PLS PLAE DMC 2
+        'DANTE IS GUD IS DE BÄST PLAYE DMC 2 PLSSS
+        Friend Sub SendArrived()
+            If Rejoin Then
+                LocalClient.WriteStream("r")
+            Else
+                LocalClient.WriteStream("a" & My.Settings.Username)
+            End If
         End Sub
-        Private Sub SendBeginGaem()
-            SendNetworkMessageToAll("b")
-            SendSoundFile()
-        End Sub
-        Private Sub SendChatMessage(index As Integer, text As String)
-            SendNetworkMessageToAll("c" & index.ToString & text)
-        End Sub
-        Private Sub SendPlayerLeft(index As Integer)
-            LocalClient.WriteStream("e" & index)
+
+        Private Sub SendChatMessage(text As String)
+            LocalClient.WriteStream("c" & text)
         End Sub
         Private Sub SendGameClosed()
-            SendNetworkMessageToAll("l")
+            LocalClient.WriteStream("e")
         End Sub
-        Private Sub SendMessage(msg As String)
-            SendNetworkMessageToAll("m" & msg)
-        End Sub
-        Private Sub SendNewPlayerActive(who As Integer)
-            SendNetworkMessageToAll("n" & who.ToString)
-        End Sub
-        Private Sub SendPlayerBack(index As Integer)
-            Dim str As String = JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, Spielfeld))
-            SendNetworkMessageToAll("r" & index.ToString & str)
-            SendSoundFile()
-        End Sub
-
         Private Sub SendMoves()
-            SendNetworkMessageToAll("s" & JsonConvert.SerializeObject(SpielfeldUpdates))
-            SpielfeldUpdates.Clear()
-        End Sub
-        Private Sub SendWinFlag()
-            SendNetworkMessageToAll("w")
-        End Sub
-        Private Sub SendGameActive()
-            SendNetworkMessageToAll("x")
-        End Sub
-
-        Private Sub SendSync()
-            Dim str As String = JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, Spielfeld))
-            SendNetworkMessageToAll("y" & str)
+            LocalClient.WriteStream("p" & JsonConvert.SerializeObject(CurrentCursor))
         End Sub
         Private Sub SendSoundFile()
-            For i As Integer = 0 To Spielers.Length - 1
-                Dim pl = Spielers(i)
-                If pl.Typ = SpielerTyp.Local Then
-                    Dim txt As String = ""
-                    If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
-                End If
-            Next
+            Dim txt As String = ""
+            If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(File.ReadAllBytes("Cache\client\sound.audio")))
+            LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & "_TATA_" & txt)
         End Sub
 
-        Private Sub SendNetworkMessageToAll(message As String)
-            If NetworkMode Then LocalClient.WriteStream(message)
+        Private Sub SendSwitch()
+            LocalClient.WriteStream("n")
         End Sub
 #End Region
 
@@ -405,16 +462,9 @@ Namespace Game.DropTrop
                     If CheckRow(i, CurrentCursor + i * vec, counter) Then Exit For
                 Next
 
-                If counter > 0 And Spielfeld.ContainsKey(CurrentCursor + (counter + 1) * vec) Then
-                    For j As Integer = 0 To counter + 1
-                        Spielfeld(CurrentCursor + j * vec) = SpielerIndex
-                        SpielfeldUpdates.Add((CurrentCursor + j * vec, SpielerIndex))
-                    Next
-                    movesuccessful = True
-                End If
+                If counter > 0 And Spielfeld.ContainsKey(CurrentCursor + (counter + 1) * vec) Then movesuccessful = True
             Next
 
-            If Not movesuccessful Then NonViableCoord = CurrentCursor
             Return movesuccessful
         End Function
 
@@ -439,70 +489,19 @@ Namespace Game.DropTrop
             Dim mstate As MouseState = Mouse.GetState
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
 
-            Select Case Spielers(SpielerIndex).Typ
-                Case SpielerTyp.Local
 
-                    Dim sizz As New Vector2(Math.Floor(950 / SpielfeldSize.X), Math.Floor(950 / SpielfeldSize.Y))
-                    'Return true when left clicked and cursor valid(store cursor coords in CurrentCursor)
-                    CurrentCursor = Vector2.One * -1
-                    For Each element In rects
-                        If element.Value.Contains(mpos - Feld.Location) Then CurrentCursor = element.Key : Exit For
-                    Next
+            If SpielerIndex = UserIndex Then
 
-                    Return mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And rects.ContainsKey(CurrentCursor)
-                Case SpielerTyp.Online
-                    If NetworkLocation = Vector2.One * -1 Then Return False
-                    CurrentCursor = NetworkLocation
-                    NetworkLocation = Vector2.One * -1
-                    Return True
-                Case SpielerTyp.CPU
+                Dim sizz As New Vector2(Math.Floor(950 / SpielfeldSize.X), Math.Floor(950 / SpielfeldSize.Y))
+                'Return true when left clicked and cursor valid(store cursor coords in CurrentCursor)
+                CurrentCursor = Vector2.One * -1
+                For Each element In rects
+                    If element.Value.Contains(mpos - Feld.Location) Then CurrentCursor = element.Key : Exit For
+                Next
 
-                    'Calculate CPU moves
-                    If ElapsedMoveTime < 0 Then
-
-                        'Get possible moves
-                        Dim selectIndex As Integer
-                        If Not IsMovePossible() Then StopUpdating = True : SwitchPlayer() : Return False
-
-                        'Sort moves by amount of fields covered
-                        MovesPossible.Sort(Function(x, y) x.Item2.CompareTo(y.Item2))
-                        'Get Index by Difficulty
-                        Dim cnt As Integer = 0
-                        Do While (cnt < 1 OrElse NonViableCoord = MovesPossible(selectIndex).Item1) And cnt < 10
-                            Select Case Spielers(SpielerIndex).Schwierigkeit
-                                Case Difficulty.Brainless
-                                    selectIndex = Nez.Random.Range(0, CInt(Math.Floor(0.7 * MovesPossible.Count)))
-                                Case Difficulty.Smart
-                                    'selectIndex = Nez.Random.Range(CInt(Math.Floor(0.5 * MovesPossible.Count)), MovesPossible.Count)
-                                    selectIndex = MovesPossible.Count - 1
-                            End Select
-                            cnt += 1
-                        Loop
-                        If cnt >= 10 Then StopUpdating = True : SwitchPlayer() : Return False
-                        'Set aim position
-                        AimCursor = MovesPossible(selectIndex).Item1
-                        'Return back
-                        ElapsedMoveTime = 0
-                        Return False
-                    End If
-
-                    'Implement time buffer
-                    ElapsedMoveTime += Time.DeltaTime * 1000
-                    If ElapsedMoveTime > CPUMoveTime Then
-                        If CurrentCursor = AimCursor Then
-                            ElapsedMoveTime = -1
-                            Return True
-                        Else
-                            Dim dif As Vector2 = AimCursor - CurrentCursor
-                            If dif.X <> 0 Then CurrentCursor.X += Math.Sign(dif.X) Else CurrentCursor.Y += Math.Sign(dif.Y)
-                            ElapsedMoveTime = 0
-                        End If
-                    End If
-                    Return False
-
-                Case Else
-                    Return False
-            End Select
+                Return mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And rects.ContainsKey(CurrentCursor)
+            End If
+            Return False
         End Function
 
         Private Function CheckField(pos As Vector2, ByRef fieldscovered As Integer) As Boolean
@@ -521,6 +520,7 @@ Namespace Game.DropTrop
 
                 If counter > 0 Then fieldscovered += counter : movesuccessful = True
             Next
+            If fieldscovered > 10 Then Console.WriteLine()
             Return movesuccessful
         End Function
 
@@ -529,7 +529,7 @@ Namespace Game.DropTrop
                 Select Case Spielfeld(checkpos)
                     Case SpielerIndex 'Landing on a field of your own
                         'If we have at least jumped over 1 enemy, the row is complete
-
+                        Console.WriteLine()
                     Case -1    'Landing on an empty field
                         counter = -1 'Theres a gap
                     Case Else 'Landing on an enemy field
@@ -598,7 +598,6 @@ Namespace Game.DropTrop
                             Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                     End Select
                 Next
-                SendWinFlag()
                 FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
                 Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)
                 Automator.Add(Renderer.AdditionalZPos)
@@ -654,30 +653,19 @@ Namespace Game.DropTrop
             Return MovesPossible.Count > 0
         End Function
 
-        Private Sub SwitchPlayer()
+        Private Sub PrepareMove()
             Dim lastind As Integer = SpielerIndex
             'Get new viable player
             Dim LoopCount As Integer = 0
-            SpielerIndex = (SpielerIndex + 1) Mod PlCount
-            Do While (Spielers(SpielerIndex).AdditionalPoints = 0 OrElse Not IsMovePossible()) And LoopCount < PlCount
-                SpielerIndex = (SpielerIndex + 1) Mod PlCount
-                LoopCount += 1
-            Loop
-            If LoopCount >= PlCount Then CheckWin(True) 'If no player can be switched to, force the game to end
 
-            SendNewPlayerActive(SpielerIndex)
-            If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             HUD.Color = hudcolors(UserIndex)
-            StopUpdating = False
-            SendGameActive()
             HUDInstructions.Text = "Move!"
             If Status <> SpielStatus.SpielZuEnde Then Status = SpielStatus.SpielAktiv
             NonViableCoord = Vector2.One * -1
-            NetworkLocation = Vector2.One * -1
 
-            If (lastind < 0 OrElse Spielers(lastind).Typ = SpielerTyp.Online) And Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then
+            If SpielerIndex = UserIndex Then
                 FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
-            ElseIf (lastind < 0 OrElse Spielers(lastind).Typ <> SpielerTyp.Online) And Spielers(SpielerIndex).Typ = SpielerTyp.Online Then
+            Else
                 FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(-30, -20, -50, 0, 0.75, 0), Nothing) : Automator.Add(FigurFaderCamera)
             End If
         End Sub
@@ -692,7 +680,7 @@ Namespace Game.DropTrop
                 SFX(2).Play()
                 Dim txt As String = Microsoft.VisualBasic.InputBox("Enter your message: ", "Send message", "")
                 If txt <> "" Then
-                    SendChatMessage(UserIndex, txt)
+                    SendChatMessage(txt)
                     PostChat("[" & Spielers(UserIndex).Name & "]: " & txt, HUDColor)
                 End If
                 chatbtnpressed = False

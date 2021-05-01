@@ -109,9 +109,8 @@ Namespace Game.BetretenVerboten
 
                                                  Select Case Map
                                                      Case GaemMap.Default4Players
-                                                         Player.DefaultArray = {-1, -1} '{-1, -1, -1, -1}
-                                                         'FigCount = 4
-                                                         FigCount = 2
+                                                         Player.DefaultArray = {-1, -1, -1, -1}
+                                                         FigCount = 4
                                                          PlCount = 4
                                                          SpceCount = 10
                                                      Case GaemMap.Default6Players
@@ -426,8 +425,8 @@ Namespace Game.BetretenVerboten
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
-                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Host left! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Host left! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -453,6 +452,11 @@ Namespace Game.BetretenVerboten
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
+                        'Set local vs online players
+                        Dim stuff As String = element.Substring(1)
+                        For i As Integer = 0 To Spielers.Length - 1
+                            If stuff.Contains(CStr(i)) Then Spielers(i).Typ = SpielerTyp.Local
+                        Next
                         SendSoundFile()
                         StopUpdating = False
                         Status = SpielStatus.Waitn
@@ -517,6 +521,7 @@ Namespace Game.BetretenVerboten
                             For j As Integer = 0 To FigCount - 1
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
+                            Spielers(i).Typ = sp.Spielers(i).Typ
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
@@ -589,12 +594,23 @@ Namespace Game.BetretenVerboten
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
                         Dim dat As String = element.Substring(3).Replace("_TATA_", "")
                         If source = UserIndex Then Continue For
+                        Dim sound As SoundEffect
 
                         If IdentSound = IdentType.Custom Then
                             File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
+                            sound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
                         Else
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                            sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                        End If
+
+                        If Spielers(source).Typ = SpielerTyp.Local Then
+                            'Set sound for every local player
+                            For Each pl In Spielers
+                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound = sound
+                            Next
+                        Else
+                            'Set sound for player
+                            Spielers(source).CustomSound = sound
                         End If
                 End Select
             Next

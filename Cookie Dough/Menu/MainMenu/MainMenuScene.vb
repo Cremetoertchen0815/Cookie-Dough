@@ -95,11 +95,8 @@ Namespace Menu.MainMenu
                             Select Case i
                                 Case OnlineGameInstances.Length 'Back button
                                     SwitchToSubmenu(0)
-                                Case 0
-                                    Select Case OnlineGameInstances(i).Type
-                                        Case GameType.BetretenVerboten
-                                            OpenGaemViaNetwork(OnlineGameInstances(i))
-                                    End Select
+                                Case Else
+                                    OpenGaemViaNetwork(OnlineGameInstances(i))
                             End Select
                         End If
                     Next
@@ -288,6 +285,15 @@ Namespace Menu.MainMenu
                     Try
                         BlockOnlineJoin = True
                         Dim client As New Game.BetretenVerboten.SlaveWindow(ins)
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnScreenObscured = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                    Catch ex As Exception
+                        BlockOnlineJoin = False
+                        Microsoft.VisualBasic.MsgBox("Error connecting!")
+                    End Try
+                Case GameType.DropTrop
+                    Try
+                        BlockOnlineJoin = True
+                        Dim client As New Game.DropTrop.SlaveWindow(ins)
                         If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnScreenObscured = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False

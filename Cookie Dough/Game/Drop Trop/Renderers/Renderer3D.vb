@@ -19,6 +19,7 @@ Namespace Game.DropTrop.Renderers
         Private Projection As Matrix
         Private CamMatrix As Matrix
 
+        Private figurescale As Single
         Private Game As IGameWindow
         Private Feld As Rectangle
         Private transmatrices As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)}
@@ -75,6 +76,16 @@ Namespace Game.DropTrop.Renderers
                 Next
             Next
 
+            Select Case Game.Map
+                Case GaemMap.Smol
+                    figurescale = 4
+                Case GaemMap.Big
+                    figurescale = 3.2
+                Case GaemMap.Huuuge
+                    figurescale = 2.8
+                Case GaemMap.TREMENNNDOUS
+                    figurescale = 2.6
+            End Select
         End Sub
 
         Public Overrides Sub Render(scene As Scene)
@@ -116,7 +127,7 @@ Namespace Game.DropTrop.Renderers
 
             For Each element In Game.Spielfeld
                 If element.Value < 0 Then Continue For
-                DrawChr(rects(element.Key).Center.ToVector2 - Feld.Size.ToVector2 / 2, playcolor(element.Value), 3)
+                DrawChr(rects(element.Key).Center.ToVector2 - Feld.Size.ToVector2 / 2, playcolor(element.Value), figurescale)
             Next
 
             EffectA.World = Matrix.Identity
@@ -133,7 +144,7 @@ Namespace Game.DropTrop.Renderers
             Next
         End Sub
 
-        Private Sub DrawChr(pos As Vector2, color As Color, basescale As Single, Optional zpos As Integer = 0, Optional scale As Single = 1)
+        Private Sub DrawChr(pos As Vector2, color As Color, basescale As Single, Optional zpos As Integer = 0)
             For Each mesh In figur_model.Meshes
                 For Each element As BasicEffect In mesh.Effects
                     element.VertexColorEnabled = False
@@ -146,7 +157,7 @@ Namespace Game.DropTrop.Renderers
                     element.DirectionalLight0.Direction = New Vector3(0, 0.8, 1.5)
                     element.DirectionalLight0.DiffuseColor = color.ToVector3 * 0.6 '// a gray light
                     element.DirectionalLight0.SpecularColor = New Vector3(1, 1, 1) '// with white highlights
-                    element.World = Matrix.CreateScale(basescale * scale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(-pos.X, -pos.Y, -zpos - AdditionalZPos.Value)
+                    element.World = Matrix.CreateScale(basescale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(-pos.X, -pos.Y, -zpos - AdditionalZPos.Value)
                     element.View = View
                     element.Projection = Projection
                 Next

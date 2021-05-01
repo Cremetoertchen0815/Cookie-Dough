@@ -1,7 +1,4 @@
-﻿Imports System.Collections
-Imports System.Collections.Generic
-
-Namespace Framework.Networking
+﻿Namespace Framework.Networking
     Public Interface IGame
         Property Key As Integer
         Property Name As String

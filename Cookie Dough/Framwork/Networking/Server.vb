@@ -209,6 +209,8 @@ Namespace Framework.Networking
                     Return Game.Megäa.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case GameType.DuoCard
                     Return Game.DuoCard.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
+                Case GameType.DropTrop
+                    Return Game.DropTrop.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case Else
                     Return Nothing
             End Select

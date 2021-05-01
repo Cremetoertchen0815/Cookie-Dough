@@ -698,7 +698,11 @@ Namespace Game.BetretenVerboten
             SendNetworkMessageToAll("a" & index.ToString & name)
         End Sub
         Private Sub SendBeginGaem()
-            SendNetworkMessageToAll("b")
+            Dim appendix As String = ""
+            For i As Integer = 0 To Spielers.Length - 1
+                If Spielers(i).Typ <> SpielerTyp.Online Then appendix &= i.ToString
+            Next
+            SendNetworkMessageToAll("b" & appendix)
             SendSoundFile()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)

@@ -62,6 +62,7 @@
     <Compile Include="Enums.vb" />
     <Compile Include="Game\Drop Trop\Enums.vb" />
     <Compile Include="Game\Drop Trop\GameInstance.vb" />
+    <Compile Include="Game\Drop Trop\SlaveWindow.vb" />
     <Compile Include="Game\Drop Trop\GameRoom.vb" />
     <Compile Include="Game\Drop Trop\IGameWindow.vb" />
     <Compile Include="Game\Drop Trop\Networking\ExtGame.vb" />
