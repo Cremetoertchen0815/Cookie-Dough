@@ -87,6 +87,7 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderZ As Transition(Of Integer)
         Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single))
         Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)}
+        Friend CamRotation As Single
         Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0) 'Gibt die Standard-Position der Kamera an
         Friend PlayStompSound As Boolean
 
@@ -105,6 +106,7 @@ Namespace Game.BetretenVerboten
             NetworkMode = False
 
             If Not LocalClient.JoinGame(ins, Sub(x)
+                                                 'Load map info
                                                  Map = CInt(x())
 
                                                  Select Case Map
@@ -118,8 +120,14 @@ Namespace Game.BetretenVerboten
                                                          FigCount = 2
                                                          PlCount = 6
                                                          SpceCount = 8
+                                                     Case GaemMap.Default8Players
+                                                         Player.DefaultArray = {-1, -1}
+                                                         FigCount = 2
+                                                         PlCount = 8
+                                                         SpceCount = 7
                                                  End Select
 
+                                                 'Load player info
                                                  ReDim Spielers(GetMapSize(Map) - 1)
                                                  UserIndex = CInt(x())
                                                  For i As Integer = 0 To GetMapSize(Map) - 1
@@ -127,7 +135,19 @@ Namespace Game.BetretenVerboten
                                                      Dim name As String = x()
                                                      Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
                                                  Next
+                                                 'Load camera info
+                                                 Select Case Map
+                                                     Case GaemMap.Default4Players
+                                                         CamRotation = UserIndex / 2 * Math.PI
+                                                     Case GaemMap.Default6Players
+                                                         CamRotation = Math.Round(UserIndex / 1.5) / 2 * Math.PI
+                                                     Case GaemMap.Default8Players
+                                                         CamRotation = Math.Floor(UserIndex / 2) / 2 * Math.PI
+                                                 End Select
+                                                 StdCam = New Keyframe3D(-30, -20, -50, Math.PI * 2 - CamRotation, 0.75, 0)
+                                                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
 
+                                                 'Set rejoin flag
                                                  Rejoin = x() = "Rejoin"
                                              End Sub) Then LocalClient.AutomaticRefresh = True : Return
 
@@ -347,7 +367,8 @@ Namespace Game.BetretenVerboten
                                 defaultmov = Spielers(SpielerIndex).Spielfiguren(k)
 
                                 'Prüfe Figur nach Mouse-Klick
-                                If GetFigureRectangle(Map, SpielerIndex, k, Spielers, Center).Contains(mpos) And Spielers(SpielerIndex).Spielfiguren(k) > -1 And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                                Dim rotato As Vector2 = RotateAboutOrigin(mpos.ToVector2, Center, CamRotation)
+                                If GetFigureRectangle(Map, SpielerIndex, k, Spielers, Center).Contains(rotato.ToPoint) And Spielers(SpielerIndex).Spielfiguren(k) > -1 And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                                     If Not ichmagzüge.Contains(k) Then
                                         HUDInstructions.Text = "Incorrect move!"
                                     Else
@@ -457,6 +478,7 @@ Namespace Game.BetretenVerboten
                         For i As Integer = 0 To Spielers.Length - 1
                             If stuff.Contains(CStr(i)) Then Spielers(i).Typ = SpielerTyp.Local
                         Next
+                        'Init game
                         SendSoundFile()
                         StopUpdating = False
                         Status = SpielStatus.Waitn
@@ -675,7 +697,7 @@ Namespace Game.BetretenVerboten
                     HUDInstructions.Text = "Field already covered! Move with the other piece!"
                     Core.Schedule(ErrorCooldown, Sub()
                                                      'Move camera
-                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
                                                      Status = SpielStatus.WähleFigur
                                                      StopUpdating = False
                                                  End Sub)
@@ -696,7 +718,7 @@ Namespace Game.BetretenVerboten
                 Else 'We can't so s$*!, also schieben wir unsere Probleme einfach auf den nächst besten Deppen, der gleich dran ist
 
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
 
                     Status = SpielStatus.WähleFigur
                     StopUpdating = True
@@ -719,7 +741,7 @@ Namespace Game.BetretenVerboten
                 Status = SpielStatus.WähleFigur
 
                 'Move camera
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
             End If
         End Sub
 
@@ -1017,7 +1039,7 @@ Namespace Game.BetretenVerboten
                     Spielers(UserIndex).SacrificeCounter = SacrificeWait
                     HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
                 Else
                     Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If

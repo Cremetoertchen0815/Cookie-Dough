@@ -18,7 +18,7 @@ Namespace Game.BetretenVerboten
         Inherits Scene
         Implements IGameWindow
 
-        'Spiele-Flags und Variables
+        'Instance flags
         Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
         Friend FigCount As Integer 'Gibt an wieviele Figuren jeder Spieler hat
@@ -28,22 +28,24 @@ Namespace Game.BetretenVerboten
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
+        Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
+        Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
+        Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
+        Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
+        Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
+        Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
+
+        'Game flags
         Private WürfelAktuelleZahl As Integer 'Speichert den WErt des momentanen Würfels
         Private WürfelWerte As Integer() 'Speichert die Werte der Würfel
         Private WürfelTimer As Double 'Wird genutzt um den Würfelvorgang zu halten
         Private WürfelAnimationTimer As Double 'Implementiert einen Cooldown für die Würfelanimation
         Private WürfelTriggered As Boolean 'Gibt an ob gerade gewürfelt wird
-        Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
-        Private Fahrzahl As Integer 'Anzahl der Felder die gefahren werden kann
-        Private DontKickSacrifice As Boolean 'Gibt an, ob die zu opfernde Figur nicht gekickt werden soll
         Private DreifachWürfeln As Boolean 'Gibt an(am Anfang des Spiels), dass ma drei Versuche hat um eine 6 zu bekommen
-        Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
-        Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
+        Private Fahrzahl As Integer 'Anzahl der Felder die gefahren werden kann
         Private MoveActive As Boolean = False 'Gibt an, ob eine Figuranimation in Gange ist
         Private SaucerFields As New List(Of Integer)
-        Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
-        Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
-        Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
+        Private DontKickSacrifice As Boolean 'Gibt an, ob die zu opfernde Figur nicht gekickt werden soll
 
         'Assets
         Private Fanfare As Song
@@ -132,6 +134,12 @@ Namespace Game.BetretenVerboten
                     FigCount = 2
                     PlCount = 6
                     SpceCount = 8
+                Case GaemMap.Default8Players
+                    Timer = New TimeSpan(0, 1, 11, 11, 11)
+                    Player.DefaultArray = {-1, -1}
+                    FigCount = 2
+                    PlCount = 8
+                    SpceCount = 7
             End Select
             LastTimer = Timer
 
@@ -465,7 +473,7 @@ Namespace Game.BetretenVerboten
 
                                                 ' Destiny: landet der zug im Haus? 
                                                 If locpos(1) >= PlCount * SpceCount Then
-                                                    Scores(element) *= 3.5F
+                                                    Scores(element) *= 10.0F
                                                 End If
 
                                                 ' Attackopportunity: kann der zug einen Feindlichen spieler eleminieren? 
@@ -1202,14 +1210,14 @@ Namespace Game.BetretenVerboten
             SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
             If Not DontKickSacrifice Then KickedByGod(pl, figur) 'Kick sacrifice
             Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
-            Dim pogfactor = progress * 0.5F + 0.35F 'Field 0: Chance of sth good: 35%;  Field max.: Chance of sth good: 85%
+            Dim pogfactor = progress * 0.45F + 0.45F 'Field 0: Chance of sth good: 45%;  Field max.: Chance of sth good: 90%
             Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
 
                                  Do
                                      Dim RNG = Nez.Random.NextFloat
                                      If RNG <= pogfactor Then 'Positive effect
-                                         Select Case Nez.Random.Range(0, 5)
+                                         Select Case Nez.Random.Range(0, 6)
                                              Case 0
                                                  Try
 
@@ -1265,6 +1273,12 @@ Namespace Game.BetretenVerboten
                                                  'Add points
                                                  PostChat("You're lucky! You gained 75 points!", Color.White)
                                                  SendMessage("You're lucky! You gained 75 points!")
+                                                 Spielers(pl).AdditionalPoints += 75
+                                                 Exit Do
+                                             Case 5
+                                                 'Add points
+                                                 PostChat("You're lucky! Your next move will count double!", Color.White)
+                                                 SendMessage("You're lucky! Your next move will count double!")
                                                  Spielers(pl).AdditionalPoints += 75
                                                  Exit Do
                                          End Select

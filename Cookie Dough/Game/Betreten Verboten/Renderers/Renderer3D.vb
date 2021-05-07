@@ -58,8 +58,17 @@ Namespace Game.BetretenVerboten.Renderers
             MapBuffer = New VertexBuffer(dev, GetType(VertexPositionColorTexture), vertices.Count, BufferUsage.WriteOnly)
             MapBuffer.SetData(vertices.ToArray)
 
-            FigCount = If(Game.Map = GaemMap.Default6Players, 2, 4)
-            SpceCount = If(Game.Map = GaemMap.Default6Players, 8, 10)
+            Select Case Game.Map
+                Case GaemMap.Default4Players
+                    SpceCount = 10
+                    FigCount = 4
+                Case GaemMap.Default6Players
+                    SpceCount = 8
+                    FigCount = 2
+                Case GaemMap.Default8Players
+                    SpceCount = 7
+                    FigCount = 2
+            End Select
             Feld = New Rectangle(500, 70, 950, 950)
             Center = Feld.Center.ToVector2
 
@@ -90,7 +99,7 @@ Namespace Game.BetretenVerboten.Renderers
         Public Overrides Sub Render(scene As Scene)
 
             Dim cam = Game.GetCamPos
-            CamMatrix = Matrix.CreateFromYawPitchRoll(cam.Yaw, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
+            CamMatrix = Matrix.CreateFromYawPitchRoll(0, 0, cam.Yaw) * Matrix.CreateFromYawPitchRoll(0, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
             If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(dev.Viewport.Width, dev.Viewport.Height, 1, 100000)
@@ -99,7 +108,8 @@ Namespace Game.BetretenVerboten.Renderers
             dev.SetRenderTarget(SpielfeldTextur)
             dev.Clear(Color.Black)
 
-            Dim sizes As (Integer, Integer, Single) = GetFieldSizes(Game.Map)
+            '(Normal field diameter, small field diameter, figure scale, arrow size)
+            Dim sizes As (Integer, Integer, Single, Integer) = GetFieldSizes(Game.Map)
 
             batchlor.Begin()
 
@@ -118,7 +128,7 @@ Namespace Game.BetretenVerboten.Renderers
                             batchlor.DrawCircle(loc, sizes.Item2, playcolor(j), 2, 25)
                         Case PlayFieldPos.Feld1
                             batchlor.DrawCircle(loc, sizes.Item1, playcolor(j), 3, 30)
-                            DrawArrow(loc, playcolor(j), j)
+                            DrawArrow(loc, playcolor(j), j, sizes.Item4)
                         Case Else
                             If i - 4 >= SpceCount Then Continue For
                             batchlor.DrawCircle(loc, sizes.Item1, Color.White, 3, 30)
@@ -128,8 +138,9 @@ Namespace Game.BetretenVerboten.Renderers
 
             'Zeichne UFO-Felder
             For Each element In Game.SaucerFields
-                batchlor.DrawCircle(New Vector2(475) + GetMapVectorPos(Game.Map, element), 20, Color.SandyBrown, 10)
+                batchlor.DrawCircle(New Vector2(475) + GetMapVectorPos(Game.Map, element), sizes.Item1, Color.SandyBrown, 5)
             Next
+
 
             batchlor.End()
 
@@ -211,8 +222,8 @@ Namespace Game.BetretenVerboten.Renderers
             Next
         End Sub
 
-        Private Sub DrawArrow(vc As Vector2, color As Color, iteration As Integer)
-            batchlor.Draw(Pfeil, New Rectangle(vc.X, vc.Y, 35, 35), Nothing, color, MathHelper.PiOver2 * ((iteration / Game.Spielers.Length) * 4 + 3), New Vector2(35, 35) / 2, SpriteEffects.None, 0)
+        Private Sub DrawArrow(vc As Vector2, color As Color, iteration As Integer, size As Integer)
+            batchlor.Draw(Pfeil, New Rectangle(vc.X, vc.Y, size, size), Nothing, color, MathHelper.PiOver2 * ((iteration / Game.Spielers.Length) * 4 + 3), New Vector2(35) / 2, SpriteEffects.None, 0)
         End Sub
 
         Friend Sub TriggerSaucerAnimation(target As (Integer, Integer), ChangeFigure As Action, FinalAction As Action)

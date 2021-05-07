@@ -40,5 +40,6 @@
     Public Enum GaemMap
         Default4Players = 0
         Default6Players = 1
+        Default8Players = 2
     End Enum
 End Namespace

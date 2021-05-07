@@ -14,6 +14,14 @@ Namespace Framework.Misc
             Dim sa As Double = Math.Sin(radians)
             Return New Vector2(ca * vec.X - sa * vec.Y, sa * vec.X + ca * vec.Y)
         End Function
+        Public Function RotateAboutOrigin(ByVal point As Vector2, ByVal origin As Vector2, ByVal rotation As Single) As Vector2
+            Dim u = Point - origin
+            If u = Vector2.Zero Then Return Point
+            Dim a = CSng(Math.Atan2(u.Y, u.X))
+            a += rotation
+            u = u.Length() * New Vector2(CSng(Math.Cos(a)), CSng(Math.Sin(a)))
+            Return u + origin
+        End Function
         Public Function shortAngleDist(a As Single, b As Single) As Single
             Dim max = Math.PI * 2
             Dim da = (b - a) Mod max
