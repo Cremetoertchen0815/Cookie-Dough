@@ -134,7 +134,7 @@ Namespace Framework.Networking
                         Case "list"
                             'Implement that a lobby is viewable for the player who left only!!!
                             For Each element In games
-                                If element.Value.GetReadyPlayerCount < element.Value.GetLobbySize Then
+                                If element.Value.GetReadyPlayerCount < element.Value.GetLobbySize And (element.Value.WhiteList Is Nothing OrElse element.Value.WhiteList.Contains(con.Identifier)) Then
                                     WriteString(con, element.Key.ToString)
                                     WriteString(con, element.Value.Name.ToString)
                                     WriteString(con, element.Value.Type.ToString)
@@ -281,8 +281,13 @@ Namespace Framework.Networking
                             'If host sends that the game shall begin, unlist round
                             If games.ContainsKey(gaem.Key) Then games.Remove(gaem.Key)
                             gaem.Active = True
+                            'Generate WhiteList and transmit begin message
+                            gaem.WhiteList = New List(Of String)
                             For i As Integer = 1 To gaem.Players.Length - 1
-                                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, nl)
+                                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then
+                                    WriteString(gaem.Players(i).Connection, nl)
+                                    gaem.WhiteList.Add(gaem.Players(i).Connection.Identifier)
+                                End If
                             Next
                         Case "l"c, "I"c
                             'If host left, end game for everyone

@@ -1,7 +1,7 @@
 ﻿BV:
 -Only show open rounds for players that are supposed to see
--Higher UFO spawn chance on bigger maps
 -Send sync command when won
+-Higher UFO spawn chance on bigger maps
 -Tournament mode
 -Add Jakob Sounds as Easter eggs(Victory Jingle as music + scream when kicked)
 -Add an options menu

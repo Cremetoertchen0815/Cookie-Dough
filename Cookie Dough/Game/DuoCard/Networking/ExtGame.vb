@@ -16,6 +16,7 @@ Namespace Game.DuoCard.Networking
                 Return Players.ToArray
             End Get
         End Property
+        Public Property WhiteList As List(Of String) Implements IGame.WhiteList
 
         'Houses all the players internally
         Private Players As New List(Of Player)

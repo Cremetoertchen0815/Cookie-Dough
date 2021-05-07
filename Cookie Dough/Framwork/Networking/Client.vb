@@ -58,7 +58,11 @@ Namespace Framework.Networking
                 WriteString("Wassup?")
                 If Not ReadString() = "What's your name?" Then Throw New NotImplementedException()
                 WriteString(nickname)
+#If DEBUG Then
+                WriteString(Server.RandomString(6))
+#Else
                 WriteString(My.Settings.UniqueIdentifier)
+#End If
                 If My.Settings.UniqueIdentifier = "" Then My.Settings.UniqueIdentifier = ReadString() : My.Settings.Save()
                 Select Case ReadString()
                     Case "Sorry m8! Username already taken"

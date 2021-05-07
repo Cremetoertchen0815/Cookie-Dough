@@ -7,6 +7,7 @@
         ReadOnly Property Players As IPlayer()
         ReadOnly Property Type As GameType
         Property HostConnection As Connection
+        Property WhiteList As Collections.Generic.List(Of String)
 
         Function GetReadyPlayerCount() As Integer
         Function GetRegisteredPlayerCount() As Integer

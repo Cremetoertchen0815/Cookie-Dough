@@ -765,10 +765,11 @@ Namespace Game.BetretenVerboten
         Private Sub SendSoundFile()
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
-                If pl.Typ = SpielerTyp.Local Then
+                If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
                     Dim txt As String = ""
                     If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
                     SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
+                    Return
                 End If
             Next
         End Sub

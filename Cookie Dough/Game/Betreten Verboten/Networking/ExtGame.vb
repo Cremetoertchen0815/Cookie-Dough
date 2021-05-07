@@ -1,4 +1,5 @@
-﻿Imports Cookie_Dough.Framework.Networking
+﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.Networking
 
 Namespace Game.BetretenVerboten.Networking
     Public Class ExtGame
@@ -12,6 +13,8 @@ Namespace Game.BetretenVerboten.Networking
         Public Property Active As Boolean = False Implements IGame.Active
         Public Property HostConnection As Connection Implements IGame.HostConnection
         Public ReadOnly Property Type As GameType = GameType.BetretenVerboten Implements IGame.Type
+        Public Property WhiteList As List(Of String) Implements IGame.WhiteList
+
         Private ReadOnly Property IGame_Players As IPlayer() Implements IGame.Players
             Get
                 Return Players

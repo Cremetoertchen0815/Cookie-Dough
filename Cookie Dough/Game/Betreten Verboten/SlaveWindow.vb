@@ -619,8 +619,8 @@ Namespace Game.BetretenVerboten
                         Dim sound As SoundEffect
 
                         If IdentSound = IdentType.Custom Then
-                            File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            sound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
+                            File.WriteAllBytes("Cache\client\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                            sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & ".wav")
                         Else
                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
                         End If
