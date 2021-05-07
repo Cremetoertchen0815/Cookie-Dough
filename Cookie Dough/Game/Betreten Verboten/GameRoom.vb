@@ -755,6 +755,7 @@ Namespace Game.BetretenVerboten
             SendNetworkMessageToAll("s" & who.ToString & figur.ToString & destination.ToString)
         End Sub
         Private Sub SendWinFlag()
+            SendSync()
             SendNetworkMessageToAll("w")
         End Sub
         Private Sub SendGameActive()
