@@ -16,6 +16,7 @@ Namespace Framework.Networking
         Private client As New TcpClient
         Private endpoint As IPEndPoint = New IPEndPoint(IPAddress.Any, Port)
         Private list As New List(Of Connection)
+        Private registered As Dictionary(Of String, String) '(ID, Username)
         Private games As New Dictionary(Of Integer, IGame)
         Private RNG As New System.Random
         Private LogPath As String = "Log\" & Date.Now.ToShortDateString & ".log"
@@ -27,7 +28,7 @@ Namespace Framework.Networking
             ServerActive = True
 
             Try
-                'Create file stream
+                'Create log file
                 If Not File.Exists(LogPath) Then
                     streamw = File.CreateText(LogPath)
                 Else
@@ -35,8 +36,10 @@ Namespace Framework.Networking
                     streamw = New StreamWriter(LogPath) With {.AutoFlush = True}
                     streamw.Write(oldtxt)
                 End If
+                'Load register
+                If File.Exists("Save\register.dat") Then registered = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(File.ReadAllText("Save\register.dat")) Else registered = New Dictionary(Of String, String)
             Catch x As Exception
-                Console.WriteLine("Error logging file blocked!")
+                Console.WriteLine("Logging file blocked!")
             End Try
         End Sub
 
@@ -105,10 +108,25 @@ Namespace Framework.Networking
                 WriteString(con, "Hello there!")
                 If Not ReadString(con) = "Wassup?" Then Exit Try
                 WriteString(con, "What's your name?")
-                Dim tmpusr As String = ReadString(con)
-                If AlreadyContainsNickname(tmpusr) Then WriteString(con, "Sorry m8! Username already taken") : Exit Try
-                If Not FilenameIsOK(tmpusr) Then WriteString(con, "Sorry m8! Invalid username") : Exit Try
-                con.Nick = tmpusr
+                Dim usrname As String = ReadString(con)
+                Dim IDs As String = ReadString(con)
+
+                'If player is first time logging on, generate random key that isn't yet taken
+                If IDs = "" Then
+                    Dim rnd As String = RandomString(6)
+                    Do While registered.ContainsKey(rnd)
+                        rnd = RandomString(6)
+                    Loop
+                    IDs = rnd
+                    WriteString(con, IDs)
+                End If
+
+                If AlreadyContainsID(IDs) Then WriteString(con, "Sorry m8! ID already used") : Exit Try
+                If AlreadyContainsNickname(usrname) Then WriteString(con, "Sorry m8! Username already taken") : Exit Try
+                If Not FilenameIsOK(usrname) Then WriteString(con, "Sorry m8! Invalid username") : Exit Try
+                con.Nick = usrname
+                con.Identifier = IDs
+                RegisterPlayer(con)
                 WriteString(con, "Alrighty!")
 
                 Do
@@ -190,7 +208,7 @@ Namespace Framework.Networking
             list.Remove(con)
 
         End Sub
-        Private Function RandomString(len As Integer) As String
+        Friend Function RandomString(len As Integer) As String
             Dim s As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
             Dim sb As New StringBuilder
             For i As Integer = 1 To len
@@ -316,6 +334,24 @@ Namespace Framework.Networking
             Return False
         End Function
 
+        Private Function AlreadyContainsID(id As String) As Boolean
+            For Each element In list
+                If element.Identifier = id Then Return True
+            Next
+            Return False
+        End Function
+        Private Sub RegisterPlayer(con As Connection)
+            If registered.ContainsKey(con.Identifier) Then
+                registered(con.Identifier) = con.Nick
+            Else
+                registered.Add(con.Identifier, con.Nick)
+            End If
+            SaveRegister()
+        End Sub
+        Private Sub SaveRegister()
+            File.WriteAllText("Save\register.dat", Newtonsoft.Json.JsonConvert.SerializeObject(registered))
+        End Sub
+
         <Command("network-kick", "Kicks a specific user from the server.")>
         Public Sub KickUser(nick As String)
             For Each element In list
@@ -323,6 +359,37 @@ Namespace Framework.Networking
                     element.Client.Close()
                 End If
             Next
+        End Sub
+
+        <Command("network-list", "Lists all online users.")>
+        Public Sub ListUsers(identifier As String, Optional ShowRegistered As Boolean = False)
+            If ShowRegistered Then
+                For Each element In registered
+                    DebugConsole.Instance.Log(element.Value & ": " & element.Key)
+                Next
+            Else
+                For Each element In list
+                    DebugConsole.Instance.Log(element.Nick & ": " & element.Identifier)
+                Next
+            End If
+        End Sub
+
+        <Command("network-deregister", "Deregisters a certain user + ID.")>
+        Public Sub Deregister(id As String, Optional clear_all As Boolean = False)
+            If clear_all Then
+                registered.Clear()
+                For Each element In list
+                    element.Client.Close()
+                Next
+            Else
+                If registered.ContainsKey(id) Then
+                    registered.Remove(id)
+                    For Each element In list
+                        If element.Identifier = id Then element.Client.Close()
+                    Next
+                End If
+            End If
+            SaveRegister()
         End Sub
     End Module
 End Namespace

@@ -1448,23 +1448,23 @@ Namespace Game.BetretenVerboten
 #End Region
 #Region "Debug Commands"
 
-        <Command("network-eject", "Removes a specific user from the game.")>
+        <Command("bv-eject", "Removes a specific user from the game.")>
         Public Shared Sub dbgEjectUser(nr As Integer)
             dbgKickuser = nr
         End Sub
 
-        <Command("network-sync", "Removes a specific user from the game.")>
+        <Command("bv-sync", "Removes a specific user from the game.")>
         Public Shared Sub dbgSyncData()
             dbgExecSync = True
         End Sub
 
-        <Command("network-place", "Places a player's figure on a certain position.")>
+        <Command("bv-place", "Places a player's figure on a certain position.")>
         Public Shared Sub dbgPlaceFigure(player As Integer, figure As Integer, value As Integer)
             dbgPlaceCmd = (player, figure, value)
             dbgPlaceSet = True
         End Sub
 
-        <Command("network-info", "Gives information over a specific player.")>
+        <Command("bv-info", "Gives information over a specific player.")>
         Public Shared Sub dbgPlayerInfo(nr As Integer)
             dbgLoguser = nr
         End Sub

@@ -123,6 +123,18 @@ Partial Friend NotInheritable Class Settings
             Me("Sound") = value
         End Set
     End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+    Public Property UniqueIdentifier() As String
+        Get
+            Return CType(Me("UniqueIdentifier"),String)
+        End Get
+        Set
+            Me("UniqueIdentifier") = value
+        End Set
+    End Property
 End Class
 
 Namespace My

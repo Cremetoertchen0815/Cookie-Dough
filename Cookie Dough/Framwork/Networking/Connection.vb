@@ -8,6 +8,7 @@ Namespace Framework.Networking
         Public Property StreamW As StreamWriter
         Public Property StreamR As StreamReader
         Public Property Nick As String
+        Public Property Identifier As String
         Public Property IdentThumbnail As IdentType
         Public Property IdentSound As IdentType
         Public Property IdentThumbnailName As String

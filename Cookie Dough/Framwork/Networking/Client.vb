@@ -58,12 +58,17 @@ Namespace Framework.Networking
                 WriteString("Wassup?")
                 If Not ReadString() = "What's your name?" Then Throw New NotImplementedException()
                 WriteString(nickname)
+                WriteString(My.Settings.UniqueIdentifier)
+                If My.Settings.UniqueIdentifier = "" Then My.Settings.UniqueIdentifier = ReadString() : My.Settings.Save()
                 Select Case ReadString()
                     Case "Sorry m8! Username already taken"
                         Microsoft.VisualBasic.MsgBox("Username already taken on this server! Please change username!")
                         Exit Sub
                     Case "Sorry m8! Invalid username"
                         Microsoft.VisualBasic.MsgBox("Username invalid! Please change username!")
+                        Exit Sub
+                    Case "Sorry m8! ID already used"
+                        Microsoft.VisualBasic.MsgBox("Client already logged on on this PC! Please close other client before continuing!")
                         Exit Sub
                 End Select
                 Connected = True

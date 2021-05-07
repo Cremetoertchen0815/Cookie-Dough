@@ -1,5 +1,4 @@
 ﻿BV:
--Add unique identifiers for each player
 -Only show open rounds for players that are supposed to see
 -Higher UFO spawn chance on bigger maps
 -Send sync command when won
