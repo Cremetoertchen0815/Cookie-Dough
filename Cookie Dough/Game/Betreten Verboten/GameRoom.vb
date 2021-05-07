@@ -105,8 +105,8 @@ Namespace Game.BetretenVerboten
         Private Const CPUThinkingTime As Single = 0.6
         Private Const DopsHöhe As Integer = 150
         Private Const CamSpeed As Integer = 1300
-        Private Const SaucerChance As Integer = 18
         Private Const SacrificeWait As Integer = 5
+        Private SaucerChance As Integer = 18
         Sub New(Map As GaemMap)
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
@@ -128,18 +128,21 @@ Namespace Game.BetretenVerboten
                     FigCount = 4
                     PlCount = 4
                     SpceCount = 10
+                    SaucerChance = 18
                 Case GaemMap.Default6Players
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
                     Player.DefaultArray = {-1, -1} '{-1, -1}
                     FigCount = 2
                     PlCount = 6
                     SpceCount = 8
+                    SaucerChance = 14
                 Case GaemMap.Default8Players
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
                     Player.DefaultArray = {-1, -1}
                     FigCount = 2
                     PlCount = 8
                     SpceCount = 7
+                    SaucerChance = 10
             End Select
             LastTimer = Timer
 
