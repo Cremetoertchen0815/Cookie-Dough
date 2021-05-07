@@ -697,7 +697,7 @@ Namespace Game.BetretenVerboten
                     HUDInstructions.Text = "Field already covered! Move with the other piece!"
                     Core.Schedule(ErrorCooldown, Sub()
                                                      'Move camera
-                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
                                                      Status = SpielStatus.WähleFigur
                                                      StopUpdating = False
                                                  End Sub)
@@ -718,7 +718,7 @@ Namespace Game.BetretenVerboten
                 Else 'We can't so s$*!, also schieben wir unsere Probleme einfach auf den nächst besten Deppen, der gleich dran ist
 
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
 
                     Status = SpielStatus.WähleFigur
                     StopUpdating = True
@@ -741,7 +741,7 @@ Namespace Game.BetretenVerboten
                 Status = SpielStatus.WähleFigur
 
                 'Move camera
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
             End If
         End Sub
 

@@ -1,5 +1,4 @@
 ﻿BV:
--Only show open rounds for players that are supposed to see
 -Send sync command when won
 -Higher UFO spawn chance on bigger maps
 -Tournament mode
