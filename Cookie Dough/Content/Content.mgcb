@@ -1312,6 +1312,12 @@
 /processorParam:Quality=Best
 /build:sfx/checkpoint.wav
 
+#begin sfx/DamDamDaaam.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:sfx/DamDamDaaam.wav
+
 #begin sfx/item_collect.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -1347,4 +1353,10 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sfx/text_skip.wav
+
+#begin sfx/triumph.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:sfx/triumph.wav
 

@@ -49,6 +49,7 @@ Namespace Game.BetretenVerboten
 
         'Assets
         Private Fanfare As Song
+        Private DamDamDaaaam As Song
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
 
@@ -155,6 +156,7 @@ Namespace Game.BetretenVerboten
             ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
             ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
             Fanfare = Content.Load(Of Song)("bgm\fanfare")
+            DamDamDaaaam = Content.Load(Of Song)("sfx\DamDamDaaam")
 
             'Lade HUD
             HUD = New GuiSystem
@@ -252,8 +254,14 @@ Namespace Game.BetretenVerboten
                 'Prüfe, ob die Runde gewonnen wurde und beende gegebenenfalls die Runde
                 Dim win As Integer = CheckWin()
                 If win > -1 Or TimeOver Then
-                    MediaPlayer.Play(Fanfare)
-                    MediaPlayer.Volume = 0.3
+                    If MediaPlayer.IsRepeating Then
+                        MediaPlayer.Play(DamDamDaaaam)
+                        MediaPlayer.Volume = 0.8
+                    Else
+                        MediaPlayer.Play(Fanfare)
+                        MediaPlayer.Volume = 0.3
+                    End If
+                    MediaPlayer.IsRepeating = False
                     StopUpdating = True
                     ShowDice = False
                     HUDInstructions.Text = "Game over!"

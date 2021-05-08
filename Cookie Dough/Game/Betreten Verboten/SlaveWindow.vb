@@ -47,6 +47,7 @@ Namespace Game.BetretenVerboten
 
         'Assets
         Private Fanfare As Song
+        Private DamDamDaaaam As Song
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
 
@@ -173,6 +174,7 @@ Namespace Game.BetretenVerboten
             ButtonFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font\ButtonText"))
             ChatFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font\ChatText"))
             Fanfare = Content.Load(Of Song)("bgm\fanfare")
+            DamDamDaaaam = Content.Load(Of Song)("sfx\DamDamDaaam")
 
             'Lade HUD
             HUD = New GuiSystem
@@ -564,8 +566,14 @@ Namespace Game.BetretenVerboten
                     Case "w"c 'Spieler hat gewonnen
                         ShowDice = False
                         HUDInstructions.Text = "Game over!"
-                        MediaPlayer.Play(Fanfare)
-                        MediaPlayer.Volume = 0.3
+                        If MediaPlayer.IsRepeating Then
+                            MediaPlayer.Play(DamDamDaaaam)
+                            MediaPlayer.Volume = 0.8
+                        Else
+                            MediaPlayer.Play(Fanfare)
+                            MediaPlayer.Volume = 0.3
+                        End If
+                        MediaPlayer.IsRepeating = False
 
                         'Berechne Rankings
                         Core.Schedule(1, Sub()

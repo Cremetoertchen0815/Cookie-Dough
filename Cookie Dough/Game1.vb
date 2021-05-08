@@ -50,6 +50,7 @@ Namespace Cookie_Dough
               Content.Load(Of SoundEffect)("sfx/switch"),
               Content.Load(Of SoundEffect)("sfx/text_skip")}
             Lalala = Content.Load(Of Song)("games\BV\lalalala")
+            triumph = Content.Load(Of Song)("sfx\triumph")
             DebugTexture = Content.LoadTexture("dbg1")
 
             'Create Emmond Tween-Manager(for BV backwards compat.)
@@ -74,6 +75,7 @@ Namespace Cookie_Dough
         Private oldpress As New List(Of Keys)
 
         Protected Lalala As Song
+        Protected triumph As Song
         Private MusicCounter As Integer = 0
 
         Protected Overrides Sub Update(gameTime As GameTime)
@@ -120,7 +122,13 @@ Namespace Cookie_Dough
                 If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.6
             End If
 
-            If MediaPlayer.State = MediaState.Stopped Then
+            If GetStackKeystroke({Keys.R, Keys.E, Keys.C, Keys.T, Keys.A, Keys.N, Keys.G, Keys.L, Keys.E}) Then
+                MediaPlayer.Play(triumph)
+                MediaPlayer.Volume = 0.4
+                MediaPlayer.IsRepeating = True
+            End If
+
+            If MediaPlayer.State = MediaState.Stopped And Not MediaPlayer.IsRepeating Then
                 MediaPlayer.Play(Content.Load(Of Song)("bgm/acc_" & (MusicCounter + 1).ToString))
                 If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.1
                 MediaPlayer.IsRepeating = False

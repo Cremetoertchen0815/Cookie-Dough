@@ -1,4 +1,2 @@
 ﻿BV:
 -Tournament mode
--Add Jakob Sounds as Easter eggs(Victory Jingle as music + scream when kicked)
--Add an options menu
