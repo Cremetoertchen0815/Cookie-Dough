@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
+Imports Cookie_Dough.Game.BetretenVerboten
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -54,7 +55,6 @@ Namespace Menu.MainMenu
 
             Select Case Submenu
                 Case 0
-                    Dim sz As Vector2
                     If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(1)
                     If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(2)
                     If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(3)
@@ -101,7 +101,9 @@ Namespace Menu.MainMenu
                         End If
                     Next
                 Case 3
-
+                    If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then My.Settings.Schwierigkeitsgrad = (My.Settings.Schwierigkeitsgrad + 1) Mod 2 : My.Settings.Save()
+                    If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(5)
+                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                     If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
                 Case 4
                     'Scroll online game list
@@ -244,13 +246,13 @@ Namespace Menu.MainMenu
             End Select
 
             'Blende über
-            Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(500), 0F, 1.0F, Sub()
-                                                                                                                    If InBetweenOperation IsNot Nothing Then InBetweenOperation()
-                                                                                                                    Me.Submenu = submenu
-                                                                                                                    Blocked = False
-                                                                                                                    Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(1000), 1.0F, 0.0F, Nothing)
-                                                                                                                    Automator.Add(Schwarzblende)
-                                                                                                                End Sub)
+            Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(500), Schwarzblende.Value, 1.0F, Sub()
+                                                                                                                                     If InBetweenOperation IsNot Nothing Then InBetweenOperation()
+                                                                                                                                     Me.Submenu = submenu
+                                                                                                                                     Blocked = False
+                                                                                                                                     Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(1000), 1.0F, 0.0F, Nothing)
+                                                                                                                                     Automator.Add(Schwarzblende)
+                                                                                                                                 End Sub)
             Automator.Add(Schwarzblende)
         End Sub
 
@@ -405,11 +407,17 @@ Namespace Menu.MainMenu
                     Case 3 'Settings
                         'Draw heading
                         batcher.DrawString(TitleFont, "Settings", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Settings").X / 2, 50), FgColor)
-                        'batcher.DrawString(MediumFont, "Connect to Server", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Connect to Server").X / 2, 225), If(IsConnectedToServer, Color.Red, FgColor))
-                        'batcher.DrawString(MediumFont, "Disconnect Server", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Disconnect Server").X / 2, 375), If(IsConnectedToServer, FgColor, Color.Red))
-                        'batcher.DrawString(MediumFont, "Open local Server", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Open local Server").X / 2, 525), If(ServerActive, Color.Red, FgColor))
+                        'Draw rectangles
+                        batcher.DrawHollowRect(New Rectangle(560, 275, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 425, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 575, 800, 100), FgColor)
                         batcher.DrawHollowRect(New Rectangle(560, 725, 800, 100), FgColor)
-                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 675), FgColor)
+                        'Draw text
+                        Dim txtA As String = "CPU Difficulty: " & CType(My.Settings.Schwierigkeitsgrad, Difficulty).ToString
+                        batcher.DrawString(MediumFont, txtA, New Vector2(1920.0F / 2 - MediumFont.MeasureString(txtA).X / 2, 300), FgColor)
+                        batcher.DrawString(MediumFont, "User Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("User Settings").X / 2, 450), FgColor) 'If(IsConnectedToServer, FgColor, Color.Red)
+                        batcher.DrawString(MediumFont, "Server Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Server Settings").X / 2, 600), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 750), FgColor)
                     Case 4 'Server
                         'Draw scroll arrows
                         batcher.Draw(Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
@@ -444,7 +452,7 @@ Namespace Menu.MainMenu
                         End If
                         'Draw back button
                         batcher.DrawHollowRect(New Rectangle(560, 275 + (len + 2) * 150 - CInt(CounterScene.SM4Scroll), 800, 100), Color.Lime)
-                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + (len + 2) * 150 - CounterScene.SM4Scroll), Color.Lime)
+                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 300 + (len + 2) * 150 - CounterScene.SM4Scroll), Color.Lime)
 
                         'Draw heading
                         batcher.DrawRect(New Rectangle(0, 0, 1920, 220), Color.Black)
@@ -473,7 +481,7 @@ Namespace Menu.MainMenu
                         batcher.DrawString(MediumFont, str(1), New Vector2(1920.0F / 2 - MediumFont.MeasureString(str(1)).X / 2, 450), FgColor)
                         batcher.DrawString(MediumFont, str(2), New Vector2(1920.0F / 2 - MediumFont.MeasureString(str(2)).X / 2, 600), FgColor)
 
-                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Exit Game").X / 2, 750), FgColor)
+                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 750), FgColor)
                 End Select
 
 
