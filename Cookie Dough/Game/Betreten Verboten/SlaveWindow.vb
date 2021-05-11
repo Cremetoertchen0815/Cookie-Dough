@@ -413,7 +413,8 @@ Namespace Game.BetretenVerboten
                             'Manuelle Auswahl für lokale Spieler
                             For k As Integer = 0 To FigCount - 1
                                 'Prüfe Figur nach Mouse-Klick
-                                If GetFigureRectangle(Map, SpielerIndex, k, Spielers, Center).Contains(mpos) And Spielers(SpielerIndex).Spielfiguren(k) > -1 And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                                Dim rotato As Vector2 = RotateAboutOrigin(mpos.ToVector2, Center, CamRotation)
+                                If GetFigureRectangle(Map, SpielerIndex, k, Spielers, Center).Contains(rotato.ToPoint) And Spielers(SpielerIndex).Spielfiguren(k) > -1 And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                                     If Not ichmagzüge.Contains(k) Then
                                         HUDInstructions.Text = "Can't select this piece!"
                                     Else
