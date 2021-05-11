@@ -1231,7 +1231,7 @@ Namespace Game.BetretenVerboten
                                  Do
                                      Dim RNG = Nez.Random.NextFloat
                                      If RNG <= pogfactor Then 'Positive effect
-                                         Select Case Nez.Random.Range(0, 6)
+                                         Select Case Nez.Random.Range(0, 5)
                                              Case 0
                                                  Try
 
@@ -1277,19 +1277,12 @@ Namespace Game.BetretenVerboten
                                                  Spielers(pl).Angered = False
                                                  Exit Do
                                              Case 3
-                                                 'Reset anger button
-                                                 If Not Spielers(pl).Angered Then Continue Do
-                                                 PostChat("You're lucky! You can try again for free next round!", Color.White)
-                                                 SendMessage("You're lucky! You can try again for free next round!")
-                                                 Spielers(pl).SacrificeCounter = -1
-                                                 Exit Do
-                                             Case 4
                                                  'Add points
                                                  PostChat("You're lucky! You gained 75 points!", Color.White)
                                                  SendMessage("You're lucky! You gained 75 points!")
                                                  Spielers(pl).AdditionalPoints += 75
                                                  Exit Do
-                                             Case 5
+                                             Case 4
                                                  'Add points
                                                  PostChat("You're lucky! Your next move will count double!", Color.White)
                                                  SendMessage("You're lucky! Your next move will count double!")

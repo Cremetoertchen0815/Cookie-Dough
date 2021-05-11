@@ -1,3 +1,2 @@
 ﻿BV:
--Remove free sacrificing
 -Tournament mode
