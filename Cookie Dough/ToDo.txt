@@ -1,5 +1,3 @@
 ﻿BV:
--Debug win command
--Fix broken af spawn rates of UFO
 -Remove free sacrificing
 -Tournament mode

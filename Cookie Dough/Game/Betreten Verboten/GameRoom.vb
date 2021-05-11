@@ -82,6 +82,7 @@ Namespace Game.BetretenVerboten
         Private Shared dbgExecSync As Boolean = False
         Private Shared dbgPlaceCmd As (Integer, Integer, Integer)
         Private Shared dbgPlaceSet As Boolean = False
+        Private Shared dbgEnd As Boolean = False
         Private Shared dbgLoguser As Integer = -1
 
         'Spielfeld
@@ -252,8 +253,7 @@ Namespace Game.BetretenVerboten
             If Not StopUpdating Then
 
                 'Prüfe, ob die Runde gewonnen wurde und beende gegebenenfalls die Runde
-                Dim win As Integer = CheckWin()
-                If win > -1 Or TimeOver Then
+                If CheckWin() Or TimeOver Or dbgEnd Then
                     If MediaPlayer.IsRepeating Then
                         MediaPlayer.Play(DamDamDaaaam)
                         MediaPlayer.Volume = 0.8
@@ -264,6 +264,7 @@ Namespace Game.BetretenVerboten
                     MediaPlayer.IsRepeating = False
                     StopUpdating = True
                     ShowDice = False
+                    dbgEnd = False
                     HUDInstructions.Text = "Game over!"
                     'Berechne Rankings
                     Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
@@ -951,16 +952,16 @@ Namespace Game.BetretenVerboten
             Return sum
         End Function
 
-        Private Function CheckWin() As Integer
+        Private Function CheckWin() As Boolean
             For i As Integer = 0 To PlCount - 1
                 Dim pl As Player = Spielers(i)
                 Dim check As Boolean = True
                 For j As Integer = 0 To FigCount - 1
                     If pl.Spielfiguren(j) < PlCount * SpceCount Then check = False
                 Next
-                If check Then Return i
+                If check Then Return True
             Next
-            Return -1
+            Return False
         End Function
 
         Private Function CanDoAMove() As Boolean
@@ -1480,6 +1481,11 @@ Namespace Game.BetretenVerboten
         <Command("bv-info", "Gives information over a specific player.")>
         Public Shared Sub dbgPlayerInfo(nr As Integer)
             dbgLoguser = nr
+        End Sub
+
+        <Command("bv-end", "Gives information over a specific player.")>
+        Public Shared Sub dbgEndGame()
+            dbgEnd = True
         End Sub
 #End Region
 #Region "Schnittstellenimplementation"
