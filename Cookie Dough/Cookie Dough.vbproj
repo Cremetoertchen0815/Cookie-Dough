@@ -60,6 +60,7 @@
     <Compile Include="Framwork\Misc\VertexExtractor.vb" />
     <Compile Include="Framwork\Networking\IPlayer.vb" />
     <Compile Include="Enums.vb" />
+    <Compile Include="Game\Betreten Verboten\GuestWindow.vb" />
     <Compile Include="Game\Drop Trop\Enums.vb" />
     <Compile Include="Game\Drop Trop\GameInstance.vb" />
     <Compile Include="Game\Drop Trop\SlaveWindow.vb" />

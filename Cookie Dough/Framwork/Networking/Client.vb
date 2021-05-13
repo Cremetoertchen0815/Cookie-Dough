@@ -23,6 +23,7 @@ Namespace Framework.Networking
         Public Property AutomaticRefresh As Boolean = True
         Public Shared Property OutputDelegate As Action(Of String) = Sub(x) Return
         Public Shared Property NetworkLog As Boolean = False
+        Public Shared Property SecondaryClient As Boolean = False
 
 
         Private stream As NetworkStream
@@ -58,11 +59,7 @@ Namespace Framework.Networking
                 WriteString("Wassup?")
                 If Not ReadString() = "What's your name?" Then Throw New NotImplementedException()
                 WriteString(nickname)
-#If DEBUG Then
-                WriteString(Server.RandomString(6))
-#Else
-                WriteString(My.Settings.UniqueIdentifier)
-#End If
+                WriteString(If(SecondaryClient, "b", My.Settings.UniqueIdentifier))
                 If My.Settings.UniqueIdentifier = "" Then My.Settings.UniqueIdentifier = ReadString() : My.Settings.Save()
                 Select Case ReadString()
                     Case "Sorry m8! Username already taken"
@@ -188,6 +185,15 @@ Namespace Framework.Networking
                 Disconnect()
                 Return 0
             End Try
+        End Function
+
+        Public Function GetAllMembers() As String()
+            WriteString("memberlist")
+            Dim ret As String() = New String(CInt(ReadString())) {}
+            For i As Integer = 0 To ret.Length - 1
+                ret(i) = ReadString()
+            Next
+            Return ret
         End Function
 
         Public Function CreateGameFinal() As Boolean

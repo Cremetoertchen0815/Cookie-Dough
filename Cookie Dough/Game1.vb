@@ -36,6 +36,7 @@ Namespace Cookie_Dough
                 LocalClient.Connect("127.0.0.1", My.Settings.Username)
             Else
                 LocalClient.Connect("127.0.0.1", My.Settings.Username & "a")
+                Client.SecondaryClient = True
             End If
 #End If
 
