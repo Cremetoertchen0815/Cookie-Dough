@@ -1,8 +1,8 @@
 ﻿BV:
+-Add updating user name when rejoining
 -Skip bug
 -Monitor wins for each player(serverside)
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
--Calc K/D(serverside, add command to send stats to client)
 -Soundeffekte, wenn man jmd kickt
 
 
