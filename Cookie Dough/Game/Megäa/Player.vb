@@ -25,6 +25,8 @@ Namespace Game.Megäa
         Public Property CustomSound As SoundEffect Implements IPlayer.CustomSound
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
 
+        Public Property ID As String Implements IPlayer.ID
+
         Private HandTransformOrigin As Keyframe3D
 
         Sub New(type As SpielerTyp)

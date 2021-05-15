@@ -16,7 +16,8 @@ Namespace Game.Megäa.Networking
                 Return Players.ToArray
             End Get
         End Property
-        Public Property WhiteList As List(Of String) Implements IGame.WhiteList
+        Public Property WhiteList As String() Implements IGame.WhiteList
+        Public Property Viewers As List(Of Connection) Implements IGame.Viewers
 
         'Houses all the players internally
         Private Players As New List(Of Player)

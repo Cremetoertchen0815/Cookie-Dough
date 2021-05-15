@@ -1,2 +1,8 @@
 ﻿BV:
--Tournament mode
+-White list mode
+-Skip bug
+-Monitor wins for each player
+-Monitor high score(sollte in chat bei sieg angezeigt werden)
+-Calc K/D
+-Soundeffekte, wenn man jmd kickt
+-Monopoly(Mit Ereignisfeldern + Kaufbaren Feldern)

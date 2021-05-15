@@ -11,6 +11,7 @@ Namespace Framework.Networking
         Public Property Connected As Boolean = False
         Public Property Hostname As String
         Public Property IsHost As Boolean
+        Public Property SecondaryClient As Boolean = False
         Public Property LeaveFlag As Boolean
             Get
                 Return _LeaveFlag
@@ -23,7 +24,6 @@ Namespace Framework.Networking
         Public Property AutomaticRefresh As Boolean = True
         Public Shared Property OutputDelegate As Action(Of String) = Sub(x) Return
         Public Shared Property NetworkLog As Boolean = False
-        Public Shared Property SecondaryClient As Boolean = False
 
 
         Private stream As NetworkStream
@@ -60,7 +60,7 @@ Namespace Framework.Networking
                 If Not ReadString() = "What's your name?" Then Throw New NotImplementedException()
                 WriteString(nickname)
                 WriteString(If(SecondaryClient, "b", My.Settings.UniqueIdentifier))
-                If My.Settings.UniqueIdentifier = "" Then My.Settings.UniqueIdentifier = ReadString() : My.Settings.Save()
+                If Not SecondaryClient AndAlso My.Settings.UniqueIdentifier = "" Then My.Settings.UniqueIdentifier = ReadString() : My.Settings.Save()
                 Select Case ReadString()
                     Case "Sorry m8! Username already taken"
                         Microsoft.VisualBasic.MsgBox("Username already taken on this server! Please change username!")
@@ -75,7 +75,7 @@ Namespace Framework.Networking
                 Connected = True
                 blastmode = False
                 Me.Hostname = hostname
-            Catch ex As Exception
+                Catch ex As Exception
                 NoteError(ex, False)
                 Microsoft.VisualBasic.MsgBox("Verbindung zum Server nicht möglich!")
             End Try

@@ -13,7 +13,8 @@ Namespace Game.DropTrop.Networking
         Public Property Active As Boolean = False Implements IGame.Active
         Public Property HostConnection As Connection Implements IGame.HostConnection
         Public ReadOnly Property Type As GameType = GameType.DropTrop Implements IGame.Type
-        Public Property WhiteList As List(Of String) Implements IGame.WhiteList
+        Public Property WhiteList As String() Implements IGame.WhiteList
+        Public Property Viewers As List(Of Connection) Implements IGame.Viewers
 
         Private ReadOnly Property IGame_Players As IPlayer() Implements IGame.Players
             Get

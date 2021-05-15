@@ -47,6 +47,7 @@ Namespace Game.DuoCard
         ''' </summary>
         <JsonIgnore>
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
+        Public Property ID As String Implements IPlayer.ID
 
         Sub New(typ As SpielerTyp)
             Me.Typ = typ

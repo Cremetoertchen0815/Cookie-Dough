@@ -7,6 +7,7 @@ Namespace Framework.Networking
         Property Bereit As Boolean
         Property Typ As SpielerTyp
         Property Name As String
+        Property ID As String
         Property CustomSound As SoundEffect
         Property Thumbnail As Texture2D
     End Interface

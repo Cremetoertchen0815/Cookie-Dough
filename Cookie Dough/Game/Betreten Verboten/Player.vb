@@ -73,6 +73,8 @@ Namespace Game.BetretenVerboten
         <JsonIgnore>
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
 
+        Public Property ID As String Implements IPlayer.ID
+
         Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)
             Me.Typ = typ
             Me.Schwierigkeit = schwierigkeit

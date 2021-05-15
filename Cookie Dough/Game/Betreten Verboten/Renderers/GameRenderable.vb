@@ -41,7 +41,7 @@ Namespace Game.BetretenVerboten.Renderers
                 batcher.Draw(WürfelRahmen, New Rectangle(1570, 700, 300, 300), Color.Lerp(color, Color.White, 0.4))
             End If
             'Zeichne Mini-Würfel
-            If (window.Status = SpielStatus.Würfel Or window.Status = SpielStatus.WähleFigur Or window.Status = SpielStatus.FahreFelder) And window.SpielerIndex = window.UserIndex Then
+            If (window.Status = SpielStatus.Würfel Or window.Status = SpielStatus.WähleFigur Or window.Status = SpielStatus.FahreFelder) And window.SpielerIndex = window.UserIndex And window.UserIndex > -1 Then
                 For i As Integer = 0 To window.WürfelWerte.Length - 1
                     If window.SpielerIndex = window.UserIndex And window.WürfelWerte(i) > 0 Then
                         batcher.Draw(WürfelAugen, New Rectangle(1590 + i * 70, 600, 50, 50), GetWürfelSourceRectangle(window.WürfelWerte(i)), color)

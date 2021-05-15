@@ -22,6 +22,7 @@ Namespace Cookie_Dough
             'Prepare program
             IO.Directory.CreateDirectory("Cache\server\")
             IO.Directory.CreateDirectory("Log\")
+            IO.Directory.CreateDirectory("Save\")
             PauseOnFocusLost = False
             Screen.SetSize(1280, 720)
             Scene.SetDefaultDesignResolution(1920, 1080, Scene.SceneResolutionPolicy.BestFit)
@@ -35,8 +36,8 @@ Namespace Cookie_Dough
                 StartServer()
                 LocalClient.Connect("127.0.0.1", My.Settings.Username)
             Else
+                LocalClient.SecondaryClient = True
                 LocalClient.Connect("127.0.0.1", My.Settings.Username & "a")
-                Client.SecondaryClient = True
             End If
 #End If
 

@@ -662,8 +662,15 @@ Namespace Game.BetretenVerboten
                         SendPlayerArrived(source, Spielers(source).Name)
                     Case "c"c 'Sent chat message
                         Dim text As String = element.Substring(2)
-                        PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
-                        SendChatMessage(source, text)
+                        If source = 9 Then
+                            Dim rieltxt As String = text.Split("---")(0)
+                            Dim src As String = text.Split("---")(1)
+                            PostChat("[" & src & "]: " & rieltxt, Color.Gray)
+                            SendChatMessage(source, text)
+                        Else
+                            PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
+                            SendChatMessage(source, text)
+                        End If
                     Case "e"c 'Suspend gaem
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
                         Spielers(source).Bereit = False
@@ -700,6 +707,8 @@ Namespace Game.BetretenVerboten
                         Status = SpielStatus.FahreFelder
                         FigurFaderZiel = (source, figur)
                         StartMoverSub(destination)
+                    Case "y"c
+                        SendSync()
                     Case "z"c
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
                         Dim dat As String = element.Substring(3).Replace("_TATA_", "")

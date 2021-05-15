@@ -137,15 +137,19 @@ Namespace Game.BetretenVerboten
                                                      Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
                                                  Next
                                                  'Load camera info
-                                                 Select Case Map
-                                                     Case GaemMap.Default4Players
-                                                         CamRotation = UserIndex / 2 * Math.PI
-                                                     Case GaemMap.Default6Players
-                                                         CamRotation = Math.Round(UserIndex / 1.5) / 2 * Math.PI
-                                                     Case GaemMap.Default8Players
-                                                         CamRotation = Math.Floor(UserIndex / 2) / 2 * Math.PI
-                                                 End Select
-                                                 StdCam = New Keyframe3D(-30, -20, -50, Math.PI * 2 - CamRotation, 0.75, 0)
+                                                 If UserIndex > -1 Then
+                                                     Select Case Map
+                                                         Case GaemMap.Default4Players
+                                                             CamRotation = UserIndex / 2 * Math.PI
+                                                         Case GaemMap.Default6Players
+                                                             CamRotation = Math.Round(UserIndex / 1.5) / 2 * Math.PI
+                                                         Case GaemMap.Default8Players
+                                                             CamRotation = Math.Floor(UserIndex / 2) / 2 * Math.PI
+                                                     End Select
+                                                     StdCam = New Keyframe3D(-30, -20, -50, Math.PI * 2 - CamRotation, 0.75, 0)
+                                                 Else
+                                                     StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)
+                                                 End If
                                                  FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
 
                                                  'Set rejoin flag
@@ -161,7 +165,7 @@ Namespace Game.BetretenVerboten
             LocalClient.IsHost = False
             Chat = New List(Of (String, Color))
             MoveActive = False
-            Spielers(UserIndex).CustomSound = GetLocalAudio(My.Settings.Sound)
+            If UserIndex > -1 Then Spielers(UserIndex).CustomSound = GetLocalAudio(My.Settings.Sound)
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
@@ -190,7 +194,7 @@ Namespace Game.BetretenVerboten
             HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
-            HUD.Color = hudcolors(UserIndex)
+            HUD.Color = If(UserIndex > -1, hudcolors(UserIndex), Color.White)
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0))
@@ -287,7 +291,7 @@ Namespace Game.BetretenVerboten
             Dim kstate As KeyboardState = Keyboard.GetState()
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
 
-            If Not StopUpdating Then
+            If Not StopUpdating Or UserIndex > -1 Then
 
                 'Update die Spielelogik
                 Select Case Status
@@ -488,7 +492,14 @@ Namespace Game.BetretenVerboten
                         PostChat("The game has started!", Color.White)
                     Case "c"c 'Sent chat message
                         Dim source As Integer = CInt(element(1).ToString)
-                        PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
+                        If source = 9 Then
+                            Dim text As String = element.Substring(2)
+                            Dim rieltxt As String = Text.Split("---")(0)
+                            Dim src As String = Text.Split("---")(1)
+                            PostChat("[" & src & "]: " & rieltxt, Color.Gray)
+                        Else
+                            PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
+                        End If
                     Case "d"c
                         Dim source As Integer = CInt(element(1).ToString)
                         Dim figure As Integer = CInt(element(2).ToString)
@@ -530,6 +541,7 @@ Namespace Game.BetretenVerboten
                         SpielerIndex = who
                         HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
                         HUDBtnD.Active = SpielerIndex = UserIndex
+                        If UserIndex < 0 Then Continue For
                         If who = UserIndex Then
                             PrepareMove()
                         Else
@@ -552,7 +564,7 @@ Namespace Game.BetretenVerboten
                             Spielers(i).Angered = sp.Spielers(i).Angered
                             Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
                         Next
-                        If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
+                        If UserIndex > -1 AndAlso Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
                         SendSoundFile()
                     Case "s"c 'Create transition
@@ -618,7 +630,7 @@ Namespace Game.BetretenVerboten
                             Spielers(i).Angered = sp.Spielers(i).Angered
                             Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
                         Next
-                        If Spielers(UserIndex).Angered Then HUDBtnC.Active = False
+                        If UserIndex > -1 AndAlso Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
                     Case "z"c
                         Dim source As Integer = CInt(element(1).ToString)
@@ -650,6 +662,11 @@ Namespace Game.BetretenVerboten
         'BOOTI PLS PLAE DMC 2
         'DANTE IS GUD IS DE BÄST PLAYE DMC 2 PLSSS
         Friend Sub SendArrived()
+            If UserIndex < 0 Then
+                LocalClient.WriteStream("y") 'request refresh
+                Return
+            End If
+
             If Rejoin Then
                 LocalClient.WriteStream("r")
             Else
@@ -670,6 +687,7 @@ Namespace Game.BetretenVerboten
             LocalClient.WriteStream("p")
         End Sub
         Private Sub SendSoundFile()
+            If UserIndex < 0 Then Return
             Dim txt As String = ""
             If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
             LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & "_TATA_" & txt)
@@ -1011,7 +1029,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub AngerButton() Handles HUDBtnC.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating Then
+            If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex > -1 Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
@@ -1039,7 +1057,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub SacrificeButton() Handles HUDBtnD.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 Then
+            If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 And UserIndex > -1 Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
                 If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then

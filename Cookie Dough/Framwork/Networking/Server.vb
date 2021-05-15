@@ -134,12 +134,10 @@ Namespace Framework.Networking
                         Case "list"
                             'Implement that a lobby is viewable for the player who left only!!!
                             For Each element In games
-                                If element.Value.GetReadyPlayerCount < element.Value.GetLobbySize And (element.Value.WhiteList Is Nothing OrElse element.Value.WhiteList.Contains(con.Identifier)) Then
-                                    WriteString(con, element.Key.ToString)
-                                    WriteString(con, element.Value.Name.ToString)
-                                    WriteString(con, element.Value.Type.ToString)
-                                    WriteString(con, element.Value.GetRegisteredPlayerCount.ToString)
-                                End If
+                                WriteString(con, element.Key.ToString)
+                                WriteString(con, element.Value.Name.ToString)
+                                WriteString(con, element.Value.Type.ToString)
+                                WriteString(con, element.Value.GetRegisteredPlayerCount.ToString)
                             Next
                             WriteString(con, "That's it!")
                         Case "join"
@@ -148,22 +146,13 @@ Namespace Framework.Networking
                                 Dim gaem As IGame = games(id)
                                 Dim index As Integer = -1
                                 gaem.ServerSendJoinGlobalData(con, AddressOf WriteString)
-                                If gaem.GetRegisteredPlayerCount >= gaem.GetLobbySize Then
-                                    If IsRejoining(gaem, con.Nick, index) Then
-                                        'Is Rejoining
-                                        If index = -1 Then Throw New NotImplementedException
-                                        WriteString(con, index)
-                                        gaem.ServerSendJoinRejoinData(index, con, AddressOf WriteString)
-                                        WriteString(con, "Rejoin")
-                                    Else
-                                        Throw New NotImplementedException
-                                    End If
-                                Else
-                                    'Is joining from scratch
-                                    For i As Integer = 0 To gaem.Players.Length - 1
-                                        If gaem.Players(i) Is Nothing Then index = i : Exit For
-                                    Next
+                                If IsRejoining(gaem, con.Identifier, index) Then
+                                    'Is Rejoining
                                     If index = -1 Then Throw New NotImplementedException
+                                    WriteString(con, index)
+                                    gaem.ServerSendJoinRejoinData(index, con, AddressOf WriteString)
+                                    WriteString(con, "Rejoin")
+                                Else
                                     WriteString(con, index.ToString)
                                     gaem.ServerSendJoinNujoinData(index, con, AddressOf WriteString)
                                     WriteString(con, "Nujoin")
@@ -172,8 +161,14 @@ Namespace Framework.Networking
                                 'Check if rejoining
                                 If ReadString(con) <> "Okidoki!" Then Throw New NotImplementedException
                                 WriteString(con, "LET'S HAVE A BLAST!")
-                                gaem.Players(index).Bereit = True
-                                EnterJoinMode(con, gaem, index)
+
+                                If index > -1 Then
+                                    gaem.Players(index).ID = con.Identifier
+                                    gaem.Players(index).Bereit = True
+                                    EnterJoinMode(con, gaem, index)
+                                Else
+                                    EnterViewerJoinMode(con, gaem)
+                                End If
                             Catch ex As Exception
                                 WriteString(con, "Sorry m8!")
                             End Try
@@ -234,11 +229,22 @@ Namespace Framework.Networking
             End Select
         End Function
 
-        Private Function IsRejoining(gaem As IGame, nick As String, ByRef index As Integer) As Boolean
+        Private Function IsRejoining(gaem As IGame, ID As String, ByRef index As Integer) As Boolean
             If gaem Is Nothing Then Return False
+            'If player is rejoining, return yes and hand over old ID
             For i As Integer = 0 To gaem.Players.Length - 1
-                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Name = nick Then index = i : Return True
+                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).ID = ID Then index = i : Return True
             Next
+            'If not rejoining, check whitelist if welcome
+            For i As Integer = 0 To gaem.WhiteList.Length - 1
+                If gaem.WhiteList(i) = ID Or gaem.WhiteList(i) = "" Then
+                    gaem.WhiteList(i) = ID
+                    index = i
+                    Return False
+                End If
+            Next
+            'Else, join as guest
+            index = -1
             Return False
         End Function
 
@@ -272,6 +278,27 @@ Namespace Framework.Networking
             If Not gaem.Active Then gaem.Players(index) = Nothing : WriteString(con, "LOL")
         End Sub
 
+        Private Sub EnterViewerJoinMode(con As Connection, gaem As IGame)
+            gaem.Viewers.Add(con)
+            Try
+                Dim break As Boolean = False
+                Do Until gaem.Ended Or break
+                    Dim txt As String = ReadString(con)
+                    If gaem.HostConnection IsNot Nothing And txt(0) = "c"c Then WriteString(gaem.HostConnection, "9" & txt & "---" & con.Identifier)
+                    If gaem.HostConnection IsNot Nothing And txt = "y" Then WriteString(gaem.HostConnection, "9" & txt)
+                    If txt = "e" Then break = True
+                Loop
+            Catch ex As Exception
+            End Try
+
+            'Send terminator/flusher
+            Try
+                con.StreamW.WriteLine("(I'm already Spacer)")
+            Catch
+            End Try
+            gaem.Viewers.Remove(con)
+        End Sub
+
         Private Sub EnterCreateMode(con As Connection, gaem As IGame)
             Try
                 Do Until gaem.Ended
@@ -279,19 +306,12 @@ Namespace Framework.Networking
                     Select Case nl(0)
                         Case "b"c
                             'If host sends that the game shall begin, unlist round
-                            If games.ContainsKey(gaem.Key) Then games.Remove(gaem.Key)
                             gaem.Active = True
-                            'Generate WhiteList and transmit begin message
-                            gaem.WhiteList = New List(Of String)
-                            For i As Integer = 1 To gaem.Players.Length - 1
-                                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then
-                                    WriteString(gaem.Players(i).Connection, nl)
-                                    gaem.WhiteList.Add(gaem.Players(i).Connection.Identifier)
-                                End If
-                            Next
+                            'Transmit begin message
+                            SendToAllGameClients(gaem, nl)
                         Case "l"c, "I"c
                             'If host left, end game for everyone
-                            SendToAllGameClients(gaem)
+                            SendEndToAllGameClients(gaem)
                             gaem.HostConnection = Nothing
                             Exit Try
                         Case "e"c
@@ -299,27 +319,25 @@ Namespace Framework.Networking
                             Dim who As Integer = CInt(nl(1).ToString)
                             If Not games.ContainsKey(gaem.Key) Then games.Add(gaem.Key, gaem)
 
-                            For i As Integer = 1 To gaem.Players.Length - 1
-                                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, nl)
-                            Next
+                            SendToAllGameClients(gaem, nl)
 
                             If gaem.Players(who) IsNot Nothing Then gaem.Players(who).Bereit = False : gaem.Players(who).Connection = Nothing
                         Case Else
-                            For i As Integer = 1 To gaem.Players.Length - 1
-                                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, nl)
-                            Next
+                            SendToAllGameClients(gaem, nl)
                     End Select
                 Loop
             Catch ex As Exception
-                SendToAllGameClients(gaem)
+                SendEndToAllGameClients(gaem)
             End Try
             If games.ContainsKey(gaem.Key) Then games.Remove(gaem.Key)
         End Sub
 
-        Private Sub SendToAllGameClients(gaem As IGame)
+        Private Sub SendEndToAllGameClients(gaem As IGame)
             If Not gaem.Ended Then
                 gaem.Ended = True
                 Dim takenconnections As New List(Of Connection)
+
+                'Send to players
                 For i As Integer = 0 To gaem.Players.Length - 1
                     Try
                         If gaem IsNot Nothing AndAlso gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Connection IsNot Nothing AndAlso Not takenconnections.Contains(gaem.Players(i).Connection) Then
@@ -329,7 +347,33 @@ Namespace Framework.Networking
                     Catch
                     End Try
                 Next
+
+                'Send to viewers
+                For i As Integer = 0 To gaem.Viewers.Count - 1
+                    Try
+                        If gaem IsNot Nothing AndAlso gaem.Viewers(i) IsNot Nothing AndAlso Not takenconnections.Contains(gaem.Viewers(i)) Then
+                            WriteString(gaem.Viewers(i), "Understandable, have a nice day!")
+                            takenconnections.Add(gaem.Viewers(i))
+                        End If
+                    Catch
+                    End Try
+                Next
             End If
+        End Sub
+
+        Private Sub SendToAllGameClients(gaem As IGame, msg As String)
+            'Send to players
+            For i As Integer = 1 To gaem.Players.Length - 1
+                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, msg)
+            Next
+
+            'Send to viewers
+            For i As Integer = 0 To gaem.Viewers.Count - 1
+                Try
+                    If gaem.Viewers(i) IsNot Nothing Then WriteString(gaem.Viewers(i), msg)
+                Catch
+                End Try
+            Next
         End Sub
 
         Private Function AlreadyContainsNickname(nick As String) As Boolean
@@ -353,6 +397,7 @@ Namespace Framework.Networking
             End If
             SaveRegister()
         End Sub
+
         Private Sub SaveRegister()
             File.WriteAllText("Save\register.dat", Newtonsoft.Json.JsonConvert.SerializeObject(registered))
         End Sub
