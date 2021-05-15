@@ -1,8 +1,10 @@
 ﻿BV:
--White list mode
 -Skip bug
--Monitor wins for each player
+-Monitor wins for each player(serverside)
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
--Calc K/D
+-Calc K/D(serverside, add command to send stats to client)
 -Soundeffekte, wenn man jmd kickt
+
+
+
 -Monopoly(Mit Ereignisfeldern + Kaufbaren Feldern)

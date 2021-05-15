@@ -187,11 +187,11 @@ Namespace Framework.Networking
             End Try
         End Function
 
-        Public Function GetAllMembers() As String()
-            WriteString("memberlist")
-            Dim ret As String() = New String(CInt(ReadString())) {}
+        Public Function GetAllUsers() As (String, String)()
+            WriteString("users")
+            Dim ret As (String, String)() = New(String, String)(CInt(ReadString())) {}
             For i As Integer = 0 To ret.Length - 1
-                ret(i) = ReadString()
+                ret(i) = (ReadString(), ReadString())
             Next
             Return ret
         End Function

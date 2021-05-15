@@ -135,6 +135,30 @@ Partial Friend NotInheritable Class Settings
             Me("UniqueIdentifier") = value
         End Set
     End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+    Public Property GamesWon() As Integer
+        Get
+            Return CType(Me("GamesWon"),Integer)
+        End Get
+        Set
+            Me("GamesWon") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+    Public Property GamesLost() As Integer
+        Get
+            Return CType(Me("GamesLost"),Integer)
+        End Get
+        Set
+            Me("GamesLost") = value
+        End Set
+    End Property
 End Class
 
 Namespace My

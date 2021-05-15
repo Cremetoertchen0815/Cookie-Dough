@@ -494,9 +494,7 @@ Namespace Game.BetretenVerboten
                         Dim source As Integer = CInt(element(1).ToString)
                         If source = 9 Then
                             Dim text As String = element.Substring(2)
-                            Dim rieltxt As String = Text.Split("---")(0)
-                            Dim src As String = Text.Split("---")(1)
-                            PostChat("[" & src & "]: " & rieltxt, Color.Gray)
+                            PostChat("[Guest]: " & text, Color.Gray)
                         Else
                             PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
                         End If
@@ -611,7 +609,16 @@ Namespace Game.BetretenVerboten
                                                          Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                                                  End Select
                                              Next
+
+                                             'Update K/D
+                                             If ranks(0).Item1 = UserIndex Then
+                                                 My.Settings.GamesWon += 1
+                                             Else
+                                                 My.Settings.GamesLost += 1
+                                             End If
+                                             My.Settings.Save()
                                          End Sub)
+                        'Set flags
                         Status = SpielStatus.SpielZuEnde
                         FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
                         Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)

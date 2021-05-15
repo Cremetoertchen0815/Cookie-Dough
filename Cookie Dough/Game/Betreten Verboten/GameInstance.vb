@@ -19,7 +19,7 @@ Namespace Game.BetretenVerboten
         Private PlayerSel As Integer = 0
         Private Map As GaemMap = 0
         Friend Arrow As Texture2D
-        Protected AllUser As New List(Of (String, String)) '(Name, Key)
+        Protected AllUser As New List(Of (String, String)) '(ID, Name)
         Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
         Protected Whitelist As Integer() = {0, 0, 0, 0}
         Protected SecondScreen As Boolean = False
@@ -89,7 +89,8 @@ Namespace Game.BetretenVerboten
 
                         If IsConnectedToServer And Internetz Then
                             SwitchToOtherScreen(Sub()
-                                                    AllUser = New List(Of (String, String)) From {("Open", "")}
+                                                    AllUser = New List(Of (String, String)) From {("", "Open")}
+                                                    AllUser.AddRange(LocalClient.GetAllUsers)
                                                     SM4Scroll = 0
                                                 End Sub)
                         Else
@@ -102,8 +103,25 @@ Namespace Game.BetretenVerboten
                     If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
                     SM4Scroll = Mathf.Clamp(SM4Scroll - scrollval * 30, 0, Math.Max(375 + (Whitelist.Length - 1) * 150 - 1050, 0))
 
+                    'Upper buttons
                     If New Rectangle(560, 200, 400, 100).Contains(mpos) And OneshotPressed Then OpenInputbox("Enter a name for the round:", "Start Round", AddressOf StartNewRound)
                     If New Rectangle(960, 200, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen()
+
+                    'Whitelist items
+                    Dim offset As Integer = 0
+                    For i As Integer = 0 To NewGamePlayers.Length - 1
+                        If NewGamePlayers(i) = SpielerTyp.Online Then
+                            If New Rectangle(560, 350 + offset * 150 - CInt(SM4Scroll), 800, 100).Contains(mpos) And OneshotPressed Then
+                                'Increment player
+                                Dim once As Boolean = True
+                                Do While once Or IsIDtaken(i)
+                                    Whitelist(i) = (Whitelist(i) + 1) Mod AllUser.Count
+                                    once = False
+                                Loop
+                            End If
+                            offset += 1
+                        End If
+                    Next
                 End If
 
                 PlayerCount = GetMapSize(Map)
@@ -113,6 +131,12 @@ Namespace Game.BetretenVerboten
             lastmstate = mstate
             MyBase.Update()
         End Sub
+        Private Function IsIDtaken(i As String) As Boolean
+            For j As Integer = 0 To Whitelist.Length - 1
+                If Whitelist(j) = Whitelist(i) And i <> j And AllUser(Whitelist(i)).Item1 <> "" Then Return True
+            Next
+            Return False
+        End Function
         Private Sub StartNewRound(servername As String)
             If Not MenuAktiviert Then Return
 
@@ -145,7 +169,7 @@ Namespace Game.BetretenVerboten
                                                                                                             If Internetz Then
                                                                                                                 Dim wtlst As String() = New String(Whitelist.Length - 1) {}
                                                                                                                 For i As Integer = 0 To Whitelist.Length - 1
-                                                                                                                    wtlst(i) = AllUser(Whitelist(i)).Item2
+                                                                                                                    wtlst(i) = AllUser(Whitelist(i)).Item1
                                                                                                                 Next
                                                                                                                 If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                             End If
@@ -245,7 +269,7 @@ Namespace Game.BetretenVerboten
                     Dim offset As Integer = 0
                     For i As Integer = 0 To instance.NewGamePlayers.Length - 1
                         If instance.NewGamePlayers(i) = SpielerTyp.Online Then
-                            Dim str As String = "Player " & i.ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item1
+                            Dim str As String = "Player " & i.ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item2
                             batcher.DrawHollowRect(New Rectangle(560, 350 + offset * 150 - CInt(instance.SM4Scroll), 800, 100), FgColor)
                             batcher.DrawString(MediumFont, str, New Vector2(1920.0F / 2 - MediumFont.MeasureString(str).X / 2, 375 + offset * 150 - CInt(instance.SM4Scroll)), FgColor)
                             offset += 1

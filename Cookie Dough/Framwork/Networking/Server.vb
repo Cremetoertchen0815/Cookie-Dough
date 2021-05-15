@@ -132,7 +132,6 @@ Namespace Framework.Networking
                 Do
                     Select Case ReadString(con)
                         Case "list"
-                            'Implement that a lobby is viewable for the player who left only!!!
                             For Each element In games
                                 WriteString(con, element.Key.ToString)
                                 WriteString(con, element.Value.Name.ToString)
@@ -140,6 +139,12 @@ Namespace Framework.Networking
                                 WriteString(con, element.Value.GetRegisteredPlayerCount.ToString)
                             Next
                             WriteString(con, "That's it!")
+                        Case "users"
+                            WriteString(con, (registered.Count - 1).ToString)
+                            For Each element In registered
+                                WriteString(con, element.Key.ToString)
+                                WriteString(con, element.Value.ToString)
+                            Next
                         Case "join"
                             Try
                                 Dim id As Integer = CInt(ReadString(con))
@@ -284,8 +289,7 @@ Namespace Framework.Networking
                 Dim break As Boolean = False
                 Do Until gaem.Ended Or break
                     Dim txt As String = ReadString(con)
-                    If gaem.HostConnection IsNot Nothing And txt(0) = "c"c Then WriteString(gaem.HostConnection, "9" & txt & "---" & con.Identifier)
-                    If gaem.HostConnection IsNot Nothing And txt = "y" Then WriteString(gaem.HostConnection, "9" & txt)
+                    If gaem.HostConnection IsNot Nothing And (txt(0) = "y"c Or txt(0) = "c"c) Then WriteString(gaem.HostConnection, "9" & txt)
                     If txt = "e" Then break = True
                 Loop
             Catch ex As Exception

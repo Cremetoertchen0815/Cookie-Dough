@@ -254,6 +254,7 @@ Namespace Game.BetretenVerboten
 
                 'Prüfe, ob die Runde gewonnen wurde und beende gegebenenfalls die Runde
                 If CheckWin() Or TimeOver Or dbgEnd Then
+                    'Cue music
                     If MediaPlayer.IsRepeating Then
                         MediaPlayer.Play(DamDamDaaaam)
                         MediaPlayer.Volume = 0.8
@@ -266,6 +267,7 @@ Namespace Game.BetretenVerboten
                     ShowDice = False
                     dbgEnd = False
                     HUDInstructions.Text = "Game over!"
+
                     'Berechne Rankings
                     Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
                     For i As Integer = 0 To PlCount - 1
@@ -274,6 +276,7 @@ Namespace Game.BetretenVerboten
                     ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
                     ranks.Reverse()
 
+                    'Display ranks
                     For i As Integer = 0 To ranks.Count - 1
                         Dim ia As Integer = i
                         Select Case i
@@ -287,6 +290,16 @@ Namespace Game.BetretenVerboten
                                 Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
                         End Select
                     Next
+
+                    'Update K/D
+                    If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then
+                        My.Settings.GamesWon += 1
+                    Else
+                        My.Settings.GamesLost += 1
+                    End If
+                    My.Settings.Save()
+
+                    'Set flags
                     SendWinFlag()
                     Status = SpielStatus.SpielZuEnde
                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
@@ -663,9 +676,7 @@ Namespace Game.BetretenVerboten
                     Case "c"c 'Sent chat message
                         Dim text As String = element.Substring(2)
                         If source = 9 Then
-                            Dim rieltxt As String = text.Split("---")(0)
-                            Dim src As String = text.Split("---")(1)
-                            PostChat("[" & src & "]: " & rieltxt, Color.Gray)
+                            PostChat("[Guest]: " & text, Color.Gray)
                             SendChatMessage(source, text)
                         Else
                             PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
