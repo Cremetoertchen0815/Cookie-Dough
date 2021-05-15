@@ -1,5 +1,5 @@
 ﻿BV:
--Add updating user name when rejoining
+-Redesign user page
 -Skip bug
 -Monitor wins for each player(serverside)
 -Monitor high score(sollte in chat bei sieg angezeigt werden)

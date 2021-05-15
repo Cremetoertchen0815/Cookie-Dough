@@ -556,6 +556,7 @@ Namespace Game.BetretenVerboten
                             For j As Integer = 0 To FigCount - 1
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
+                            Spielers(i).Name = sp.Spielers(i).Name
                             Spielers(i).Typ = sp.Spielers(i).Typ
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
@@ -632,6 +633,7 @@ Namespace Game.BetretenVerboten
                             For j As Integer = 0 To FigCount - 1
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
+                            Spielers(i).Name = sp.Spielers(i).Name
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
@@ -675,9 +677,9 @@ Namespace Game.BetretenVerboten
             End If
 
             If Rejoin Then
-                LocalClient.WriteStream("r")
+                LocalClient.WriteStream("r" & My.Settings.Username) 'Rejoin
             Else
-                LocalClient.WriteStream("a" & My.Settings.Username)
+                LocalClient.WriteStream("a" & My.Settings.Username) 'Nujoin
             End If
         End Sub
 

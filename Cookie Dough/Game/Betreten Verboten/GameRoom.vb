@@ -699,6 +699,7 @@ Namespace Game.BetretenVerboten
                     Case "p"c 'Player angered
                         Spielers(source).Angered = True
                     Case "r"c 'Player is back
+                        Spielers(source).Name = element.Substring(2)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         SendPlayerBack(source)
