@@ -747,7 +747,7 @@ Namespace Game.BetretenVerboten
         Private Sub SendBeginGaem()
             Dim appendix As String = ""
             For i As Integer = 0 To Spielers.Length - 1
-                If Spielers(i).Typ <> SpielerTyp.Online Then appendix &= i.ToString
+                If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.CPU Then appendix &= i.ToString
             Next
             SendNetworkMessageToAll("b" & appendix)
             SendSync()

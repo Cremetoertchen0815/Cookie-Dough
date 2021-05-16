@@ -639,6 +639,7 @@ Namespace Game.BetretenVerboten
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
                             Spielers(i).Name = sp.Spielers(i).Name
+                            Spielers(i).Typ = sp.Spielers(i).Typ
                             Spielers(i).MOTD = sp.Spielers(i).MOTD
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
