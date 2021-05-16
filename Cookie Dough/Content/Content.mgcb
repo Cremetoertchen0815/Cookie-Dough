@@ -140,23 +140,155 @@
 /processorParam:TextureFormat=Compressed
 /build:font/MenuTitle.spritefont
 
-#begin fx/fx_alphastencil.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:fx/fx_alphastencil.fx
+#begin fx/effects/Bevels.mgfxo
+/copy:fx/effects/Bevels.mgfxo
 
-#begin fx/fx_fadetocolor.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:fx/fx_fadetocolor.fx
+#begin fx/effects/BloomCombine.mgfxo
+/copy:fx/effects/BloomCombine.mgfxo
 
-#begin fx/fx_gaussianblur.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:fx/fx_gaussianblur.fx
+#begin fx/effects/BloomExtract.mgfxo
+/copy:fx/effects/BloomExtract.mgfxo
+
+#begin fx/effects/Crosshatch.mgfxo
+/copy:fx/effects/Crosshatch.mgfxo
+
+#begin fx/effects/DeferredLighting.mgfxo
+/copy:fx/effects/DeferredLighting.mgfxo
+
+#begin fx/effects/DeferredSprite.mgfxo
+/copy:fx/effects/DeferredSprite.mgfxo
+
+#begin fx/effects/Dissolve.mgfxo
+/copy:fx/effects/Dissolve.mgfxo
+
+#begin fx/effects/Dots.mgfxo
+/copy:fx/effects/Dots.mgfxo
+
+#begin fx/effects/ForwardLighting.mgfxo
+/copy:fx/effects/ForwardLighting.mgfxo
+
+#begin fx/effects/fx_color_grade.mgfxo
+/copy:fx/effects/fx_color_grade.mgfxo
+
+#begin fx/effects/GaussianBlur.mgfxo
+/copy:fx/effects/GaussianBlur.mgfxo
+
+#begin fx/effects/Grayscale.mgfxo
+/copy:fx/effects/Grayscale.mgfxo
+
+#begin fx/effects/HeatDistortion.mgfxo
+/copy:fx/effects/HeatDistortion.mgfxo
+
+#begin fx/effects/Invert.mgfxo
+/copy:fx/effects/Invert.mgfxo
+
+#begin fx/effects/Letterbox.mgfxo
+/copy:fx/effects/Letterbox.mgfxo
+
+#begin fx/effects/LUTColorGrade.mgfxo
+/copy:fx/effects/LUTColorGrade.mgfxo
+
+#begin fx/effects/Mosaic.mgfxo
+/copy:fx/effects/Mosaic.mgfxo
+
+#begin fx/effects/MultiTexture.mgfxo
+/copy:fx/effects/MultiTexture.mgfxo
+
+#begin fx/effects/MultiTextureOverlay.mgfxo
+/copy:fx/effects/MultiTextureOverlay.mgfxo
+
+#begin fx/effects/Noise.mgfxo
+/copy:fx/effects/Noise.mgfxo
+
+#begin fx/effects/PaletteCycler.mgfxo
+/copy:fx/effects/PaletteCycler.mgfxo
+
+#begin fx/effects/PixelGlitch.mgfxo
+/copy:fx/effects/PixelGlitch.mgfxo
+
+#begin fx/effects/PolygonLight.mgfxo
+/copy:fx/effects/PolygonLight.mgfxo
+
+#begin fx/effects/QualityBloom.mgfxo
+/copy:fx/effects/QualityBloom.mgfxo
+
+#begin fx/effects/Reflection.mgfxo
+/copy:fx/effects/Reflection.mgfxo
+
+#begin fx/effects/Scanlines.mgfxo
+/copy:fx/effects/Scanlines.mgfxo
+
+#begin fx/effects/Sepia.mgfxo
+/copy:fx/effects/Sepia.mgfxo
+
+#begin fx/effects/SpriteAlphaTest.mgfxo
+/copy:fx/effects/SpriteAlphaTest.mgfxo
+
+#begin fx/effects/SpriteBlinkEffect.mgfxo
+/copy:fx/effects/SpriteBlinkEffect.mgfxo
+
+#begin fx/effects/SpriteEffect.mgfxo
+/copy:fx/effects/SpriteEffect.mgfxo
+
+#begin fx/effects/SpriteLightMultiply.mgfxo
+/copy:fx/effects/SpriteLightMultiply.mgfxo
+
+#begin fx/effects/SpriteLines.mgfxo
+/copy:fx/effects/SpriteLines.mgfxo
+
+#begin fx/effects/StencilLight.mgfxo
+/copy:fx/effects/StencilLight.mgfxo
+
+#begin fx/effects/transitions/Squares.mgfxo
+/copy:fx/effects/transitions/Squares.mgfxo
+
+#begin fx/effects/transitions/TextureWipe.mgfxo
+/copy:fx/effects/transitions/TextureWipe.mgfxo
+
+#begin fx/effects/transitions/Wind.mgfxo
+/copy:fx/effects/transitions/Wind.mgfxo
+
+#begin fx/effects/Twist.mgfxo
+/copy:fx/effects/Twist.mgfxo
+
+#begin fx/effects/Vignette.mgfxo
+/copy:fx/effects/Vignette.mgfxo
+
+#begin fx/textures/defaultLUT.xnb
+/copy:fx/textures/defaultLUT.xnb
+
+#begin fx/textures/defaultLUTb.xnb
+/copy:fx/textures/defaultLUTb.xnb
+
+#begin fx/textures/heatDistortionNoise.xnb
+/copy:fx/textures/heatDistortionNoise.xnb
+
+#begin fx/textures/textureWipeTransition/angular.xnb
+/copy:fx/textures/textureWipeTransition/angular.xnb
+
+#begin fx/textures/textureWipeTransition/crissCross.xnb
+/copy:fx/textures/textureWipeTransition/crissCross.xnb
+
+#begin fx/textures/textureWipeTransition/diagonalDistort.xnb
+/copy:fx/textures/textureWipeTransition/diagonalDistort.xnb
+
+#begin fx/textures/textureWipeTransition/horizontal.xnb
+/copy:fx/textures/textureWipeTransition/horizontal.xnb
+
+#begin fx/textures/textureWipeTransition/noise.xnb
+/copy:fx/textures/textureWipeTransition/noise.xnb
+
+#begin fx/textures/textureWipeTransition/pokemon.xnb
+/copy:fx/textures/textureWipeTransition/pokemon.xnb
+
+#begin fx/textures/textureWipeTransition/sawTooth.xnb
+/copy:fx/textures/textureWipeTransition/sawTooth.xnb
+
+#begin fx/textures/textureWipeTransition/spiral.xnb
+/copy:fx/textures/textureWipeTransition/spiral.xnb
+
+#begin fx/textures/textureWipeTransition/wink.xnb
+/copy:fx/textures/textureWipeTransition/wink.xnb
 
 #begin games/BV/arrow_right.png
 /importer:TextureImporter
@@ -1299,6 +1431,180 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:mesh/wall.fbx
+
+#begin nez/effects/Bevels.mgfxo
+/copy:nez/effects/Bevels.mgfxo
+
+#begin nez/effects/BloomCombine.mgfxo
+/copy:nez/effects/BloomCombine.mgfxo
+
+#begin nez/effects/BloomExtract.mgfxo
+/copy:nez/effects/BloomExtract.mgfxo
+
+#begin nez/effects/Crosshatch.mgfxo
+/copy:nez/effects/Crosshatch.mgfxo
+
+#begin nez/effects/DeferredLighting.mgfxo
+/copy:nez/effects/DeferredLighting.mgfxo
+
+#begin nez/effects/DeferredSprite.mgfxo
+/copy:nez/effects/DeferredSprite.mgfxo
+
+#begin nez/effects/Dissolve.mgfxo
+/copy:nez/effects/Dissolve.mgfxo
+
+#begin nez/effects/Dots.mgfxo
+/copy:nez/effects/Dots.mgfxo
+
+#begin nez/effects/ForwardLighting.mgfxo
+/copy:nez/effects/ForwardLighting.mgfxo
+
+#begin nez/effects/fx_color_grade.mgfxo
+/copy:nez/effects/fx_color_grade.mgfxo
+
+#begin nez/effects/GaussianBlur.mgfxo
+/copy:nez/effects/GaussianBlur.mgfxo
+
+#begin nez/effects/Grayscale.mgfxo
+/copy:nez/effects/Grayscale.mgfxo
+
+#begin nez/effects/HeatDistortion.mgfxo
+/copy:nez/effects/HeatDistortion.mgfxo
+
+#begin nez/effects/Invert.mgfxo
+/copy:nez/effects/Invert.mgfxo
+
+#begin nez/effects/Letterbox.mgfxo
+/copy:nez/effects/Letterbox.mgfxo
+
+#begin nez/effects/LUTColorGrade.mgfxo
+/copy:nez/effects/LUTColorGrade.mgfxo
+
+#begin nez/effects/Mosaic.mgfxo
+/copy:nez/effects/Mosaic.mgfxo
+
+#begin nez/effects/MultiTexture.mgfxo
+/copy:nez/effects/MultiTexture.mgfxo
+
+#begin nez/effects/MultiTextureOverlay.mgfxo
+/copy:nez/effects/MultiTextureOverlay.mgfxo
+
+#begin nez/effects/Noise.mgfxo
+/copy:nez/effects/Noise.mgfxo
+
+#begin nez/effects/PaletteCycler.mgfxo
+/copy:nez/effects/PaletteCycler.mgfxo
+
+#begin nez/effects/PixelGlitch.mgfxo
+/copy:nez/effects/PixelGlitch.mgfxo
+
+#begin nez/effects/PolygonLight.mgfxo
+/copy:nez/effects/PolygonLight.mgfxo
+
+#begin nez/effects/QualityBloom.mgfxo
+/copy:nez/effects/QualityBloom.mgfxo
+
+#begin nez/effects/Reflection.mgfxo
+/copy:nez/effects/Reflection.mgfxo
+
+#begin nez/effects/Scanlines.mgfxo
+/copy:nez/effects/Scanlines.mgfxo
+
+#begin nez/effects/Sepia.mgfxo
+/copy:nez/effects/Sepia.mgfxo
+
+#begin nez/effects/SpriteAlphaTest.mgfxo
+/copy:nez/effects/SpriteAlphaTest.mgfxo
+
+#begin nez/effects/SpriteBlinkEffect.mgfxo
+/copy:nez/effects/SpriteBlinkEffect.mgfxo
+
+#begin nez/effects/SpriteEffect.mgfxo
+/copy:nez/effects/SpriteEffect.mgfxo
+
+#begin nez/effects/SpriteLightMultiply.mgfxo
+/copy:nez/effects/SpriteLightMultiply.mgfxo
+
+#begin nez/effects/SpriteLines.mgfxo
+/copy:nez/effects/SpriteLines.mgfxo
+
+#begin nez/effects/StencilLight.mgfxo
+/copy:nez/effects/StencilLight.mgfxo
+
+#begin nez/effects/transitions/Squares.mgfxo
+/copy:nez/effects/transitions/Squares.mgfxo
+
+#begin nez/effects/transitions/TextureWipe.mgfxo
+/copy:nez/effects/transitions/TextureWipe.mgfxo
+
+#begin nez/effects/transitions/Wind.mgfxo
+/copy:nez/effects/transitions/Wind.mgfxo
+
+#begin nez/effects/Twist.mgfxo
+/copy:nez/effects/Twist.mgfxo
+
+#begin nez/effects/Vignette.mgfxo
+/copy:nez/effects/Vignette.mgfxo
+
+#begin nez/textures/defaultLUT.xnb
+/copy:nez/textures/defaultLUT.xnb
+
+#begin nez/textures/defaultLUTb.xnb
+/copy:nez/textures/defaultLUTb.xnb
+
+#begin nez/textures/heatDistortionNoise.xnb
+/copy:nez/textures/heatDistortionNoise.xnb
+
+#begin nez/textures/textureWipeTransition/angular.xnb
+/copy:nez/textures/textureWipeTransition/angular.xnb
+
+#begin nez/textures/textureWipeTransition/crissCross.xnb
+/copy:nez/textures/textureWipeTransition/crissCross.xnb
+
+#begin nez/textures/textureWipeTransition/diagonalDistort.xnb
+/copy:nez/textures/textureWipeTransition/diagonalDistort.xnb
+
+#begin nez/textures/textureWipeTransition/horizontal.xnb
+/copy:nez/textures/textureWipeTransition/horizontal.xnb
+
+#begin nez/textures/textureWipeTransition/noise.xnb
+/copy:nez/textures/textureWipeTransition/noise.xnb
+
+#begin nez/textures/textureWipeTransition/pokemon.xnb
+/copy:nez/textures/textureWipeTransition/pokemon.xnb
+
+#begin nez/textures/textureWipeTransition/sawTooth.xnb
+/copy:nez/textures/textureWipeTransition/sawTooth.xnb
+
+#begin nez/textures/textureWipeTransition/spiral.xnb
+/copy:nez/textures/textureWipeTransition/spiral.xnb
+
+#begin nez/textures/textureWipeTransition/wink.xnb
+/copy:nez/textures/textureWipeTransition/wink.xnb
+
+#begin prep/audio_0.wav
+/copy:prep/audio_0.wav
+
+#begin prep/audio_1.wav
+/copy:prep/audio_1.wav
+
+#begin prep/audio_2.wav
+/copy:prep/audio_2.wav
+
+#begin prep/audio_3.wav
+/copy:prep/audio_3.wav
+
+#begin prep/audio_4.wav
+/copy:prep/audio_4.wav
+
+#begin prep/audio_5.wav
+/copy:prep/audio_5.wav
+
+#begin prep/plc.png
+/copy:prep/plc.png
+
+#begin prep/plc.wav
+/copy:prep/plc.wav
 
 #begin sfx/access_denied.wav
 /importer:WavImporter
