@@ -1442,11 +1442,11 @@ Namespace Game.BetretenVerboten
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                    Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum and -3 the minimum)", "You suck!")
+                    Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", "You suck!")
                     Try
                         Dim aim As Integer = CInt(res)
-                        Do Until aim < 13 And aim > -3
-                            res = Microsoft.VisualBasic.InputBox("Screw you! I said -3 <= x <= 12 FIELDS!", "You suck!")
+                        Do Until aim < 13 And aim > 0
+                            res = Microsoft.VisualBasic.InputBox("Screw you! I said 1 <= x <= 12 FIELDS!", "You suck!")
                             aim = CInt(res)
                         Loop
                         WürfelWerte(0) = If(aim > 6, 6, aim)
