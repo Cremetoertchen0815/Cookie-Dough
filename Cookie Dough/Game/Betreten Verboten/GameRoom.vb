@@ -828,7 +828,6 @@ Namespace Game.BetretenVerboten
         ''' Prüft nach dem Würfeln, wie der Zug weitergeht(Ist Zug möglich, muss Figur ausgewählt werden, ...)
         ''' </summary>
         Private Sub CalcMoves()
-            Dim homecount As Integer = GetHomebaseCount(SpielerIndex)
             Dim homebase As Integer = GetHomebaseIndex(SpielerIndex) 'Eine Spielfigur-ID, die sich in der Homebase befindet(-1, falls Homebase leer ist)
             Dim startfd As Boolean = IsFieldCoveredByOwnFigure(SpielerIndex, 0) 'Ob das Start-Feld blockiert ist
             ShowDice = False

@@ -1,5 +1,4 @@
 ﻿BV:
--Skip bug
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
 -Add intro scene
 

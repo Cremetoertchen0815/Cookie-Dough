@@ -43,6 +43,7 @@ Namespace Game.BetretenVerboten
         Private lastmstate As MouseState
         Private lastkstate As KeyboardState
         Private MoveActive As Boolean = False
+        Private StopDiceWhenFinished As Boolean = False 'Verhindert den Skip-Bug
         Private SaucerFields As New List(Of Integer)
 
         'Assets
@@ -93,11 +94,11 @@ Namespace Game.BetretenVerboten
         Friend PlayStompSound As Boolean
 
         Private Const WürfelDauer As Integer = 320
-        Private Const WürfelAnimationCooldown As Integer = 40
+        Private Const WürfelAnimationCooldown As Integer = 4
         Private Const FigurSpeed As Integer = 450
         Private Const ErrorCooldown As Integer = 1
         Private Const RollDiceCooldown As Single = 0.5
-        Private Const CPUThinkingTime As Integer = 600
+        Private Const CPUThinkingTime As Integer = 0.6
         Private Const DopsHöhe As Integer = 150
         Private Const CamSpeed As Integer = 1300
         Private Const SacrificeWait As Integer = 5
@@ -291,11 +292,12 @@ Namespace Game.BetretenVerboten
             Dim kstate As KeyboardState = Keyboard.GetState()
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
 
-            If Not StopUpdating Or UserIndex > -1 Then
+            If Not StopUpdating And UserIndex > -1 Then
 
                 'Update die Spielelogik
                 Select Case Status
                     Case SpielStatus.Würfel
+                        If StopDiceWhenFinished Then Exit Select
 
                         'Manuelles Würfeln für lokalen Spieler
                         'Prüft und speichert, ob der Würfel-Knopf gedrückt wurde
@@ -682,9 +684,9 @@ Namespace Game.BetretenVerboten
             End If
 
             If Rejoin Then
-                LocalClient.WriteStream("r" & My.Settings.Username & My.Settings.MOTD) 'Rejoin
+                LocalClient.WriteStream("r" & My.Settings.Username & "|" & My.Settings.MOTD) 'Rejoin
             Else
-                LocalClient.WriteStream("a" & My.Settings.Username & My.Settings.MOTD) 'Nujoin
+                LocalClient.WriteStream("a" & My.Settings.Username & "|" & My.Settings.MOTD) 'Nujoin
             End If
         End Sub
 
@@ -736,6 +738,7 @@ Namespace Game.BetretenVerboten
                 FigurFaderZiel = (SpielerIndex, homebase)
                 'Animiere wie die Figur sich nach vorne bewegt, anschließend prüfe ob andere Spieler rausgeschmissen wurden
                 If Not IsFieldCoveredByOwnFigure(SpielerIndex, Fahrzahl) Then
+                    StopDiceWhenFinished = True
                     SubmitResults(homebase, Fahrzahl)
                 Else
                     StopUpdating = True
@@ -755,10 +758,7 @@ Namespace Game.BetretenVerboten
                 If IsFutureFieldCoveredByOwnFigure(SpielerIndex, 0, -1) AndAlso Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, Fahrzahl, -1) Then 'Spieler auf dem Start-Feld muss wenn mögl.  bewegt werden
                     homebase = GetFieldID(SpielerIndex, 0).Item2
                     FigurFaderZiel = (SpielerIndex, homebase)
-                    SubmitResults(homebase, Fahrzahl)
-                ElseIf IsFutureFieldCoveredByOwnFigure(SpielerIndex, Fahrzahl, -1) AndAlso Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, Fahrzahl * 2, -1) Then 'Wenn Spieler auf dem Start-Feld nicht kann, fahre stattdessen mit nächtem blockierenden Spieler
-                    homebase = GetFieldID(SpielerIndex, WürfelWerte(1)).Item2
-                    FigurFaderZiel = (SpielerIndex, homebase)
+                    StopDiceWhenFinished = True
                     SubmitResults(homebase, Fahrzahl)
                 Else 'We can't so s$*!, also schieben wir unsere Probleme einfach auf den nächst besten Deppen, der gleich dran ist
 
@@ -771,8 +771,6 @@ Namespace Game.BetretenVerboten
                 End If
 
                 Status = SpielStatus.WähleFigur
-                StopUpdating = True
-                Core.Schedule(ErrorCooldown, Sub() StopUpdating = False)
             ElseIf (GetHomebaseCount(SpielerIndex) = FigCount And Not Is6InDiceList()) OrElse Not CanDoAMove() Then 'Falls Homebase komplett voll ist(keine Figur auf Spielfeld) und keine 6 gewürfelt wurde(oder generell kein Zug mehr möglich ist), ist kein Zug möglich und der nächste Spieler ist an der Reihe
                 StopUpdating = True
                 HUDInstructions.Text = "No move possible!"
@@ -789,15 +787,6 @@ Namespace Game.BetretenVerboten
                 FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
             End If
         End Sub
-
-        Public Function GetStackKeystroke(keysa As Keys()) As Boolean
-            If keysa.Length > ButtonStack.Count Then Return False
-            For i As Integer = 0 To keysa.Length - 1
-                If ButtonStack(ButtonStack.Count - i - 1) <> keysa(keysa.Length - i - 1) Then Return False
-            Next
-            ButtonStack.Add(Keys.BrowserBack)
-            Return True
-        End Function
 
         Private Function CheckKick(Optional Increment As Integer = 0) As Integer
             'Berechne globale Spielfeldposition der rauswerfenden Figur
@@ -999,6 +988,7 @@ Namespace Game.BetretenVerboten
             SpielerIndex = UserIndex
             Status = SpielStatus.Würfel
             ShowDice = True
+            StopDiceWhenFinished = False
             HUDInstructions.Text = "Roll the Dice!"
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter

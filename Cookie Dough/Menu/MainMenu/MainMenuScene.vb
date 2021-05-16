@@ -157,6 +157,7 @@ Namespace Menu.MainMenu
                         End If
                     Next
 
+                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 5
                     'Nick name
                     If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
@@ -226,8 +227,8 @@ Namespace Menu.MainMenu
                         End Try
                     End If
 
-                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
-                    If New Rectangle(560, 955, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
+                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
+                    If New Rectangle(560, 955, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
             End Select
 
 
@@ -533,6 +534,7 @@ Namespace Menu.MainMenu
                     batcher.DrawString(SmolFont, txtB, New Vector2(1920.0F - SmolFont.MeasureString(txtB).X - 20, 40), FgColor)
                 End If
                 batcher.DrawRect(New Rectangle(0, 0, 1920, 1080), Color.Black * CounterScene.Schwarzblende.Value)
+
             End Sub
 
             Private Sub DrawUserMenuTableString(txtA As String, txtB As String, i As Integer, batcher As Batcher)

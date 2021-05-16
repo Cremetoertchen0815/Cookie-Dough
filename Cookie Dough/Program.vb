@@ -3,7 +3,6 @@ Imports Cookie_Dough.Framework.Networking
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
-Imports Nez.Console
 
 Namespace Cookie_Dough
     ' <summary>
@@ -23,7 +22,7 @@ Namespace Cookie_Dough
         Friend Property FgColor As Color = Color.Lime
         Friend Property hudcolors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), Color.Olive, Color.Teal, New Color(48, 48, 255)}
         Friend Property playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Yellow, Color.Maroon * 1.5F, New Color(85, 120, 20), New Color(0, 80, 80), Color.Blue}
-        Friend Property Farben As String() = {"Magenta", "Lime", "Cyan", "Yellow", "Red", "Olive", "Teal", "Blue"}
+        Friend Property Farben As String() = {"Telekom", "Lime", "Cyan", "Yellow", "Red", "Olive", "Teal", "Blue"}
 
         ' <summary>
         ' The main entry point for the application.
