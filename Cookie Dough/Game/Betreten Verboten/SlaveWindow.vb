@@ -1181,12 +1181,6 @@ Namespace Game.BetretenVerboten
             End Get
         End Property
 
-        Private ReadOnly Property IGameWindow_HUDColor As Color Implements IGameWindow.HUDColor
-            Get
-                Return HUDColor
-            End Get
-        End Property
-
         Private ReadOnly Property IGameWindow_WürfelWerte As Integer() Implements IGameWindow.WürfelWerte
             Get
                 Return WürfelWerte

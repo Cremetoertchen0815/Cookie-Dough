@@ -1,6 +1,5 @@
 ﻿BV:
 -Skip bug
--Host chat messages invisible
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
 -Add intro scene
 

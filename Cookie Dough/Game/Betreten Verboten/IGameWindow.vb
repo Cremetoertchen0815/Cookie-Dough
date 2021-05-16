@@ -17,7 +17,6 @@ Namespace Game.BetretenVerboten
         ReadOnly Property FigurFaderZ As Transition(Of Integer)
         ReadOnly Property ShowDice As Boolean
         ReadOnly Property WürfelAktuelleZahl As Integer
-        ReadOnly Property HUDColor As Color
         ReadOnly Property WürfelWerte As Integer()
         ReadOnly Property DreifachWürfeln As Boolean
         ReadOnly Property BGTexture As Texture2D

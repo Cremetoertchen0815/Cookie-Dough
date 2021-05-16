@@ -71,7 +71,6 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDDiceBtn As GameRenderable
         Private InstructionFader As ITween(Of Color)
         Private ShowDice As Boolean = False
-        Private HUDColor As Color
         Private Chat As List(Of (String, Color))
 
         'Keystack & other debug shit
@@ -1418,7 +1417,7 @@ Namespace Game.BetretenVerboten
                 Dim txt As String = Microsoft.VisualBasic.InputBox("Enter your message: ", "Send message", "")
                 If txt <> "" Then
                     SendChatMessage(UserIndex, txt)
-                    PostChat("[" & Spielers(UserIndex).Name & "]: " & txt, HUDColor)
+                    PostChat("[" & Spielers(UserIndex).Name & "]: " & txt, hudcolors(UserIndex))
                 End If
                 chatbtnpressed = False
             End If
@@ -1592,12 +1591,6 @@ Namespace Game.BetretenVerboten
         Private ReadOnly Property IGameWindow_WürfelAktuelleZahl As Integer Implements IGameWindow.WürfelAktuelleZahl
             Get
                 Return WürfelAktuelleZahl
-            End Get
-        End Property
-
-        Private ReadOnly Property IGameWindow_HUDColor As Color Implements IGameWindow.HUDColor
-            Get
-                Return HUDColor
             End Get
         End Property
 
