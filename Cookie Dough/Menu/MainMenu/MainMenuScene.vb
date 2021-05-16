@@ -159,11 +159,12 @@ Namespace Menu.MainMenu
 
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 5
+
                     'Nick name
-                    If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
-                                                                                                                                                                                                 My.Settings.Username = x
-                                                                                                                                                                                                 My.Settings.Save()
-                                                                                                                                                                                             End Sub, My.Settings.Username)
+                    If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And Not IsConnectedToServer Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
+                                                                                                                                                                                                                             My.Settings.Username = x
+                                                                                                                                                                                                                             My.Settings.Save()
+                                                                                                                                                                                                                         End Sub, My.Settings.Username)
 
                     'MOTD
                     If New Rectangle(960, 230 + 1 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter your new ""Message of the day"": ", "Change MOTD", Sub(x)
@@ -234,14 +235,7 @@ Namespace Menu.MainMenu
 
 
             'Wechsel Benutzername
-            If New Rectangle(New Point(20, 40), rend.MediumFont.MeasureString("Username: " & My.Settings.Username).ToPoint).Contains(mpos) And OneshotPressed Then
-                If Not IsConnectedToServer Then
-                    SFX(2).Play()
-                    SwitchToSubmenu(5)
-                Else
-                    SFX(0).Play()
-                End If
-            End If
+            If New Rectangle(New Point(20, 40), rend.MediumFont.MeasureString("Username: " & My.Settings.Username).ToPoint).Contains(mpos) And OneshotPressed Then SwitchToSubmenu(5)
 
             'Grab data from Server in a set interval
             If IsConnectedToServer And LocalClient.AutomaticRefresh Then
@@ -498,7 +492,7 @@ Namespace Menu.MainMenu
                         batcher.DrawLine(New Vector2(1920 / 2, 230), New Vector2(1920 / 2, 790), Color.Cyan, 4)
                         batcher.DrawHollowRect(New Rectangle(450, 230, 1920 - 2 * 450, 560), Color.Red, 3)
 
-                        DrawUserMenuTableString("Name", My.Settings.Username, 0, batcher)
+                        DrawUserMenuTableString("Name", My.Settings.Username, 0, batcher, CounterScene.IsConnectedToServer)
                         DrawUserMenuTableString("MOTD", If(My.Settings.MOTD.Length > 15, My.Settings.MOTD.Substring(0, 13) & "...", My.Settings.MOTD), 1, batcher)
                         DrawUserMenuTableString("Profile Picture", CType(My.Settings.Thumbnail, IdentType).ToString, 2, batcher)
                         DrawUserMenuTableString("Spawn Sound", CType(My.Settings.SoundA, IdentType).ToString, 3, batcher)
@@ -537,9 +531,9 @@ Namespace Menu.MainMenu
 
             End Sub
 
-            Private Sub DrawUserMenuTableString(txtA As String, txtB As String, i As Integer, batcher As Batcher)
+            Private Sub DrawUserMenuTableString(txtA As String, txtB As String, i As Integer, batcher As Batcher, Optional red As Boolean = False)
                 batcher.DrawString(MediumFont, txtA, New Vector2(1920 / 2 - MediumFont.MeasureString(txtA).X - 80, 250 + i * 80), Color.Lime)
-                batcher.DrawString(MediumFont, txtB, New Vector2(1920 / 2 + 80, 250 + i * 80), Color.Lime)
+                batcher.DrawString(MediumFont, txtB, New Vector2(1920 / 2 + 80, 250 + i * 80), If(red, Color.Red, Color.Lime))
                 If i = 0 Then Return
                 batcher.DrawLine(New Vector2(450, 230 + i * 80), New Vector2(1920 - 450, 230 + i * 80), Color.Yellow, 1)
             End Sub
