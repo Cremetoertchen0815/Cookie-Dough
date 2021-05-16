@@ -83,6 +83,7 @@ Namespace Menu.MainMenu
                             End Select
                         End If
                     Next
+                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 2
                     'Scroll online game list
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
@@ -100,6 +101,7 @@ Namespace Menu.MainMenu
                             End Select
                         End If
                     Next
+                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 3
                     If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then My.Settings.Schwierigkeitsgrad = (My.Settings.Schwierigkeitsgrad + 1) Mod 2 : My.Settings.Save()
                     If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(5)
@@ -156,46 +158,76 @@ Namespace Menu.MainMenu
                     Next
 
                 Case 5
+                    'Nick name
+                    If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
+                                                                                                                                                                                                 My.Settings.Username = x
+                                                                                                                                                                                                 My.Settings.Save()
+                                                                                                                                                                                             End Sub, My.Settings.Username)
 
-                    If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
-                                                                                                                                                                                         My.Settings.Username = x
-                                                                                                                                                                                         My.Settings.Save()
-                                                                                                                                                                                     End Sub, My.Settings.Username)
-                    If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
-                        My.Settings.Thumbnail = (My.Settings.Thumbnail + 1) Mod 6
-                        My.Settings.Save()
-                        If My.Settings.Thumbnail = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\pp.png") Then IO.File.Copy("Content\prep\plc.png", "Cache\client\pp.png")
-                    End If
-                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
-                        My.Settings.Sound = (My.Settings.Sound + 1) Mod 6
-                        My.Settings.Save()
-                        If My.Settings.Sound = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\sound.audio") Then IO.File.Copy("Content\prep\plc.wav", "Cache\client\sound.audio")
-                        Try
-                            PlayAudio(My.Settings.Sound)
-                        Catch ex As Exception
-                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
-                        End Try
-                    End If
-                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
+                    'MOTD
+                    If New Rectangle(960, 230 + 1 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter your new ""Message of the day"": ", "Change MOTD", Sub(x)
+                                                                                                                                                                                                            My.Settings.MOTD = x
+                                                                                                                                                                                                            My.Settings.Save()
+                                                                                                                                                                                                        End Sub, My.Settings.MOTD)
 
-                    If New Rectangle(1400, 455, 100, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                    'PFP
+                    If New Rectangle(1350, 245 + 2 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "PNG-File|*.png", .Title = "Select profile picture"}
                         If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
                             IO.File.Copy(ofd.FileName, "Cache\client\pp.png", True)
                         End If
+                    ElseIf New Rectangle(960, 230 + 2 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        My.Settings.Thumbnail = (My.Settings.Thumbnail + 1) Mod 7
+                        My.Settings.Save()
+                        If My.Settings.Thumbnail = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\pp.png") Then IO.File.Copy("Content\prep\plc.png", "Cache\client\pp.png")
                     End If
-                    If New Rectangle(1400, 605, 100, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+
+                    'Spawn Sound
+                    If New Rectangle(1350, 245 + 3 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
                         If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
-                            IO.File.Copy(ofd.FileName, "Cache\client\sound.audio", True)
+                            IO.File.Copy(ofd.FileName, "Cache\client\soundA.audio", True)
                         End If
                         Try
                             PlayAudio(IdentType.Custom)
                         Catch ex As Exception
                             Microsoft.VisualBasic.MsgBox("Invalid sound file!")
                         End Try
+                    ElseIf New Rectangle(960, 230 + 3 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        My.Settings.SoundA = (My.Settings.SoundA + 1) Mod 7
+                        My.Settings.Save()
+                        If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundA.audio") Then IO.File.Copy("Content\prep\plc.wav", "Cache\client\soundA.audio")
+                        Try
+                            PlayAudio(My.Settings.SoundA)
+                        Catch ex As Exception
+                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                        End Try
                     End If
-                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
+
+                    'Kick Sound
+                    If New Rectangle(1350, 245 + 4 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
+                        If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
+                            IO.File.Copy(ofd.FileName, "Cache\client\soundB.audio", True)
+                        End If
+                        Try
+                            PlayAudio(IdentType.Custom, True)
+                        Catch ex As Exception
+                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                        End Try
+                    ElseIf New Rectangle(960, 230 + 4 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        My.Settings.SoundB = (My.Settings.SoundB + 1) Mod 7
+                        My.Settings.Save()
+                        If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundB.audio") Then IO.File.Copy("Content\prep\plc.wav", "Cache\client\soundB.audio")
+                        Try
+                            PlayAudio(My.Settings.SoundB, True)
+                        Catch ex As Exception
+                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                        End Try
+                    End If
+
+                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
+                    If New Rectangle(560, 955, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
             End Select
 
 
@@ -256,11 +288,11 @@ Namespace Menu.MainMenu
             Automator.Add(Schwarzblende)
         End Sub
 
-        Private Sub PlayAudio(ident As IdentType)
+        Private Sub PlayAudio(ident As IdentType, Optional SoundB As Boolean = False)
             If ident <> IdentType.Custom Then
                 SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav").Play()
             Else
-                SoundEffect.FromFile("Cache\client\sound.audio").Play()
+                SoundEffect.FromFile("Cache\client\sound" & If(SoundB, "B", "A") & ".audio").Play()
             End If
         End Sub
 
@@ -461,27 +493,35 @@ Namespace Menu.MainMenu
 
                         'Draw heading
                         batcher.DrawString(TitleFont, "User", New Vector2(1920.0F / 2 - TitleFont.MeasureString("User").X / 2, 50), FgColor)
-                        'Draw rectangles
-                        batcher.DrawHollowRect(New Rectangle(560, 275, 800, 100), FgColor)
-                        batcher.DrawHollowRect(New Rectangle(560, 425, 800, 100), FgColor)
-                        batcher.DrawHollowRect(New Rectangle(560, 575, 800, 100), FgColor)
-                        batcher.DrawHollowRect(New Rectangle(560, 725, 800, 100), FgColor)
+
+                        batcher.DrawLine(New Vector2(1920 / 2, 230), New Vector2(1920 / 2, 790), Color.Cyan, 4)
+                        batcher.DrawHollowRect(New Rectangle(450, 230, 1920 - 2 * 450, 560), Color.Red, 3)
+
+                        DrawUserMenuTableString("Name", My.Settings.Username, 0, batcher)
+                        DrawUserMenuTableString("MOTD", If(My.Settings.MOTD.Length > 15, My.Settings.MOTD.Substring(0, 13) & "...", My.Settings.MOTD), 1, batcher)
+                        DrawUserMenuTableString("Profile Picture", CType(My.Settings.Thumbnail, IdentType).ToString, 2, batcher)
+                        DrawUserMenuTableString("Spawn Sound", CType(My.Settings.SoundA, IdentType).ToString, 3, batcher)
+                        DrawUserMenuTableString("Kick Sound", CType(My.Settings.SoundB, IdentType).ToString, 4, batcher)
+                        DrawUserMenuTableString("Games Played", My.Settings.GamesLost + My.Settings.GamesWon - 2, 5, batcher)
+                        DrawUserMenuTableString("K/D", My.Settings.GamesWon / My.Settings.GamesLost, 6, batcher)
+
                         'File dialogue boxes
                         If My.Settings.Thumbnail = IdentType.Custom Then
-                            batcher.DrawHollowRect(New Rectangle(1400, 455, 100, 70), FgColor)
-                            batcher.DrawString(MediumFont, "...", New Vector2(1410, 465), FgColor)
+                            batcher.DrawHollowRect(New Rectangle(1350, 245 + 2 * 80, 100, 50), FgColor)
+                            batcher.DrawString(MediumFont, "...", New Vector2(1360, 240 + 2 * 80), FgColor)
                         End If
-                        If My.Settings.Sound = IdentType.Custom Then
-                            batcher.DrawHollowRect(New Rectangle(1400, 605, 100, 70), FgColor)
-                            batcher.DrawString(MediumFont, "...", New Vector2(1410, 615), FgColor)
+                        If My.Settings.SoundA = IdentType.Custom Then
+                            batcher.DrawHollowRect(New Rectangle(1350, 245 + 3 * 80, 100, 50), FgColor)
+                            batcher.DrawString(MediumFont, "...", New Vector2(1360, 240 + 3 * 80), FgColor)
                         End If
-                        'Draw text
-                        Dim str = {"Username: " & My.Settings.Username, "Picture: " & CType(My.Settings.Thumbnail, IdentType).ToString, "Sound: " & CType(My.Settings.Sound, IdentType).ToString}
-                        batcher.DrawString(MediumFont, str(0), New Vector2(1920.0F / 2 - MediumFont.MeasureString(str(0)).X / 2, 300), FgColor)
-                        batcher.DrawString(MediumFont, str(1), New Vector2(1920.0F / 2 - MediumFont.MeasureString(str(1)).X / 2, 450), FgColor)
-                        batcher.DrawString(MediumFont, str(2), New Vector2(1920.0F / 2 - MediumFont.MeasureString(str(2)).X / 2, 600), FgColor)
+                        If My.Settings.SoundB = IdentType.Custom Then
+                            batcher.DrawHollowRect(New Rectangle(1350, 245 + 4 * 80, 100, 50), FgColor)
+                            batcher.DrawString(MediumFont, "...", New Vector2(1360, 240 + 4 * 80), FgColor)
+                        End If
 
-                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 750), FgColor)
+                        'Draw back button
+                        batcher.DrawHollowRect(New Rectangle(560, 955, 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 975), FgColor)
                 End Select
 
 
@@ -493,6 +533,13 @@ Namespace Menu.MainMenu
                     batcher.DrawString(SmolFont, txtB, New Vector2(1920.0F - SmolFont.MeasureString(txtB).X - 20, 40), FgColor)
                 End If
                 batcher.DrawRect(New Rectangle(0, 0, 1920, 1080), Color.Black * CounterScene.Schwarzblende.Value)
+            End Sub
+
+            Private Sub DrawUserMenuTableString(txtA As String, txtB As String, i As Integer, batcher As Batcher)
+                batcher.DrawString(MediumFont, txtA, New Vector2(1920 / 2 - MediumFont.MeasureString(txtA).X - 80, 250 + i * 80), Color.Lime)
+                batcher.DrawString(MediumFont, txtB, New Vector2(1920 / 2 + 80, 250 + i * 80), Color.Lime)
+                If i = 0 Then Return
+                batcher.DrawLine(New Vector2(450, 230 + i * 80), New Vector2(1920 - 450, 230 + i * 80), Color.Yellow, 1)
             End Sub
 
             Private Function GetGameTitle(gaem As GameType) As String

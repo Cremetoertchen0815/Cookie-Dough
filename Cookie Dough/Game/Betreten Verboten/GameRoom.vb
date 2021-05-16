@@ -186,7 +186,7 @@ Namespace Game.BetretenVerboten
             Center = New Rectangle(500, 70, 950, 950).Center.ToVector2
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
-            Dim sf As SoundEffect = GetLocalAudio(My.Settings.Sound)
+            Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
                 If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
@@ -669,10 +669,12 @@ Namespace Game.BetretenVerboten
                 Dim command As Char = element(1)
                 Select Case command
                     Case "a"c 'Player arrived
-                        Spielers(source).Name = element.Substring(2)
+                        Dim txt As String() = element.Substring(2).Split("|")
+                        Spielers(source).Name = txt(0)
+                        Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
-                        SendPlayerArrived(source, Spielers(source).Name)
+                        SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD)
                     Case "c"c 'Sent chat message
                         Dim text As String = element.Substring(2)
                         If source = 9 Then
@@ -699,7 +701,9 @@ Namespace Game.BetretenVerboten
                     Case "p"c 'Player angered
                         Spielers(source).Angered = True
                     Case "r"c 'Player is back
-                        Spielers(source).Name = element.Substring(2)
+                        Dim txt As String() = element.Substring(2).Split("|")
+                        Spielers(source).Name = txt(0)
+                        Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         SendPlayerBack(source)
@@ -723,22 +727,23 @@ Namespace Game.BetretenVerboten
                         SendSync()
                     Case "z"c
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim dat As String = element.Substring(3).Replace("_TATA_", "")
+                        Dim SoundNr As Integer = CInt(element(3).ToString)
+                        Dim dat As String = element.Substring(4).Replace("_TATA_", "")
 
                         If IdentSound = IdentType.Custom Then
-                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
+                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                            Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav")
                         Else
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                            Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
                         End If
-                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & "_TATA_" & dat)
+                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_" & dat)
                 End Select
             Next
         End Sub
 
         ' ---Methoden um Daten via den Server an die Clients zu senden---
-        Private Sub SendPlayerArrived(index As Integer, name As String)
-            SendNetworkMessageToAll("a" & index.ToString & name)
+        Private Sub SendPlayerArrived(index As Integer, name As String, MOTD As String)
+            SendNetworkMessageToAll("a" & index.ToString & name & "|" & MOTD)
         End Sub
         Private Sub SendBeginGaem()
             Dim appendix As String = ""
@@ -746,6 +751,7 @@ Namespace Game.BetretenVerboten
                 If Spielers(i).Typ <> SpielerTyp.Online Then appendix &= i.ToString
             Next
             SendNetworkMessageToAll("b" & appendix)
+            SendSync()
             SendSoundFile()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
@@ -800,9 +806,15 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
+                    'Send Sound A
                     Dim txt As String = ""
-                    If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
+                    If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
+
+                    'Send Sound B
+                    txt = ""
+                    If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+                    LocalClient.WriteStream("z" & i.ToString & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
                     Return
                 End If
             Next
@@ -1048,11 +1060,11 @@ Namespace Game.BetretenVerboten
             Next
             Return (-1, -1)
         End Function
-        Private Function GetLocalAudio(ident As IdentType) As SoundEffect
+        Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
             If ident <> IdentType.Custom Then
                 Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache\client\sound.audio")
+                Return SoundEffect.FromFile("Cache\client\sound" & If(IsSoundB, "B", "A") & ".audio")
             End If
         End Function
 
@@ -1138,7 +1150,7 @@ Namespace Game.BetretenVerboten
                 If (Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1) Or (Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1 = 0) Then
                     Dim kickID As Integer = CheckKick(FigurFaderZiel.Item1, FigurFaderZiel.Item2, 1)
                     Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
-                                                                                                                                  SFX(4).Play()
+                                                                                                                                  Spielers(FigurFaderZiel.Item1).CustomSound(1).Play()
                                                                                                                                   If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1
                                                                                                                                   If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
                                                                                                                                   Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
@@ -1163,7 +1175,7 @@ Namespace Game.BetretenVerboten
             If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < FigurFaderEnd Then
                 'Play sound
                 If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = 0 Then
-                    Spielers(FigurFaderZiel.Item1).CustomSound.Play()
+                    Spielers(FigurFaderZiel.Item1).CustomSound(0).Play()
                 Else
                     SFX(3).Play()
                 End If
@@ -1173,7 +1185,7 @@ Namespace Game.BetretenVerboten
                         Dim kickID As Integer = CheckKick(FigurFaderZiel.Item1, FigurFaderZiel.Item2, 1)
                         PlayStompSound = True
                         Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
-                                                                                                                                      SFX(4).Play()
+                                                                                                                                      Spielers(FigurFaderZiel.Item1).CustomSound(1).Play()
                                                                                                                                       If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1
                                                                                                                                       If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
                                                                                                                                       Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)

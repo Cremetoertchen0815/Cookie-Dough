@@ -168,7 +168,7 @@ Namespace Game.DropTrop
             Feld = New Rectangle(500, 70, 950, 950)
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
-            Spielers(UserIndex).CustomSound = GetLocalAudio(My.Settings.Sound)
+            Spielers(UserIndex).CustomSound = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
 
             'Generate Spielfeld
             For x As Integer = 0 To SpielfeldSize.X - 1
@@ -407,11 +407,11 @@ Namespace Game.DropTrop
                         If Spielers(source).Typ = SpielerTyp.Local Then
                             'Set sound for every local player
                             For Each pl In Spielers
-                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound = sound
+                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound(0) = sound
                             Next
                         Else
                             'Set sound for player
-                            Spielers(source).CustomSound = sound
+                            Spielers(source).CustomSound(0) = sound
                         End If
                 End Select
             Next
@@ -438,8 +438,8 @@ Namespace Game.DropTrop
         End Sub
         Private Sub SendSoundFile()
             Dim txt As String = ""
-            If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(File.ReadAllBytes("Cache\client\sound.audio")))
-            LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & "_TATA_" & txt)
+            If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(File.ReadAllBytes("Cache\client\sound.audio")))
+            LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "_TATA_" & txt)
         End Sub
 
         Private Sub SendSwitch()
@@ -609,11 +609,11 @@ Namespace Game.DropTrop
             HUDChat.ScrollDown = True
         End Sub
 
-        Private Function GetLocalAudio(ident As IdentType) As SoundEffect
+        Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
             If ident <> IdentType.Custom Then
                 Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache\client\sound.audio")
+                Return SoundEffect.FromFile("Cache\client\sound" & If(IsSoundB, "B", "A") & ".audio")
             End If
         End Function
 

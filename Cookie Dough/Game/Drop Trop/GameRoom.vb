@@ -138,10 +138,10 @@ Namespace Game.DropTrop
 
 
 
-            Dim sf As SoundEffect = GetLocalAudio(My.Settings.Sound)
+            Dim sf As SoundEffect = GetLocalAudio(My.Settings.SoundA)
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
-                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
+                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound(0) = sf
             Next
 
             'Generate Spielfeld
@@ -321,9 +321,9 @@ Namespace Game.DropTrop
 
                         If IdentSound = IdentType.Custom Then
                             IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
+                            Spielers(source).CustomSound(0) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
                         Else
-                            Spielers(source).CustomSound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                            Spielers(source).CustomSound(0) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
                         End If
                         SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & "_TATA_" & dat)
                 End Select
@@ -379,8 +379,8 @@ Namespace Game.DropTrop
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Then
                     Dim txt As String = ""
-                    If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
+                    If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
+                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.SoundA).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
                 End If
             Next
         End Sub

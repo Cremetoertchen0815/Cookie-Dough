@@ -65,7 +65,7 @@ Namespace Cookie_Dough
             'Load settings
             If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection
             If My.Settings.Username = "" Then My.Settings.Username = Environment.UserName
-            If My.Settings.Sound = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\sound.audio") Then My.Settings.Sound = 0
+            If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\sound.audio") Then My.Settings.SoundA = 0
             My.Settings.Save()
 
             'Load intro screen

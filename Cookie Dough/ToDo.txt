@@ -1,9 +1,8 @@
 ﻿BV:
--Redesign user page
 -Skip bug
--Monitor wins for each player(serverside)
+-Host chat messages invisible
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
--Soundeffekte, wenn man jmd kickt
+-Add intro scene
 
 
 

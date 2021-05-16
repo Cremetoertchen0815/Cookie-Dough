@@ -22,10 +22,11 @@ Namespace Game.Megäa
         Public Property TableCard As Card = Card.NoCard
         Public Property TableCardTransform As New Keyframe3D
 
-        Public Property CustomSound As SoundEffect Implements IPlayer.CustomSound
+        Public Property CustomSound As SoundEffect() = {SFX(3), SFX(4)} Implements IPlayer.CustomSound
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
 
         Public Property ID As String Implements IPlayer.ID
+        Public Property MOTD As String Implements IPlayer.MOTD
 
         Private HandTransformOrigin As Keyframe3D
 

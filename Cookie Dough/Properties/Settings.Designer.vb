@@ -114,13 +114,13 @@ Partial Friend NotInheritable Class Settings
     
     <Global.System.Configuration.UserScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
-    Public Property Sound() As Integer
+     Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+    Public Property SoundA() As Integer
         Get
-            Return CType(Me("Sound"),Integer)
+            Return CType(Me("SoundA"),Integer)
         End Get
         Set
-            Me("Sound") = value
+            Me("SoundA") = value
         End Set
     End Property
     
@@ -157,6 +157,30 @@ Partial Friend NotInheritable Class Settings
         End Get
         Set
             Me("GamesLost") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("Lorem Ipsum")>  _
+    Public Property MOTD() As String
+        Get
+            Return CType(Me("MOTD"),String)
+        End Get
+        Set
+            Me("MOTD") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+    Public Property SoundB() As Integer
+        Get
+            Return CType(Me("SoundB"),Integer)
+        End Get
+        Set
+            Me("SoundB") = value
         End Set
     End Property
 End Class

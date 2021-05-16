@@ -21,5 +21,6 @@ Public Enum IdentType
     TypeC
     TypeD
     TypeE
+    TypeF
     Custom
 End Enum

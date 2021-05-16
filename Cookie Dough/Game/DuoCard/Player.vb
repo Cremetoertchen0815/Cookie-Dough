@@ -40,7 +40,7 @@ Namespace Game.DuoCard
         ''' Der Sound, der abgespielt wird, wenn man gekickt wird
         ''' </summary>
         <JsonIgnore>
-        Public Property CustomSound As SoundEffect = SFX(3) Implements IPlayer.CustomSound
+        Public Property CustomSound As SoundEffect() = {SFX(3), SFX(4)} Implements IPlayer.CustomSound
 
         ''' <summary>
         ''' Das Thumbnail des Spielers
@@ -48,6 +48,7 @@ Namespace Game.DuoCard
         <JsonIgnore>
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
         Public Property ID As String Implements IPlayer.ID
+        Public Property MOTD As String Implements IPlayer.MOTD
 
         Sub New(typ As SpielerTyp)
             Me.Typ = typ

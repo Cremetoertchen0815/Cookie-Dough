@@ -165,7 +165,7 @@ Namespace Game.BetretenVerboten
             LocalClient.IsHost = False
             Chat = New List(Of (String, Color))
             MoveActive = False
-            If UserIndex > -1 Then Spielers(UserIndex).CustomSound = GetLocalAudio(My.Settings.Sound)
+            If UserIndex > -1 Then Spielers(UserIndex).CustomSound = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
@@ -250,7 +250,7 @@ Namespace Game.BetretenVerboten
             If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < FigurFaderEnd Then
                 'Play sound
                 If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = 0 Then
-                    Spielers(FigurFaderZiel.Item1).CustomSound.Play()
+                    Spielers(FigurFaderZiel.Item1).CustomSound(0).Play()
                 Else
                     SFX(3).Play()
                 End If
@@ -259,7 +259,7 @@ Namespace Game.BetretenVerboten
                     If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1 Then
                         Dim kickID As Integer = CheckKick(1)
                         Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
-                                                                                                                                      SFX(4).Play()
+                                                                                                                                      Spielers(FigurFaderZiel.Item1).CustomSound(1).Play()
                                                                                                                                       If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1
                                                                                                                                       If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
                                                                                                                                       Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
@@ -476,7 +476,9 @@ Namespace Game.BetretenVerboten
                 Select Case command
                     Case "a"c 'Player arrived
                         Dim source As Integer = CInt(element(1).ToString)
-                        Spielers(source).Name = element.Substring(2)
+                        Dim txt As String() = element.Substring(2).Split("|")
+                        Spielers(source).Name = txt(0)
+                        Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
@@ -557,6 +559,7 @@ Namespace Game.BetretenVerboten
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
                             Spielers(i).Name = sp.Spielers(i).Name
+                            Spielers(i).MOTD = sp.Spielers(i).MOTD
                             Spielers(i).Typ = sp.Spielers(i).Typ
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
@@ -634,6 +637,7 @@ Namespace Game.BetretenVerboten
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
                             Spielers(i).Name = sp.Spielers(i).Name
+                            Spielers(i).MOTD = sp.Spielers(i).MOTD
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
@@ -644,13 +648,14 @@ Namespace Game.BetretenVerboten
                     Case "z"c
                         Dim source As Integer = CInt(element(1).ToString)
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim dat As String = element.Substring(3).Replace("_TATA_", "")
+                        Dim SoundNr As Integer = CInt(element(3).ToString)
+                        Dim dat As String = element.Substring(4).Replace("_TATA_", "")
                         If source = UserIndex Then Continue For
                         Dim sound As SoundEffect
 
                         If IdentSound = IdentType.Custom Then
-                            File.WriteAllBytes("Cache\client\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & ".wav")
+                            File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                            sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
                         Else
                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
                         End If
@@ -658,11 +663,11 @@ Namespace Game.BetretenVerboten
                         If Spielers(source).Typ = SpielerTyp.Local Then
                             'Set sound for every local player
                             For Each pl In Spielers
-                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound = sound
+                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound(SoundNr) = sound
                             Next
                         Else
                             'Set sound for player
-                            Spielers(source).CustomSound = sound
+                            Spielers(source).CustomSound(SoundNr) = sound
                         End If
                 End Select
             Next
@@ -677,9 +682,9 @@ Namespace Game.BetretenVerboten
             End If
 
             If Rejoin Then
-                LocalClient.WriteStream("r" & My.Settings.Username) 'Rejoin
+                LocalClient.WriteStream("r" & My.Settings.Username & My.Settings.MOTD) 'Rejoin
             Else
-                LocalClient.WriteStream("a" & My.Settings.Username) 'Nujoin
+                LocalClient.WriteStream("a" & My.Settings.Username & My.Settings.MOTD) 'Nujoin
             End If
         End Sub
 
@@ -698,8 +703,12 @@ Namespace Game.BetretenVerboten
         Private Sub SendSoundFile()
             If UserIndex < 0 Then Return
             Dim txt As String = ""
-            If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-            LocalClient.WriteStream("z" & CInt(My.Settings.Sound).ToString & "_TATA_" & txt)
+            If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+            LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt)
+
+            txt = ""
+            If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+            LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
         End Sub
 
         Private Sub SubmitResults(figur As Integer, destination As Integer)
@@ -893,11 +902,11 @@ Namespace Game.BetretenVerboten
             Next
             Return (-1, -1)
         End Function
-        Private Function GetLocalAudio(ident As IdentType) As SoundEffect
+        Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
             If ident <> IdentType.Custom Then
                 Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache\client\sound.audio")
+                Return SoundEffect.FromFile("Cache\client\sound" & If(IsSoundB, "B", "A") & ".audio")
             End If
         End Function
 

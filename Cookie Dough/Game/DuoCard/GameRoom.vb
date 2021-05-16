@@ -127,10 +127,10 @@ Namespace Game.DuoCard
             Center = New Rectangle(500, 70, 950, 950).Center.ToVector2
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
-            Dim sf As SoundEffect = GetLocalAudio(My.Settings.Sound)
+            Dim sf As SoundEffect = GetLocalAudio(My.Settings.SoundA)
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
-                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
+                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound(0) = sf
             Next
         End Sub
 
@@ -284,8 +284,8 @@ Namespace Game.DuoCard
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Then
                     Dim txt As String = ""
-                    If My.Settings.Sound = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.Sound).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
+                    If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
+                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.SoundA).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
                 End If
             Next
         End Sub
