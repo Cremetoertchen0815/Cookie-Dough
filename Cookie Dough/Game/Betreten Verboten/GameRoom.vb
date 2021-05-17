@@ -292,9 +292,9 @@ Namespace Game.BetretenVerboten
 
                     'Update K/D
                     If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then
-                        My.Settings.GamesWon += 1
+                        If NetworkMode Then My.Settings.GamesWon += 1
                     Else
-                        My.Settings.GamesLost += 1
+                        If NetworkMode Then My.Settings.GamesLost += 1
                     End If
                     My.Settings.Save()
 

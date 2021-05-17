@@ -1,4 +1,5 @@
 ﻿BV:
+-Store save data if settings file not found in INI file in appdata 
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
 -Add intro scene
 
