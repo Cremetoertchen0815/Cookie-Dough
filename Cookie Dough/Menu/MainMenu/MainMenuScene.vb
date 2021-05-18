@@ -117,7 +117,7 @@ Namespace Menu.MainMenu
                     SM4Scroll = Mathf.Clamp(SM4Scroll - scrollval * 30, 0, Math.Max(375 + (ln + 2) * 150 - 1050, 0))
 
                     For i As Integer = -2 To ln
-                        If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(560, 275 + (i + 2) * 150 - CInt(SM4Scroll), 800, 100).Contains(mpos) Then
+                        If ((mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) Or (mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released)) AndAlso New Rectangle(560, 275 + (i + 2) * 150 - CInt(SM4Scroll), 800, 100).Contains(mpos) Then
                             Select Case i
                                 Case ln
                                     SwitchToSubmenu(0)
@@ -150,10 +150,15 @@ Namespace Menu.MainMenu
                                     End If
                                 Case -1
                                 Case Else
-                                    If Not (IsConnectedToServer And ServerActive) Then
+                                    If Not (IsConnectedToServer And ServerActive) And mstate.LeftButton = ButtonState.Pressed Then
                                         LocalClient.Connect(AvailableServerList(i), My.Settings.Username)
                                         lasthostname = AvailableServerList(i)
                                         SFX(2).Play()
+                                    ElseIf Not IsConnectedToServer And mstate.RightButton = ButtonState.Pressed Then
+                                        My.Settings.Reload()
+                                        If My.Settings.Servers.Contains(AvailableServerList(i)) Then My.Settings.Servers.Remove(AvailableServerList(i))
+                                        My.Settings.Save()
+                                        UpdateServerList()
                                     End If
                             End Select
                         End If
