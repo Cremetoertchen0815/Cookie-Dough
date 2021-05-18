@@ -8,6 +8,7 @@ Namespace Game.BetretenVerboten.Networking
         Public Property Key As Integer Implements IGame.Key
         Public Property Name As String Implements IGame.Name
         Public Property Map As GaemMap
+        Public Property Casual As Boolean
         Public Property Players As Player() = {Nothing, Nothing, Nothing, Nothing}
         Public Property Ended As Boolean = False Implements IGame.Ended
         Public Property Active As Boolean = False Implements IGame.Active
@@ -46,12 +47,14 @@ Namespace Game.BetretenVerboten.Networking
 
         Public Sub ServerSendJoinGlobalData(con As Connection, writer As Action(Of Connection, String)) Implements IGame.ServerSendJoinGlobalData
             writer(con, CInt(Map))
+            writer(con, Casual.ToString)
         End Sub
 
         Public Shared Function ServerSendCreateData(ReadString As Func(Of Connection, String), con As Connection, gamename As String, Key As Integer) As IGame
             'Read map from stream and resize arrays accordingly
             Dim map As GaemMap = CInt(ReadString(con))
-            Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Map = map}
+            Dim casual As Boolean = CBool(ReadString(con))
+            Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Map = map, .Casual = casual}
             ReDim nugaem.Players(GetMapSize(map) - 1)
             ReDim nugaem.WhiteList(GetMapSize(map) - 1)
             Dim types As SpielerTyp() = New SpielerTyp(GetMapSize(map) - 1) {}
