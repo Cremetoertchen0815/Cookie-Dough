@@ -17,7 +17,8 @@ Namespace Game.BetretenVerboten
         Private ChangeNameButtonPressed As Boolean = False
         Private PlayerCount As Integer = 4
         Private PlayerSel As Integer = 0
-        Private Map As GaemMap = 0
+        Private Map As GaemMap = GaemMap.Default4Players
+        Private Mode As GameMode = GameMode.Casual
         Friend Arrow As Texture2D
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
         Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
@@ -68,6 +69,7 @@ Namespace Game.BetretenVerboten
                         ReDim Whitelist(GetMapSize(Map) - 1)
                         SFX(2).Play()
                     End If
+                    If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then Mode = If(Mode = GameMode.Casual, GameMode.Competetive, GameMode.Casual)
                     If New Rectangle(560, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel -= 1 : SFX(2).Play()
                     If New Rectangle(960, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel += 1 : SFX(2).Play()
                     If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then
@@ -148,6 +150,7 @@ Namespace Game.BetretenVerboten
 
             Dim AktuellesSpiel As New GameRoom(Map)
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
+            AktuellesSpiel.GameMode = Mode
             AktuellesSpiel.NetworkMode = False
             AktuellesSpiel.Spielers(0) = New Player(NewGamePlayers(0), Difficulty.Smart) With {.Name = If(NewGamePlayers(0) = SpielerTyp.Local, My.Settings.Username, Farben(0))}
             For i As Integer = 1 To AktuellesSpiel.PlCount - 1
@@ -171,7 +174,7 @@ Namespace Game.BetretenVerboten
                                                                                                                 For i As Integer = 0 To Whitelist.Length - 1
                                                                                                                     wtlst(i) = AllUser(Whitelist(i)).Item1
                                                                                                                 Next
-                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
+                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                             End If
                                                                                                         End Sub
 
@@ -246,13 +249,19 @@ Namespace Game.BetretenVerboten
                     batcher.DrawHollowRect(New Rectangle(560, 650, 800, 100), FgColor)
 
                     'Draw contents
+                    batcher.DrawLine(New Vector2(1920.0F / 2, 200), New Vector2(1920.0F / 2, 300), FgColor)
+                    batcher.DrawString(MediumFont, "Map: " & GetMapName(instance.Map), New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Map: " & GetMapName(instance.Map)).X / 2, 225), FgColor)
+                    batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 225), FgColor)
+
+                    batcher.DrawString(MediumFont, "Mode: " & instance.Mode.ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Mode: " & instance.Mode.ToString).X / 2, 375), FgColor)
+
                     batcher.DrawLine(New Vector2(1920.0F / 2, 500), New Vector2(1920.0F / 2, 600), FgColor)
                     batcher.DrawString(MediumFont, "←", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("←").X / 2, 525), FgColor)
                     batcher.DrawString(MediumFont, "→", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("→").X / 2, 525), FgColor)
-                    batcher.DrawString(MediumFont, "Map: " & GetMapName(instance.Map), New Vector2(1920.0F / 2 - MediumFont.MeasureString("Map: " & GetMapName(instance.Map)).X / 2, 225), FgColor)
-                    batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 375), FgColor)
+
                     batcher.DrawString(MediumFont, "Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString).X / 2, 675), FgColor)
                     batcher.DrawHollowRect(New Rectangle(560, 900, 800, 100), FgColor)
+
                     batcher.DrawLine(New Vector2(1920.0F / 2, 900), New Vector2(1920.0F / 2, 1000), FgColor)
                     batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Back").X / 2, 925), FgColor)
                     batcher.DrawString(MediumFont, "Start Round", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Start Round").X / 2, 925), FgColor)

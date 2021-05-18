@@ -28,7 +28,8 @@ Namespace Game.BetretenVerboten
         Friend SpceCount As Integer
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
-        Friend NetworkMode As Boolean = False
+        Friend NetworkMode As Boolean = False 'Gibt an, ob das SPiel online ist
+        Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Private SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Private Status As SpielStatus 'Speichert den aktuellen Status des Spiels
         Private WürfelAktuelleZahl As Integer 'Speichert den WErt des momentanen Würfels
@@ -110,6 +111,7 @@ Namespace Game.BetretenVerboten
             If Not LocalClient.JoinGame(ins, Sub(x)
                                                  'Load map info
                                                  Map = CInt(x())
+                                                 GameMode = If(CBool(x()), GameMode.Casual, GameMode.Competetive)
 
                                                  Select Case Map
                                                      Case GaemMap.Default4Players
@@ -618,11 +620,11 @@ Namespace Game.BetretenVerboten
 
                                              'Update K/D
                                              If ranks(0).Item1 = UserIndex Then
-                                                 My.Settings.GamesWon += 1
+                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
                                              Else
-                                                 My.Settings.GamesLost += 1
+                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
                                              End If
-                                             My.Settings.Save()
+                                                 My.Settings.Save()
                                          End Sub)
                         'Set flags
                         Status = SpielStatus.SpielZuEnde

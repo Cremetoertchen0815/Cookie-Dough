@@ -77,7 +77,7 @@ Namespace Game.BetretenVerboten.Networking
             Return nugaem
         End Function
 
-        Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player(), whitelist As String()) As Boolean
+        Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player(), whitelist As String(), casual As Boolean) As Boolean
             'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
             If client.blastmode Or Not client.Connected Then Return False
 
@@ -85,6 +85,7 @@ Namespace Game.BetretenVerboten.Networking
             client.WriteString(name)
             client.WriteString(GameType.BetretenVerboten.ToString)
             client.WriteString(CInt(map).ToString)
+            client.WriteString(casual.ToString)
             For i As Integer = 0 To GetMapSize(map) - 1
                 client.WriteString(CInt(types(i).Typ).ToString) 'Send player type
                 If types(i).Typ = SpielerTyp.Online Then client.WriteString(whitelist(i)) 'Send whitelist slot

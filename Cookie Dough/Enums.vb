@@ -15,6 +15,10 @@ Public Enum SpielerTyp
     None = 2
     Online = 3
 End Enum
+Public Enum GameMode
+    Casual = 0
+    Competetive = 1
+End Enum
 Public Enum IdentType
     TypeA
     TypeB

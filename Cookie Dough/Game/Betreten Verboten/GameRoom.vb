@@ -28,6 +28,7 @@ Namespace Game.BetretenVerboten
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
+        Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
@@ -292,9 +293,9 @@ Namespace Game.BetretenVerboten
 
                     'Update K/D
                     If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then
-                        If NetworkMode Then My.Settings.GamesWon += 1
+                        If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
                     Else
-                        If NetworkMode Then My.Settings.GamesLost += 1
+                        If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
                     End If
                     My.Settings.Save()
 
