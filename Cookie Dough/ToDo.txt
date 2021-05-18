@@ -1,7 +1,6 @@
 ﻿BV:
 -Competetive/casual mode
 -Remove stuff from server list
--Auto reconnect after changing username when online
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
 -Add intro scene
 

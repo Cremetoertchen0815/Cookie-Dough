@@ -27,6 +27,7 @@ Namespace Menu.MainMenu
         Friend Const ServerAutoRefresh As Integer = 500
         Private MenschenOnline As Integer = 0
         Private ServerRefreshTimer As Integer = 0
+        Private lasthostname As String = "127.0.0.1"
         Friend OnlineGameInstances As OnlineGameInstance() = {}
         Friend AvailableServerList As New List(Of String)
         Friend ConnectedUsers As New List(Of String)
@@ -151,6 +152,7 @@ Namespace Menu.MainMenu
                                 Case Else
                                     If Not (IsConnectedToServer And ServerActive) Then
                                         LocalClient.Connect(AvailableServerList(i), My.Settings.Username)
+                                        lasthostname = AvailableServerList(i)
                                         SFX(2).Play()
                                     End If
                             End Select
@@ -161,10 +163,17 @@ Namespace Menu.MainMenu
                 Case 5
 
                     'Nick name
-                    If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And Not IsConnectedToServer Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
-                                                                                                                                                                                                                             My.Settings.Username = x
-                                                                                                                                                                                                                             My.Settings.Save()
-                                                                                                                                                                                                                         End Sub, My.Settings.Username)
+                    If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
+                                                                                                                                                                                                 If IsConnectedToServer Then
+                                                                                                                                                                                                     LocalClient.Disconnect()
+                                                                                                                                                                                                     My.Settings.Username = x
+                                                                                                                                                                                                     My.Settings.Save()
+                                                                                                                                                                                                     LocalClient.Connect(lasthostname, My.Settings.Username)
+                                                                                                                                                                                                 Else
+                                                                                                                                                                                                     My.Settings.Username = x
+                                                                                                                                                                                                     My.Settings.Save()
+                                                                                                                                                                                                 End If
+                                                                                                                                                                                             End Sub, My.Settings.Username)
 
                     'MOTD
                     If New Rectangle(960, 230 + 1 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter your new ""Message of the day"": ", "Change MOTD", Sub(x)
@@ -492,7 +501,7 @@ Namespace Menu.MainMenu
                         batcher.DrawLine(New Vector2(1920 / 2, 230), New Vector2(1920 / 2, 790), Color.Cyan, 4)
                         batcher.DrawHollowRect(New Rectangle(450, 230, 1920 - 2 * 450, 560), Color.Red, 3)
 
-                        DrawUserMenuTableString("Name", My.Settings.Username, 0, batcher, CounterScene.IsConnectedToServer)
+                        DrawUserMenuTableString("Name", My.Settings.Username, 0, batcher)
                         DrawUserMenuTableString("MOTD", If(My.Settings.MOTD.Length > 15, My.Settings.MOTD.Substring(0, 13) & "...", My.Settings.MOTD), 1, batcher)
                         DrawUserMenuTableString("Profile Picture", CType(My.Settings.Thumbnail, IdentType).ToString, 2, batcher)
                         DrawUserMenuTableString("Spawn Sound", CType(My.Settings.SoundA, IdentType).ToString, 3, batcher)
