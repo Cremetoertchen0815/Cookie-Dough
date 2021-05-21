@@ -643,8 +643,8 @@ Namespace Game.BetretenVerboten
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
-                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -1314,12 +1314,6 @@ Namespace Game.BetretenVerboten
                                                  SendMessage("You're lucky! You gained 75 points!")
                                                  Spielers(pl).AdditionalPoints += 75
                                                  Exit Do
-                                             Case 4
-                                                 'Add points
-                                                 PostChat("You're lucky! Your next move will count double!", Color.White)
-                                                 SendMessage("You're lucky! Your next move will count double!")
-                                                 Spielers(pl).AdditionalPoints += 75
-                                                 Exit Do
                                          End Select
                                      ElseIf RNG > pogfactor + (1 - pogfactor) / 5 * 3 Then 'Negative effect
                                          Select Case Nez.Random.Range(0, 3)
@@ -1434,7 +1428,7 @@ Namespace Game.BetretenVerboten
                 SFX(2).Play()
                 SendGameClosed()
                 NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
         End Sub
         Private Sub AngerButton() Handles HUDBtnC.Clicked

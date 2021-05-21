@@ -40,7 +40,6 @@ Namespace Menu.MainMenu
             AddRenderer(New DefaultRenderer)
             AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
             ClearColor = Color.Black
-
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
             GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", False), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
@@ -72,7 +71,7 @@ Namespace Menu.MainMenu
                         If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(560, 275 + i * 150 - CInt(SM1Scroll), 800, 100).Contains(mpos) Then
                             Select Case i
                                 Case GameType.BetretenVerboten
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.BetretenVerboten.GameInstance))
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.BetretenVerboten.CreatorMenu))
                                 Case GameType.Megäa
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Megäa.GameRoom))
                                 Case GameType.DuoCard

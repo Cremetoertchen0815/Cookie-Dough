@@ -8,7 +8,7 @@ Namespace Game.BetretenVerboten
     ''' <summary>
     ''' Enthällt das Menu des Spiels und verwaltet die Spiele-Session
     ''' </summary>
-    Public Class GameInstance
+    Public Class CreatorMenu
         Inherits Scene
 
         'Menü Flags
@@ -39,6 +39,8 @@ Namespace Game.BetretenVerboten
             Arrow = Core.Content.LoadTexture("arrow_left")
             Dev = Core.GraphicsDevice
             ClearColor = Color.Black
+
+            Dim jkl = New Sprites.SpriteRenderer
 
             'Init values
             NewGamePlayers = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
@@ -217,9 +219,9 @@ Namespace Game.BetretenVerboten
 
             Private TitleFont As NezSpriteFont
             Private MediumFont As NezSpriteFont
-            Private instance As GameInstance
+            Private instance As CreatorMenu
 
-            Sub New(instance As GameInstance)
+            Sub New(instance As CreatorMenu)
                 MyBase.New()
                 Me.instance = instance
             End Sub

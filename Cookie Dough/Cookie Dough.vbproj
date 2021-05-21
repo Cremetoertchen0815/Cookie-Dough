@@ -124,7 +124,7 @@
     <Compile Include="Framwork\UI\IParent.vb" />
     <Compile Include="Game1.vb" />
     <Compile Include="Game\Betreten Verboten\Enums.vb" />
-    <Compile Include="Game\Betreten Verboten\GameInstance.vb" />
+    <Compile Include="Game\Betreten Verboten\CreatorMenu.vb" />
     <Compile Include="Game\Betreten Verboten\GameRoom.vb" />
     <Compile Include="Game\Betreten Verboten\IGameWindow.vb" />
     <Compile Include="Game\Betreten Verboten\Maps.vb" />
