@@ -89,7 +89,7 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderXY As Transition(Of Vector2)
         Friend FigurFaderZ As Transition(Of Integer)
         Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single))
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)}
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D)
         Friend CamRotation As Single
         Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0) 'Gibt die Standard-Position der Kamera an
         Friend PlayStompSound As Boolean
@@ -153,7 +153,7 @@ Namespace Game.BetretenVerboten
                                                  Else
                                                      StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)
                                                  End If
-                                                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+                                                 FigurFaderCamera = New Transition(Of Keyframe3D)
 
                                                  'Set rejoin flag
                                                  Rejoin = x() = "Rejoin"
@@ -496,6 +496,8 @@ Namespace Game.BetretenVerboten
                         StopUpdating = False
                         Status = SpielStatus.Waitn
                         PostChat("The game has started!", Color.White)
+                        FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+                        Renderer.TriggerStartAnimation(Sub() Return)
                     Case "c"c 'Sent chat message
                         Dim source As Integer = CInt(element(1).ToString)
                         If source = 9 Then
@@ -987,13 +989,16 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub PrepareMove()
-            'Setze benötigte Flags
+            'Set HUD flags
             SpielerIndex = UserIndex
             Status = SpielStatus.Würfel
             ShowDice = True
             StopDiceWhenFinished = False
             HUDInstructions.Text = "Roll the Dice!"
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
+            'Reset camera if not already moving
+            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+            'Set game flags
             If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter
             DreifachWürfeln = CanRollThrice(SpielerIndex) 'Falls noch alle Figuren un der Homebase sind
             WürfelTimer = 0

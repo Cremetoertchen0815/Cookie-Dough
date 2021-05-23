@@ -93,7 +93,7 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderXY As Transition(Of Vector2) 'Bewegt die zu animierende Figur auf der X- und Y-Achse
         Friend FigurFaderZ As Transition(Of Integer)  'Bewegt die zu animierende Figur auf der Z-Achse
         Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single)) 'Gibt die Skalierung für einzelne Figuren an Key: (Spieler ID, Figur ID) Value: Transition(Z)
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)} 'Bewegt die Kamera 
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(0, 0, 0, 0, 0, 0)} 'Bewegt die Kamera 
         Friend CPUTimer As Single 'Timer-Flag um der CPU etwas "Überlegzeit" zu geben
         Friend PlayStompSound As Boolean 'Gibt an, ob der Stampf-Sound beim Landen(Kicken) gespielt werden soll
         Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0) 'Gibt die Standard-Position der Kamera an
@@ -605,7 +605,9 @@ Namespace Game.BetretenVerboten
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
                                                SendBeginGaem()
-                                               SwitchPlayer()
+                                               FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+                                               'Launch start animation
+                                               Renderer.TriggerStartAnimation(AddressOf SwitchPlayer)
                                            End Sub)
                     Case SpielStatus.SpielZuEnde
                         StopUpdating = True
@@ -1399,6 +1401,9 @@ Namespace Game.BetretenVerboten
             HUDBtnD.Active = SpielerIndex = UserIndex
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUD.Color = hudcolors(UserIndex)
+            'Reset camera if not already moving
+            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+            'Set game flags
             ShowDice = True
             StopUpdating = False
             SendGameActive()

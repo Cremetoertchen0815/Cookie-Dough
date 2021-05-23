@@ -23,6 +23,10 @@ Namespace Game.BetretenVerboten.Renderers
         Private SaucerPickedUp As Boolean = False
         Private SaucerDefaultPosition As New Vector3(0, 0, 1000)
 
+        Private BeginCurrentPlayer As Integer
+        Private BeginTriggered As Boolean
+        Private BeginCam As Transition(Of Keyframe3D)
+
         Private View As Matrix
         Private Projection As Matrix
         Private CamMatrix As Matrix
@@ -96,9 +100,11 @@ Namespace Game.BetretenVerboten.Renderers
 
         End Sub
 
+#Region "Rendering"
+
         Public Overrides Sub Render(scene As Scene)
 
-            Dim cam = Game.GetCamPos
+            Dim cam = If(BeginTriggered, BeginCam.Value, Game.GetCamPos)
             CamMatrix = Matrix.CreateFromYawPitchRoll(0, 0, cam.Yaw) * Matrix.CreateFromYawPitchRoll(0, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
             If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
@@ -226,6 +232,9 @@ Namespace Game.BetretenVerboten.Renderers
             batchlor.Draw(Pfeil, New Rectangle(vc.X, vc.Y, size, size), Nothing, color, MathHelper.PiOver2 * ((iteration / Game.Spielers.Length) * 4 + 3), New Vector2(35) / 2, SpriteEffects.None, 0)
         End Sub
 
+#End Region
+
+#Region "Animation"
         Friend Sub TriggerSaucerAnimation(target As (Integer, Integer), ChangeFigure As Action, FinalAction As Action)
             Dim aimpos As Vector2 = GetSpielfeldVector(target.Item1, target.Item2)
             Dim startpos As Vector2 = New Vector2(SaucerDefaultPosition.X, SaucerDefaultPosition.Y)
@@ -256,11 +265,45 @@ Namespace Game.BetretenVerboten.Renderers
             Automator.Add(SaucerLift)
         End Sub
 
+        Friend Sub TriggerStartAnimation(FinalAction As Action)
+            Dim plcount As Integer = 1
+            BeginCurrentPlayer = -1
+            BeginTriggered = True
+
+            'Get actual player count
+            For Each element In Game.Spielers
+                If element.Typ <> SpielerTyp.None Then plcount += 1
+            Next
+
+            'Move camera down
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D, New Keyframe3D(-30, -20, -50, 0, 0.75, 0), AddressOf PlayerANimation)
+            Automator.Add(BeginCam)
+
+            'Continue with game
+            Core.Schedule(2.5 * plcount + 0.8, Sub() FinalAction())
+        End Sub
+
+        Private Sub PlayerAnimation()
+            'Find next player, if available
+
+            If BeginCurrentPlayer + 1 >= Game.Spielers.Length Then BeginTriggered = False : Return
+            BeginCurrentPlayer += 1
+            For i As Integer = BeginCurrentPlayer To Game.Spielers.Length - 1
+                If Game.Spielers(i).Typ <> SpielerTyp.None Then BeginCurrentPlayer = i : Exit For
+            Next
+
+            'Move camera down
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D(200, 0, 0, 0, 0, 0), New Keyframe3D(-30, -20, -50, 0, 0.75, 0), AddressOf PlayerAnimation)
+            Automator.Add(BeginCam)
+        End Sub
+
         Private Function GetBufferedTime(afteraction As Action(Of ITimer)) As Transition(Of Single).FinishedDelegate
             Return Sub()
                        Core.Schedule(0.3, afteraction)
                    End Sub
         End Function
+
+#End Region
 
         Private Function GetSpielfeldVector(player As Integer, figur As Integer, Optional increment As Integer = 0) As Vector2
             Return GetMapVectorPos(Game.Map, player, figur, Game.Spielers(player).Spielfiguren(figur) + increment)

@@ -1,10 +1,14 @@
 ﻿BV:
--"0 Humans Online" bug
--Crash when selecting wave file for both sounds
--Monitor high score(sollte in chat bei sieg angezeigt werden)
 -Add intro scene
-
-
+-Fix UFO being able to fly info others in Haus
+-Fix not being able to rejoin after game ended
+-Name of host not having -x ending when only local
+-Competitive should be standard
+-Do an actual K/D calc(kick vs being kicked)
+-Sound when entering UFO 
+-Save all hgihscores
+-Custom CPU sounds
+-Fix not being kicked from round when host left
 -Store save data if settings file not found in INI file in appdata 
 
 
