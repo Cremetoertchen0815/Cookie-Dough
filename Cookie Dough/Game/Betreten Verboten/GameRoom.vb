@@ -291,13 +291,13 @@ Namespace Game.BetretenVerboten
                         End Select
                     Next
 
-                    'Update K/D
-                    If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then
-                        If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
-                    Else
-                        If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
+                    If GameMode = GameMode.Competetive Then
+                        'Update highscores
+                        Core.Schedule(ranks.Count + 1, AddressOf SendHighscore)
+                        'Update K/D
+                        If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
+                        My.Settings.Save()
                     End If
-                    My.Settings.Save()
 
                     'Set flags
                     SendWinFlag()
@@ -696,6 +696,9 @@ Namespace Game.BetretenVerboten
                         DontKickSacrifice = Spielers(source).SacrificeCounter < 0
                         Spielers(source).SacrificeCounter = SacrificeWait
                         Sacrifice(source, figur)
+                    Case "m"c 'Sent chat message
+                        Dim msg As String = element.Substring(2)
+                        PostChat(msg, Color.White)
                     Case "n"c 'Switch player
                         SwitchPlayer()
                     Case "p"c 'Player angered
@@ -768,6 +771,15 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendFlyingSaucerAdded(fields As Integer)
             SendNetworkMessageToAll("g" & fields.ToString)
+        End Sub
+        Private Sub SendHighscore()
+            Dim pls As New List(Of (String, Integer))
+            For i As Integer = 0 To Spielers.Length - 1
+                If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.Online Then
+                    pls.Add((Spielers(i).Name, GetScore(i)))
+                End If
+            Next
+            SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
         End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)

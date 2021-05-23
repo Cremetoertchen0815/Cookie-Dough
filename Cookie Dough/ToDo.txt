@@ -1,4 +1,6 @@
 ﻿BV:
+-"0 Humans Online" bug
+-Crash when selecting wave file for both sounds
 -Monitor high score(sollte in chat bei sieg angezeigt werden)
 -Add intro scene
 

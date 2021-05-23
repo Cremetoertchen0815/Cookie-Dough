@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports System.IO
+Imports System.Linq
 Imports System.Net
 Imports System.Net.Sockets
 Imports System.Text
@@ -297,7 +298,7 @@ Namespace Framework.Networking
 
             'Send terminator/flusher
             Try
-                con.StreamW.WriteLine("(I'm already Spacer)")
+                con.StreamW.WriteLine("0")
             Catch
             End Try
             gaem.Viewers.Remove(con)
@@ -313,6 +314,36 @@ Namespace Framework.Networking
                             gaem.Active = True
                             'Transmit begin message
                             SendToAllGameClients(gaem, nl)
+                        Case "h"c
+                            'Receive player scores
+                            Dim game As Integer = CInt(nl(1).ToString)
+                            Dim map As Integer = CInt(nl(2).ToString)
+                            Dim path As String = "Save\highsc" & game.ToString & map.ToString & ".dat"
+                            Dim highscore As List(Of (String, Integer))
+                            Dim data As List(Of (String, Integer)) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(nl.Substring(3))
+                            Dim updated As Boolean() = New Boolean(2) {}
+                            'Load and update highscores
+                            If File.Exists(path) Then highscore = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Integer))
+                            highscore.AddRange(data.ToArray)
+                            highscore = highscore.OrderBy(Function(x) x.Item2).ToList()
+                            highscore.Reverse()
+                            'Delete access
+                            Do While highscore.Count > 3
+                                highscore.RemoveAt(highscore.Count - 1)
+                            Loop
+                            'Update "updated" list
+                            For i As Integer = 0 To 2
+                                updated(i) = data.Contains(highscore(i))
+                            Next
+                            'Save to file
+                            File.WriteAllText(path, Newtonsoft.Json.JsonConvert.SerializeObject(highscore))
+
+                            SendToAllGameClients(gaem, "mHighscores:", False)
+
+                            For i As Integer = 0 To 2
+                                Dim ii As Integer = i
+                                Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & highscore(ii).Item1 & "(" & highscore(ii).Item2.ToString & ")", False))
+                            Next
                         Case "l"c, "I"c
                             'If host left, end game for everyone
                             SendEndToAllGameClients(gaem)
@@ -365,11 +396,14 @@ Namespace Framework.Networking
             End If
         End Sub
 
-        Private Sub SendToAllGameClients(gaem As IGame, msg As String)
-            'Send to players
+        Private Sub SendToAllGameClients(gaem As IGame, msg As String, Optional IgnoreLocals As Boolean = True)
+            'Send to online players
             For i As Integer = 1 To gaem.Players.Length - 1
                 If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, msg)
             Next
+
+            'Send to host
+            If Not IgnoreLocals Then gaem.HostConnection.StreamW.WriteLine("9" & msg)
 
             'Send to viewers
             For i As Integer = 0 To gaem.Viewers.Count - 1
