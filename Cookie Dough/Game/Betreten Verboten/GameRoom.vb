@@ -196,7 +196,17 @@ Namespace Game.BetretenVerboten
             Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
-                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound = sf
+                Select Case pl.Typ
+                    Case SpielerTyp.Local
+                        Spielers(i).CustomSound = sf
+                    Case SpielerTyp.CPU
+                        If i <> 0 Then
+                            Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
+                        Else
+                            Dim sff = SoundEffect.FromFile("Content\prep\tele.wav")
+                            Spielers(i).CustomSound = {sff, sff}
+                        End If
+                End Select
             Next
         End Sub
 
@@ -836,18 +846,41 @@ Namespace Game.BetretenVerboten
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
                     'Send Sound A
-                    Dim txt As String = ""
-                    If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
+                    Dim txt As String
+                    Dim snd As IdentType = GetPlayerAudio(i, False, txt)
+                    SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
 
                     'Send Sound B
-                    txt = ""
-                    If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
-                    LocalClient.WriteStream("z" & i.ToString & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+                    snd = GetPlayerAudio(i, True, txt)
+                    LocalClient.WriteStream("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
                     Return
                 End If
             Next
         End Sub
+
+        Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType
+            txt = ""
+            Dim ret As IdentType
+            Select Case Spielers(i).Typ
+                Case SpielerTyp.Local
+                    If IsB Then
+                        ret = My.Settings.SoundB
+                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+                    Else
+                        ret = My.Settings.SoundA
+                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+                    End If
+                Case SpielerTyp.CPU
+                    Select Case i
+                        Case 0
+                            ret = IdentType.Custom
+                            txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Content\prep\tele.wav")))
+                        Case Else
+                            ret = If(IsB, IdentType.TypeA, IdentType.TypeB)
+                    End Select
+            End Select
+            Return ret
+        End Function
 
         Private Sub SendNetworkMessageToAll(message As String)
             If NetworkMode Then LocalClient.WriteStream(message)

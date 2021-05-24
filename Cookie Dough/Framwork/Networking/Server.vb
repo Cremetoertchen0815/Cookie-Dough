@@ -325,10 +325,11 @@ Namespace Framework.Networking
                             'Load and update highscores
                             If File.Exists(path) Then highscore = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Integer))
                             highscore.AddRange(data.ToArray)
+                            'Remove double ganger
                             highscore = highscore.OrderBy(Function(x) x.Item2).ToList()
                             highscore.Reverse()
                             'Delete access
-                            Do While highscore.Count > 3
+                            Do While highscore.Count > 10
                                 highscore.RemoveAt(highscore.Count - 1)
                             Loop
                             'Update "updated" list
@@ -342,7 +343,7 @@ Namespace Framework.Networking
 
                             For i As Integer = 0 To 2
                                 Dim ii As Integer = i
-                                Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & highscore(ii).Item1 & "(" & highscore(ii).Item2.ToString & ")", False))
+                                Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & highscore(ii).Item1 & "(" & highscore(ii).Item2.ToString & If(updated(ii), ", GG!)", ")"), False))
                             Next
                         Case "l"c, "I"c
                             'If host left, end game for everyone

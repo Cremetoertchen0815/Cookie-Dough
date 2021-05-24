@@ -1,9 +1,7 @@
 ﻿Imports System.Collections.Generic
 Imports System.IO
 Imports System.Net.Sockets
-Imports System.Text
 Imports System.Threading
-Imports Microsoft.Xna.Framework.Audio
 Imports Nez.Console
 
 Namespace Framework.Networking
@@ -240,6 +238,7 @@ Namespace Framework.Networking
             End Try
             blastmode = False
             AutomaticRefresh = True
+            WriteString("e")
             WriteString("Ich putz hier mal durch.")
             WriteString("Damit keine ReadLine-Commands offen bleiben.")
         End Sub

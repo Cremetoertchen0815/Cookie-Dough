@@ -670,15 +670,8 @@ Namespace Game.BetretenVerboten
                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
                         End If
 
-                        If Spielers(source).Typ = SpielerTyp.Local Then
-                            'Set sound for every local player
-                            For Each pl In Spielers
-                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound(SoundNr) = sound
-                            Next
-                        Else
-                            'Set sound for player
-                            Spielers(source).CustomSound(SoundNr) = sound
-                        End If
+                        'Set sound for player
+                        Spielers(source).CustomSound(SoundNr) = sound
                 End Select
             Next
         End Sub

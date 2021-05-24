@@ -1,7 +1,6 @@
 ﻿BV:
 -Fix UFO being able to fly into others in Haus
 -Sound when entering UFO 
--Save all hgihscores
 -Custom CPU sounds
 -Fix not being kicked from round when host left
 -Store save data if settings file not found in INI file in appdata 
