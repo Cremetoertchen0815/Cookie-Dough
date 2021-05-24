@@ -40,8 +40,6 @@ Namespace Game.BetretenVerboten
             Dev = Core.GraphicsDevice
             ClearColor = Color.Black
 
-            Dim jkl = New Sprites.SpriteRenderer
-
             'Init values
             NewGamePlayers = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
             Map = GaemMap.Default4Players
@@ -150,15 +148,16 @@ Namespace Game.BetretenVerboten
             Next
             If Internetz Then LocalClient.AutomaticRefresh = False
 
+            Dim local_count As Integer = 1
             Dim AktuellesSpiel As New GameRoom(Map)
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.GameMode = Mode
             AktuellesSpiel.NetworkMode = False
-            AktuellesSpiel.Spielers(0) = New Player(NewGamePlayers(0), Difficulty.Smart) With {.Name = If(NewGamePlayers(0) = SpielerTyp.Local, My.Settings.Username, Farben(0))}
-            For i As Integer = 1 To AktuellesSpiel.PlCount - 1
+            For i As Integer = 0 To AktuellesSpiel.PlCount - 1
                 Select Case NewGamePlayers(i)
                     Case SpielerTyp.Local
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local, My.Settings.Schwierigkeitsgrad) With {.Name = My.Settings.Username & "-" & (i + 1).ToString}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local, My.Settings.Schwierigkeitsgrad) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, "")}
+                        local_count += 1
                     Case SpielerTyp.CPU
                         AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU, Difficulty.Smart) With {.Name = Farben(i)}
                     Case SpielerTyp.Online
