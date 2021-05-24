@@ -38,6 +38,7 @@ Namespace Framework.UI
         Public Overrides Sub OnAddedToEntity()
             GlobalFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/fnt_HKG_17_M"))
             Material = New Material(DepthStencilState.None)
+
             For Each element In Controls
                 element.Init(Me)
             Next

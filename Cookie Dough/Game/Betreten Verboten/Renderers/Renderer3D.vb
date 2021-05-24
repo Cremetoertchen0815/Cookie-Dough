@@ -24,7 +24,7 @@ Namespace Game.BetretenVerboten.Renderers
         Private SaucerDefaultPosition As New Vector3(0, 0, 1000)
 
         Private BeginCurrentPlayer As Integer
-        Private BeginTriggered As Boolean
+        Friend BeginTriggered As Boolean
         Private BeginCam As Transition(Of Keyframe3D)
 
         Private View As Matrix
@@ -272,6 +272,7 @@ Namespace Game.BetretenVerboten.Renderers
             BeginCurrentPlayer = -1
             BeginTriggered = True
             Game.HUDmotdLabel.Active = True
+            Game.HUDNameBtn.Active = True
             Game.HUDNameBtn.Location = New Vector2(500, 650)
 
             'Get actual player count
@@ -306,8 +307,10 @@ Namespace Game.BetretenVerboten.Renderers
 
             'Play sound
             Game.Spielers(BeginCurrentPlayer).CustomSound(0).Play()
-            Game.HUDNameBtn.Text = Game.Spielers(BeginCurrentPlayer).Name
+
+            'Set presentation stuff
             Game.HUDNameBtn.Color = hudcolors(BeginCurrentPlayer)
+            Game.HUDNameBtn.Text = Game.Spielers(BeginCurrentPlayer).Name
             Game.HUDmotdLabel.Text = Game.Spielers(BeginCurrentPlayer).MOTD
             Game.HUDmotdLabel.Location = New Vector2(1920 / 2 - Game.HUDmotdLabel.Font.MeasureString(Game.HUDmotdLabel.Text).X / 2, 730)
 
