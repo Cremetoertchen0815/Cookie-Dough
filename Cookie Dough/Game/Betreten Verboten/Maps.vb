@@ -33,6 +33,25 @@ Namespace Game.BetretenVerboten
             End Select
         End Function
 
+
+        Friend Function GetIntroKeyframes(map As GaemMap, player As Integer, ending As Boolean) As Keyframe3D
+            Select Case map
+                Case GaemMap.Default4Players
+                    Select Case player
+                        Case 0
+                            If Not ending Then Return New Keyframe3D(-215, -250, -850, -0.37, 1, 2.3, False) Else Return New Keyframe3D(250, -235, -800, 0.65, 1, 2.3, False)
+                        Case 1
+                            If Not ending Then Return New Keyframe3D(-315, -142, -925, 0, 1.1, 0, False) Else Return New Keyframe3D(255, -250, -1044, 1.23, 1, 0, False)
+                        Case 2
+                            If Not ending Then Return New Keyframe3D(340, -410, -710, -0.12, 0.64, 0, False) Else Return New Keyframe3D(-100, -230, -1110, -0.2, 1.1, -1, False)
+                        Case 3
+                            If Not ending Then Return New Keyframe3D(-120, 75, -530, -0.2, 1.3, -4.55, False) Else Return New Keyframe3D(-390, 70, -440, -0.2, 1.3, -4.64, False)
+                    End Select
+                Case Else
+                    Return New Keyframe3D
+            End Select
+        End Function
+
         Private FDist0 As Integer = 85
         Private FDist1 As Integer = 65
         Private FDist2 As Integer = 40

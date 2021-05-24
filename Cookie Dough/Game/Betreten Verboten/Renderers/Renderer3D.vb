@@ -104,8 +104,7 @@ Namespace Game.BetretenVerboten.Renderers
 
         Public Overrides Sub Render(scene As Scene)
 
-            Dim cam = If(BeginTriggered, BeginCam.Value, Game.GetCamPos)
-            CamMatrix = cam.GetMatrix
+            CamMatrix = If(BeginTriggered, BeginCam.Value, Game.GetCamPos).GetMatrix
             If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(dev.Viewport.Width, dev.Viewport.Height, 1, 100000)
@@ -266,7 +265,7 @@ Namespace Game.BetretenVerboten.Renderers
         End Sub
 
         Friend Sub TriggerStartAnimation(FinalAction As Action)
-            Dim plcount As Integer = 1
+            Dim plcount As Integer = 0
             BeginCurrentPlayer = -1
             BeginTriggered = True
 
@@ -280,7 +279,7 @@ Namespace Game.BetretenVerboten.Renderers
             Automator.Add(BeginCam)
 
             'Continue with game
-            Core.Schedule(2.5 * plcount + 0.8, Sub() FinalAction())
+            Core.Schedule(3 * plcount + 3.3, Sub() FinalAction())
         End Sub
 
         Private Sub PlayerAnimation()
@@ -293,7 +292,7 @@ Namespace Game.BetretenVerboten.Renderers
             Next
 
             'Move camera down
-            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D(200, 0, 0, 0, 0, 0, False), New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False), AddressOf PlayerAnimation)
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_Linear(3000), GetIntroKeyframes(Game.Map, BeginCurrentPlayer, False), GetIntroKeyframes(Game.Map, BeginCurrentPlayer, True), AddressOf PlayerAnimation)
             Automator.Add(BeginCam)
         End Sub
 

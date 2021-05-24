@@ -69,6 +69,7 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDNameBtn As Controls.Button
         Private WithEvents HUDFullscrBtn As Controls.Button
         Private WithEvents HUDMusicBtn As Controls.Button
+        Private WithEvents HUDdbgLabel As Controls.Label
         Private WithEvents HUDDiceBtn As GameRenderable
         Private InstructionFader As ITween(Of Color)
         Private ShowDice As Boolean = False
@@ -83,6 +84,7 @@ Namespace Game.BetretenVerboten
         Private Shared dbgPlaceCmd As (Integer, Integer, Integer)
         Private Shared dbgPlaceSet As Boolean = False
         Private Shared dbgEnd As Boolean = False
+        Private Shared dbgCamFree As Boolean = False
         Private Shared dbgCam As Keyframe3D = Nothing
         Private Shared dbgLoguser As Integer = -1
 
@@ -169,6 +171,7 @@ Namespace Game.BetretenVerboten
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Controls.Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
+            HUDdbgLabel = New Controls.Label(Function() FigurFaderCamera.Value.ToString, New Vector2(500, 120)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond, .Active = False} : HUD.Controls.Add(HUDdbgLabel)
             InstructionFader = HUDInstructions.Tween("Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), 0.7).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut) : InstructionFader.Start()
             HUDNameBtn = New Controls.Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
             HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
@@ -250,12 +253,14 @@ Namespace Game.BetretenVerboten
                 dbgLoguser = -1
             End If
 
+            'Set cam
             If dbgCam <> Nothing Then
                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = dbgCam}
                 dbgCam = Nothing
             End If
 
-            FigurFaderCamera.Value = New Keyframe3D(0, 0, -550, 0, 0, 0, True)
+            'Move cam
+            If dbgCamFree Then FigurFaderCamera.Value = FigurFaderCamera.Value + New Keyframe3D(If(kstate.IsKeyDown(Keys.A), -1, 0) + If(kstate.IsKeyDown(Keys.D), 1, 0), If(kstate.IsKeyDown(Keys.S), -1, 0) + If(kstate.IsKeyDown(Keys.W), 1, 0), If(kstate.IsKeyDown(Keys.LeftShift), -1, 0) + If(kstate.IsKeyDown(Keys.Space), 1, 0), If(kstate.IsKeyDown(Keys.J), -0.01, 0) + If(kstate.IsKeyDown(Keys.L), 0.01, 0), If(kstate.IsKeyDown(Keys.K), -0.01, 0) + If(kstate.IsKeyDown(Keys.I), 0.01, 0), If(kstate.IsKeyDown(Keys.RightShift), -0.01, 0) + If(kstate.IsKeyDown(Keys.Enter), 0.01, 0), True) : HUDdbgLabel.Active = True
 
             If Not StopUpdating Then
 
@@ -1531,9 +1536,14 @@ Namespace Game.BetretenVerboten
             dbgEnd = True
         End Sub
 
-        <Command("bv-cam", "Sets up the camera in a specific way.")>
+        <Command("bv-cam-place", "Sets up the camera in a specific way.")>
         Public Shared Sub dbgCamPlace(x As Single, y As Single, z As Single, yaw As Single, pitch As Single, roll As Single)
             dbgCam = New Keyframe3D(x, y, z, yaw, pitch, roll, False)
+        End Sub
+
+        <Command("bv-cam-free", "Sets up the camera in a specific way.")>
+        Public Shared Sub dbgCamFreeS()
+            dbgCamFree = True
         End Sub
 #End Region
 #Region "Schnittstellenimplementation"
