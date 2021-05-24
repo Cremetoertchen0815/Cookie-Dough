@@ -18,7 +18,7 @@ Namespace Game.BetretenVerboten
         Private PlayerCount As Integer = 4
         Private PlayerSel As Integer = 0
         Private Map As GaemMap = GaemMap.Default4Players
-        Private Mode As GameMode = GameMode.Casual
+        Private Mode As GameMode = GameMode.Competetive
         Friend Arrow As Texture2D
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
         Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
