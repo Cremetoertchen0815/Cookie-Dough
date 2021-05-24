@@ -81,7 +81,7 @@ Namespace Game.BetretenVerboten
         ''' <summary>
         ''' Ein ganz krasser Spruch
         ''' </summary>
-        Public Property MOTD As String Implements IPlayer.MOTD
+        Public Property MOTD As String = My.Settings.MOTD Implements IPlayer.MOTD
 
         Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)
             Me.Typ = typ

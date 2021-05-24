@@ -268,6 +268,8 @@ Namespace Game.BetretenVerboten.Renderers
             Dim plcount As Integer = 0
             BeginCurrentPlayer = -1
             BeginTriggered = True
+            Game.HUDmotdLabel.Active = True
+            Game.HUDNameBtn.Location = New Vector2(500, 650)
 
             'Get actual player count
             For Each element In Game.Spielers
@@ -283,13 +285,28 @@ Namespace Game.BetretenVerboten.Renderers
         End Sub
 
         Private Sub PlayerAnimation()
-            'Find next player, if available
 
-            If BeginCurrentPlayer + 1 >= Game.Spielers.Length Then BeginTriggered = False : Return
+            'End loop if end reached
+            If BeginCurrentPlayer + 1 >= Game.Spielers.Length Then
+                BeginTriggered = False
+                Game.HUDmotdLabel.Active = False
+                Game.HUDNameBtn.Location = New Vector2(500, 20)
+                Game.HUDNameBtn.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+                Return
+            End If
+
+            'Find next player, if available
             BeginCurrentPlayer += 1
             For i As Integer = BeginCurrentPlayer To Game.Spielers.Length - 1
                 If Game.Spielers(i).Typ <> SpielerTyp.None Then BeginCurrentPlayer = i : Exit For
             Next
+
+            'Play sound
+            Game.Spielers(BeginCurrentPlayer).CustomSound(0).Play()
+            Game.HUDNameBtn.Text = Game.Spielers(BeginCurrentPlayer).Name
+            Game.HUDNameBtn.Color = hudcolors(BeginCurrentPlayer)
+            Game.HUDmotdLabel.Text = Game.Spielers(BeginCurrentPlayer).MOTD
+            Game.HUDmotdLabel.Location = New Vector2(1920 / 2 - Game.HUDmotdLabel.Font.MeasureString(Game.HUDmotdLabel.Text).X / 2, 730)
 
             'Move camera down
             BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_Linear(3000), GetIntroKeyframes(Game.Map, BeginCurrentPlayer, False), GetIntroKeyframes(Game.Map, BeginCurrentPlayer, True), AddressOf PlayerAnimation)

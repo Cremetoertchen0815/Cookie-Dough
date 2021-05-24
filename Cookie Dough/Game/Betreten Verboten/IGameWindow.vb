@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.UI
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 
@@ -19,6 +20,8 @@ Namespace Game.BetretenVerboten
         ReadOnly Property WürfelAktuelleZahl As Integer
         ReadOnly Property WürfelWerte As Integer()
         ReadOnly Property DreifachWürfeln As Boolean
+        ReadOnly Property HUDNameBtn As Controls.Button
+        ReadOnly Property HUDmotdLabel As Controls.Label
         ReadOnly Property BGTexture As Texture2D
         Function GetCamPos() As Keyframe3D
     End Interface

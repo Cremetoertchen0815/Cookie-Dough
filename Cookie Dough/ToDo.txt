@@ -1,5 +1,4 @@
 ﻿BV:
--Add intro scene
 -Fix UFO being able to fly into others in Haus
 -Fix being able to rejoin after game ended
 -Name of host not having -x ending when only local

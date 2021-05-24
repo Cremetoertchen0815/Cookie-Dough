@@ -3,6 +3,7 @@ Imports System.IO
 Imports System.Linq
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
+Imports Cookie_Dough.Framework.UI.Controls
 Imports Cookie_Dough.Game.BetretenVerboten.Networking
 Imports Cookie_Dough.Game.BetretenVerboten.Renderers
 Imports Microsoft.Xna.Framework
@@ -60,16 +61,17 @@ Namespace Game.BetretenVerboten
 
         'HUD
         Private WithEvents HUD As GuiSystem
-        Private WithEvents HUDBtnB As Controls.Button
-        Private WithEvents HUDBtnC As Controls.Button
-        Private WithEvents HUDBtnD As Controls.Button
-        Private WithEvents HUDChat As Controls.TextscrollBox
-        Private WithEvents HUDChatBtn As Controls.Button
-        Private WithEvents HUDInstructions As Controls.Label
-        Private WithEvents HUDNameBtn As Controls.Button
-        Private WithEvents HUDFullscrBtn As Controls.Button
-        Private WithEvents HUDMusicBtn As Controls.Button
+        Private WithEvents HUDBtnB As Button
+        Private WithEvents HUDBtnC As Button
+        Private WithEvents HUDBtnD As Button
+        Private WithEvents HUDChat As TextscrollBox
+        Private WithEvents HUDChatBtn As Button
+        Private WithEvents HUDInstructions As Label
+        Private WithEvents HUDNameBtn As Button
+        Private WithEvents HUDFullscrBtn As Button
+        Private WithEvents HUDMusicBtn As Button
         Private WithEvents HUDDiceBtn As GameRenderable
+        Private WithEvents HUDmotdLabel As Controls.Label
         Private InstructionFader As PropertyTransition
         Private ShowDice As Boolean = False
         Private HUDColor As Color
@@ -186,16 +188,17 @@ Namespace Game.BetretenVerboten
             'Lade HUD
             HUD = New GuiSystem
             HUDDiceBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDDiceBtn)
-            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
-            HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
-            HUDBtnD = New Controls.Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnD)
-            HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
-            HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
-            HUDInstructions = New Controls.Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
+            HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnC = New Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
+            HUDBtnD = New Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnD)
+            HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
+            HUDChatBtn = New Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
+            HUDInstructions = New Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
             InstructionFader = New PropertyTransition(New TransitionTypes.TransitionType_EaseInEaseOut(700), HUDInstructions, "Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), Nothing) With {.Repeat = RepeatJob.Reverse} : Automator.Add(InstructionFader)
-            HUDNameBtn = New Controls.Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
-            HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
-            HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
+            HUDNameBtn = New Button("", New Vector2(500, 650), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
+            HUDmotdLabel = New Label("", New Vector2(400, 750)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond, .Active = False} : HUD.Controls.Add(HUDmotdLabel)
+            HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
+            HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = If(UserIndex > -1, hudcolors(UserIndex), Color.White)
 
@@ -626,7 +629,7 @@ Namespace Game.BetretenVerboten
                                              Else
                                                  If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
                                              End If
-                                                 My.Settings.Save()
+                                             My.Settings.Save()
                                          End Sub)
                         'Set flags
                         Status = SpielStatus.SpielZuEnde
@@ -1188,6 +1191,18 @@ Namespace Game.BetretenVerboten
         Private ReadOnly Property IGameWindow_DreifachWürfeln As Boolean Implements IGameWindow.DreifachWürfeln
             Get
                 Return DreifachWürfeln
+            End Get
+        End Property
+
+        Private ReadOnly Property IGameWindow_HUDNameBtn As Button Implements IGameWindow.HUDNameBtn
+            Get
+                Return HUDNameBtn
+            End Get
+        End Property
+
+        Public ReadOnly Property IGameWindow_HUDmotdLabel As Label Implements IGameWindow.HUDmotdLabel
+            Get
+                Return HUDmotdLabel
             End Get
         End Property
 
