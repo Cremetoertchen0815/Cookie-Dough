@@ -50,7 +50,8 @@ Namespace Cookie_Dough
               Content.Load(Of SoundEffect)("sfx/land"),
               Content.Load(Of SoundEffect)("sfx/sucess"),
               Content.Load(Of SoundEffect)("sfx/switch"),
-              Content.Load(Of SoundEffect)("sfx/text_skip")}
+              Content.Load(Of SoundEffect)("sfx/text_skip"),
+              Content.Load(Of SoundEffect)("sfx/saucer")}
             Lalala = Content.Load(Of Song)("games\BV\lalalala")
             triumph = Content.Load(Of Song)("sfx\triumph")
             DebugTexture = Content.LoadTexture("dbg1")

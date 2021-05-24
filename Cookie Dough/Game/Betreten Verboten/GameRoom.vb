@@ -853,7 +853,6 @@ Namespace Game.BetretenVerboten
                     'Send Sound B
                     snd = GetPlayerAudio(i, True, txt)
                     LocalClient.WriteStream("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
-                    Return
                 End If
             Next
         End Sub

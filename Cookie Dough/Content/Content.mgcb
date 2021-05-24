@@ -1606,6 +1606,9 @@
 #begin prep/plc.wav
 /copy:prep/plc.wav
 
+#begin prep/tele.wav
+/copy:prep/tele.wav
+
 #begin sfx/access_denied.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -1641,6 +1644,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sfx/land.wav
+
+#begin sfx/saucer.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/saucer.wav
 
 #begin sfx/sucess.wav
 /importer:WavImporter

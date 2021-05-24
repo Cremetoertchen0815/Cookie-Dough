@@ -239,6 +239,9 @@ Namespace Game.BetretenVerboten.Renderers
             Dim startpos As Vector2 = New Vector2(SaucerDefaultPosition.X, SaucerDefaultPosition.Y)
             SaucerTarget = target
 
+            'Play sound
+            SFX(8).Play()
+
             SaucerMover = New Transition(Of Vector2)(New TransitionTypes.TransitionType_CriticalDamping(1000), startpos, aimpos, Nothing)
             Automator.Add(SaucerMover)
 
