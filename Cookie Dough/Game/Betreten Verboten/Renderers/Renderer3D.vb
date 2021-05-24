@@ -105,7 +105,7 @@ Namespace Game.BetretenVerboten.Renderers
         Public Overrides Sub Render(scene As Scene)
 
             Dim cam = If(BeginTriggered, BeginCam.Value, Game.GetCamPos)
-            CamMatrix = Matrix.CreateFromYawPitchRoll(0, 0, cam.Yaw) * Matrix.CreateFromYawPitchRoll(0, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
+            CamMatrix = cam.GetMatrix
             If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(dev.Viewport.Width, dev.Viewport.Height, 1, 100000)
@@ -276,7 +276,7 @@ Namespace Game.BetretenVerboten.Renderers
             Next
 
             'Move camera down
-            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D, New Keyframe3D(-30, -20, -50, 0, 0.75, 0), AddressOf PlayerANimation)
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D, New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False), AddressOf PlayerAnimation)
             Automator.Add(BeginCam)
 
             'Continue with game
@@ -293,7 +293,7 @@ Namespace Game.BetretenVerboten.Renderers
             Next
 
             'Move camera down
-            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D(200, 0, 0, 0, 0, 0), New Keyframe3D(-30, -20, -50, 0, 0.75, 0), AddressOf PlayerAnimation)
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D(200, 0, 0, 0, 0, 0, False), New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False), AddressOf PlayerAnimation)
             Automator.Add(BeginCam)
         End Sub
 

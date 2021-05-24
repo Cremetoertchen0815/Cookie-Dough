@@ -10,6 +10,7 @@ Namespace Framework.Graphics
         Public Yaw As Single
         Public Pitch As Single
         Public Roll As Single
+        Public DefaultOrder As Boolean
 
         Public ReadOnly Property Location As Vector3
             Get
@@ -18,20 +19,25 @@ Namespace Framework.Graphics
         End Property
 
         Public Function GetMatrix() As Matrix
-            Return Matrix.CreateFromYawPitchRoll(Yaw, Pitch, Roll) * Matrix.CreateTranslation(X, Y, Z)
+            If DefaultOrder Then
+                Return Matrix.CreateFromYawPitchRoll(Yaw, Pitch, Roll) * Matrix.CreateTranslation(X, Y, Z)
+            Else
+                Return Matrix.CreateFromYawPitchRoll(0, 0, Yaw) * Matrix.CreateFromYawPitchRoll(0, Pitch, Roll) * Matrix.CreateTranslation(Location)
+            End If
         End Function
 
-        Public Sub New(x As Single, y As Single, z As Single, w As Single, p As Single, r As Single)
+        Public Sub New(x As Single, y As Single, z As Single, w As Single, p As Single, r As Single, DefaultOrder As Boolean)
             Me.X = x
             Me.Y = y
             Me.Z = z
             Yaw = w
             Pitch = p
             Roll = r
+            Me.DefaultOrder = DefaultOrder
         End Sub
 
         Public Shared Operator +(ByVal a As Keyframe3D, ByVal b As Keyframe3D) As Keyframe3D
-            Return New Keyframe3D(a.X + a.X, a.Y + a.Y, a.Z + a.Z, a.Yaw + a.Yaw, a.Pitch + a.Pitch, a.Roll + a.Roll)
+            Return New Keyframe3D(a.X + a.X, a.Y + a.Y, a.Z + a.Z, a.Yaw + a.Yaw, a.Pitch + a.Pitch, a.Roll + a.Roll, a.DefaultOrder And b.DefaultOrder)
         End Operator
 
         Public Shared Operator =(ByVal a As Keyframe3D, ByVal b As Keyframe3D) As Boolean

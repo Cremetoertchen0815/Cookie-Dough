@@ -76,9 +76,9 @@ Namespace Game.DropTrop
         Friend Spielfeld As New Dictionary(Of Vector2, Integer)
         Friend SpielfeldUpdates As New List(Of (Vector2, Integer))
         Friend SpielfeldSize As Vector2
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)} 'Bewegt die Kamera 
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0, True)} 'Bewegt die Kamera 
         Friend CPUTimer As Single 'Timer-Flag um der CPU etwas "Überlegzeit" zu geben
-        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0) 'Gibt die Standard-Position der Kamera an
+        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, True) 'Gibt die Standard-Position der Kamera an
 
         'Konstanten
         Private CPUThinkingTime As Single = 0.6
@@ -599,7 +599,7 @@ Namespace Game.DropTrop
                     End Select
                 Next
                 SendWinFlag()
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, True), Nothing) : Automator.Add(FigurFaderCamera)
                 Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)
                 Automator.Add(Renderer.AdditionalZPos)
             End If
@@ -676,9 +676,9 @@ Namespace Game.DropTrop
             NetworkLocation = Vector2.One * -1
 
             If (lastind < 0 OrElse Spielers(lastind).Typ = SpielerTyp.Online) And Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, True), Nothing) : Automator.Add(FigurFaderCamera)
             ElseIf (lastind < 0 OrElse Spielers(lastind).Typ <> SpielerTyp.Online) And Spielers(SpielerIndex).Typ = SpielerTyp.Online Then
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(-30, -20, -50, 0, 0.75, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(-30, -20, -50, 0, 0.75, 0, True), Nothing) : Automator.Add(FigurFaderCamera)
             End If
         End Sub
 #End Region

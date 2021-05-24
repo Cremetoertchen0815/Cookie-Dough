@@ -94,10 +94,10 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderXY As Transition(Of Vector2) 'Bewegt die zu animierende Figur auf der X- und Y-Achse
         Friend FigurFaderZ As Transition(Of Integer)  'Bewegt die zu animierende Figur auf der Z-Achse
         Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single)) 'Gibt die Skalierung für einzelne Figuren an Key: (Spieler ID, Figur ID) Value: Transition(Z)
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(0, 0, 0, 0, 0, 0)} 'Bewegt die Kamera 
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(0, 0, 0, 0, 0, 0, False)} 'Bewegt die Kamera 
         Friend CPUTimer As Single 'Timer-Flag um der CPU etwas "Überlegzeit" zu geben
         Friend PlayStompSound As Boolean 'Gibt an, ob der Stampf-Sound beim Landen(Kicken) gespielt werden soll
-        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0) 'Gibt die Standard-Position der Kamera an
+        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
 
         'Konstanten
         Private Const WürfelDauer As Integer = 320
@@ -255,6 +255,7 @@ Namespace Game.BetretenVerboten
                 dbgCam = Nothing
             End If
 
+            FigurFaderCamera.Value = New Keyframe3D(0, 0, -550, 0, 0, 0, True)
 
             If Not StopUpdating Then
 
@@ -308,7 +309,7 @@ Namespace Game.BetretenVerboten
                     'Set flags
                     SendWinFlag()
                     Status = SpielStatus.SpielZuEnde
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                     Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)
                     Automator.Add(Renderer.AdditionalZPos)
                 End If
@@ -868,7 +869,7 @@ Namespace Game.BetretenVerboten
                     HUDInstructions.Text = "Field already covered! Move with the other piece!"
                     Core.Schedule(ErrorCooldown, Sub()
                                                      'Move camera
-                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                                                      Status = SpielStatus.WähleFigur
                                                      StopUpdating = False
                                                  End Sub)
@@ -884,7 +885,7 @@ Namespace Game.BetretenVerboten
                 Else 'We can't so s$*!, also schieben wir unsere Probleme einfach auf den nächst besten Deppen, der gleich dran ist
 
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
 
                     Status = SpielStatus.WähleFigur
                     StopUpdating = True
@@ -902,7 +903,7 @@ Namespace Game.BetretenVerboten
                 Status = SpielStatus.WähleFigur
 
                 'Move camera
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
             End If
         End Sub
 
@@ -1492,7 +1493,7 @@ Namespace Game.BetretenVerboten
                     Spielers(UserIndex).SacrificeCounter = SacrificeWait
                     HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                 Else
                     Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If
@@ -1531,8 +1532,8 @@ Namespace Game.BetretenVerboten
         End Sub
 
         <Command("bv-cam", "Sets up the camera in a specific way.")>
-        Public Shared Sub dbgCamPlace(x As Single, y As Single, z As Single, yaw As Integer, pitch As Single, roll As Single)
-            dbgCam = New Keyframe3D(x, y, z, yaw, pitch, roll)
+        Public Shared Sub dbgCamPlace(x As Single, y As Single, z As Single, yaw As Single, pitch As Single, roll As Single)
+            dbgCam = New Keyframe3D(x, y, z, yaw, pitch, roll, False)
         End Sub
 #End Region
 #Region "Schnittstellenimplementation"

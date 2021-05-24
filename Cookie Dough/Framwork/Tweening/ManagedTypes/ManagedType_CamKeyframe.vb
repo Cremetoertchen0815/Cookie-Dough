@@ -11,7 +11,7 @@ Namespace Framework.Tweening.ManagedTypes
 
         Public Function copy(ByVal o As Object) As Object Implements IManagedType.copy
             Dim c As Keyframe3D = DirectCast(o, Keyframe3D)
-            Return New Keyframe3D(c.X, c.Y, c.Z, c.Yaw, c.Pitch, c.Roll)
+            Return New Keyframe3D(c.X, c.Y, c.Z, c.Yaw, c.Pitch, c.Roll, c.DefaultOrder)
         End Function
 
         Public Function getIntermediateValue(ByVal start As Object, ByVal [end] As Object, ByVal dPercentage As Double) As Object Implements IManagedType.getIntermediateValue
@@ -35,7 +35,8 @@ Namespace Framework.Tweening.ManagedTypes
             Dim new_Yaw As Single = interpolate(iStart_Yaw, iEnd_Yaw, dPercentage)
             Dim new_Pitch As Single = interpolate(iStart_Pitch, iEnd_Pitch, dPercentage)
             Dim new_Roll As Single = interpolate(iStart_Roll, iEnd_Roll, dPercentage)
-            Return New Keyframe3D(new_X, new_Y, new_Z, new_Yaw, new_Pitch, new_Roll)
+            Dim new_Order As Boolean = If(dPercentage < 0.5, startVector.DefaultOrder, endVector.DefaultOrder)
+            Return New Keyframe3D(new_X, new_Y, new_Z, new_Yaw, new_Pitch, new_Roll, new_Order)
         End Function
     End Class
 End Namespace

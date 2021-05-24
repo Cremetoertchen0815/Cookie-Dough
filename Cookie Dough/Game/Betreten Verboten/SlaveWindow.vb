@@ -91,7 +91,7 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single))
         Friend FigurFaderCamera As New Transition(Of Keyframe3D)
         Friend CamRotation As Single
-        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0) 'Gibt die Standard-Position der Kamera an
+        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
         Friend PlayStompSound As Boolean
 
         Private Const WürfelDauer As Integer = 320
@@ -149,9 +149,9 @@ Namespace Game.BetretenVerboten
                                                          Case GaemMap.Default8Players
                                                              CamRotation = Math.Floor(UserIndex / 2) / 2 * Math.PI
                                                      End Select
-                                                     StdCam = New Keyframe3D(-30, -20, -50, Math.PI * 2 - CamRotation, 0.75, 0)
+                                                     StdCam = New Keyframe3D(-30, -20, -50, Math.PI * 2 - CamRotation, 0.75, 0, False)
                                                  Else
-                                                     StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, 0)
+                                                     StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)
                                                  End If
                                                  FigurFaderCamera = New Transition(Of Keyframe3D)
 
@@ -630,7 +630,7 @@ Namespace Game.BetretenVerboten
                                          End Sub)
                         'Set flags
                         Status = SpielStatus.SpielZuEnde
-                        FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                        FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                         Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)
                         Automator.Add(Renderer.AdditionalZPos)
                     Case "x"c 'Continue with game
@@ -750,7 +750,7 @@ Namespace Game.BetretenVerboten
                     HUDInstructions.Text = "Field already covered! Move with the other piece!"
                     Core.Schedule(ErrorCooldown, Sub()
                                                      'Move camera
-                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                                                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                                                      Status = SpielStatus.WähleFigur
                                                      StopUpdating = False
                                                  End Sub)
@@ -768,7 +768,7 @@ Namespace Game.BetretenVerboten
                 Else 'We can't so s$*!, also schieben wir unsere Probleme einfach auf den nächst besten Deppen, der gleich dran ist
 
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
 
                     Status = SpielStatus.WähleFigur
                     StopUpdating = True
@@ -789,7 +789,7 @@ Namespace Game.BetretenVerboten
                 Status = SpielStatus.WähleFigur
 
                 'Move camera
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
             End If
         End Sub
 
@@ -1082,7 +1082,7 @@ Namespace Game.BetretenVerboten
                     Spielers(UserIndex).SacrificeCounter = SacrificeWait
                     HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                 Else
                     Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If

@@ -67,7 +67,7 @@ Namespace Game.DuoCard
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
         Private Center As Vector2 'Gibt den Mittelpunkt des Screen-Viewports des Spielfelds an
-        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0) 'Gibt die Standard-Position der Kamera an
+        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, True) 'Gibt die Standard-Position der Kamera an
 
         'Konstanten
         Private Const WürfelDauer As Integer = 320

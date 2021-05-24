@@ -42,10 +42,10 @@ Namespace Game.Megäa
             Dim cardPosUnit As New Vector2(Location.X, Location.Z)
             cardPosUnit.Normalize()
             Dim cardRotation As Single = Mathf.AngleBetweenVectors(cardPosUnit, Vector2.UnitY) * -2
-            TableCardTransform = New Keyframe3D(cardPosUnit.X * 2.8F, 2.604F, cardPosUnit.Y * 2.8F, cardRotation, 0F, 0F)
+            TableCardTransform = New Keyframe3D(cardPosUnit.X * 2.8F, 2.604F, cardPosUnit.Y * 2.8F, cardRotation, 0F, 0F, True)
 
             'Set the transform for the hand card
-            HandTransformOrigin = New Keyframe3D(Location.X, 4, Location.Z, 2, 0.75, MathHelper.PiOver2)
+            HandTransformOrigin = New Keyframe3D(Location.X, 4, Location.Z, 2, 0.75, MathHelper.PiOver2, True)
         End Sub
 
         Friend Function GetRelativeAngle(Optional preangle As Single = 0) As Single
