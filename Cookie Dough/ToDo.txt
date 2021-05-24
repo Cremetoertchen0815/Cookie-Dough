@@ -1,6 +1,5 @@
 ﻿BV:
 -Fix UFO being able to fly into others in Haus
--Fix being able to rejoin after game ended
 -Sound when entering UFO 
 -Save all hgihscores
 -Custom CPU sounds

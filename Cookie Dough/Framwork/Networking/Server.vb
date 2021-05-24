@@ -357,6 +357,10 @@ Namespace Framework.Networking
                             SendToAllGameClients(gaem, nl)
 
                             If gaem.Players(who) IsNot Nothing Then gaem.Players(who).Bereit = False : gaem.Players(who).Connection = Nothing
+                        Case "w"c
+                            'Win flag was sent, remove game from server list
+                            If games.ContainsKey(gaem.Key) Then games.Remove(gaem.Key)
+                            SendToAllGameClients(gaem, nl)
                         Case Else
                             SendToAllGameClients(gaem, nl)
                     End Select

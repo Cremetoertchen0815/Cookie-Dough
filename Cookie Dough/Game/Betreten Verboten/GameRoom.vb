@@ -646,7 +646,7 @@ Namespace Game.BetretenVerboten
                 'Set HUD color
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
                 HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
-                HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (Spielers(SpielerIndex).Typ = SpielerTyp.Local)
+                HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex > -1 AndAlso Spielers(SpielerIndex).Typ = SpielerTyp.Local)
             End If
 
             Dim scheiß As New List(Of (Integer, Integer))
