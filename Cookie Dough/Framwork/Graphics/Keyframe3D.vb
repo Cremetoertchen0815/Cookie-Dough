@@ -34,6 +34,13 @@ Namespace Framework.Graphics
             Return New Keyframe3D(a.X + a.X, a.Y + a.Y, a.Z + a.Z, a.Yaw + a.Yaw, a.Pitch + a.Pitch, a.Roll + a.Roll)
         End Operator
 
+        Public Shared Operator =(ByVal a As Keyframe3D, ByVal b As Keyframe3D) As Boolean
+            Return a.X = b.X AndAlso a.Y = b.Y AndAlso a.Z = b.Z AndAlso a.Yaw = b.Yaw AndAlso a.Pitch = b.Pitch AndAlso a.Roll = b.Roll
+        End Operator
+
+        Public Shared Operator <>(ByVal a As Keyframe3D, ByVal b As Keyframe3D) As Boolean
+            Return Not a = b
+        End Operator
 
     End Structure
 

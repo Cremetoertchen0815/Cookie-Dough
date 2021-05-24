@@ -1,7 +1,7 @@
 ﻿BV:
 -Add intro scene
--Fix UFO being able to fly info others in Haus
--Fix not being able to rejoin after game ended
+-Fix UFO being able to fly into others in Haus
+-Fix being able to rejoin after game ended
 -Name of host not having -x ending when only local
 -Competitive should be standard
 -Do an actual K/D calc(kick vs being kicked)

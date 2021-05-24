@@ -83,6 +83,7 @@ Namespace Game.BetretenVerboten
         Private Shared dbgPlaceCmd As (Integer, Integer, Integer)
         Private Shared dbgPlaceSet As Boolean = False
         Private Shared dbgEnd As Boolean = False
+        Private Shared dbgCam As Keyframe3D = Nothing
         Private Shared dbgLoguser As Integer = -1
 
         'Spielfeld
@@ -247,6 +248,11 @@ Namespace Game.BetretenVerboten
             If dbgLoguser > -1 Then
                 DebugConsole.Instance.Log(Newtonsoft.Json.JsonConvert.SerializeObject(Spielers(dbgLoguser)))
                 dbgLoguser = -1
+            End If
+
+            If dbgCam <> Nothing Then
+                FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = dbgCam}
+                dbgCam = Nothing
             End If
 
 
@@ -1519,9 +1525,14 @@ Namespace Game.BetretenVerboten
             dbgLoguser = nr
         End Sub
 
-        <Command("bv-end", "Gives information over a specific player.")>
+        <Command("bv-end", "Ends the game.")>
         Public Shared Sub dbgEndGame()
             dbgEnd = True
+        End Sub
+
+        <Command("bv-cam", "Sets up the camera in a specific way.")>
+        Public Shared Sub dbgCamPlace(x As Single, y As Single, z As Single, yaw As Integer, pitch As Single, roll As Single)
+            dbgCam = New Keyframe3D(x, y, z, yaw, pitch, roll)
         End Sub
 #End Region
 #Region "Schnittstellenimplementation"
