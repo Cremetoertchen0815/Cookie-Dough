@@ -193,13 +193,16 @@ Namespace Game.BetretenVerboten
             Center = New Rectangle(500, 70, 950, 950).Center.ToVector2
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
+            'Load sounds and MOTDs
             Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
                 Select Case pl.Typ
                     Case SpielerTyp.Local
                         Spielers(i).CustomSound = sf
+                        Spielers(i).MOTD = My.Settings.MOTD
                     Case SpielerTyp.CPU
+                        Spielers(i).MOTD = CPU_MOTDs(i)
                         If i <> 0 Then
                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
                         Else
