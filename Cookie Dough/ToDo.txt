@@ -1,5 +1,4 @@
 ﻿BV:
--Slave name not being shown
 -Fix being able to rejoin after match over
 -Enhance rejoining
 -Fix figure on start field dicing 6 being buggy

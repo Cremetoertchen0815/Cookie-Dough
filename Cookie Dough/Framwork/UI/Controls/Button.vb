@@ -3,7 +3,15 @@
 Namespace Framework.UI.Controls
     Public Class Button
         Inherits GuiControl
+        Dim _txt As String = ""
         Public Property Text As String
+            Get
+                Return _txt
+            End Get
+            Set(value As String)
+                _txt = value
+            End Set
+        End Property
         Public Overrides ReadOnly Property InnerBounds As Rectangle
             Get
                 Return rect

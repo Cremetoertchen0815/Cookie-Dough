@@ -443,13 +443,13 @@ Namespace Game.BetretenVerboten
                 End Select
 
                 'Set HUD color
-                HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
-                HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
+                If Status <> SpielStatus.Waitn Then HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
+                If Status <> SpielStatus.Waitn Then HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex = UserIndex)
-            End If
+                End If
 
 
-            For Each element In FigurFaderScales
+                For Each element In FigurFaderScales
                 If element.Value.State = TransitionState.Done Then scheiß.Add(element.Key)
             Next
 
