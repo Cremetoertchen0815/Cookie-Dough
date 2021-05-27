@@ -663,15 +663,23 @@ Namespace Game.BetretenVerboten
                         If source = UserIndex Then Continue For
                         Dim sound As SoundEffect
 
-                        If IdentSound = IdentType.Custom Then
-                            File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
-                        Else
+                        Try
+                            'Receive sound
+                            If IdentSound = IdentType.Custom Then
+                                File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                            Else
+                                sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                            End If
+                        Catch ex As Exception
+                            'Data damaged, send standard sound
+                            IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                        End If
+                        End Try
 
                         'Set sound for player
                         Spielers(source).CustomSound(SoundNr) = sound
+
                 End Select
             Next
         End Sub

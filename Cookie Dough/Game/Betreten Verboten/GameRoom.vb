@@ -31,6 +31,7 @@ Namespace Game.BetretenVerboten
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
+        Private StopWhenRealStart As Boolean = False
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
         Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
@@ -635,7 +636,10 @@ Namespace Game.BetretenVerboten
                                                SendBeginGaem()
                                                FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
                                                'Launch start animation
-                                               Renderer.TriggerStartAnimation(AddressOf SwitchPlayer)
+                                               Renderer.TriggerStartAnimation(Sub()
+                                                                                  SwitchPlayer()
+                                                                                  If StopWhenRealStart Then StopUpdating = True
+                                                                              End Sub)
                                            End Sub)
                     Case SpielStatus.SpielZuEnde
                         StopUpdating = True
@@ -720,6 +724,8 @@ Namespace Game.BetretenVerboten
                         PostChat(Spielers(source).Name & " left!", Color.White)
                         If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
                         If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
+                        If Renderer.BeginTriggered Then StopWhenRealStart = True
+
                         SendPlayerLeft(source)
                     Case "j"c 'God got activated
                         Dim figur As Integer = CInt(element(2).ToString)
@@ -747,6 +753,7 @@ Namespace Game.BetretenVerboten
                             If Not pl.Bereit Then everythere = False
                         Next
                         If everythere And Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
+                        If everythere And StopWhenRealStart Then StopWhenRealStart = False
                     Case "s"c 'Move figure
                         Dim figur As Integer = CInt(element(2).ToString)
                         Dim destination As Integer = CInt(element.Substring(3).ToString)
@@ -762,14 +769,21 @@ Namespace Game.BetretenVerboten
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
                         Dim SoundNr As Integer = CInt(element(3).ToString)
                         Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-
-                        If IdentSound = IdentType.Custom Then
-                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav")
-                        Else
+                        Try
+                            'Receive sound
+                            If IdentSound = IdentType.Custom Then
+                                IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                            Else
+                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                            End If
+                            SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_" & dat)
+                        Catch ex As Exception
+                            'Data damaged, send standard sound
+                            IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
                             Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                        End If
-                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_" & dat)
+                            SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_")
+                        End Try
                 End Select
             Next
         End Sub
