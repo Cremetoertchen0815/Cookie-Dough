@@ -274,6 +274,7 @@ Namespace Game.BetretenVerboten.Renderers
             Game.HUDmotdLabel.Active = True
             Game.HUDNameBtn.Active = True
             Game.HUDNameBtn.Location = New Vector2(500, 650)
+            Game.HUDNameBtn.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MenuTitle"))
 
             'Get actual player count
             For Each element In Game.Spielers
