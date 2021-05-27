@@ -39,7 +39,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>taskbar_icon.ico</ApplicationIcon>
+    <ApplicationIcon>CD_icon_small.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -180,6 +180,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CD_icon_small.ico" />
     <Content Include="Icon.ico" />
     <Content Include="taskbar_icon.ico" />
     <Content Include="ToDo.txt" />

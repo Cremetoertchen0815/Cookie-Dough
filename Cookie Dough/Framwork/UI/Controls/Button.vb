@@ -40,7 +40,6 @@ Namespace Framework.UI.Controls
             batcher.DrawRect(rect, BackgroundColor)
             batcher.DrawHollowRect(rect, color, Border.Width)
             batcher.DrawString(Font, Text, rect.Center.ToVector2 - Font.MeasureString(Text) / 2, If(Me.Color = Color.Transparent, color, Me.Color))
-            If Me.Color = Color.Transparent Then Console.WriteLine()
         End Sub
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)

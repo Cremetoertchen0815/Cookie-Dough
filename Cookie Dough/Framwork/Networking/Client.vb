@@ -122,7 +122,6 @@ Namespace Framework.Networking
             Try
                 If Not Server.ServerActive And Not str.Contains("_TATA_") Then Console.WriteLine("[Client/O]" & str)
                 If NetworkLog Then OutputDelegate.Invoke("[Client/O]" & str)
-                If str = "Ich putz hier mal durch." Then Console.WriteLine()
                 streamw.WriteLine(str)
             Catch ex As Exception
                 NoteError(ex, False)
@@ -133,7 +132,6 @@ Namespace Framework.Networking
         Friend Function ReadStream() As String()
             SyncLock data
                 Dim dataS As String() = data.ToArray
-                If dataS.Length > 0 Then Console.WriteLine()
                 data.Clear()
                 Return dataS
             End SyncLock
@@ -240,7 +238,9 @@ Namespace Framework.Networking
             AutomaticRefresh = True
             WriteString("e")
             WriteString("Ich putz hier mal durch.")
-            WriteString("Damit keine ReadLine-Commands offen bleiben.")
+            For i As Integer = 1 To 3
+                WriteString("Tach" & i)
+            Next
         End Sub
 
         <Command("network-log", "Enables the logging of any network traffic to the in-game chat")>

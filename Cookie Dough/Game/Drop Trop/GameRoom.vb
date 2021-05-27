@@ -508,7 +508,6 @@ Namespace Game.DropTrop
         Private Function CheckField(pos As Vector2, ByRef fieldscovered As Integer) As Boolean
             Dim movesuccessful As Boolean = False
 
-            If pos = New Vector2(0, 5) Then Console.WriteLine()
             If Spielfeld(pos) <> -1 Then Return False
 
             For dir As Integer = 0 To 7
