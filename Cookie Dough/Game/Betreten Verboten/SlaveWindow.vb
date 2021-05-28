@@ -1086,7 +1086,7 @@ Namespace Game.BetretenVerboten
                     Spielers(UserIndex).SacrificeCounter = SacrificeWait
                     HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, CamRotation, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                 Else
                     Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If

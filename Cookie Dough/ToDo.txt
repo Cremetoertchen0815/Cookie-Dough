@@ -1,5 +1,4 @@
 ﻿BV:
--Fix sacrifice screen rotation
 -Add intro animation for all maps
 
 Engine Fixes:
