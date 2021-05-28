@@ -223,7 +223,7 @@ Namespace Game.BetretenVerboten
         ''' </summary>
         Public Overrides Sub Update()
             Dim mstate As MouseState = Mouse.GetState()
-            Dim kstate As KeyboardState = Keyboard.GetState()
+            Dim kstate As KeyboardState = If(DebugConsole.Instance.IsOpen, Nothing, Keyboard.GetState())
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
 
             'Eject command
