@@ -29,9 +29,10 @@ Namespace Cookie_Dough
             Window.AllowUserResizing = True
             ExitOnEscapeKeypress = False
 
-            Dim arg As String() = Environment.GetCommandLineArgs()
+            'Create client(for debug: create and/or connect to server)
             LocalClient = New Client
 #If DEBUG Then
+            Dim arg As String() = Environment.GetCommandLineArgs()
             If (arg.Length > 1 AndAlso arg(1) = "-launchserver") Then
                 StartServer()
                 LocalClient.Connect("127.0.0.1", My.Settings.Username)
@@ -41,6 +42,7 @@ Namespace Cookie_Dough
             End If
 #End If
 
+            'Load common assets
             ReferencePixel = New Texture2D(GraphicsDevice, 1, 1)
             ReferencePixel.SetData({Color.White})
             SFX = {Content.Load(Of SoundEffect)("sfx/access_denied"),
@@ -62,6 +64,14 @@ Namespace Cookie_Dough
 
             'Update transformation matrix if event is fired
             Emitter.AddObserver(CoreEvents.GraphicsDeviceReset, Sub() ScaleMatrix = Scene.ScreenTransformMatrix)
+
+            'Upgrade settings if necessairy
+            If My.Settings.MissingNo Then
+                My.Settings.Upgrade()
+                My.Settings.MissingNo = False
+                My.Settings.Save()
+                My.Settings.Reload()
+            End If
 
             'Load settings
             If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection
@@ -93,7 +103,6 @@ Namespace Cookie_Dough
                 Next
             End If
 
-
             For Each element In keysa
                 If Not oldpress.Contains(element) Then ButtonStack.Add(element)
             Next
@@ -105,7 +114,6 @@ Namespace Cookie_Dough
 
             If ButtonStack.Count > 20 Then ButtonStack.RemoveAt(0)
 
-            'Update music
             UpdateMusic()
 
             MyBase.Update(gameTime)

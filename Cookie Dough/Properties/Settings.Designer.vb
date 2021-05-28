@@ -16,7 +16,7 @@ Option Explicit On
 <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
  Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0"),  _
  Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-Partial Friend NotInheritable Class Settings
+Partial Public NotInheritable Class Settings
     Inherits Global.System.Configuration.ApplicationSettingsBase
     
     Private Shared defaultInstance As Settings = CType(Global.System.Configuration.ApplicationSettingsBase.Synchronized(New Settings()),Settings)
@@ -181,6 +181,18 @@ Partial Friend NotInheritable Class Settings
         End Get
         Set
             Me("SoundB") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+    Public Property MissingNo() As Boolean
+        Get
+            Return CType(Me("MissingNo"),Boolean)
+        End Get
+        Set
+            Me("MissingNo") = value
         End Set
     End Property
 End Class
