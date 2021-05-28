@@ -270,7 +270,7 @@ Namespace Framework.Networking
         Private Sub EnterJoinMode(con As Connection, gaem As IGame, index As Integer)
             Try
                 Dim break As Boolean = False
-                Do Until gaem.Ended Or break
+                Do Until gaem.Ended = EndingMode.Abruptly Or break
                     Dim txt As String = ReadString(con)
                     If gaem.HostConnection IsNot Nothing Then WriteString(gaem.HostConnection, index.ToString & txt)
                     If txt = "e" Then break = True
@@ -288,7 +288,7 @@ Namespace Framework.Networking
             gaem.Viewers.Add(con)
             Try
                 Dim break As Boolean = False
-                Do Until gaem.Ended Or break
+                Do Until gaem.Ended = EndingMode.Abruptly Or break
                     Dim txt As String = ReadString(con)
                     If gaem.HostConnection IsNot Nothing And (txt(0) = "y"c Or txt(0) = "c"c) Then WriteString(gaem.HostConnection, "9" & txt)
                     If txt = "e" Then break = True
@@ -306,7 +306,7 @@ Namespace Framework.Networking
 
         Private Sub EnterCreateMode(con As Connection, gaem As IGame)
             Try
-                Do Until gaem.Ended
+                Do Until gaem.Ended = EndingMode.Abruptly
                     Dim nl As String = ReadString(con)
                     Select Case nl(0)
                         Case "b"c
@@ -353,13 +353,14 @@ Namespace Framework.Networking
                         Case "e"c
                             'If remote client lost connection, send to all other remotes and add relist game
                             Dim who As Integer = CInt(nl(1).ToString)
-                            If Not games.ContainsKey(gaem.Key) Then games.Add(gaem.Key, gaem)
+                            If Not games.ContainsKey(gaem.Key) And Not gaem.Ended = EndingMode.Properly Then games.Add(gaem.Key, gaem)
 
                             SendToAllGameClients(gaem, nl)
 
                             If gaem.Players(who) IsNot Nothing Then gaem.Players(who).Bereit = False : gaem.Players(who).Connection = Nothing
                         Case "w"c
                             'Win flag was sent, remove game from server list
+                            gaem.Ended = EndingMode.Properly
                             If games.ContainsKey(gaem.Key) Then games.Remove(gaem.Key)
                             SendToAllGameClients(gaem, nl)
                         Case Else
@@ -373,8 +374,8 @@ Namespace Framework.Networking
         End Sub
 
         Private Sub SendEndToAllGameClients(gaem As IGame)
-            If Not gaem.Ended Then
-                gaem.Ended = True
+            If gaem.Ended <> EndingMode.Abruptly Then
+                gaem.Ended = EndingMode.Abruptly
                 Dim takenconnections As New List(Of Connection)
 
                 'Send to players

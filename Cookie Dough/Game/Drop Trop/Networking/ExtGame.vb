@@ -9,7 +9,7 @@ Namespace Game.DropTrop.Networking
         Public Property Name As String Implements IGame.Name
         Public Property Map As GaemMap
         Public Property Players As Player() = {Nothing, Nothing, Nothing, Nothing}
-        Public Property Ended As Boolean = False Implements IGame.Ended
+        Public Property Ended As EndingMode = EndingMode.Running Implements IGame.Ended
         Public Property Active As Boolean = False Implements IGame.Active
         Public Property HostConnection As Connection Implements IGame.HostConnection
         Public ReadOnly Property Type As GameType = GameType.DropTrop Implements IGame.Type

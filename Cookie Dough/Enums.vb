@@ -28,3 +28,9 @@ Public Enum IdentType
     TypeF
     Custom
 End Enum
+
+Public Enum EndingMode
+    Running
+    Properly
+    Abruptly
+End Enum

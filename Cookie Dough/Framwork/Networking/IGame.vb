@@ -4,7 +4,7 @@ Namespace Framework.Networking
     Public Interface IGame
         Property Key As Integer
         Property Name As String
-        Property Ended As Boolean
+        Property Ended As EndingMode
         Property Active As Boolean
         ReadOnly Property Players As IPlayer()
         Property Viewers As List(Of Connection)

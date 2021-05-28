@@ -1041,8 +1041,8 @@ Namespace Game.BetretenVerboten
         Private Sub MenuButton() Handles HUDBtnB.Clicked
             If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                 SFX(2).Play()
-                SendGameClosed()
                 LocalClient.blastmode = False
+                SendGameClosed()
                 NetworkMode = False
                 Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
             End If

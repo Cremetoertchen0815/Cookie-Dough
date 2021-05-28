@@ -7,7 +7,7 @@ Namespace Game.Megäa.Networking
 
         Public Property Key As Integer Implements IGame.Key
         Public Property Name As String Implements IGame.Name
-        Public Property Ended As Boolean = False Implements IGame.Ended
+        Public Property Ended As EndingMode = EndingMode.Running Implements IGame.Ended
         Public Property Active As Boolean = False Implements IGame.Active
         Public Property HostConnection As Connection Implements IGame.HostConnection
         Public ReadOnly Property Type As GameType = GameType.BetretenVerboten Implements IGame.Type
