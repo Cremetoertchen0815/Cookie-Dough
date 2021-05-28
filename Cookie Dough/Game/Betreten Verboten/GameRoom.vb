@@ -1030,8 +1030,8 @@ Namespace Game.BetretenVerboten
             SaucerFields.Remove(last)
             Status = SpielStatus.SaucerFlight
             Dim distance As Integer = Nez.Random.Range(-6, 7)
-            Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or distance = 0 Or Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance < 0 ' Or ((Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Mod SpceCount) = 0
-                distance += 1
+            Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or distance = 0 Or Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance < 0 Or Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance >= PlCount * SpceCount + FigCount
+                distance = Nez.Random.Range(-6, 7)
             Loop
 
             Dim nr As Integer = Math.Min(Math.Max(distance + Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), 0), PlCount * SpceCount + FigCount - 1)
@@ -1106,6 +1106,14 @@ Namespace Game.BetretenVerboten
             Next
 
             Return False
+        End Function
+
+        Private Function GetFurthestSpaceInHaus() As Integer
+            Dim max As Integer = PlCount * SpceCount + FigCount
+            For i As Integer = 0 To FigCount - 1
+                If Spielers(SpielerIndex).Spielfiguren(i) >= PlCount * SpceCount Then max = Math.Min(Spielers(SpielerIndex).Spielfiguren(i), max)
+            Next
+            Return max - 1
         End Function
 
 

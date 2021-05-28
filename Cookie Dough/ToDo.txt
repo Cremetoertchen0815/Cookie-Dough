@@ -1,6 +1,5 @@
 ﻿BV:
 -Fix figure on start field dicing 6 being buggy
--Fix UFO being able to fly into others in house
 -Fix sacrifice screen rotation
 -Add intro animation for all maps
 

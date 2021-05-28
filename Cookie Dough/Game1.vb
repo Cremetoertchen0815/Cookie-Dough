@@ -29,6 +29,21 @@ Namespace Cookie_Dough
             Window.AllowUserResizing = True
             ExitOnEscapeKeypress = False
 
+            'Upgrade settings if necessairy
+            If My.Settings.MissingNo Then
+                My.Settings.Upgrade()
+                My.Settings.MissingNo = False
+                My.Settings.Save()
+                My.Settings.Reload()
+            End If
+
+            'Load settings
+            If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection
+            If My.Settings.Username = "" Then My.Settings.Username = Environment.UserName
+            If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundA.audio") Then My.Settings.SoundA = 0
+            If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundB.audio") Then My.Settings.SoundB = 0
+            My.Settings.Save()
+
             'Create client(for debug: create and/or connect to server)
             LocalClient = New Client
 #If DEBUG Then
@@ -64,21 +79,6 @@ Namespace Cookie_Dough
 
             'Update transformation matrix if event is fired
             Emitter.AddObserver(CoreEvents.GraphicsDeviceReset, Sub() ScaleMatrix = Scene.ScreenTransformMatrix)
-
-            'Upgrade settings if necessairy
-            If My.Settings.MissingNo Then
-                My.Settings.Upgrade()
-                My.Settings.MissingNo = False
-                My.Settings.Save()
-                My.Settings.Reload()
-            End If
-
-            'Load settings
-            If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection
-            If My.Settings.Username = "" Then My.Settings.Username = Environment.UserName
-            If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundA.audio") Then My.Settings.SoundA = 0
-            If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundB.audio") Then My.Settings.SoundB = 0
-            My.Settings.Save()
 
             'Load intro screen
             Scene = New Menu.MainMenu.SplashScreen
