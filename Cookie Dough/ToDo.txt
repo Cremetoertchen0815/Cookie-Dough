@@ -1,5 +1,4 @@
 ﻿BV:
--Fix figure on start field dicing 6 being buggy
 -Fix sacrifice screen rotation
 -Add intro animation for all maps
 
