@@ -1,4 +1,7 @@
-﻿Namespace Game.CommonCards
+﻿Imports System.Collections.Generic
+Imports Microsoft.Xna.Framework.Graphics
+
+Namespace Game.CommonCards
     Public Interface ICardRendererWindow
         ReadOnly Property HandDeck As List(Of Card)
         ReadOnly Property TableCard As Card

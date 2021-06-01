@@ -56,7 +56,7 @@ Namespace Game.BetretenVerboten.Renderers
 
             'Load table 
             TableModel = scene.Content.Load(Of Model)("mesh/table")
-            Common.ApplyDefaultFX(TableModel, Projection)
+            ApplyDefaultFX(TableModel, Projection)
 
             Dim vertices As New List(Of VertexPositionColorTexture)
             vertices.Add(New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX))

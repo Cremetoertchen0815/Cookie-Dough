@@ -1,7 +1,7 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
-Imports Cookie_Dough.Game.Common
+Imports Cookie_Dough.Game.CommonCards
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -500,43 +500,44 @@ Namespace Game.DuoCard
 #Region "Schnittstellenimplementation"
 
 
-        Private ReadOnly Property IGameWindow_Spielers As Player() Implements IGameWindow.Spielers
-            Get
-                Return Spielers
-            End Get
-        End Property
 
-        Private ReadOnly Property IGameWindow_Status As SpielStatus Implements IGameWindow.Status
-            Get
-                Return Status
-            End Get
-        End Property
-
-        Private ReadOnly Property IGameWindow_SelectFader As Single Implements IGameWindow.SelectFader
+        Private ReadOnly Property IGameWindow_SelectFader As Single Implements ICardRendererWindow.SelectFader
             Get
                 Return SelectFader
             End Get
         End Property
 
-        Private ReadOnly Property IGameWindow_SpielerIndex As Integer Implements IGameWindow.SpielerIndex
+        Private ReadOnly Property IGameWindow_SpielerIndex As Integer Implements ICardRendererWindow.SpielerIndex
             Get
                 Return SpielerIndex
             End Get
         End Property
 
-        Private ReadOnly Property IGameWindow_UserIndex As Integer Implements IGameWindow.UserIndex
+        Private ReadOnly Property IGameWindow_UserIndex As Integer Implements ICardRendererWindow.UserIndex
             Get
                 Return UserIndex
             End Get
         End Property
 
-        Public ReadOnly Property BGTexture As Texture2D Implements IGameWindow.BGTexture
+        Public ReadOnly Property BGTexture As Texture2D Implements ICardRendererWindow.BGTexture
             Get
                 Return Renderer.RenderTexture
             End Get
         End Property
 
-        Public Function GetCamPos() As Keyframe3D Implements IGameWindow.GetCamPos
+        Public ReadOnly Property HandDeck As List(Of Card) Implements ICardRendererWindow.HandDeck
+            Get
+
+            End Get
+        End Property
+
+        Public ReadOnly Property TableCard As Card Implements ICardRendererWindow.TableCard
+            Get
+
+            End Get
+        End Property
+
+        Public Function GetCamPos() As Keyframe3D Implements ICardRendererWindow.GetCamPos
             If FigurFaderCamera IsNot Nothing Then Return FigurFaderCamera.Value
             Return New Keyframe3D
         End Function
