@@ -93,7 +93,7 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single))
         Friend FigurFaderCamera As New Transition(Of Keyframe3D)
         Friend CamRotation As Single
-        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
+        Friend StdCam As New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False) 'Gibt die Standard-Position der Kamera an
         Friend PlayStompSound As Boolean
 
         Private Const WürfelDauer As Integer = 320
@@ -155,7 +155,7 @@ Namespace Game.BetretenVerboten
                                                  Else
                                                      StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)
                                                  End If
-                                                 FigurFaderCamera = New Transition(Of Keyframe3D)
+                                                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)}
 
                                                  'Set rejoin flag
                                                  Rejoin = x() = "Rejoin"
@@ -1210,6 +1210,12 @@ Namespace Game.BetretenVerboten
         Public ReadOnly Property BGTexture As Texture2D Implements IGameWindow.BGTexture
             Get
                 Return Renderer.RenderTexture
+            End Get
+        End Property
+
+        Public ReadOnly Property StartCamPoses As Keyframe3D() Implements IGameWindow.StartCamPoses
+            Get
+                Return {New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0, False), StdCam}
             End Get
         End Property
 #End Region

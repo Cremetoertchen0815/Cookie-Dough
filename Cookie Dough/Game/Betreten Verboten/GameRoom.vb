@@ -99,7 +99,7 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderXY As Transition(Of Vector2) 'Bewegt die zu animierende Figur auf der X- und Y-Achse
         Friend FigurFaderZ As Transition(Of Integer)  'Bewegt die zu animierende Figur auf der Z-Achse
         Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single)) 'Gibt die Skalierung für einzelne Figuren an Key: (Spieler ID, Figur ID) Value: Transition(Z)
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(0, 0, 0, 0, 0, 0, False)} 'Bewegt die Kamera 
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)} 'Bewegt die Kamera 
         Friend CPUTimer As Single 'Timer-Flag um der CPU etwas "Überlegzeit" zu geben
         Friend PlayStompSound As Boolean 'Gibt an, ob der Stampf-Sound beim Landen(Kicken) gespielt werden soll
         Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
@@ -153,8 +153,6 @@ Namespace Game.BetretenVerboten
                     SaucerChance = 10
             End Select
             LastTimer = Timer
-
-            If Spielers Is Nothing Then Spielers = {New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart), New Player(SpielerTyp.Local, Difficulty.Smart)}
         End Sub
 
         Public Sub LoadContent()
@@ -1714,6 +1712,12 @@ Namespace Game.BetretenVerboten
         Public ReadOnly Property IGameWindow_HUDmotdLabel As Label Implements IGameWindow.HUDmotdLabel
             Get
                 Return HUDmotdLabel
+            End Get
+        End Property
+
+        Public ReadOnly Property StartCamPoses As Keyframe3D() Implements IGameWindow.StartCamPoses
+            Get
+                Return {New Keyframe3D, New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)}
             End Get
         End Property
 

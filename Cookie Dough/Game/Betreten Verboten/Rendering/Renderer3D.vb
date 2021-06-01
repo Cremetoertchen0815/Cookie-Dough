@@ -15,6 +15,8 @@ Namespace Game.BetretenVerboten.Renderers
         Private SpielfeldVerbindungen As Texture2D
         Private Pfeil As Texture2D
         Private MapBuffer As VertexBuffer
+        Private TableModel As Model
+        Private TableMatrix As Matrix
 
         Private SaucerModel As Model
         Private SaucerLift As Transition(Of Single)
@@ -51,6 +53,10 @@ Namespace Game.BetretenVerboten.Renderers
             figur_model = scene.Content.Load(Of Model)("mesh\piece_std")
             SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games\BV\playfield_connections_" & CInt(Game.Map))
             Pfeil = scene.Content.Load(Of Texture2D)("games\BV\arrow_right")
+
+            'Load table 
+            TableModel = scene.Content.Load(Of Model)("mesh/table")
+            Common.ApplyDefaultFX(TableModel, Projection)
 
             Dim vertices As New List(Of VertexPositionColorTexture)
             vertices.Add(New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX))
@@ -149,12 +155,15 @@ Namespace Game.BetretenVerboten.Renderers
 
             batchlor.End()
 
+            '---RENDERER 3D---
+
             dev.SetRenderTarget(RenderTexture)
             dev.Clear(Color.Transparent)
 
             dev.RasterizerState = RasterizerState.CullNone
             dev.DepthStencilState = DepthStencilState.Default
 
+            'Render map
             EffectA.World = Matrix.Identity
             EffectA.View = View
             EffectA.Projection = Projection
@@ -166,6 +175,13 @@ Namespace Game.BetretenVerboten.Renderers
                 pass.Apply()
 
                 dev.DrawPrimitives(PrimitiveType.TriangleList, 0, MapBuffer.VertexCount)
+            Next
+
+            'Draw Table
+            TableMatrix = Matrix.CreateScale(New Vector3(3.2, 3.2, 3) * 150) * Matrix.CreateTranslation(New Vector3(0, 0, 590))
+            For Each element In TableModel.Meshes
+                ApplyFX(element, Color.White, element.ParentBone.ModelTransform * TableMatrix)
+                element.Draw()
             Next
 
             'Zeichne Spielfiguren
@@ -230,6 +246,15 @@ Namespace Game.BetretenVerboten.Renderers
         Private Sub DrawArrow(vc As Vector2, color As Color, iteration As Integer, size As Integer)
             batchlor.Draw(Pfeil, New Rectangle(vc.X, vc.Y, size, size), Nothing, color, MathHelper.PiOver2 * ((iteration / Game.Spielers.Length) * 4 + 3), New Vector2(35) / 2, SpriteEffects.None, 0)
         End Sub
+        Private Sub ApplyFX(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)
+            For Each effect As BasicEffect In mesh.Effects
+                effect.DirectionalLight2.Direction = New Vector3(1, -1 * yflip, 1)
+                effect.DiffuseColor = DiffuseColor.ToVector3
+                effect.World = world
+                effect.View = View
+                effect.Projection = Projection
+            Next
+        End Sub
 
 #End Region
 
@@ -282,21 +307,25 @@ Namespace Game.BetretenVerboten.Renderers
             Next
 
             'Move camera down
-            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2500), New Keyframe3D, New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False), AddressOf PlayerAnimation)
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_Acceleration(2500), New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False), New Keyframe3D(-79, -90, -169, 4.36, 1.39, 0.17, False), AddressOf PlayerAnimation)
             Automator.Add(BeginCam)
 
             'Continue with game
-            Core.Schedule(3 * plcount + 3.3, Sub() FinalAction())
+            Core.Schedule(3 * plcount + 4.8, Sub() FinalAction())
         End Sub
 
         Private Sub PlayerAnimation()
 
             'End loop if end reached
             If BeginCurrentPlayer + 1 >= Game.Spielers.Length Then
-                BeginTriggered = False
-                Game.HUDmotdLabel.Active = False
-                Game.HUDNameBtn.Location = New Vector2(500, 20)
-                Game.HUDNameBtn.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+
+                BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_CriticalDamping(1500), Game.StartCamPoses(0), Game.StartCamPoses(1), Sub()
+                                                                                                                                                                     BeginTriggered = False
+                                                                                                                                                                     Game.HUDmotdLabel.Active = False
+                                                                                                                                                                     Game.HUDNameBtn.Location = New Vector2(500, 20)
+                                                                                                                                                                     Game.HUDNameBtn.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+                                                                                                                                                                 End Sub)
+                Automator.Add(BeginCam)
                 Return
             End If
 

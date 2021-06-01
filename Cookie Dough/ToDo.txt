@@ -1,5 +1,9 @@
 ﻿BV:
 -Add intro animation for all maps
+-Save highscore by ID, not by name
+-Implement kill streak bonus
+-Optimize kicking by command
+-Slaves not being kicked when host leaves
 
 Engine Fixes:
 -Blurry Scaling(Anisotropic or point filtering???)

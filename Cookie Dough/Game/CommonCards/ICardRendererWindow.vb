@@ -1,11 +1,7 @@
-﻿Imports System.Collections.Generic
-Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Graphics
-
-Namespace Game.DuoCard
-    Public Interface IGameWindow
-        ReadOnly Property Spielers As Player()
-        ReadOnly Property Status As SpielStatus
+﻿Namespace Game.CommonCards
+    Public Interface ICardRendererWindow
+        ReadOnly Property HandDeck As List(Of Card)
+        ReadOnly Property TableCard As Card
         ReadOnly Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
         ReadOnly Property SpielerIndex As Integer 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         ReadOnly Property UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.

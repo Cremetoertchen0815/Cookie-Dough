@@ -75,7 +75,7 @@ Namespace Menu.MainMenu
                                 Case GameType.Megäa
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Megäa.GameRoom))
                                 Case GameType.DuoCard
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.GameInstance))
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.CreatorMenu))
                                 Case GameType.DropTrop
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.GameInstance))
                                 Case GameList.Length

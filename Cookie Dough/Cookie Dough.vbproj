@@ -60,6 +60,10 @@
     <Compile Include="Framwork\Misc\VertexExtractor.vb" />
     <Compile Include="Framwork\Networking\IPlayer.vb" />
     <Compile Include="Enums.vb" />
+    <Compile Include="Game\CommonCards\Cards.vb" />
+    <Compile Include="Game\CommonCards\CardRenderer.vb" />
+    <Compile Include="Framwork\Graphics\RenderingHelpers.vb" />
+    <Compile Include="Game\CommonCards\ICardRendererWindow.vb" />
     <Compile Include="Game\Drop Trop\Enums.vb" />
     <Compile Include="Game\Drop Trop\GameInstance.vb" />
     <Compile Include="Game\Drop Trop\SlaveWindow.vb" />
@@ -71,7 +75,7 @@
     <Compile Include="Game\Drop Trop\Renderers\GameRenderable.vb" />
     <Compile Include="Game\Drop Trop\Renderers\Renderer3D.vb" />
     <Compile Include="Game\Betreten Verboten\Networking\ExtGame.vb" />
-    <Compile Include="Game\Betreten Verboten\Renderers\GameRenderable.vb" />
+    <Compile Include="Game\Betreten Verboten\Rendering\GameRenderable.vb" />
     <Compile Include="Framwork\Graphics\PsygroundRenderer.vb" />
     <Compile Include="Framwork\Graphics\STL.vb" />
     <Compile Include="Framwork\Graphics\VertexPositionColorNormal.vb" />
@@ -129,17 +133,15 @@
     <Compile Include="Game\Betreten Verboten\IGameWindow.vb" />
     <Compile Include="Game\Betreten Verboten\Maps.vb" />
     <Compile Include="Game\Betreten Verboten\Player.vb" />
-    <Compile Include="Game\Betreten Verboten\Renderers\Renderer3D.vb" />
+    <Compile Include="Game\Betreten Verboten\Rendering\Renderer3D.vb" />
     <Compile Include="Game\Betreten Verboten\SlaveWindow.vb" />
+    <Compile Include="Game\DuoCard\CreatorMenu.vb" />
     <Compile Include="Game\DuoCard\Enums.vb" />
-    <Compile Include="Game\DuoCard\GameInstance.vb" />
     <Compile Include="Game\DuoCard\GameRoom.vb" />
     <Compile Include="Game\DuoCard\IGameWindow.vb" />
     <Compile Include="Game\DuoCard\Networking\ExtGame.vb" />
     <Compile Include="Game\DuoCard\Networking\SyncMessage.vb" />
     <Compile Include="Game\DuoCard\Player.vb" />
-    <Compile Include="Game\DuoCard\Renderers\GameRenderable.vb" />
-    <Compile Include="Game\DuoCard\Renderers\Renderer3D.vb" />
     <Compile Include="Game\DuoCard\SlaveWindow.vb" />
     <Compile Include="Game\Megäa\Enums.vb" />
     <Compile Include="Game\Megäa\IObject3D.vb" />
@@ -182,8 +184,8 @@
   <ItemGroup>
     <Content Include="CD_icon_small.ico" />
     <EmbeddedResource Include="Icon.bmp">
-		<LogicalName>Icon.bmp</LogicalName>
-	</EmbeddedResource>
+      <LogicalName>Icon.bmp</LogicalName>
+    </EmbeddedResource>
     <Content Include="Icon.ico" />
     <Content Include="taskbar_icon.ico" />
     <Content Include="ToDo.txt" />
@@ -215,7 +217,9 @@
     <Import Include="Nez" />
     <Import Include="System" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Game\DuoCard\Rendering\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <Import Project="..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets" Condition="Exists('..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets')" />

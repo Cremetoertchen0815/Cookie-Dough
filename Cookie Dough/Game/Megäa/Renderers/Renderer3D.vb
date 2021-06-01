@@ -60,22 +60,22 @@ Namespace Game.Megäa.Renderers
 
             'Load quad effect
             QuadEffect = New BasicEffect(Dev) With {.TextureEnabled = True}
-            ApplyDefaultFX(QuadEffect)
+            Common.ApplyDefaultFX(QuadEffect, Projection)
 
             'Load player
             PlayerModel = scene.Content.Load(Of Model)("mesh/piece_filled")
             PlayerModelHeadless = scene.Content.Load(Of Model)("mesh/piece_filled_headless")
             PlayerTransform = Matrix.CreateScale(0.27)
-            ApplyDefaultFX(PlayerModel)
-            ApplyDefaultFX(PlayerModelHeadless)
+            Common.ApplyDefaultFX(PlayerModel, Projection)
+            Common.ApplyDefaultFX(PlayerModelHeadless, Projection)
 
             'Load table 
             TableModel = scene.Content.Load(Of Model)("mesh/table")
-            ApplyDefaultFX(TableModel)
+            Common.ApplyDefaultFX(TableModel, Projection)
 
             'Load totem
             TotemModel = scene.Content.Load(Of Model)("mesh\totem")
-            ApplyDefaultFX(TotemModel, -1)
+            Common.ApplyDefaultFX(TotemModel, Projection, -1)
 
             'Load cards
             CardBaseTransform = Matrix.CreateRotationX(MathHelper.PiOver2 * 3) * Matrix.CreateScale(1.4) * Matrix.CreateTranslation(New Vector3(-0.5, 0, 0.5))
@@ -109,7 +109,7 @@ Namespace Game.Megäa.Renderers
                               Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 12, -20)}
             RoomTextures = {scene.Content.LoadTexture("3Droom_floor"), DebugTexture}
             WallModel = scene.Content.Load(Of Model)("mesh\wall")
-            ApplyDefaultFX(WallModel)
+            Common.ApplyDefaultFX(WallModel, Projection)
         End Sub
 
         Public Overrides Sub Render(scene As Scene)
@@ -208,33 +208,6 @@ Namespace Game.Megäa.Renderers
                 pass.Apply()
 
                 Dev.DrawPrimitives(PrimitiveType.TriangleList, 0, 2)
-            Next
-        End Sub
-
-        'Apply the default lighting
-        Private Sub ApplyDefaultFX(effect As BasicEffect, Optional yflip As Integer = 1)
-            effect.LightingEnabled = True
-            effect.AmbientLightColor = Color.White.ToVector3 * 0.06
-            effect.DirectionalLight0.Enabled = True
-            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.25
-            effect.DirectionalLight0.Direction = New Vector3(0.7, yflip, 0.7)
-            effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
-            effect.DirectionalLight1.Enabled = True
-            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.25
-            effect.DirectionalLight1.Direction = New Vector3(-0.7, yflip, -0.7)
-            effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
-            effect.DirectionalLight2.Enabled = True
-            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.35
-            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.1
-            effect.SpecularPower = 15
-            effect.Alpha = 1
-            effect.Projection = Projection
-        End Sub
-        Private Sub ApplyDefaultFX(model As Model, Optional yflip As Integer = 1)
-            For Each element In model.Meshes
-                For Each fx As BasicEffect In element.Effects
-                    ApplyDefaultFX(fx, yflip)
-                Next
             Next
         End Sub
 
