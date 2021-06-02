@@ -1,4 +1,6 @@
-﻿Namespace Game.CommonCards
+﻿Imports System.Collections.Generic
+
+Namespace Game.CommonCards
     Public Enum CardType
         Ace = 1
         Two = 2
@@ -16,10 +18,10 @@
     End Enum
 
     Public Enum CardSuit
-        Hearts
-        Spades
-        Diamonds
-        Clubs
+        Hearts = 0
+        Spades = 1
+        Diamonds = 2
+        Clubs = 3
     End Enum
 
     Public Structure Card
@@ -50,5 +52,26 @@
 
             Return appnd
         End Function
+
+        Public Property ID As Integer
+            Get
+                Return 13 * Suit + Type - 1
+            End Get
+            Set(value As Integer)
+                Suit = Math.Floor(value / 13)
+                Type = (value Mod 13) + 1
+            End Set
+        End Property
+
+        Shared Function GetAllCards() As Card()
+            Dim lst As New List(Of Card)
+            For a As Integer = 0 To 3
+                For b As Integer = 1 To 13
+                    lst.Add(New Card(b, a))
+                Next
+            Next
+            Return lst.ToArray
+        End Function
+
     End Structure
 End Namespace

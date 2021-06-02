@@ -2,6 +2,7 @@
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
 Imports Cookie_Dough.Game.CommonCards
+Imports Cookie_Dough.Game.DuoCard.Rendering
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -60,7 +61,7 @@ Namespace Game.DuoCard
         Private WithEvents HUDMusicBtn As Button
         Private WithEvents HUDdbgLabel As Label
         Private WithEvents HUDmotdLabel As Label
-        'Private WithEvents HUDDiceBtn As GameRenderable
+        Private WithEvents HUDSoftBtn As GameRenderable
         Private InstructionFader As ITween(Of Color)
         Private Chat As List(Of (String, Color))
 
@@ -111,7 +112,7 @@ Namespace Game.DuoCard
 
             'Lade HUD
             HUD = New GuiSystem
-            'HUDDiceBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDDiceBtn)
+            HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
             'HUDBtnC = New Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
             'HUDBtnD = New Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnD)
@@ -131,7 +132,7 @@ Namespace Game.DuoCard
             Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
             AddRenderer(New DefaultRenderer(1))
 
-            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
+            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.4).SetThreshold(0.15)
             ClearColor = Color.Black
             Material.DefaultMaterial.SamplerState = SamplerState.AnisotropicClamp
 
@@ -500,7 +501,6 @@ Namespace Game.DuoCard
 #Region "Schnittstellenimplementation"
 
 
-
         Private ReadOnly Property IGameWindow_SelectFader As Single Implements ICardRendererWindow.SelectFader
             Get
                 Return SelectFader
@@ -527,13 +527,13 @@ Namespace Game.DuoCard
 
         Public ReadOnly Property HandDeck As List(Of Card) Implements ICardRendererWindow.HandDeck
             Get
-
+                Return New List(Of Card) From {New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts)}
             End Get
         End Property
 
         Public ReadOnly Property TableCard As Card Implements ICardRendererWindow.TableCard
             Get
-
+                Return New Card(CardType.Ace, CardSuit.Spades)
             End Get
         End Property
 

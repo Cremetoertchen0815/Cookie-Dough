@@ -1,12 +1,12 @@
-﻿Imports Microsoft.Xna.Framework
+﻿Imports Cookie_Dough.Game.CommonCards
+Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 
-Namespace Game.BetretenVerboten.Rendering
+Namespace Game.DuoCard.Rendering
     Public Class GameRenderable
         Inherits Framework.UI.GuiControl
 
-        Private window As IGameWindow
-        Private WürfelAugen As Texture2D
+        Private window As ICardRendererWindow
         Private WürfelRahmen As Texture2D
 
         Public Overrides ReadOnly Property InnerBounds As Rectangle
@@ -15,13 +15,12 @@ Namespace Game.BetretenVerboten.Rendering
             End Get
         End Property
 
-        Sub New(window As IGameWindow)
+        Sub New(window As ICardRendererWindow)
             MyBase.New()
             Me.window = window
         End Sub
 
         Public Overrides Sub Init(system As Framework.UI.IParent)
-            WürfelAugen = Core.Content.Load(Of Texture2D)("games\BV\würfel_augen")
             WürfelRahmen = Core.Content.Load(Of Texture2D)("games\BV\würfel_rahmen")
         End Sub
 
@@ -35,21 +34,21 @@ Namespace Game.BetretenVerboten.Rendering
             'Draw BG
             batcher.Draw(window.BGTexture, New Rectangle(0, 0, 1920, 1080), Nothing, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0)
 
-            'Zeichne Haupt-Würfel
-            If window.ShowDice And window.SpielerIndex = window.UserIndex Then
-                batcher.Draw(WürfelAugen, New Rectangle(1570, 700, 300, 300), GetWürfelSourceRectangle(window.WürfelAktuelleZahl), color)
-                batcher.Draw(WürfelRahmen, New Rectangle(1570, 700, 300, 300), Color.Lerp(color, Color.White, 0.4))
-            End If
-            'Zeichne Mini-Würfel
-            If (window.Status = SpielStatus.Würfel Or window.Status = SpielStatus.WähleFigur Or window.Status = SpielStatus.FahreFelder) And window.SpielerIndex = window.UserIndex And window.UserIndex > -1 Then
-                For i As Integer = 0 To window.WürfelWerte.Length - 1
-                    If window.SpielerIndex = window.UserIndex And window.WürfelWerte(i) > 0 Then
-                        batcher.Draw(WürfelAugen, New Rectangle(1590 + i * 70, 600, 50, 50), GetWürfelSourceRectangle(window.WürfelWerte(i)), color)
-                        batcher.Draw(WürfelRahmen, New Rectangle(1590 + i * 70, 600, 50, 50), Color.Lerp(color, Color.White, 0.4))
-                    End If
-                    If window.Spielers(window.SpielerIndex).Typ = SpielerTyp.CPU And Not window.DreifachWürfeln And window.WürfelWerte(i) <> 6 Then Exit For
-                Next
-            End If
+            ''Zeichne Haupt-Würfel
+            'If window.ShowDice And window.SpielerIndex = window.UserIndex Then
+            '    batcher.Draw(WürfelAugen, New Rectangle(1570, 700, 300, 300), GetWürfelSourceRectangle(window.WürfelAktuelleZahl), color)
+            '    batcher.Draw(WürfelRahmen, New Rectangle(1570, 700, 300, 300), Color.Lerp(color, Color.White, 0.4))
+            'End If
+            ''Zeichne Mini-Würfel
+            'If (window.Status = SpielStatus.Würfel Or window.Status = SpielStatus.WähleFigur Or window.Status = SpielStatus.FahreFelder) And window.SpielerIndex = window.UserIndex And window.UserIndex > -1 Then
+            '    For i As Integer = 0 To window.WürfelWerte.Length - 1
+            '        If window.SpielerIndex = window.UserIndex And window.WürfelWerte(i) > 0 Then
+            '            batcher.Draw(WürfelAugen, New Rectangle(1590 + i * 70, 600, 50, 50), GetWürfelSourceRectangle(window.WürfelWerte(i)), color)
+            '            batcher.Draw(WürfelRahmen, New Rectangle(1590 + i * 70, 600, 50, 50), Color.Lerp(color, Color.White, 0.4))
+            '        End If
+            '        If window.Spielers(window.SpielerIndex).Typ = SpielerTyp.CPU And Not window.DreifachWürfeln And window.WürfelWerte(i) <> 6 Then Exit For
+            '    Next
+            'End If
         End Sub
 
         Private Function GetWürfelSourceRectangle(augenzahl As Integer) As Rectangle

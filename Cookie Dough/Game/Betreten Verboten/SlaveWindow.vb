@@ -5,7 +5,7 @@ Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
 Imports Cookie_Dough.Game.BetretenVerboten.Networking
-Imports Cookie_Dough.Game.BetretenVerboten.Renderers
+Imports Cookie_Dough.Game.BetretenVerboten.Rendering
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -446,10 +446,10 @@ Namespace Game.BetretenVerboten
                 If Not Renderer.BeginTriggered Then HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
                 If Not Renderer.BeginTriggered Then HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex = UserIndex)
-                End If
+            End If
 
 
-                For Each element In FigurFaderScales
+            For Each element In FigurFaderScales
                 If element.Value.State = TransitionState.Done Then scheiß.Add(element.Key)
             Next
 

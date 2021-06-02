@@ -3,7 +3,7 @@ Imports System.IO
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 
-Namespace Game.BetretenVerboten.Renderers
+Namespace Game.BetretenVerboten.Rendering
     Public Class Renderer3D
         Inherits Renderer
 

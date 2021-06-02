@@ -2,7 +2,7 @@
 Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
-Imports Cookie_Dough.Game.BetretenVerboten.Renderers
+Imports Cookie_Dough.Game.BetretenVerboten.Rendering
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
