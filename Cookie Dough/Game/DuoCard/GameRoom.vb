@@ -53,6 +53,8 @@ Namespace Game.DuoCard
         Private WithEvents HUDBtnB As Button
         'Private WithEvents HUDBtnC As Button
         'Private WithEvents HUDBtnD As Button
+        Private WithEvents HUDArrowUp As TextureButton
+        Private WithEvents HUDArrowDown As TextureButton
         Private WithEvents HUDChat As TextscrollBox
         Private WithEvents HUDChatBtn As Button
         Private WithEvents HUDInstructions As Label
@@ -62,6 +64,7 @@ Namespace Game.DuoCard
         Private WithEvents HUDdbgLabel As Label
         Private WithEvents HUDmotdLabel As Label
         Private WithEvents HUDSoftBtn As GameRenderable
+        Private DeckScroll As Integer
         Private InstructionFader As ITween(Of Color)
         Private Chat As List(Of (String, Color))
 
@@ -114,8 +117,8 @@ Namespace Game.DuoCard
             HUD = New GuiSystem
             HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
-            'HUDBtnC = New Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
-            'HUDBtnD = New Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnD)
+            HUDArrowUp = New TextureButton(DebugTexture, New Vector2(500, 500), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowUp)
+            HUDArrowDown = New TextureButton(DebugTexture, New Vector2(500, 1000), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowDown)
             HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
@@ -171,17 +174,12 @@ Namespace Game.DuoCard
             Dim kstate As KeyboardState = If(DebugConsole.Instance.IsOpen, Nothing, Keyboard.GetState())
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
 
-            'Set cam
-            If dbgCam <> Nothing Then
-                FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = dbgCam}
-                dbgCam = Nothing
-            End If
 
             'Move cam
             If dbgCamFree Then FigurFaderCamera.Value = FigurFaderCamera.Value + New Keyframe3D(If(kstate.IsKeyDown(Keys.A), -1, 0) + If(kstate.IsKeyDown(Keys.D), 1, 0), If(kstate.IsKeyDown(Keys.S), -1, 0) + If(kstate.IsKeyDown(Keys.W), 1, 0), If(kstate.IsKeyDown(Keys.LeftShift), -1, 0) + If(kstate.IsKeyDown(Keys.Space), 1, 0), If(kstate.IsKeyDown(Keys.J), -0.01, 0) + If(kstate.IsKeyDown(Keys.L), 0.01, 0), If(kstate.IsKeyDown(Keys.K), -0.01, 0) + If(kstate.IsKeyDown(Keys.I), 0.01, 0), If(kstate.IsKeyDown(Keys.RightShift), -0.01, 0) + If(kstate.IsKeyDown(Keys.Enter), 0.01, 0), True) : HUDdbgLabel.Active = True
 
             If Not StopUpdating Then
-
+                'TODO: Show remaining cards in player title
             End If
 
             'Network stuff
@@ -462,38 +460,8 @@ Namespace Game.DuoCard
 #End Region
 #Region "Debug Commands"
 
-        <Command("bv-eject", "Removes a specific user from the game.")>
-        Public Shared Sub dbgEjectUser(nr As Integer)
-            dbgKickuser = nr
-        End Sub
 
-        <Command("bv-sync", "Removes a specific user from the game.")>
-        Public Shared Sub dbgSyncData()
-            dbgExecSync = True
-        End Sub
-
-        <Command("bv-place", "Places a player's figure on a certain position.")>
-        Public Shared Sub dbgPlaceFigure(player As Integer, figure As Integer, value As Integer)
-            dbgPlaceCmd = (player, figure, value)
-            dbgPlaceSet = True
-        End Sub
-
-        <Command("bv-info", "Gives information over a specific player.")>
-        Public Shared Sub dbgPlayerInfo(nr As Integer)
-            dbgLoguser = nr
-        End Sub
-
-        <Command("bv-end", "Ends the game.")>
-        Public Shared Sub dbgEndGame()
-            dbgEnd = True
-        End Sub
-
-        <Command("bv-cam-place", "Sets up the camera in a specific way.")>
-        Public Shared Sub dbgCamPlace(x As Single, y As Single, z As Single, yaw As Single, pitch As Single, roll As Single)
-            dbgCam = New Keyframe3D(x, y, z, yaw, pitch, roll, False)
-        End Sub
-
-        <Command("bv-cam-free", "Sets up the camera in a specific way.")>
+        <Command("dc-cam-free", "Sets up the camera in a specific way.")>
         Public Shared Sub dbgCamFreeS()
             dbgCamFree = True
         End Sub
@@ -527,13 +495,19 @@ Namespace Game.DuoCard
 
         Public ReadOnly Property HandDeck As List(Of Card) Implements ICardRendererWindow.HandDeck
             Get
-                Return New List(Of Card) From {New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts)}
+                Return New List(Of Card) From {New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds)}
             End Get
         End Property
 
         Public ReadOnly Property TableCard As Card Implements ICardRendererWindow.TableCard
             Get
                 Return New Card(CardType.Ace, CardSuit.Spades)
+            End Get
+        End Property
+
+        Private ReadOnly Property ICardRendererWindow_DeckScroll As Integer Implements ICardRendererWindow.DeckScroll
+            Get
+                Return DeckScroll
             End Get
         End Property
 

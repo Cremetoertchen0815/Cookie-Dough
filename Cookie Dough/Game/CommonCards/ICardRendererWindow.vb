@@ -9,6 +9,7 @@ Namespace Game.CommonCards
         ReadOnly Property SpielerIndex As Integer 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         ReadOnly Property UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         ReadOnly Property BGTexture As Texture2D
+        ReadOnly Property DeckScroll As Integer
         Function GetCamPos() As Keyframe3D
     End Interface
 End Namespace

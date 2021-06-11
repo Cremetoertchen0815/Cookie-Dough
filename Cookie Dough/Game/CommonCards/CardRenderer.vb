@@ -9,6 +9,7 @@ Namespace Game.CommonCards
         'Models and textures
         Private figur_model As Model
         Private card_model As Model
+        Private card_fx As BasicEffect
         Private card_Matrix As Matrix
         Private card_deck_model As Model
         Private card_deck_Matrix As Matrix
@@ -42,6 +43,7 @@ Namespace Game.CommonCards
             'Load models
             figur_model = scene.Content.Load(Of Model)("mesh/piece_std")
             card_model = scene.Content.Load(Of Model)("games/Cards/card")
+            card_fx = CType(card_model.Meshes(1).Effects(0), BasicEffect)
             card_Matrix = Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(150) * Matrix.CreateTranslation(-150, 0, 0)
             ApplyDefaultFX(card_model, Projection)
 
@@ -59,13 +61,14 @@ Namespace Game.CommonCards
                 CardTextures.Add(scene.Content.LoadTexture("games/Cards/" & element.GetTextureName))
             Next
 
-            Dim vertices As New List(Of VertexPositionColorTexture)
-            vertices.Add(New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(475, -475, 0), Color.White, Vector2.UnitY))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One))
+            Dim vertices As New List(Of VertexPositionColorTexture) From {
+                New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX),
+                New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero),
+                New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One),
+                New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero),
+                New VertexPositionColorTexture(New Vector3(475, -475, 0), Color.White, Vector2.UnitY),
+                New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One)
+            }
             MapBuffer = New VertexBuffer(dev, GetType(VertexPositionColorTexture), vertices.Count, BufferUsage.WriteOnly)
             MapBuffer.SetData(vertices.ToArray)
 
@@ -100,6 +103,7 @@ Namespace Game.CommonCards
             dev.DepthStencilState = DepthStencilState.Default
 
             'Draw card
+            card_fx.Texture = CardTextures(Game.TableCard.ID)
             For Each element In card_model.Meshes
                 ApplyFX(element, Color.White, element.ParentBone.ModelTransform * card_Matrix)
                 element.Draw()
@@ -118,10 +122,12 @@ Namespace Game.CommonCards
             Next
 
             'Draw Hand Deck
+            dev.DepthStencilState = DepthStencilState.None
             SetViewMatrix(New Keyframe3D)
             For i As Integer = 0 To Game.HandDeck.Count - 1
-                Dim transform As Matrix = Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(4.3 - i * 1.4, -3, -1069.2)
-                CType(card_model.Meshes(1).Effects(0), BasicEffect).Texture = CardTextures(Game.HandDeck(i).ID)
+                If Game.DeckScroll <> Math.Floor(i / 7) Then Continue For
+                Dim transform As Matrix = Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(4.3 - (i Mod 7) * 1.4, -3, -1069.2)
+                card_fx.Texture = CardTextures(Game.HandDeck(i).ID)
                 For Each element In card_model.Meshes
                     ApplyFX(element, Color.White, element.ParentBone.ModelTransform * transform)
                     element.Draw()
@@ -134,6 +140,9 @@ Namespace Game.CommonCards
         Private Sub ApplyFX(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)
             For Each effect As BasicEffect In mesh.Effects
                 effect.DirectionalLight2.Direction = New Vector3(1, -1 * yflip, 1)
+                effect.DirectionalLight0.Enabled = True
+                effect.DirectionalLight1.Enabled = True
+                effect.DirectionalLight2.Enabled = True
                 effect.DiffuseColor = DiffuseColor.ToVector3
                 effect.World = world
                 effect.View = View

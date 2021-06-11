@@ -60,6 +60,7 @@
     <Compile Include="Framwork\Misc\VertexExtractor.vb" />
     <Compile Include="Framwork\Networking\IPlayer.vb" />
     <Compile Include="Enums.vb" />
+    <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
     <Compile Include="Game\CommonCards\Cards.vb" />
     <Compile Include="Game\CommonCards\CardRenderer.vb" />
     <Compile Include="Framwork\Graphics\RenderingHelpers.vb" />

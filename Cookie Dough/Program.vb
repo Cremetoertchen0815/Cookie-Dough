@@ -44,6 +44,7 @@ Namespace Cookie_Dough
                 NoteError(ex, True)
             End Try
 #End If
+            If Server.streamw IsNot Nothing Then streamw.Close()
             StopServer()
             Process.GetCurrentProcess.Kill()
         End Sub

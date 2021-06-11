@@ -1,4 +1,5 @@
 ﻿BV:
+-Fix 6pl map not starting(might be an incompatibility bug???)
 -Add intro animation for all maps
 -Save highscore by ID, not by name
 -Implement kill streak bonus

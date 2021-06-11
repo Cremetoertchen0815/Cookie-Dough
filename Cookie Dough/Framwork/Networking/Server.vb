@@ -21,7 +21,7 @@ Namespace Framework.Networking
         Private games As New Dictionary(Of Integer, IGame)
         Private RNG As New System.Random
         Private LogPath As String = "Log\" & Date.Now.ToShortDateString & ".log"
-        Private streamw As StreamWriter
+        Friend streamw As StreamWriter
 
         Public Sub StartServer()
             MainThread = New Thread(AddressOf ServerMainSub)
