@@ -818,7 +818,7 @@ Namespace Game.BetretenVerboten
             Dim pls As New List(Of (String, Integer))
             For i As Integer = 0 To Spielers.Length - 1
                 If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.Online Then
-                    pls.Add((Spielers(i).Name, GetScore(i)))
+                    pls.Add((Spielers(i).ID, GetScore(i)))
                 End If
             Next
             SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
