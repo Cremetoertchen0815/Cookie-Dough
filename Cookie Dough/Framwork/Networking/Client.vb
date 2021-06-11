@@ -57,8 +57,8 @@ Namespace Framework.Networking
                 WriteString("Wassup?")
                 If Not ReadString() = "What's your name?" Then Throw New NotImplementedException()
                 WriteString(nickname)
-                WriteString(If(SecondaryClient, "b", My.Settings.UniqueIdentifier))
-                If Not SecondaryClient AndAlso My.Settings.UniqueIdentifier = "" Then My.Settings.UniqueIdentifier = ReadString() : My.Settings.Save()
+                WriteString(If(SecondaryClient, "b", UniqueIdentifier))
+                If Not SecondaryClient AndAlso UniqueIdentifier = "" Then UniqueIdentifier = ReadString()
                 Select Case ReadString()
                     Case "Sorry m8! Username already taken"
                         Microsoft.VisualBasic.MsgBox("Username already taken on this server! Please change username!")
@@ -73,11 +73,27 @@ Namespace Framework.Networking
                 Connected = True
                 blastmode = False
                 Me.Hostname = hostname
-                Catch ex As Exception
+            Catch ex As Exception
                 NoteError(ex, False)
                 Microsoft.VisualBasic.MsgBox("Verbindung zum Server nicht möglich!")
             End Try
         End Sub
+
+        Private IDFilePath As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\Cookie Dough\ID.dat"
+        Private IDFileFolder As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\Cookie Dough"
+        Friend Property UniqueIdentifier As String
+            Get
+                If My.Settings.UniqueIdentifier = "" And File.Exists(IDFilePath) Then My.Settings.UniqueIdentifier = File.ReadAllText(IDFilePath)
+                My.Settings.Save()
+                Return My.Settings.UniqueIdentifier
+            End Get
+            Set(value As String)
+                My.Settings.UniqueIdentifier = value
+                If Not Directory.Exists(IDFileFolder) Then Directory.CreateDirectory(IDFileFolder)
+                File.WriteAllText(IDFilePath, value)
+                My.Settings.Save()
+            End Set
+        End Property
 
         'Gibt an, ob ein Server bereits läuft
         Friend Function TryConnect() As Boolean

@@ -126,18 +126,6 @@ Partial Public NotInheritable Class Settings
     
     <Global.System.Configuration.UserScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-    Public Property UniqueIdentifier() As String
-        Get
-            Return CType(Me("UniqueIdentifier"),String)
-        End Get
-        Set
-            Me("UniqueIdentifier") = value
-        End Set
-    End Property
-    
-    <Global.System.Configuration.UserScopedSettingAttribute(),  _
-     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
     Public Property GamesWon() As Integer
         Get
@@ -193,6 +181,18 @@ Partial Public NotInheritable Class Settings
         End Get
         Set
             Me("MissingNo") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+    Public Property UniqueIdentifier() As String
+        Get
+            Return CType(Me("UniqueIdentifier"),String)
+        End Get
+        Set
+            Me("UniqueIdentifier") = value
         End Set
     End Property
 End Class
