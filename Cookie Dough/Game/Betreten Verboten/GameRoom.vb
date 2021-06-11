@@ -704,9 +704,10 @@ Namespace Game.BetretenVerboten
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
+                        Spielers(source).ID = txt(2)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
-                        SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD)
+                        SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD, Spielers(source).ID)
                     Case "c"c 'Sent chat message
                         Dim text As String = element.Substring(2)
                         If source = 9 Then
@@ -787,8 +788,8 @@ Namespace Game.BetretenVerboten
         End Sub
 
         ' ---Methoden um Daten via den Server an die Clients zu senden---
-        Private Sub SendPlayerArrived(index As Integer, name As String, MOTD As String)
-            SendNetworkMessageToAll("a" & index.ToString & name & "|" & MOTD)
+        Private Sub SendPlayerArrived(index As Integer, name As String, MOTD As String, ID As String)
+            SendNetworkMessageToAll("a" & index.ToString & name & "|" & MOTD & "|" & ID)
         End Sub
         Private Sub SendBeginGaem()
             Dim appendix As String = ""

@@ -693,9 +693,9 @@ Namespace Game.BetretenVerboten
             End If
 
             If Rejoin Then
-                LocalClient.WriteStream("r" & My.Settings.Username & "|" & My.Settings.MOTD) 'Rejoin
+                LocalClient.WriteStream("r" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Rejoin
             Else
-                LocalClient.WriteStream("a" & My.Settings.Username & "|" & My.Settings.MOTD) 'Nujoin
+                LocalClient.WriteStream("a" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Nujoin
             End If
         End Sub
 

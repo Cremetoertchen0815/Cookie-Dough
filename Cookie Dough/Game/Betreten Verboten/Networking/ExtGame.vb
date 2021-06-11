@@ -30,10 +30,11 @@ Namespace Game.BetretenVerboten.Networking
                 writer(con, Players(i).Name)
             Next
             Players(index).Connection = con
+            Players(index).ID = con.Identifier
         End Sub
 
         Public Sub ServerSendJoinNujoinData(index As Integer, con As Connection, writer As Action(Of Connection, String)) Implements IGame.ServerSendJoinNujoinData
-            If index > -1 Then Players(index) = New Player(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick}
+            If index > -1 Then Players(index) = New Player(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick, .ID = con.Identifier}
             For i As Integer = 0 To Players.Length - 1
                 If Players(i) IsNot Nothing Then
                     writer(con, CInt(Players(i).Typ))
@@ -64,11 +65,11 @@ Namespace Game.BetretenVerboten.Networking
                 Select Case types(i)
                     Case SpielerTyp.Local
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .Connection = con}
+                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .Connection = con, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.CPU
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True}
+                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.None
                         nugaem.Players(i) = New Player(types(i)) With {.Bereit = True}
@@ -92,7 +93,7 @@ Namespace Game.BetretenVerboten.Networking
             For i As Integer = 0 To GetMapSize(map) - 1
                 client.WriteString(CInt(types(i).Typ).ToString) 'Send player type
                 If types(i).Typ = SpielerTyp.Online Then client.WriteString(whitelist(i)) 'Send whitelist slot
-                If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name) 'Send name
+                If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name) : types(i).ID = client.UniqueIdentifier 'Send name
             Next
             Return client.CreateGameFinal()
         End Function

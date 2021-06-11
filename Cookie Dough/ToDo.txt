@@ -1,5 +1,4 @@
 ﻿BV:
--Save ID in seperate file
 -Implement kill streak bonus
 -Optimize kicking by command
 -Fix 6pl map not starting(might be an incompatibility bug???)
