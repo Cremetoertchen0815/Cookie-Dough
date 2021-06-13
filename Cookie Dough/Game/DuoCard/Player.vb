@@ -1,4 +1,6 @@
-﻿Imports Cookie_Dough.Framework.Networking
+﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.Networking
+Imports Cookie_Dough.Game.CommonCards
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Newtonsoft.Json
@@ -35,6 +37,9 @@ Namespace Game.DuoCard
         ''' Gibt an, ob der Spieler die Verbindung korrekt hergestellt hat
         ''' </summary>
         Public Property Bereit As Boolean = True Implements IPlayer.Bereit
+
+
+        Public Property HandDeck As List(Of Card) = New List(Of Card) From {New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds)}
 
         ''' <summary>
         ''' Der Sound, der abgespielt wird, wenn man gekickt wird

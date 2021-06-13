@@ -35,6 +35,9 @@ Namespace Game.CommonCards
             Game = window
         End Sub
 
+        Protected Overrides Sub DebugRender(scene As Scene, cam As Camera)
+        End Sub
+
         Public Overrides Sub OnAddedToScene(scene As Scene)
             MyBase.OnAddedToScene(scene)
 
@@ -103,11 +106,13 @@ Namespace Game.CommonCards
             dev.DepthStencilState = DepthStencilState.Default
 
             'Draw card
-            card_fx.Texture = CardTextures(Game.TableCard.ID)
-            For Each element In card_model.Meshes
-                ApplyFX(element, Color.White, element.ParentBone.ModelTransform * card_Matrix)
-                element.Draw()
-            Next
+            If Game.TableCard.Visible Then
+                card_fx.Texture = CardTextures(Game.TableCard.ID)
+                For Each element In card_model.Meshes
+                    ApplyFX(element, Color.White, element.ParentBone.ModelTransform * card_Matrix)
+                    element.Draw()
+                Next
+            End If
 
             'Draw deck model
             For Each element In card_deck_model.Meshes
@@ -122,6 +127,7 @@ Namespace Game.CommonCards
             Next
 
             'Draw Hand Deck
+            If Game.State <> CardGameState.SelectAction Then Return
             dev.DepthStencilState = DepthStencilState.None
             SetViewMatrix(New Keyframe3D)
             For i As Integer = 0 To Game.HandDeck.Count - 1
@@ -133,8 +139,6 @@ Namespace Game.CommonCards
                     element.Draw()
                 Next
             Next
-
-
         End Sub
 
         Private Sub ApplyFX(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)

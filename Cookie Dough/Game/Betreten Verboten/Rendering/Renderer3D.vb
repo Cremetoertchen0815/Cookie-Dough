@@ -122,7 +122,8 @@ Namespace Game.BetretenVerboten.Rendering
             '(Normal field diameter, small field diameter, figure scale, arrow size)
             Dim sizes As (Integer, Integer, Single, Integer) = GetFieldSizes(Game.Map)
 
-            batchlor.Begin()
+            Material.SamplerState = SamplerState.AnisotropicWrap
+            batchlor.Begin(Material)
 
             'Zeichne Verbindungen
             batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)

@@ -73,5 +73,10 @@ Namespace Game.CommonCards
             Return lst.ToArray
         End Function
 
+        Public Overrides Function ToString() As String
+            Return Type.ToString & "/" & Suit.ToString
+        End Function
+
+
     End Structure
 End Namespace

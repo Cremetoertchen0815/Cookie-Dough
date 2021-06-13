@@ -61,6 +61,7 @@
     <Compile Include="Framwork\Networking\IPlayer.vb" />
     <Compile Include="Enums.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
+    <Compile Include="Game\CommonCards\CardGameState.vb" />
     <Compile Include="Game\CommonCards\Cards.vb" />
     <Compile Include="Game\CommonCards\CardRenderer.vb" />
     <Compile Include="Framwork\Graphics\RenderingHelpers.vb" />
@@ -137,7 +138,6 @@
     <Compile Include="Game\Betreten Verboten\Rendering\Renderer3D.vb" />
     <Compile Include="Game\Betreten Verboten\SlaveWindow.vb" />
     <Compile Include="Game\DuoCard\CreatorMenu.vb" />
-    <Compile Include="Game\DuoCard\Enums.vb" />
     <Compile Include="Game\DuoCard\GameRoom.vb" />
     <Compile Include="Game\DuoCard\IGameWindow.vb" />
     <Compile Include="Game\DuoCard\Networking\ExtGame.vb" />

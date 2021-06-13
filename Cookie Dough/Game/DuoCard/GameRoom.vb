@@ -25,8 +25,8 @@ Namespace Game.DuoCard
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
-        Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
+        Private stat As CardGameState 'Speichert den aktuellen Status des Spiels
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
         Private StopWhenRealStart As Boolean = False
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
@@ -84,7 +84,7 @@ Namespace Game.DuoCard
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
         Private Center As Vector2 'Gibt den Mittelpunkt des Screen-Viewports des Spielfelds an
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)} 'Bewegt die Kamera 
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D} 'Bewegt die Kamera New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)
         Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
 
         'Konstanten
@@ -92,14 +92,15 @@ Namespace Game.DuoCard
         Private Const ErrorCooldown As Integer = 1
         Private Const CPUThinkingTime As Single = 0.6
         Private Const CamSpeed As Integer = 1300
+
         Sub New()
             'Bereite Flags und Variablen vor
-            Status = SpielStatus.WarteAufOnlineSpieler
+            stat = CardGameState.SelectAction
             LocalClient.LeaveFlag = False
             LocalClient.IsHost = True
             Chat = New List(Of (String, Color))
-            Status = SpielStatus.WarteAufOnlineSpieler
             SpielerIndex = -1
+            PlCount = 4
             MoveActive = False
 
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
@@ -117,8 +118,8 @@ Namespace Game.DuoCard
             HUD = New GuiSystem
             HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
-            HUDArrowUp = New TextureButton(DebugTexture, New Vector2(500, 500), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowUp)
-            HUDArrowDown = New TextureButton(DebugTexture, New Vector2(500, 1000), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowDown)
+            HUDArrowUp = New TextureButton(DebugTexture, New Vector2(935, 700), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowUp)
+            HUDArrowDown = New TextureButton(DebugTexture, New Vector2(935, 970), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowDown)
             HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
@@ -180,12 +181,33 @@ Namespace Game.DuoCard
 
             If Not StopUpdating Then
                 'TODO: Show remaining cards in player title
+                Select Case Status
+                    Case CardGameState.SelectAction
+
+                        For i As Integer = 0 To 6
+                            Dim card_nr As Integer = i + 7 * DeckScroll
+                            If card_nr >= HandDeck.Count Then Exit For
+
+                            If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(i * 140 + 470, 740, 120, 200).Contains(mpos) Then
+                                If IsLayingCardValid(Spielers(UserIndex).HandDeck(card_nr)) Then
+                                    'Read and pop card from hand deck
+                                    Dim card As Card = Spielers(UserIndex).HandDeck(card_nr)
+                                    Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
+                                    DebugConsole.Instance.Log(card.ToString)
+                                    LayCard(card)
+                                Else
+                                    HUDInstructions.Text = "Card invalid!"
+                                End If
+                                Exit For
+                            End If
+                        Next
+                End Select
             End If
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
-                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If Not LocalClient.Connected And Status <> CardGameState.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If LocalClient.LeaveFlag And Status <> CardGameState.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -194,8 +216,11 @@ Namespace Game.DuoCard
             If kstate.IsKeyDown(Keys.Escape) And lastkstate.IsKeyUp(Keys.Escape) Then MenuButton()
             lastmstate = mstate
             lastkstate = kstate
+            DeckScroll = Mathf.Clamp(DeckScroll, 0, CInt(Math.Floor((HandDeck.Count - 1) / 7.0F)))
             MyBase.Update()
         End Sub
+
+
 
 #Region "Netzwerkfunktionen"
         ''' <summary>
@@ -229,8 +254,8 @@ Namespace Game.DuoCard
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
                         Spielers(source).Bereit = False
                         PostChat(Spielers(source).Name & " left!", Color.White)
-                        If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
-                        If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
+                        If Not StopUpdating And Status <> CardGameState.SpielZuEnde And Status <> CardGameState.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
+                        If Status <> CardGameState.WarteAufOnlineSpieler Then StopUpdating = True
                         'If Renderer.BeginTriggered Then StopWhenRealStart = True
 
                         SendPlayerLeft(source)
@@ -252,7 +277,7 @@ Namespace Game.DuoCard
                         For Each pl In Spielers
                             If Not pl.Bereit Then everythere = False
                         Next
-                        If everythere And Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
+                        If everythere And Status <> CardGameState.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
                         If everythere And StopWhenRealStart Then StopWhenRealStart = False
                     Case "y"c
                         SendSync()
@@ -406,6 +431,17 @@ Namespace Game.DuoCard
             HUDChat.ScrollDown = True
         End Sub
 
+        Private Function IsLayingCardValid(card As Card) As Boolean
+            Return True
+        End Function
+
+        Private Sub LayCard(card As Card)
+            Status = CardGameState.CardAnimationActive
+            HUDInstructions.Text = ""
+            TableCard = card
+            SwitchPlayer()
+        End Sub
+
         Private Sub SwitchPlayer()
 
             'Setze benötigte Flags
@@ -414,7 +450,7 @@ Namespace Game.DuoCard
                 SpielerIndex = (SpielerIndex + 1) Mod PlCount
             Loop
             'Setze HUD flags
-            If Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then Status = SpielStatus.Würfel Else Status = SpielStatus.Waitn
+            If Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then Status = CardGameState.SelectAction Else Status = CardGameState.Waitn
             SendNewPlayerActive(SpielerIndex)
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             HUD.Color = hudcolors(UserIndex)
@@ -457,6 +493,12 @@ Namespace Game.DuoCard
                 Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
         End Sub
+        Private Sub ScrollUp() Handles HUDArrowUp.Clicked
+            DeckScroll = Math.Max(0, DeckScroll - 1)
+        End Sub
+        Private Sub ScrollDown() Handles HUDArrowDown.Clicked
+            DeckScroll = Math.Min(Math.Floor((HandDeck.Count - 1) / 7), DeckScroll + 1)
+        End Sub
 #End Region
 #Region "Debug Commands"
 
@@ -495,15 +537,11 @@ Namespace Game.DuoCard
 
         Public ReadOnly Property HandDeck As List(Of Card) Implements ICardRendererWindow.HandDeck
             Get
-                Return New List(Of Card) From {New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds)}
+                Return Spielers(UserIndex).HandDeck
             End Get
         End Property
 
-        Public ReadOnly Property TableCard As Card Implements ICardRendererWindow.TableCard
-            Get
-                Return New Card(CardType.Ace, CardSuit.Spades)
-            End Get
-        End Property
+        Public Property TableCard As Card Implements ICardRendererWindow.TableCard
 
         Private ReadOnly Property ICardRendererWindow_DeckScroll As Integer Implements ICardRendererWindow.DeckScroll
             Get
@@ -515,6 +553,17 @@ Namespace Game.DuoCard
             If FigurFaderCamera IsNot Nothing Then Return FigurFaderCamera.Value
             Return New Keyframe3D
         End Function
+
+        Friend Property Status As CardGameState Implements ICardRendererWindow.State
+            Get
+                Return stat
+            End Get
+            Set(value As CardGameState)
+                stat = value
+                HUDArrowUp.Active = value = CardGameState.SelectAction
+                HUDArrowDown.Active = value = CardGameState.SelectAction
+            End Set
+        End Property
 #End Region
     End Class
 End Namespace

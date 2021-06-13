@@ -69,5 +69,6 @@ Namespace Game.DuoCard.Rendering
                     Return New Rectangle(0, 0, 0, 0)
             End Select
         End Function
+
     End Class
 End Namespace
