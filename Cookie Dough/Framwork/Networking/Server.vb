@@ -338,6 +338,7 @@ Namespace Framework.Networking
                                     ent -= 1
                                 Else
                                     indx += 1
+                                    takenIDs.Add(highscore(indx).Item1)
                                 End If
                             Loop
                             'Delete access
