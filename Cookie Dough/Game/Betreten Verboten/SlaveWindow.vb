@@ -141,6 +141,10 @@ Namespace Game.BetretenVerboten
                                                      Dim name As String = x()
                                                      Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
                                                  Next
+
+                                                 'Set rejoin flag
+                                                 Rejoin = x() = "Rejoin"
+
                                                  'Load camera info
                                                  If UserIndex > -1 Then
                                                      Select Case Map
@@ -155,10 +159,7 @@ Namespace Game.BetretenVerboten
                                                  Else
                                                      StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)
                                                  End If
-                                                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)}
-
-                                                 'Set rejoin flag
-                                                 Rejoin = x() = "Rejoin"
+                                                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = If(Rejoin, StdCam, New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False))}
                                              End Sub) Then LocalClient.AutomaticRefresh = True : Return
 
             'Bereite Flags und Variablen vor
@@ -545,11 +546,12 @@ Namespace Game.BetretenVerboten
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
-                    Case "n"c 'Next player
+                    Case "n"c 'New player active
                         Dim who As Integer = CInt(element(1).ToString)
                         SpielerIndex = who
                         HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
                         HUDBtnD.Active = SpielerIndex = UserIndex
+                        HUDNameBtn.Active = True
                         If UserIndex < 0 Then Continue For
                         If who = UserIndex Then
                             PrepareMove()
@@ -655,7 +657,7 @@ Namespace Game.BetretenVerboten
                         Next
                         If UserIndex > -1 AndAlso Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields
-                    Case "z"c
+                    Case "z"c 'Receive sound
                         Dim source As Integer = CInt(element(1).ToString)
                         Dim IdentSound As IdentType = CInt(element(2).ToString)
                         Dim SoundNr As Integer = CInt(element(3).ToString)

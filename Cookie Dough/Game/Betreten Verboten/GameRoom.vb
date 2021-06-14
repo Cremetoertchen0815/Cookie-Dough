@@ -631,13 +631,13 @@ Namespace Game.BetretenVerboten
                         StopUpdating = True
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
-                                               SendBeginGaem()
                                                FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
                                                'Launch start animation
                                                Renderer.TriggerStartAnimation(Sub()
                                                                                   SwitchPlayer()
                                                                                   If StopWhenRealStart Then StopUpdating = True
                                                                               End Sub)
+                                               SendBeginGaem()
                                            End Sub)
                     Case SpielStatus.SpielZuEnde
                         StopUpdating = True
@@ -1457,28 +1457,19 @@ Namespace Game.BetretenVerboten
                     SendFlyingSaucerAdded(nr)
                 End If
             End If
-
-            'Setze benötigte Flags
+            'Increment Player Index
             SpielerIndex = (SpielerIndex + 1) Mod PlCount
             Do While Spielers(SpielerIndex).Typ = SpielerTyp.None
                 SpielerIndex = (SpielerIndex + 1) Mod PlCount
             Loop
-            'Setze HUD flags
-            If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter
-            If Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then Status = SpielStatus.Würfel Else Status = SpielStatus.Waitn
-            SendNewPlayerActive(SpielerIndex)
-            If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
-            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
-            HUDBtnD.Active = SpielerIndex = UserIndex
-            HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
-            HUD.Color = hudcolors(UserIndex)
-            'Reset camera if not already moving
-            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
             'Set game flags
+            If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter
+            Status = If(Spielers(SpielerIndex).Typ <> SpielerTyp.Online, SpielStatus.Würfel, SpielStatus.Waitn)
+            SendNewPlayerActive(SpielerIndex) 'Transmit to slaves that new player is active
+            If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             ShowDice = True
             StopUpdating = False
             SendGameActive()
-            HUDInstructions.Text = "Roll the Dice!"
             DreifachWürfeln = CanRollThrice(SpielerIndex) 'Falls noch alle Figuren un der Homebase sind
             WürfelTimer = 0
             WürfelAktuelleZahl = 0
@@ -1486,6 +1477,15 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To WürfelWerte.Length - 1
                 WürfelWerte(i) = 0
             Next
+            'Set HUD flags
+            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
+            HUDBtnD.Active = SpielerIndex = UserIndex
+            HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
+            HUDInstructions.Text = "Roll the Dice!"
+            HUD.Color = hudcolors(UserIndex)
+            HUDNameBtn.Active = True
+            'Reset camera if not already moving
+            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
         End Sub
 #End Region
 #Region "Knopfgedrücke"

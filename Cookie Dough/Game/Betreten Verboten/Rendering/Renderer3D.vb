@@ -320,14 +320,17 @@ Namespace Game.BetretenVerboten.Rendering
             'End loop if end reached
             If BeginCurrentPlayer + 1 >= Game.Spielers.Length Then
 
-                BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_CriticalDamping(1500), Game.StartCamPoses(0), Game.StartCamPoses(1), Sub()
-                                                                                                                                                                     BeginTriggered = False
-                                                                                                                                                                     Game.HUDmotdLabel.Active = False
-                                                                                                                                                                     Game.HUDNameBtn.Location = New Vector2(500, 20)
-                                                                                                                                                                     Game.HUDNameBtn.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
-                                                                                                                                                                 End Sub)
+                'Prepare HUD
+                Game.HUDmotdLabel.Active = False
+                Game.HUDNameBtn.Active = False
+                Game.HUDNameBtn.Location = New Vector2(500, 20)
+                Game.HUDNameBtn.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+
+                'Move camera down and disable camera overtake
+                BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_CriticalDamping(1500), Game.StartCamPoses(0), Game.StartCamPoses(1), Sub() BeginTriggered = False)
                 Automator.Add(BeginCam)
-                Return
+
+                Return 'End this looping hell
             End If
 
             'Find next player, if available
