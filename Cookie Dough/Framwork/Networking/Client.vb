@@ -243,8 +243,8 @@ Namespace Framework.Networking
             Try
                 While blastmode And Not LeaveFlag
                     Dim tmp As String = ReadString()
+                    If tmp.StartsWith("Understandable") Then LeaveFlag = True : Exit While
                     If tmp.StartsWith("Sorry m8!") Then Throw New Exception() Else data.Add(tmp)
-                    If tmp.StartsWith("Understandable, have a nice day!") Then LeaveFlag = True : Exit While
                 End While
             Catch ex As Exception
                 NoteError(ex, False)

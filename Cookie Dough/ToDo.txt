@@ -1,10 +1,7 @@
 ﻿BV:
 -Work on DC
 -Implement kill streak bonus
--Optimize kicking by command(???)
--Fix 6pl map not starting(might be an incompatibility bug???)
 -Add intro animation for all maps
--Slaves not being kicked when host leaves
 
 Engine Fixes:
 -Blurry Scaling(Anisotropic or point filtering???)
