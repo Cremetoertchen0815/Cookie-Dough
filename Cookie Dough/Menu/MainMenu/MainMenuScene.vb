@@ -511,7 +511,7 @@ Namespace Menu.MainMenu
                         DrawUserMenuTableString("Spawn Sound", CType(My.Settings.SoundA, IdentType).ToString, 3, batcher)
                         DrawUserMenuTableString("Kick Sound", CType(My.Settings.SoundB, IdentType).ToString, 4, batcher)
                         DrawUserMenuTableString("Games Played", My.Settings.GamesLost + My.Settings.GamesWon - 2, 5, batcher)
-                        DrawUserMenuTableString("K/D", My.Settings.GamesWon / My.Settings.GamesLost, 6, batcher)
+                        DrawUserMenuTableString("K/D", Math.Round(My.Settings.GamesWon / My.Settings.GamesLost, 3), 6, batcher)
 
                         'File dialogue boxes
                         If My.Settings.Thumbnail = IdentType.Custom Then
