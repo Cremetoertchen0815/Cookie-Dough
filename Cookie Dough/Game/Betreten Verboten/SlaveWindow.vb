@@ -654,6 +654,7 @@ Namespace Game.BetretenVerboten
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
                             Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
+                            Spielers(i).SuicideField = sp.Spielers(i).SuicideField
                         Next
                         If UserIndex > -1 AndAlso Spielers(UserIndex).Angered Then HUDBtnC.Active = False
                         SaucerFields = sp.SaucerFields

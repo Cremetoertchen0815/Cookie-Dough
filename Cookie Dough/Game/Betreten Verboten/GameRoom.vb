@@ -1489,6 +1489,7 @@ Namespace Game.BetretenVerboten
                     indx = Nez.Random.Range(0, PlCount * SpceCount)
                 Loop
                 Spielers(SpielerIndex).SuicideField = indx
+                SendSync()
             End If
             'Increment Player Index
             SpielerIndex = (SpielerIndex + 1) Mod PlCount

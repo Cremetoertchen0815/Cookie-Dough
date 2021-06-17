@@ -166,10 +166,10 @@ Namespace Game.BetretenVerboten
                         AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.None, My.Settings.Schwierigkeitsgrad) With {.Bereit = True}
                 End Select
             Next
+            AktuellesSpiel.LoadContent()
 
             'Blende über
             Core.StartSceneTransition(New FadeTransition(Function() AktuellesSpiel)).OnScreenObscured = Sub()
-                                                                                                            AktuellesSpiel.LoadContent()
                                                                                                             If Internetz Then
                                                                                                                 Dim wtlst As String() = New String(Whitelist.Length - 1) {}
                                                                                                                 For i As Integer = 0 To Whitelist.Length - 1
