@@ -1001,6 +1001,7 @@ Namespace Game.BetretenVerboten
             Automator.Add(trans)
             FigurFaderScales.Add(key, trans)
             SendKick(player, figur)
+            SFX(9).Play()
         End Sub
 
         Private Function GetKickFigur(player As Integer, figur As Integer, Optional Increment As Integer = 0) As (Integer, Integer)
@@ -1071,6 +1072,15 @@ Namespace Game.BetretenVerboten
                 If check Then Return True
             Next
             Return False
+        End Function
+
+        Private Function GetFigureCountInHaus(spieler As Integer)
+            Dim ret As Integer = 0
+            Dim pl As Player = Spielers(spieler)
+            For j As Integer = 0 To FigCount - 1
+                If pl.Spielfiguren(j) >= PlCount * SpceCount Then ret += 1
+            Next
+            Return ret
         End Function
 
         Private Function CanDoAMove() As Boolean
@@ -1206,6 +1216,13 @@ Namespace Game.BetretenVerboten
             Return False
         End Function
 
+        Private Function DoesContainField(indx As Integer) As Boolean
+            For Each element In Spielers
+                If element.SuicideField = indx Then Return True
+            Next
+            Return False
+        End Function
+
         Private Function PlayerFieldToGlobalField(field As Integer, player As Integer) As Integer
             Return (field + player * SpceCount) Mod (PlCount * SpceCount)
         End Function
@@ -1295,6 +1312,14 @@ Namespace Game.BetretenVerboten
                         nr = element
                     End If
                 Next
+
+                'Trigger suicide
+                If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
+                    saucertrigger = False
+                    PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
+                    SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
+                    KickedByGod(FigurFaderZiel.Item1, FigurFaderZiel.Item2)
+                End If
 
                 'Trigger UFO, falls auf Feld gelandet
                 If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * SpceCount Then TriggerSaucer(nr) Else SwitchPlayer()
@@ -1456,6 +1481,14 @@ Namespace Game.BetretenVerboten
                     SaucerFields.Add(nr)
                     SendFlyingSaucerAdded(nr)
                 End If
+            End If
+            'Generate suicide field
+            If SpielerIndex >= 0 AndAlso Spielers(SpielerIndex).SuicideField < 0 AndAlso GetFigureCountInHaus(SpielerIndex) > FigCount - 2 Then
+                Dim indx As Integer = -1
+                Do While indx < 0 OrElse DoesContainField(indx)
+                    indx = Nez.Random.Range(0, PlCount * SpceCount)
+                Loop
+                Spielers(SpielerIndex).SuicideField = indx
             End If
             'Increment Player Index
             SpielerIndex = (SpielerIndex + 1) Mod PlCount

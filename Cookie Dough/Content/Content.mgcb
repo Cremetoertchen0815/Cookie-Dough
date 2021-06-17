@@ -2337,3 +2337,9 @@
 /processorParam:Quality=Best
 /build:sfx/triumph.wav
 
+#begin sfx/tuba.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/tuba.mp3
+

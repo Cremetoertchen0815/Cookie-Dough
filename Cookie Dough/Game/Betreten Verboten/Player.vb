@@ -33,6 +33,11 @@ Namespace Game.BetretenVerboten
         ''' <summary>
         ''' Gibt an, wieviele Zusatzpunkte der Spieler hat.
         ''' </summary>
+        Public Property SuicideField As Integer = -1
+
+        ''' <summary>
+        ''' Gibt an, wieviele Zusatzpunkte der Spieler hat.
+        ''' </summary>
         Public Property AdditionalPoints As Integer = 0
 
         ''' <summary>

@@ -153,6 +153,14 @@ Namespace Game.BetretenVerboten.Rendering
                 batchlor.DrawCircle(New Vector2(475) + GetMapVectorPos(Game.Map, element), sizes.Item1, Color.SandyBrown, 5)
             Next
 
+            For i As Integer = 0 To Game.Spielers.Length - 1
+                If Game.Spielers(i).SuicideField < 0 Then Continue For
+                Dim center As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, Game.Spielers(i).SuicideField)
+                Dim line_coords As Vector2() = {center - Vector2.One * 20, center + Vector2.One * 20, center - New Vector2(-20, 20), center - New Vector2(20, -20)}
+                batchlor.DrawLine(line_coords(0), line_coords(1), playcolor(i), 3)
+                batchlor.DrawLine(line_coords(2), line_coords(3), playcolor(i), 3)
+            Next
+
 
             batchlor.End()
 

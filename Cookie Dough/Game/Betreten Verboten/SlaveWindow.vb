@@ -836,6 +836,7 @@ Namespace Game.BetretenVerboten
                                                                                                                       End Sub)
             Automator.Add(trans)
             FigurFaderScales.Add(key, trans)
+            SFX(9).Play()
         End Sub
 
         Private Function GetNormalDiceSum() As Integer
