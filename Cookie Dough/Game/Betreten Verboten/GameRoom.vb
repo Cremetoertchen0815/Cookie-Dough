@@ -980,8 +980,17 @@ Namespace Game.BetretenVerboten
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
                     If fieldB >= 0 And fieldB < PlCount * SpceCount And fb = fa Then
-                        Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
-                        Spielers(playerA).AdditionalPoints += 25
+                        'Implement BV bonus
+                        If fieldA = 0 Then
+                            Core.Schedule(1, Sub()
+                                                 PostChat("BETRETEN VERBOTEN!", Color.White)
+                                                 PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White)
+                                             End Sub)
+                            Spielers(playerA).AdditionalPoints += 50
+                        Else
+                            Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
+                            Spielers(playerA).AdditionalPoints += 25
+                        End If
                         Return j
                     End If
                 Next
@@ -1287,7 +1296,7 @@ Namespace Game.BetretenVerboten
                         PlayStompSound = True
                         Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
                                                                                                                                       Spielers(FigurFaderZiel.Item1).CustomSound(1).Play()
-                                                                                                                                      If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1
+                                                                                                                                      If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1 'Kick figure
                                                                                                                                       If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
                                                                                                                                       Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
                                                                                                                                       Automator.Add(transB)

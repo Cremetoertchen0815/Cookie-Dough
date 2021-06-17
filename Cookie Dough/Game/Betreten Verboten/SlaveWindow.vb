@@ -817,8 +817,18 @@ Namespace Game.BetretenVerboten
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
                     If fieldB >= 0 And fieldB < PlCount * SpceCount And fb = fa Then
-                        Spielers(playerA).AdditionalPoints += 25
-                        PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White)
+
+                        'Implement BV bonus
+                        If fieldA = 0 Then
+                            Core.Schedule(1, Sub()
+                                                 PostChat("BETRETEN VERBOTEN!", Color.White)
+                                                 PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White)
+                                             End Sub)
+                            Spielers(playerA).AdditionalPoints += 50
+                        Else
+                            Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
+                            Spielers(playerA).AdditionalPoints += 25
+                        End If
                         Return j
                     End If
                 Next
