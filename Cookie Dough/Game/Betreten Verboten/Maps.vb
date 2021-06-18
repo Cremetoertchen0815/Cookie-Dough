@@ -47,6 +47,22 @@ Namespace Game.BetretenVerboten
                         Case 3
                             If Not ending Then Return New Keyframe3D(-120, 75, -530, -0.2, 1.3, -4.55, False) Else Return New Keyframe3D(-390, 70, -440, -0.2, 1.3, -4.64, False)
                     End Select
+                Case GaemMap.Default6Players
+
+                    Select Case player
+                        Case 0
+                            If Not ending Then Return New Keyframe3D(-70, 57, -546, 5.31, 1.39, 0.17, False) Else Return New Keyframe3D(145, 57, -546, 5.31, 1.39, 0.17, False)
+                        Case 1
+                            If Not ending Then Return New Keyframe3D(225, -162, -1206, 1.91, 1.19, 0.17, False) Else Return New Keyframe3D(111, -165, -1278, 1.44, 1.19, 0.17, False)
+                        Case 2
+                            If Not ending Then Return New Keyframe3D(245, -110, -1326, 0.78, 1.31, 0.17, False) Else Return New Keyframe3D(-50, -145, -1372, -0.07, 1.31, 0.17, False)
+                        Case 3
+                            If Not ending Then Return New Keyframe3D(140, 50, -460, 2.21, 1.31, 0.17, False) Else Return New Keyframe3D(18, 95, -550, 2.21, 1.31, 0.17, False)
+                        Case 4
+                            If Not ending Then Return New Keyframe3D(-354, 241, -1078, 2.21, -0.09, 0.17, False) Else Return New Keyframe3D(-36, 434, -890, 1.36, -0.06, 0.13, False)
+                        Case 5
+                            If Not ending Then Return New Keyframe3D(280, 75, -680, 5.67, 1.2, 0.17, False) Else Return New Keyframe3D(420, 75, -680, 5.67, 1.2, 0.17, False)
+                    End Select
                 Case Else
                     Return New Keyframe3D
             End Select

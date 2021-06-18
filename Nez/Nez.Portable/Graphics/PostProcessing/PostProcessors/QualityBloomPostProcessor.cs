@@ -211,7 +211,7 @@ namespace Nez
 
 
 			_graphicsDev = Core.GraphicsDevice;
-			SamplerState = SamplerState.LinearWrap;
+			SamplerState = SamplerState.AnisotropicClamp;
 			//UpdateResolution(scene.SceneRenderTargetSize.X, scene.SceneRenderTargetSize.Y);
 
 			//if quadRenderer == null -> new, otherwise not
