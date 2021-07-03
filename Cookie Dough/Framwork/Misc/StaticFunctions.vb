@@ -76,6 +76,13 @@ Namespace Framework.Misc
             End If
         End Sub
 
+        Public Function RemIllegalChars(text As String, font As NezSpriteFont) As String
+            Dim result As String = text
+            For Each element In text.Distinct
+                If Not font.HasCharacter(element) Or element = "'"c Then result = result.Replace(element, "#"c)
+            Next
+            Return result
+        End Function
 
         Public Function interpolate(ByVal d1 As Double, ByVal d2 As Double, ByVal dPercentage As Double) As Double
             Dim dDifference As Double = d2 - d1

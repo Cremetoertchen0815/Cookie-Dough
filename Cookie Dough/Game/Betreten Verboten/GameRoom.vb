@@ -624,7 +624,7 @@ Namespace Game.BetretenVerboten
 
                         'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
                         For Each sp In Spielers
-                            If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein SPieler noch nicht belegt/bereit, breche Spielstart ab
+                            If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
                         Next
 
                         'Falls vollzählig, starte Spiel
@@ -695,96 +695,101 @@ Namespace Game.BetretenVerboten
         Private Sub ReadAndProcessInputData()
             If MoveActive Then Return
 
-            Dim data As String() = LocalClient.ReadStream()
-            For Each element In data
-                Dim source As Integer = CInt(element(0).ToString)
-                Dim command As Char = element(1)
-                Select Case command
-                    Case "a"c 'Player arrived
-                        Dim txt As String() = element.Substring(2).Split("|")
-                        Spielers(source).Name = txt(0)
-                        Spielers(source).MOTD = txt(1)
-                        Spielers(source).ID = txt(2)
-                        Spielers(source).Bereit = True
-                        PostChat(Spielers(source).Name & " arrived!", Color.White)
-                        SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD, Spielers(source).ID)
-                    Case "c"c 'Sent chat message
-                        Dim text As String = element.Substring(2)
-                        If source = 9 Then
-                            PostChat("[Guest]: " & text, Color.Gray)
-                            SendChatMessage(source, text)
-                        Else
-                            PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
-                            SendChatMessage(source, text)
-                        End If
-                    Case "e"c 'Suspend gaem
-                        If Spielers(source).Typ = SpielerTyp.None Then Continue For
-                        Spielers(source).Bereit = False
-                        PostChat(Spielers(source).Name & " left!", Color.White)
-                        If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
-                        If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
-                        If Renderer.BeginTriggered Then StopWhenRealStart = True
-
-                        SendPlayerLeft(source)
-                    Case "j"c 'God got activated
-                        Dim figur As Integer = CInt(element(2).ToString)
-                        DontKickSacrifice = Spielers(source).SacrificeCounter < 0
-                        Spielers(source).SacrificeCounter = SacrificeWait
-                        Sacrifice(source, figur)
-                    Case "m"c 'Sent chat message
-                        Dim msg As String = element.Substring(2)
-                        PostChat(msg, Color.White)
-                    Case "n"c 'Switch player
-                        SwitchPlayer()
-                    Case "p"c 'Player angered
-                        Spielers(source).Angered = True
-                    Case "r"c 'Player is back
-                        Dim txt As String() = element.Substring(2).Split("|")
-                        Spielers(source).Name = txt(0)
-                        Spielers(source).MOTD = txt(1)
-                        Spielers(source).Bereit = True
-                        PostChat(Spielers(source).Name & " is back!", Color.White)
-                        SendPlayerBack(source)
-                        If SpielerIndex = source Then SendNewPlayerActive(SpielerIndex)
-                        'Check if players are still missing, if not, send the signal to continue the game
-                        Dim everythere As Boolean = True
-                        For Each pl In Spielers
-                            If Not pl.Bereit Then everythere = False
-                        Next
-                        If everythere And Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
-                        If everythere And StopWhenRealStart Then StopWhenRealStart = False
-                    Case "s"c 'Move figure
-                        Dim figur As Integer = CInt(element(2).ToString)
-                        Dim destination As Integer = CInt(element.Substring(3).ToString)
-                        SendFigureTransition(source, figur, destination)
-                        'Animiere wie die Figur sich nach vorne bewegt, anschließend kehre zurück zum nichts tun
-                        Dim defaultmov As Integer = Math.Max(Spielers(source).Spielfiguren(figur), 0)
-                        Status = SpielStatus.FahreFelder
-                        FigurFaderZiel = (source, figur)
-                        StartMoverSub(destination)
-                    Case "y"c
-                        SendSync()
-                    Case "z"c
-                        Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim SoundNr As Integer = CInt(element(3).ToString)
-                        Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-                        Try
-                            'Receive sound
-                            If IdentSound = IdentType.Custom Then
-                                IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+            Try
+                Dim data As String() = LocalClient.ReadStream()
+                For Each element In data
+                    Dim source As Integer = CInt(element(0).ToString)
+                    Dim command As Char = element(1)
+                    Select Case command
+                        Case "a"c 'Player arrived
+                            Dim txt As String() = element.Substring(2).Split("|")
+                            Spielers(source).Name = txt(0)
+                            Spielers(source).MOTD = txt(1)
+                            Spielers(source).ID = txt(2)
+                            Spielers(source).Bereit = True
+                            PostChat(Spielers(source).Name & " arrived!", Color.White)
+                            SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD, Spielers(source).ID)
+                        Case "c"c 'Sent chat message
+                            Dim text As String = element.Substring(2)
+                            If source = 9 Then
+                                PostChat("[Guest]: " & text, Color.Gray)
+                                SendChatMessage(source, text)
                             Else
-                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
+                                SendChatMessage(source, text)
                             End If
-                            SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_" & dat)
-                        Catch ex As Exception
-                            'Data damaged, send standard sound
-                            IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                            Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                            SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_")
-                        End Try
-                End Select
-            Next
+                        Case "e"c 'Suspend gaem
+                            If Spielers(source).Typ = SpielerTyp.None Then Continue For
+                            Spielers(source).Bereit = False
+                            PostChat(Spielers(source).Name & " left!", Color.White)
+                            If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
+                            If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
+                            If Renderer.BeginTriggered Then StopWhenRealStart = True
+
+                            SendPlayerLeft(source)
+                        Case "j"c 'God got activated
+                            Dim figur As Integer = CInt(element(2).ToString)
+                            DontKickSacrifice = Spielers(source).SacrificeCounter < 0
+                            Spielers(source).SacrificeCounter = SacrificeWait
+                            Sacrifice(source, figur)
+                        Case "m"c 'Sent chat message
+                            Dim msg As String = element.Substring(2)
+                            PostChat(msg, Color.White)
+                        Case "n"c 'Switch player
+                            SwitchPlayer()
+                        Case "p"c 'Player angered
+                            Spielers(source).Angered = True
+                        Case "r"c 'Player is back
+                            Dim txt As String() = element.Substring(2).Split("|")
+                            Spielers(source).Name = txt(0)
+                            Spielers(source).MOTD = txt(1)
+                            Spielers(source).Bereit = True
+                            PostChat(Spielers(source).Name & " is back!", Color.White)
+                            SendPlayerBack(source)
+                            If SpielerIndex = source Then SendNewPlayerActive(SpielerIndex)
+                            'Check if players are still missing, if not, send the signal to continue the game
+                            Dim everythere As Boolean = True
+                            For Each pl In Spielers
+                                If Not pl.Bereit Then everythere = False
+                            Next
+                            If everythere And Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
+                            If everythere And StopWhenRealStart Then StopWhenRealStart = False
+                        Case "s"c 'Move figure
+                            Dim figur As Integer = CInt(element(2).ToString)
+                            Dim destination As Integer = CInt(element.Substring(3).ToString)
+                            SendFigureTransition(source, figur, destination)
+                            'Animiere wie die Figur sich nach vorne bewegt, anschließend kehre zurück zum nichts tun
+                            Dim defaultmov As Integer = Math.Max(Spielers(source).Spielfiguren(figur), 0)
+                            Status = SpielStatus.FahreFelder
+                            FigurFaderZiel = (source, figur)
+                            StartMoverSub(destination)
+                        Case "y"c
+                            SendSync()
+                        Case "z"c
+                            Dim IdentSound As IdentType = CInt(element(2).ToString)
+                            Dim SoundNr As Integer = CInt(element(3).ToString)
+                            Dim dat As String = element.Substring(4).Replace("_TATA_", "")
+                            Try
+                                'Receive sound
+                                If IdentSound = IdentType.Custom Then
+                                    IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                    Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                                Else
+                                    Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                End If
+                                SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_" & dat)
+                            Catch ex As Exception
+                                'Data damaged, send standard sound
+                                IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
+                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_")
+                            End Try
+                    End Select
+                Next
+
+            Catch ex As Exception
+
+            End Try
         End Sub
 
         ' ---Methoden um Daten via den Server an die Clients zu senden---
@@ -1541,6 +1546,7 @@ Namespace Game.BetretenVerboten
                 SFX(2).Play()
                 Dim txt As String = Microsoft.VisualBasic.InputBox("Enter your message: ", "Send message", "")
                 If txt <> "" Then
+                    txt = RemIllegalChars(txt, ChatFont)
                     SendChatMessage(UserIndex, txt)
                     PostChat("[" & Spielers(UserIndex).Name & "]: " & txt, hudcolors(UserIndex))
                 End If

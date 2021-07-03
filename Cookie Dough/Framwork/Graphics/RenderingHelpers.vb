@@ -24,6 +24,32 @@ Namespace Framework.Graphics
             effect.Alpha = 1
             effect.Projection = Projection
         End Sub
+        Friend Sub ApplyDefaultFX(effect As BasicEffect, Projection As Matrix, color As Color)
+            effect.LightingEnabled = True
+            effect.AmbientLightColor = Color.White.ToVector3 * 0.06
+            effect.DirectionalLight0.Enabled = True
+            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight0.Direction = New Vector3(0.7, 1, 0.7)
+            effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+            effect.DirectionalLight1.Enabled = True
+            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight1.Direction = New Vector3(-0.7, 1, -0.7)
+            effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+            effect.DirectionalLight2.Enabled = True
+            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.35
+            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.1
+            effect.DiffuseColor = color.ToVector3
+            effect.SpecularPower = 15
+            effect.Alpha = 1
+            effect.Projection = Projection
+        End Sub
+        Friend Sub ApplyDefaultFX(model As Model, Projection As Matrix, color As Color)
+            For Each element In model.Meshes
+                For Each fx As BasicEffect In element.Effects
+                    ApplyDefaultFX(fx, Projection, color)
+                Next
+            Next
+        End Sub
         Friend Sub ApplyDefaultFX(model As Model, Projection As Matrix, Optional yflip As Integer = 1)
             For Each element In model.Meshes
                 For Each fx As BasicEffect In element.Effects

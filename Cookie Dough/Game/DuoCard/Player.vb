@@ -39,7 +39,7 @@ Namespace Game.DuoCard
         Public Property Bereit As Boolean = True Implements IPlayer.Bereit
 
 
-        Public Property HandDeck As List(Of Card) = New List(Of Card) From {New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Queen, CardSuit.Hearts), New Card(CardType.Jack, CardSuit.Spades), New Card(CardType.Four, CardSuit.Diamonds)}
+        Public Property HandDeck As List(Of Card)
 
         ''' <summary>
         ''' Der Sound, der abgespielt wird, wenn man gekickt wird

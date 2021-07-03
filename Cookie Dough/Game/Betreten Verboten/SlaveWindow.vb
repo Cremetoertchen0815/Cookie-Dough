@@ -1038,6 +1038,7 @@ Namespace Game.BetretenVerboten
                 SFX(2).Play()
                 Dim txt As String = Microsoft.VisualBasic.InputBox("Enter your message: ", "Send message", "")
                 If txt <> "" Then
+                    txt = RemIllegalChars(txt, ChatFont)
                     SendChatMessage(txt)
                 End If
                 chatbtnpressed = False

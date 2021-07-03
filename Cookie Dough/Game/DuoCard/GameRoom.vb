@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
 Imports Cookie_Dough.Game.CommonCards
@@ -34,6 +35,7 @@ Namespace Game.DuoCard
         Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
         Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
+        Private CardStack As List(Of Card)
 
         'Game flags
         Private MoveActive As Boolean = False 'Gibt an, ob eine Figuranimation in Gange ist
@@ -51,7 +53,7 @@ Namespace Game.DuoCard
         'HUD
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnB As Button
-        'Private WithEvents HUDBtnC As Button
+        ' Private WithEvents HUDBtnC As Button
         'Private WithEvents HUDBtnD As Button
         Private WithEvents HUDArrowUp As TextureButton
         Private WithEvents HUDArrowDown As TextureButton
@@ -84,7 +86,7 @@ Namespace Game.DuoCard
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
         Private Center As Vector2 'Gibt den Mittelpunkt des Screen-Viewports des Spielfelds an
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D} 'Bewegt die Kamera New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(0, 0, 0, 0, 0, 0, False)} 'Bewegt die Kamera New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)
         Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
 
         'Konstanten
@@ -95,7 +97,7 @@ Namespace Game.DuoCard
 
         Sub New()
             'Bereite Flags und Variablen vor
-            stat = CardGameState.SelectAction
+            stat = CardGameState.WarteAufOnlineSpieler
             LocalClient.LeaveFlag = False
             LocalClient.IsHost = True
             Chat = New List(Of (String, Color))
@@ -105,6 +107,7 @@ Namespace Game.DuoCard
 
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
         End Sub
+
 
         Public Sub LoadContent()
 
@@ -134,8 +137,8 @@ Namespace Game.DuoCard
 
             Renderer = AddRenderer(New CardRenderer(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
-            AddRenderer(New DefaultRenderer(1))
 
+            AddRenderer(New DefaultRenderer(1))
             AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.4).SetThreshold(0.15)
             ClearColor = Color.Black
             Material.DefaultMaterial.SamplerState = SamplerState.AnisotropicClamp
@@ -143,7 +146,15 @@ Namespace Game.DuoCard
             Center = New Rectangle(500, 70, 950, 950).Center.ToVector2
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
-            'Load sounds and MOTDs
+            'Generate card stack
+            CardStack = New List(Of Card)
+            For i As Integer = 1 To 13
+                For j As Integer = 0 To 3
+                    CardStack.Add(New Card(i, j))
+                Next
+            Next
+
+            'Load sounds, MOTDs and decks
             Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
@@ -160,7 +171,10 @@ Namespace Game.DuoCard
                             Spielers(i).CustomSound = {sff, sff}
                         End If
                 End Select
+                If Spielers(i).Typ <> SpielerTyp.None Then Spielers(i).HandDeck = New List(Of Card) From {DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard()}
             Next
+            'Set table card
+            TableCard = DrawRandomCard()
         End Sub
 
         Public Overrides Sub Unload()
@@ -180,10 +194,64 @@ Namespace Game.DuoCard
             If dbgCamFree Then FigurFaderCamera.Value = FigurFaderCamera.Value + New Keyframe3D(If(kstate.IsKeyDown(Keys.A), -1, 0) + If(kstate.IsKeyDown(Keys.D), 1, 0), If(kstate.IsKeyDown(Keys.S), -1, 0) + If(kstate.IsKeyDown(Keys.W), 1, 0), If(kstate.IsKeyDown(Keys.LeftShift), -1, 0) + If(kstate.IsKeyDown(Keys.Space), 1, 0), If(kstate.IsKeyDown(Keys.J), -0.01, 0) + If(kstate.IsKeyDown(Keys.L), 0.01, 0), If(kstate.IsKeyDown(Keys.K), -0.01, 0) + If(kstate.IsKeyDown(Keys.I), 0.01, 0), If(kstate.IsKeyDown(Keys.RightShift), -0.01, 0) + If(kstate.IsKeyDown(Keys.Enter), 0.01, 0), True) : HUDdbgLabel.Active = True
 
             If Not StopUpdating Then
+
+                'Prüfe, ob die Runde gewonnen wurde und beende gegebenenfalls die Runde
+                If CheckWin() Or TimeOver Or dbgEnd Then
+                    'Cue music
+                    If MediaPlayer.IsRepeating Then
+                        MediaPlayer.Play(DamDamDaaaam)
+                        MediaPlayer.Volume = 0.8
+                    Else
+                        MediaPlayer.Play(Fanfare)
+                        MediaPlayer.Volume = 0.3
+                    End If
+                    MediaPlayer.IsRepeating = False
+                    StopUpdating = True
+                    dbgEnd = False
+                    HUDInstructions.Text = "Game over!"
+
+                    'Berechne Rankings
+                    Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
+                    For i As Integer = 0 To PlCount - 1
+                        ranks.Add((i, GetScore(i)))
+                    Next
+                    ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
+                    ranks.Reverse()
+
+                    'Display ranks
+                    For i As Integer = 0 To ranks.Count - 1
+                        Dim ia As Integer = i
+                        Select Case i
+                            Case 0
+                                Core.Schedule(1 + i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                            Case 1
+                                Core.Schedule(1 + i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                            Case 2
+                                Core.Schedule(1 + i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                            Case Else
+                                Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                        End Select
+                    Next
+
+                    If GameMode = GameMode.Competetive Then
+                        'Update highscores
+                        Core.Schedule(ranks.Count + 1, AddressOf SendHighscore)
+                        'Update K/D
+                        If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
+                        My.Settings.Save()
+                    End If
+
+                    'Set flags
+                    SendWinFlag()
+                    Status = CardGameState.SpielZuEnde
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                End If
+
                 'TODO: Show remaining cards in player title
                 Select Case Status
                     Case CardGameState.SelectAction
 
+                        'Lay down card
                         For i As Integer = 0 To 6
                             Dim card_nr As Integer = i + 7 * DeckScroll
                             If card_nr >= HandDeck.Count Then Exit For
@@ -201,6 +269,34 @@ Namespace Game.DuoCard
                                 Exit For
                             End If
                         Next
+
+                        'Draw card
+                        If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(710, 420, 220, 270).Contains(mpos) AndAlso CardStack.Count > 0 Then
+                            Dim res As Card = DrawRandomCard()
+                            Spielers(UserIndex).HandDeck.Add(res)
+                            StopUpdating = True
+                            Core.Schedule(0.5, AddressOf SwitchPlayer)
+                        End If
+                    Case CardGameState.WarteAufOnlineSpieler
+
+                        HUDInstructions.Text = "Waiting for all players to connect..."
+
+                        'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
+                        For Each sp In Spielers
+                            If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
+                        Next
+
+                        'Falls vollzählig, starte Spiel
+                        StopUpdating = True
+                        Core.Schedule(0.8, Sub()
+                                               PostChat("The game has started!", Color.White)
+                                               FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(1500), New Keyframe3D, StdCam, Sub()
+                                                                                                                                                                                    SwitchPlayer()
+                                                                                                                                                                                    If StopWhenRealStart Then StopUpdating = True
+                                                                                                                                                                                End Sub) With {.Value = StdCam}
+                                               Automator.Add(FigurFaderCamera)
+                                               SendBeginGaem()
+                                           End Sub)
                 End Select
             End If
 
@@ -323,15 +419,15 @@ Namespace Game.DuoCard
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
         End Sub
-        'Private Sub SendHighscore()
-        '    Dim pls As New List(Of (String, Integer))
-        '    For i As Integer = 0 To Spielers.Length - 1
-        '        If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.Online Then
-        '            pls.Add((Spielers(i).Name, GetScore(i)))
-        '        End If
-        '    Next
-        '    SendNetworkMessageToAll("h" & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
-        'End Sub
+        Private Sub SendHighscore()
+            Dim pls As New List(Of (String, Integer))
+            For i As Integer = 0 To Spielers.Length - 1
+                If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.Online Then
+                    pls.Add((Spielers(i).Name, GetScore(i)))
+                End If
+            Next
+            SendNetworkMessageToAll("h" & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
+        End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
         End Sub
@@ -432,15 +528,34 @@ Namespace Game.DuoCard
         End Sub
 
         Private Function IsLayingCardValid(card As Card) As Boolean
-            Return True
+            Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
+        End Function
+        Private Function GetScore(i As Integer) As Integer
+            Return 0
+        End Function
+
+        Private Function CheckWin() As Boolean
+            For Each element In Spielers
+                If element.Typ <> SpielerTyp.None AndAlso element.HandDeck.Count = 0 Then Return True
+            Next
+            Return False
         End Function
 
         Private Sub LayCard(card As Card)
             Status = CardGameState.CardAnimationActive
             HUDInstructions.Text = ""
             TableCard = card
-            SwitchPlayer()
+            If CardStack.Contains(card) Then CardStack.Remove(card)
+            StopUpdating = True
+            Core.Schedule(0.5, AddressOf SwitchPlayer)
         End Sub
+
+        Private Function DrawRandomCard() As Card
+            Dim indx As Integer = Nez.Random.Range(0, CardStack.Count)
+            Dim ret As Card = CardStack(indx)
+            CardStack.RemoveAt(indx)
+            Return ret
+        End Function
 
         Private Sub SwitchPlayer()
 
@@ -472,6 +587,7 @@ Namespace Game.DuoCard
                 SFX(2).Play()
                 Dim txt As String = Microsoft.VisualBasic.InputBox("Enter your message: ", "Send message", "")
                 If txt <> "" Then
+                    txt = RemIllegalChars(txt, ChatFont)
                     SendChatMessage(UserIndex, txt)
                     PostChat("[" & Spielers(UserIndex).Name & "]: " & txt, hudcolors(UserIndex))
                 End If

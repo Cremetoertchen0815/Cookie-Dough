@@ -349,6 +349,7 @@ Namespace Menu.MainMenu
                 ChangeNameButtonPressed = True
                 Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
                 If txt <> "" Then
+                    txt = RemIllegalChars(txt, rend.MediumFont)
                     finalaction.Invoke(txt)
                 End If
                 ChangeNameButtonPressed = False

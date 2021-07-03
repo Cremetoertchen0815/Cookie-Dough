@@ -1,6 +1,7 @@
 ﻿BV:
+-Prohibit sending illegal chars in chat
+-Prohibit sending too long messages and files
 -Work on DC
--Implement kill streak bonus
 -Add intro animation for all maps
 
 Engine Fixes:
