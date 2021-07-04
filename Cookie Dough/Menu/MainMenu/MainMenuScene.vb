@@ -188,8 +188,11 @@ Namespace Menu.MainMenu
                     'PFP
                     If New Rectangle(1350, 245 + 2 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "PNG-File|*.png", .Title = "Select profile picture"}
-                        If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
+                        Dim res = ofd.ShowDialog
+                        If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
                             IO.File.Copy(ofd.FileName, "Cache\client\pp.png", True)
+                        ElseIf res = Windows.Forms.DialogResult.OK Then
+                            Microsoft.VisualBasic.MsgBox("File too big!")
                         End If
                     ElseIf New Rectangle(960, 230 + 2 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         My.Settings.Thumbnail = (My.Settings.Thumbnail + 1) Mod 7
@@ -200,8 +203,11 @@ Namespace Menu.MainMenu
                     'Spawn Sound
                     If New Rectangle(1350, 245 + 3 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
-                        If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
+                        Dim res = ofd.ShowDialog
+                        If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
                             IO.File.Copy(ofd.FileName, "Cache\client\soundA.audio", True)
+                        ElseIf res = Windows.Forms.DialogResult.OK Then
+                            Microsoft.VisualBasic.MsgBox("File too big!")
                         End If
                         Try
                             PlayAudio(IdentType.Custom)
@@ -222,8 +228,11 @@ Namespace Menu.MainMenu
                     'Kick Sound
                     If New Rectangle(1350, 245 + 4 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
-                        If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
+                        Dim res = ofd.ShowDialog
+                        If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
                             IO.File.Copy(ofd.FileName, "Cache\client\soundB.audio", True)
+                        ElseIf res = Windows.Forms.DialogResult.OK Then
+                            Microsoft.VisualBasic.MsgBox("File too big!")
                         End If
                         Try
                             PlayAudio(IdentType.Custom, True)
