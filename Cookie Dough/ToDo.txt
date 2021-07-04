@@ -1,5 +1,4 @@
 ﻿BV:
--Prohibit sending illegal chars in chat
 -Prohibit sending too long messages and files
 -Work on DC
 -Add intro animation for all maps

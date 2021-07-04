@@ -84,6 +84,22 @@ Namespace Framework.Misc
             Return result
         End Function
 
+        Private BoxOpen As Boolean = False
+        Friend Sub LaunchInputBox(finalaction As Action(Of String), font As NezSpriteFont, message As String, title As String, Optional defaultvalue As String = "")
+            If Not BoxOpen Then
+                BoxOpen = True
+                Dim t As New Threading.Thread(Sub()
+                                                  Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
+                                                  If txt <> "" Then
+                                                      txt = RemIllegalChars(txt, font)
+                                                      finalaction.Invoke(txt)
+                                                  End If
+                                                  BoxOpen = False
+                                              End Sub)
+                t.Start()
+            End If
+        End Sub
+
         Public Function interpolate(ByVal d1 As Double, ByVal d2 As Double, ByVal dPercentage As Double) As Double
             Dim dDifference As Double = d2 - d1
             Dim dDistance As Double = dDifference * dPercentage

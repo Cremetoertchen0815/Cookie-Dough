@@ -582,17 +582,11 @@ Namespace Game.DuoCard
         Dim chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
-            If Not chatbtnpressed Then
-                chatbtnpressed = True
-                SFX(2).Play()
-                Dim txt As String = Microsoft.VisualBasic.InputBox("Enter your message: ", "Send message", "")
-                If txt <> "" Then
-                    txt = RemIllegalChars(txt, ChatFont)
-                    SendChatMessage(UserIndex, txt)
-                    PostChat("[" & Spielers(UserIndex).Name & "]: " & txt, hudcolors(UserIndex))
-                End If
-                chatbtnpressed = False
-            End If
+            SFX(2).Play()
+            LaunchInputBox(Sub(x)
+                               SendChatMessage(UserIndex, x)
+                               PostChat("[" & Spielers(UserIndex).Name & "]: " & x, hudcolors(UserIndex))
+                           End Sub, ChatFont, "Enter your message: ", "Send message")
         End Sub
         Private Sub VolumeButton() Handles HUDMusicBtn.Clicked
             MediaPlayer.Volume = If(MediaPlayer.Volume > 0F, 0F, 0.1F)

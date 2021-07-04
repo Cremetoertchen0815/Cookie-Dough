@@ -1033,16 +1033,11 @@ Namespace Game.BetretenVerboten
         Dim chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
-            If Not chatbtnpressed Then
-                chatbtnpressed = True
-                SFX(2).Play()
-                Dim txt As String = Microsoft.VisualBasic.InputBox("Enter your message: ", "Send message", "")
-                If txt <> "" Then
-                    txt = RemIllegalChars(txt, ChatFont)
-                    SendChatMessage(txt)
-                End If
-                chatbtnpressed = False
-            End If
+            SFX(2).Play()
+            LaunchInputBox(Sub(x)
+                               SendChatMessage(x)
+                               PostChat("[" & Spielers(UserIndex).Name & "]: " & x, hudcolors(UserIndex))
+                           End Sub, ChatFont, "Enter your message: ", "Send message")
         End Sub
 
 

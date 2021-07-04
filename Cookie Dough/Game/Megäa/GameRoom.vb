@@ -86,7 +86,8 @@ Namespace Game.Megäa
 
             If LocalClient.Connected Then
                 Dim name As String = ""
-                OpenInputbox("Enter a name for the round:", "Start Round", Sub(x) Networking.ExtGame.CreateGame(LocalClient, x))
+
+                LaunchInputBox(Sub(x) Networking.ExtGame.CreateGame(LocalClient, x), ChatFont, "Enter a name for the round:", "Start Round")
                 NetworkMode = True
             Else
                 NetworkMode = False
@@ -485,16 +486,6 @@ Namespace Game.Megäa
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
         End Sub
-        Private Sub OpenInputbox(message As String, title As String, finalaction As Action(Of String), Optional defaultvalue As String = "")
-            If Not InputBoxFlag Then
-                InputBoxFlag = True
-                Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
-                If txt <> "" Then
-                    finalaction.Invoke(txt)
-                End If
-                InputBoxFlag = False
-            End If
-        End Sub
 
 #Region "Knopfgedrücke"
         Private Sub ExitButton() Handles HUDBtnA.Clicked
@@ -507,10 +498,11 @@ Namespace Game.Megäa
         End Sub
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
-            OpenInputbox("Enter your message: ", "Send message", Sub(x)
-                                                                     SendChatMessage(UserIndex, x)
-                                                                     PostChat("[" & Spielers(UserIndex).Name & "]: " & x, HUDColor)
-                                                                 End Sub)
+
+            LaunchInputBox(Sub(x)
+                               SendChatMessage(UserIndex, x)
+                               PostChat("[" & Spielers(UserIndex).Name & "]: " & x, hudcolors(UserIndex))
+                           End Sub, ChatFont, "Enter your message: ", "Send message")
         End Sub
         Private Sub VolumeButton() Handles HUDMusicBtn.Clicked
             MediaPlayer.Volume = If(MediaPlayer.Volume > 0F, 0F, 0.1F)

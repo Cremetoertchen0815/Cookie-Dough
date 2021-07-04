@@ -123,10 +123,10 @@ Namespace Menu.MainMenu
                                 Case -2 'Dual button
                                     If mpos.X <= 960 Then
                                         'Left button
-                                        If Not IsConnectedToServer Then OpenInputbox("Enter IP-adress:", "Add server", Sub(x)
-                                                                                                                           My.Settings.Servers.Add(x)
-                                                                                                                           UpdateServerList()
-                                                                                                                       End Sub, My.Settings.IP) : SFX(2).Play() Else SFX(0).Play()
+                                        If Not IsConnectedToServer Then LaunchInputBox(Sub(x)
+                                                                                           My.Settings.Servers.Add(x)
+                                                                                           UpdateServerList()
+                                                                                       End Sub, rend.MediumFont, "Enter IP-adress:", "Add server", My.Settings.IP) : SFX(2).Play() Else SFX(0).Play()
                                     Else
                                         'Right button
                                         If IsConnectedToServer Then
@@ -167,23 +167,23 @@ Namespace Menu.MainMenu
                 Case 5
 
                     'Nick name
-                    If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter the new username: ", "Change username", Sub(x)
-                                                                                                                                                                                                 If IsConnectedToServer Then
-                                                                                                                                                                                                     LocalClient.Disconnect()
-                                                                                                                                                                                                     My.Settings.Username = x
-                                                                                                                                                                                                     My.Settings.Save()
-                                                                                                                                                                                                     LocalClient.Connect(lasthostname, My.Settings.Username)
-                                                                                                                                                                                                 Else
-                                                                                                                                                                                                     My.Settings.Username = x
-                                                                                                                                                                                                     My.Settings.Save()
-                                                                                                                                                                                                 End If
-                                                                                                                                                                                             End Sub, My.Settings.Username)
+                    If New Rectangle(960, 230 + 0 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then LaunchInputBox(Sub(x)
+                                                                                                                                                    If IsConnectedToServer Then
+                                                                                                                                                        LocalClient.Disconnect()
+                                                                                                                                                        My.Settings.Username = x
+                                                                                                                                                        My.Settings.Save()
+                                                                                                                                                        LocalClient.Connect(lasthostname, My.Settings.Username)
+                                                                                                                                                    Else
+                                                                                                                                                        My.Settings.Username = x
+                                                                                                                                                        My.Settings.Save()
+                                                                                                                                                    End If
+                                                                                                                                                End Sub, rend.MediumFont, "Enter the new username: ", "Change username", My.Settings.Username)
 
                     'MOTD
-                    If New Rectangle(960, 230 + 1 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then OpenInputbox("Enter your new ""Message of the day"": ", "Change MOTD", Sub(x)
-                                                                                                                                                                                                            My.Settings.MOTD = x
-                                                                                                                                                                                                            My.Settings.Save()
-                                                                                                                                                                                                        End Sub, My.Settings.MOTD)
+                    If New Rectangle(960, 230 + 1 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then LaunchInputBox(Sub(x)
+                                                                                                                                                    My.Settings.MOTD = x
+                                                                                                                                                    My.Settings.Save()
+                                                                                                                                                End Sub, rend.MediumFont, "Enter your new ""Message of the day"": ", "Change MOTD", My.Settings.MOTD)
 
                     'PFP
                     If New Rectangle(1350, 245 + 2 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
@@ -344,17 +344,6 @@ Namespace Menu.MainMenu
             End Select
         End Sub
 
-        Private Sub OpenInputbox(message As String, title As String, finalaction As Action(Of String), Optional defaultvalue As String = "")
-            If Not ChangeNameButtonPressed Then
-                ChangeNameButtonPressed = True
-                Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
-                If txt <> "" Then
-                    txt = RemIllegalChars(txt, rend.MediumFont)
-                    finalaction.Invoke(txt)
-                End If
-                ChangeNameButtonPressed = False
-            End If
-        End Sub
 
         'RENDERER
         Private Class MainMenuRenderer
