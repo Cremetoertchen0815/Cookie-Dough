@@ -70,6 +70,7 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDNameBtn As Button
         Private WithEvents HUDFullscrBtn As Button
         Private WithEvents HUDMusicBtn As Button
+        Private WithEvents HUDAfkBtn As Button
         Private WithEvents HUDDiceBtn As GameRenderable
         Private WithEvents HUDmotdLabel As Controls.Label
         Private InstructionFader As PropertyTransition
@@ -198,6 +199,7 @@ Namespace Game.BetretenVerboten
             InstructionFader = New PropertyTransition(New TransitionTypes.TransitionType_EaseInEaseOut(700), HUDInstructions, "Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), Nothing) With {.Repeat = RepeatJob.Reverse} : Automator.Add(InstructionFader)
             HUDNameBtn = New Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
             HUDmotdLabel = New Label("", New Vector2(400, 750)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond, .Active = False} : HUD.Controls.Add(HUDmotdLabel)
+            HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
@@ -298,7 +300,7 @@ Namespace Game.BetretenVerboten
             Dim kstate As KeyboardState = Keyboard.GetState()
             Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
 
-            If Not StopUpdating And UserIndex > -1 Then
+            If Not StopUpdating And UserIndex > -1 And Not Spielers(UserIndex).IsAFK Then
 
                 'Update die Spielelogik
                 Select Case Status
@@ -443,6 +445,11 @@ Namespace Game.BetretenVerboten
                         StopUpdating = True
                 End Select
 
+                'Set HUD color
+                If Not Renderer.BeginTriggered Then HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
+                If Not Renderer.BeginTriggered Then HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
+                HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex = UserIndex)
+            ElseIf Not StopUpdating And UserIndex > -1 Then
                 'Set HUD color
                 If Not Renderer.BeginTriggered Then HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name & "(" & GetScore(SpielerIndex) & ")", "")
                 If Not Renderer.BeginTriggered Then HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
@@ -655,8 +662,10 @@ Namespace Game.BetretenVerboten
                             Spielers(i).Angered = sp.Spielers(i).Angered
                             Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
                             Spielers(i).SuicideField = sp.Spielers(i).SuicideField
+                            Spielers(i).IsAFK = sp.Spielers(i).IsAFK
                         Next
                         If UserIndex > -1 AndAlso Spielers(UserIndex).Angered Then HUDBtnC.Active = False
+                        If UserIndex > -1 Then HUDAfkBtn.Text = If(Spielers(UserIndex).IsAFK, "Back Again", "AFK")
                         SaucerFields = sp.SaucerFields
                     Case "z"c 'Receive sound
                         Dim source As Integer = CInt(element(1).ToString)
@@ -714,6 +723,11 @@ Namespace Game.BetretenVerboten
         Private Sub SendAngered()
             LocalClient.WriteStream("p")
         End Sub
+
+        Private Sub SendAfkSignal() Handles HUDAfkBtn.Clicked
+            LocalClient.WriteStream("h")
+        End Sub
+
         Private Sub SendSoundFile()
             If UserIndex < 0 Then Return
             Dim txt As String = ""

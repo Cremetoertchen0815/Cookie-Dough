@@ -71,6 +71,7 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDNameBtn As Button
         Private WithEvents HUDFullscrBtn As Button
         Private WithEvents HUDMusicBtn As Button
+        Private WithEvents HUDAfkBtn As Button
         Private WithEvents HUDdbgLabel As Label
         Private WithEvents HUDmotdLabel As Label
         Private WithEvents HUDDiceBtn As GameRenderable
@@ -178,6 +179,7 @@ Namespace Game.BetretenVerboten
             HUDNameBtn = New Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
             HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
+            HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = hudcolors(0)
 
@@ -632,6 +634,7 @@ Namespace Game.BetretenVerboten
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
                                                FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+                                               HUDInstructions.Text = " "
                                                'Launch start animation
                                                Renderer.TriggerStartAnimation(Sub()
                                                                                   SwitchPlayer()
@@ -727,6 +730,9 @@ Namespace Game.BetretenVerboten
                             If Renderer.BeginTriggered Then StopWhenRealStart = True
 
                             SendPlayerLeft(source)
+                        Case "h"c 'Afk button toggled
+                            Spielers(source).IsAFK = Not Spielers(source).IsAFK
+                            SendSync()
                         Case "j"c 'God got activated
                             Dim figur As Integer = CInt(element(2).ToString)
                             DontKickSacrifice = Spielers(source).SacrificeCounter < 0
@@ -867,7 +873,7 @@ Namespace Game.BetretenVerboten
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
                     'Send Sound A
-                    Dim txt As String
+                    Dim txt As String = ""
                     Dim snd As IdentType = GetPlayerAudio(i, False, txt)
                     SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
 
@@ -1526,14 +1532,19 @@ Namespace Game.BetretenVerboten
                 WürfelWerte(i) = 0
             Next
             'Set HUD flags
+            ResetHUD()
+            HUDInstructions.Text = "Roll the Dice!"
+            'Reset camera if not already moving
+            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+        End Sub
+
+        Private Sub ResetHUD()
             HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
             HUDBtnD.Active = SpielerIndex = UserIndex
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
-            HUDInstructions.Text = "Roll the Dice!"
+            HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
             HUD.Color = hudcolors(UserIndex)
             HUDNameBtn.Active = True
-            'Reset camera if not already moving
-            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
         End Sub
 #End Region
 #Region "Knopfgedrücke"
@@ -1608,6 +1619,13 @@ Namespace Game.BetretenVerboten
             Else
                 SFX(0).Play()
             End If
+        End Sub
+
+        Private Sub AwayFromKeyboardButton() Handles HUDAfkBtn.Clicked
+            If SpielerIndex < 0 OrElse Spielers(SpielerIndex)._type <> SpielerTyp.Local Then Return
+            Spielers(SpielerIndex).IsAFK = Not Spielers(SpielerIndex).IsAFK
+            If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
+            ResetHUD()
         End Sub
 #End Region
 #Region "Debug Commands"
