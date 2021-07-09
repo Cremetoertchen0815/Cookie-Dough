@@ -1,6 +1,11 @@
 ﻿BV:
--Work on DC
+-Profile Pix(under homebase)
+-Fix whitelisting with > 2 players
+-Prohibit leaving to main menu when intro is playing
+-Increase play field texture resolution
 -Add intro animation for all maps
+
+-Work on DC
 
 Engine Fixes:
 -Blurry Scaling(Anisotropic or point filtering???)

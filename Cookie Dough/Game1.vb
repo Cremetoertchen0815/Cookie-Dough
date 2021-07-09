@@ -58,8 +58,8 @@ Namespace Cookie_Dough
 #End If
 
             'Load common assets
-            ReferencePixel = New Texture2D(GraphicsDevice, 1, 1)
-            ReferencePixel.SetData({Color.White})
+            ReferencePixelTrans = New Texture2D(GraphicsDevice, 1, 1)
+            ReferencePixelTrans.SetData({Color.Red})
             SFX = {Content.Load(Of SoundEffect)("sfx/access_denied"),
               Content.Load(Of SoundEffect)("sfx/checkpoint"),
               Content.Load(Of SoundEffect)("sfx/item_collect"),
@@ -73,6 +73,7 @@ Namespace Cookie_Dough
             Lalala = Content.Load(Of Song)("games\BV\lalalala")
             triumph = Content.Load(Of Song)("sfx\triumph")
             DebugTexture = Content.LoadTexture("dbg1")
+            ReferencePixelTrans = DebugTexture
 
             'Create Emmond Tween-Manager(for BV backwards compat.)
             Automator = New TweenManager

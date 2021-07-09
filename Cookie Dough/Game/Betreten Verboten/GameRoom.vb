@@ -769,26 +769,39 @@ Namespace Game.BetretenVerboten
                             Status = SpielStatus.FahreFelder
                             FigurFaderZiel = (source, figur)
                             StartMoverSub(destination)
-                        Case "y"c
+                        Case "y"c 'Sync requested
                             SendSync()
-                        Case "z"c
+                        Case "z"c 'Transmit user data
                             Dim IdentSound As IdentType = CInt(element(2).ToString)
-                            Dim SoundNr As Integer = CInt(element(3).ToString)
+                            Dim dataNr As Integer = CInt(element(3).ToString)
                             Dim dat As String = element.Substring(4).Replace("_TATA_", "")
                             Try
-                                'Receive sound
-                                If IdentSound = IdentType.Custom Then
-                                    IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                    Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                                If dataNr = 9 Then
+                                    'Receive pfp
+                                    If IdentSound = IdentType.Custom Then
+                                        IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav")
+                                    Else
+                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                    End If
+                                    SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
                                 Else
-                                    Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                    'Receive sound
+                                    If IdentSound = IdentType.Custom Then
+                                        IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav")
+                                    Else
+                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                    End If
+                                    SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
                                 End If
-                                SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_" & dat)
+
                             Catch ex As Exception
                                 'Data damaged, send standard sound
-                                IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                                SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_")
+                                If dataNr = 9 Then Exit Select
+                                IdentSound = If(dataNr = 0, IdentType.TypeB, IdentType.TypeA)
+                                Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_")
                             End Try
                     End Select
                 Next

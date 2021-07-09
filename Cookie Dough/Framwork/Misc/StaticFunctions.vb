@@ -22,11 +22,6 @@ Namespace Framework.Misc
             u = u.Length() * New Vector2(CSng(Math.Cos(a)), CSng(Math.Sin(a)))
             Return u + origin
         End Function
-        Public Function shortAngleDist(a As Single, b As Single) As Single
-            Dim max = Math.PI * 2
-            Dim da = (b - a) Mod max
-            Return 2 * da Mod max - da
-        End Function
         Public Function WrapTextDifferently(ByVal text As String, ByVal width As Integer, ByVal overflow As Boolean) As String
             Dim result As StringBuilder = New StringBuilder()
             Dim index As Integer = 0
@@ -129,10 +124,6 @@ Namespace Framework.Misc
         Public Function convertLinearToDeceleration(dElapsed As Double) As Double
             Return dElapsed * (2.0 - dElapsed)
         End Function
-
-        Public Function DotProduct(vertex As Vector3, P1 As Vector3, P2 As Vector3) As Double
-            Return (P1.X - vertex.X) * (P2.X - vertex.X) + (P1.Y - vertex.Y) * (P2.Y - vertex.Y) + (P1.Z - vertex.Z) * (P2.Z - vertex.Z)
-        End Function
         Public Function FilenameIsOK(fileName As String) As Boolean
             Dim file As String = Path.GetFileName(fileName)
             Dim directory As String = Path.GetDirectoryName(fileName)
@@ -140,6 +131,17 @@ Namespace Framework.Misc
             Return Not (file.Intersect(Path.GetInvalidFileNameChars()).Any() _
                 OrElse
                 directory.Intersect(Path.GetInvalidPathChars()).Any())
+        End Function
+
+        Public Function PointsToRectangle(a As Vector2, b As Vector2, inflation As Vector2) As Rectangle
+            Dim smallestX As Integer = CInt(Math.Min(a.X, b.X))
+            Dim smallestY As Integer = CInt(Math.Min(a.Y, b.Y))
+            Dim largestX As Integer = CInt(Math.Max(a.X, b.X))
+            Dim largestY As Integer = CInt(Math.Max(a.Y, b.Y))
+            Dim width As Integer = largestX - smallestX
+            Dim height As Integer = largestY - smallestY
+            Dim res As New Rectangle(smallestX - inflation.X, smallestY - inflation.Y, width + inflation.X * 2, height + inflation.Y * 2)
+            Return res
         End Function
 
     End Module

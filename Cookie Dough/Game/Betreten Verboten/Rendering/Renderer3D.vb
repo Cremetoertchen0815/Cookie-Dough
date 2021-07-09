@@ -125,12 +125,17 @@ Namespace Game.BetretenVerboten.Rendering
             Material.SamplerState = SamplerState.AnisotropicWrap
             batchlor.Begin(Material)
 
-            'Zeichne Verbindungen
+            'Draw connections
             batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
             batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             'Draw fields
             For j = 0 To Game.Spielers.Length - 1
+                'Draw player thumbnail
+                Dim ptA As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, PlayFieldPos.Home1, j)
+                Dim ptB As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, If(Game.Map = GaemMap.Default4Players, PlayFieldPos.Home4, PlayFieldPos.Home2), j)
+                batchlor.Draw(Game.Spielers(j).Thumbnail, New Rectangle((ptA + (ptB - ptA) * 0.5).ToPoint, New Point(GetPPsize(Game.Map))), Nothing, Color.White, GetPProtation(j, Game.Map), Game.Spielers(j).Thumbnail.Bounds.Size.ToVector2 * 0.5, SpriteEffects.None, 0)
+
                 'Zeichne Spielfeld
                 For i = 0 To 17
                     Dim loc As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, i, j)
@@ -148,7 +153,7 @@ Namespace Game.BetretenVerboten.Rendering
                 Next
             Next
 
-            'Zeichne UFO-Felder
+            'Draw UFO fields
             For Each element In Game.SaucerFields
                 batchlor.DrawCircle(New Vector2(475) + GetMapVectorPos(Game.Map, element), sizes.Item1, Color.SandyBrown, 5)
             Next

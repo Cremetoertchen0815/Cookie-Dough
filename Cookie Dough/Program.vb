@@ -13,7 +13,7 @@ Namespace Cookie_Dough
         'Old Beacon-tweening system for backwards compatibility for BV
         Friend Property VersionString As String = "Cookie Dough V0.28"
         Friend Property Automator As TweenManager
-        Friend Property ReferencePixel As Texture2D
+        Friend Property ReferencePixelTrans As Texture2D
         Friend Property Dev As GraphicsDevice
         Friend Property DefaultFont As SpriteFont
         Friend Property DebugTexture As Texture2D

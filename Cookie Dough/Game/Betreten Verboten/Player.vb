@@ -87,7 +87,7 @@ Namespace Game.BetretenVerboten
         ''' Das Thumbnail des Spielers
         ''' </summary>
         <JsonIgnore>
-        Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
+        Public Property Thumbnail As Texture2D = ReferencePixelTrans Implements IPlayer.Thumbnail
 
         ''' <summary>
         ''' Der Identifikationsstring des Spielers

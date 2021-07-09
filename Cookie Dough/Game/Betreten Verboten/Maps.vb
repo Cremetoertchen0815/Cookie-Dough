@@ -153,6 +153,7 @@ Namespace Game.BetretenVerboten
         End Function
 
         Friend transmatrices0 As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
+        Private rotato0 As Single() = {0, MathHelper.PiOver2, MathHelper.Pi, MathHelper.PiOver2 * 3} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
         Private Function Map0GetLocalPos(ps As PlayFieldPos) As Vector2
             Select Case ps
                 Case PlayFieldPos.Home1
@@ -197,6 +198,7 @@ Namespace Game.BetretenVerboten
         End Function
 
         Friend transmatrices1 As Matrix() = {Matrix.CreateRotationZ(MathHelper.TwoPi * 2 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 3 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 4 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 5 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 6 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 7 / 6), Matrix.CreateRotationZ(MathHelper.TwoPi * 1 / 6)} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
+        Friend rotato1 As Single() = {MathHelper.TwoPi * 0 / 6, MathHelper.TwoPi * 1 / 6, MathHelper.TwoPi * 2 / 6, MathHelper.TwoPi * 3 / 6, MathHelper.TwoPi * 4 / 6, MathHelper.TwoPi * 5 / 6, MathHelper.TwoPi * 6 / 6} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
         Private Function Map1GetLocalPos(ps As PlayFieldPos) As Vector2
             Dim defvec As New Vector2(Opos1, 0)
             Dim angvecA As Vector2 = RotateVector(Vector2.UnitX * (FDist1), MathHelper.TwoPi / 5)
@@ -236,6 +238,7 @@ Namespace Game.BetretenVerboten
         End Function
 
         Friend transmatrices2 As Matrix() = {Matrix.CreateRotationZ(MathHelper.TwoPi * 3 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 4 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 5 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 6 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 7 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 8 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 1 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 2 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 3 / 8)} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
+        Friend rotato2 As Single() = {0, MathHelper.TwoPi * 1 / 8, MathHelper.TwoPi * 2 / 8, MathHelper.TwoPi * 3 / 8, MathHelper.TwoPi * 4 / 8, MathHelper.TwoPi * 5 / 8, MathHelper.TwoPi * 6 / 8, MathHelper.TwoPi * 7 / 8, MathHelper.TwoPi * 8 / 8} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
         Private Function Map2GetLocalPos(ps As PlayFieldPos) As Vector2
             FDist2 = 46
             transmatrices2 = {Matrix.CreateRotationZ(MathHelper.TwoPi * 2 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 3 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 4 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 5 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 6 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 7 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 8 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 1 / 8), Matrix.CreateRotationZ(MathHelper.TwoPi * 2 / 8)} 'Enthält Transform-Matritzen, welche die SPielfeld-Hitboxen um den Spielfeld-Mittelpunkt rotieren.
@@ -324,6 +327,27 @@ Namespace Game.BetretenVerboten
 
         Private Function GetChrRect(vc As Vector2) As Rectangle
             Return New Rectangle(vc.X - 20, vc.Y - 20, 40, 40)
+        End Function
+
+        Friend Function GetPProtation(pl As Integer, map As GaemMap) As Single
+            Select Case map
+                Case GaemMap.Default4Players
+                    Return rotato0(pl)
+                Case GaemMap.Default6Players
+                    Return rotato1(pl)
+                Case Else
+                    Return rotato2(pl) + 0.38
+            End Select
+        End Function
+        Friend Function GetPPsize(map As GaemMap) As Integer
+            Select Case map
+                Case GaemMap.Default4Players
+                    Return 140
+                Case GaemMap.Default6Players
+                    Return 80
+                Case Else
+                    Return 60
+            End Select
         End Function
     End Module
 End Namespace

@@ -28,7 +28,6 @@ Namespace Framework.Graphics
         Protected World As Matrix
         Protected View As Matrix
         Protected Projection As Matrix
-        Public StencilTexture As Texture2D = ReferencePixel
 
         'Properties
         Public Property Size As New Vector2(1920.0F, 1080)
@@ -96,9 +95,6 @@ Namespace Framework.Graphics
 
                 dev.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4)
             Next
-        End Sub
-
-        Public Sub DirectDraw(gameTime As GameTime)
         End Sub
 
         Public Sub [End]()
