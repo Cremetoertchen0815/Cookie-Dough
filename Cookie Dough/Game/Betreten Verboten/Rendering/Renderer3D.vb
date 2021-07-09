@@ -17,6 +17,7 @@ Namespace Game.BetretenVerboten.Rendering
         Private MapBuffer As VertexBuffer
         Private TableModel As Model
         Private TableMatrix As Matrix
+        Private ResolutionMultiplier As Single = 3
 
         Private SaucerModel As Model
         Private SaucerLift As Transition(Of Single)
@@ -84,8 +85,8 @@ Namespace Game.BetretenVerboten.Rendering
 
             SpielfeldTextur = New RenderTarget2D(
             dev,
-            950,
-            950,
+            950 * ResolutionMultiplier,
+            950 * ResolutionMultiplier,
             False,
             dev.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents) With {.Name = "TmpA"}
@@ -123,7 +124,7 @@ Namespace Game.BetretenVerboten.Rendering
             Dim sizes As (Integer, Integer, Single, Integer) = GetFieldSizes(Game.Map)
 
             Material.SamplerState = SamplerState.AnisotropicWrap
-            batchlor.Begin(Material)
+            batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
 
             'Draw connections
             batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
