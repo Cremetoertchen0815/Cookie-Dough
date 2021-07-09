@@ -1,7 +1,6 @@
 ﻿BV:
 -Profile Pix(under homebase)
 -Fix whitelisting with > 2 players
--Prohibit leaving to main menu when intro is playing
 -Increase play field texture resolution
 -Add intro animation for all maps
 
