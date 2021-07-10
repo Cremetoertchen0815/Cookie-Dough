@@ -1,5 +1,5 @@
 ﻿BV:
--Profile Pix(under homebase)
+-Fix none-players online issues
 -Fix whitelisting with > 2 players
 -Add intro animation for all maps
 
