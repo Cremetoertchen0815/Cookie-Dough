@@ -36,6 +36,7 @@ Namespace Framework.Networking
 
         Sub New()
             Directory.CreateDirectory("Cache\client\")
+            If Not File.Exists("Cache\client\pp.png") Then File.Copy("Content\prep\plc.png", "Cache\client\pp.png", True)
         End Sub
 
         Public Sub Connect(hostname As String, nickname As String)

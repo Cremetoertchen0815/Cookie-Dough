@@ -14,7 +14,7 @@ Option Explicit On
 
 
 <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
- Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0"),  _
+ Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0"),  _
  Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
 Partial Public NotInheritable Class Settings
     Inherits Global.System.Configuration.ApplicationSettingsBase
@@ -102,10 +102,10 @@ Partial Public NotInheritable Class Settings
     
     <Global.System.Configuration.UserScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
-    Public Property Thumbnail() As Integer
+     Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+    Public Property Thumbnail() As Boolean
         Get
-            Return CType(Me("Thumbnail"),Integer)
+            Return CType(Me("Thumbnail"),Boolean)
         End Get
         Set
             Me("Thumbnail") = value

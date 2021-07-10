@@ -186,7 +186,7 @@ Namespace Menu.MainMenu
                                                                                                                                                 End Sub, rend.MediumFont, "Enter your new ""Message of the day"": ", "Change MOTD", My.Settings.MOTD)
 
                     'PFP
-                    If New Rectangle(1350, 245 + 2 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                    If New Rectangle(1350, 245 + 2 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And My.Settings.Thumbnail Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "PNG-File|*.png", .Title = "Select profile picture"}
                         Dim res = ofd.ShowDialog
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
@@ -195,13 +195,13 @@ Namespace Menu.MainMenu
                             Microsoft.VisualBasic.MsgBox("File too big!")
                         End If
                     ElseIf New Rectangle(960, 230 + 2 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
-                        My.Settings.Thumbnail = (My.Settings.Thumbnail + 1) Mod 7
+                        My.Settings.Thumbnail = Not My.Settings.Thumbnail
                         My.Settings.Save()
-                        If My.Settings.Thumbnail = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\pp.png") Then IO.File.Copy("Content\prep\plc.png", "Cache\client\pp.png")
+                        If My.Settings.Thumbnail AndAlso Not IO.File.Exists("Cache\client\pp.png") Then IO.File.Copy("Content\prep\plc.png", "Cache\client\pp.png")
                     End If
 
                     'Spawn Sound
-                    If New Rectangle(1350, 245 + 3 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                    If New Rectangle(1350, 245 + 3 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And My.Settings.SoundA = IdentType.Custom Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
                         Dim res = ofd.ShowDialog
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
@@ -226,7 +226,7 @@ Namespace Menu.MainMenu
                     End If
 
                     'Kick Sound
-                    If New Rectangle(1350, 245 + 4 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                    If New Rectangle(1350, 245 + 4 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And My.Settings.SoundB = IdentType.Custom Then
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
                         Dim res = ofd.ShowDialog
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
@@ -506,14 +506,14 @@ Namespace Menu.MainMenu
 
                         DrawUserMenuTableString("Name", My.Settings.Username, 0, batcher)
                         DrawUserMenuTableString("MOTD", If(My.Settings.MOTD.Length > 15, My.Settings.MOTD.Substring(0, 13) & "...", My.Settings.MOTD), 1, batcher)
-                        DrawUserMenuTableString("Profile Picture", CType(My.Settings.Thumbnail, IdentType).ToString, 2, batcher)
+                        DrawUserMenuTableString("Profile Picture", If(My.Settings.Thumbnail, "Custom", "Disabled"), 2, batcher)
                         DrawUserMenuTableString("Spawn Sound", CType(My.Settings.SoundA, IdentType).ToString, 3, batcher)
                         DrawUserMenuTableString("Kick Sound", CType(My.Settings.SoundB, IdentType).ToString, 4, batcher)
                         DrawUserMenuTableString("Games Played", My.Settings.GamesLost + My.Settings.GamesWon - 2, 5, batcher)
                         DrawUserMenuTableString("K/D", Math.Round(My.Settings.GamesWon / My.Settings.GamesLost, 3), 6, batcher)
 
                         'File dialogue boxes
-                        If My.Settings.Thumbnail = IdentType.Custom Then
+                        If My.Settings.Thumbnail Then
                             batcher.DrawHollowRect(New Rectangle(1350, 245 + 2 * 80, 100, 50), FgColor)
                             batcher.DrawString(MediumFont, "...", New Vector2(1360, 240 + 2 * 80), FgColor)
                         End If

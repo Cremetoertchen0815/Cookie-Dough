@@ -19,15 +19,15 @@ Namespace Game.BetretenVerboten
         ''' Deklariert ob der Spieler lokal, durch eine KI, oder über eine Netzwerkverbindung gesteuert wird
         ''' </summary>
         <Newtonsoft.Json.JsonIgnore>
-        Public Property Typ As SpielerTyp Implements IPlayer.Typ
+        Friend Property Typ As SpielerTyp Implements IPlayer.Typ
             Get
-                Return If(IsAFK And _type <> SpielerTyp.CPU And _type <> SpielerTyp.None, SpielerTyp.CPU, _type)
+                Return If(IsAFK And OriginalType <> SpielerTyp.CPU And OriginalType <> SpielerTyp.None, SpielerTyp.CPU, OriginalType)
             End Get
             Set(value As SpielerTyp)
-                _type = value
+                OriginalType = value
             End Set
         End Property
-        Friend _type As SpielerTyp = SpielerTyp.CPU
+        Public Property OriginalType As SpielerTyp = SpielerTyp.CPU
 
         Public Property IsAFK As Boolean = False
 

@@ -196,12 +196,14 @@ Namespace Game.BetretenVerboten
 
             'Load sounds and MOTDs
             Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
+            Dim thumb = Texture2D.FromFile(Dev, "Cache\client\pp.png")
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
                 Select Case pl.Typ
                     Case SpielerTyp.Local
                         Spielers(i).CustomSound = sf
                         Spielers(i).MOTD = My.Settings.MOTD
+                        If My.Settings.Thumbnail Then Spielers(i).Thumbnail = thumb
                     Case SpielerTyp.CPU
                         Spielers(i).MOTD = CPU_MOTDs(i)
                         If i <> 0 Then
@@ -779,10 +781,8 @@ Namespace Game.BetretenVerboten
                                 If dataNr = 9 Then
                                     'Receive pfp
                                     If IdentSound = IdentType.Custom Then
-                                        IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".png", Compress.Decompress(Convert.FromBase64String(dat)))
-                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav")
-                                    Else
-                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                        IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                        Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\server\" & Spielers(source).Name & "_pp.png")
                                     End If
                                     SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
                                 Else
@@ -821,8 +821,8 @@ Namespace Game.BetretenVerboten
                 If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.CPU Then appendix &= i.ToString
             Next
             SendNetworkMessageToAll("b" & appendix)
+            SendPlayerData()
             SendSync()
-            SendSoundFile()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
@@ -863,7 +863,7 @@ Namespace Game.BetretenVerboten
         Private Sub SendPlayerBack(index As Integer)
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))
             SendNetworkMessageToAll("r" & index.ToString & str)
-            SendSoundFile()
+            SendPlayerData()
         End Sub
 
         Private Sub SendFigureTransition(who As Integer, figur As Integer, destination As Integer)
@@ -881,7 +881,7 @@ Namespace Game.BetretenVerboten
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))
             SendNetworkMessageToAll("y" & str)
         End Sub
-        Private Sub SendSoundFile()
+        Private Sub SendPlayerData()
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
@@ -893,6 +893,11 @@ Namespace Game.BetretenVerboten
                     'Send Sound B
                     snd = GetPlayerAudio(i, True, txt)
                     LocalClient.WriteStream("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
+
+                    'Send Thumbnail
+                    txt = ""
+                    If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
+                    LocalClient.WriteStream("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
                 End If
             Next
         End Sub
@@ -1635,7 +1640,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub AwayFromKeyboardButton() Handles HUDAfkBtn.Clicked
-            If SpielerIndex < 0 OrElse Spielers(SpielerIndex)._type <> SpielerTyp.Local Then Return
+            If SpielerIndex < 0 OrElse Spielers(SpielerIndex).OriginalType <> SpielerTyp.Local Then Return
             Spielers(SpielerIndex).IsAFK = Not Spielers(SpielerIndex).IsAFK
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             ResetHUD()

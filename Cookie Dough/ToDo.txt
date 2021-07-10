@@ -1,7 +1,6 @@
 ﻿BV:
 -Profile Pix(under homebase)
 -Fix whitelisting with > 2 players
--Increase play field texture resolution
 -Add intro animation for all maps
 
 -Work on DC

@@ -173,6 +173,7 @@ Namespace Game.BetretenVerboten
             Chat = New List(Of (String, Color))
             MoveActive = False
             If UserIndex > -1 Then Spielers(UserIndex).CustomSound = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
+            If UserIndex > -1 Then Spielers(UserIndex).Thumbnail = If(My.Settings.Thumbnail, Texture2D.FromFile(Dev, "Cache\client\pp.png"), ReferencePixelTrans)
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
@@ -655,7 +656,7 @@ Namespace Game.BetretenVerboten
                                 Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
                             Next
                             Spielers(i).Name = sp.Spielers(i).Name
-                            Spielers(i).Typ = sp.Spielers(i).Typ
+                            Spielers(i).OriginalType = sp.Spielers(i).OriginalType
                             Spielers(i).MOTD = sp.Spielers(i).MOTD
                             Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
@@ -675,22 +676,33 @@ Namespace Game.BetretenVerboten
                         If source = UserIndex Then Continue For
                         Dim sound As SoundEffect
 
-                        Try
-                            'Receive sound
-                            If IdentSound = IdentType.Custom Then
-                                File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
-                            Else
+                        If SoundNr = 9 Then
+                            Try
+                                'Receive sound
+                                If IdentSound = IdentType.Custom Then
+                                    File.WriteAllBytes("Cache\client\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                    Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\client\" & Spielers(source).Name & "_pp.png")
+                                End If
+                            Catch ex As Exception
+                            End Try
+                        Else
+                            Try
+                                'Receive sound
+                                If IdentSound = IdentType.Custom Then
+                                    File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                    sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                                Else
+                                    sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                End If
+                            Catch ex As Exception
+                                'Data damaged, send standard sound
+                                IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
                                 sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                            End If
-                        Catch ex As Exception
-                            'Data damaged, send standard sound
-                            IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                            sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                        End Try
+                            End Try
 
-                        'Set sound for player
-                        Spielers(source).CustomSound(SoundNr) = sound
+                            'Set sound for player
+                            Spielers(source).CustomSound(SoundNr) = sound
+                        End If
 
                 End Select
             Next
@@ -737,6 +749,10 @@ Namespace Game.BetretenVerboten
             txt = ""
             If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
             LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+
+            txt = ""
+            If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
+            LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
         End Sub
 
         Private Sub SubmitResults(figur As Integer, destination As Integer)

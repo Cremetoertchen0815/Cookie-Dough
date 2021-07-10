@@ -14,8 +14,8 @@
     <Setting Name="Servers" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Thumbnail" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="Thumbnail" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SoundA" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>

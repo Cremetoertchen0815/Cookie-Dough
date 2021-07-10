@@ -124,6 +124,7 @@ Namespace Game.BetretenVerboten.Rendering
             Dim sizes As (Integer, Integer, Single, Integer) = GetFieldSizes(Game.Map)
 
             Material.SamplerState = SamplerState.AnisotropicWrap
+            Material.BlendState = BlendState.NonPremultiplied
             batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
 
             'Draw connections
@@ -135,8 +136,14 @@ Namespace Game.BetretenVerboten.Rendering
                 'Draw player thumbnail
                 Dim ptA As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, PlayFieldPos.Home1, j)
                 Dim ptB As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, If(Game.Map = GaemMap.Default4Players, PlayFieldPos.Home4, PlayFieldPos.Home2), j)
-                batchlor.Draw(Game.Spielers(j).Thumbnail, New Rectangle((ptA + (ptB - ptA) * 0.5).ToPoint, New Point(GetPPsize(Game.Map))), Nothing, Color.White, GetPProtation(j, Game.Map), Game.Spielers(j).Thumbnail.Bounds.Size.ToVector2 * 0.5, SpriteEffects.None, 0)
+                batchlor.Draw(Game.Spielers(j).Thumbnail, New Rectangle((ptA + (ptB - ptA) * 0.5).ToPoint, New Point(GetPPsize(Game.Map))), Nothing, Color.White * 0.85, GetPProtation(j, Game.Map), Game.Spielers(j).Thumbnail.Bounds.Size.ToVector2 * 0.5, SpriteEffects.None, 0)
+            Next
 
+            batchlor.End()
+            Material.BlendState = BlendState.AlphaBlend
+            batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
+
+            For j = 0 To Game.Spielers.Length - 1
                 'Zeichne Spielfeld
                 For i = 0 To 17
                     Dim loc As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, i, j)
