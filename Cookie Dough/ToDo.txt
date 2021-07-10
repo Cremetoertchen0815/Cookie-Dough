@@ -1,5 +1,4 @@
 ﻿BV:
--Suicide field does not count by UFO
 -After slave rejoining, no host data synced
 -Improve CPU: Ignore home fields when UFO is on it
 -Fix highscoring(Not getting logged up): SIMULATE HIGHSCORE ALGORITHM!

@@ -1080,6 +1080,7 @@ Namespace Game.BetretenVerboten
                                                                 Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = nr
                                                                 HUDInstructions.Text = If(distance > 0, "+", "") & distance
                                                             End Sub, Sub()
+                                                                         'Check if succesive UFO field
                                                                          Dim saucertrigger As Boolean = False
                                                                          For Each element In SaucerFields
                                                                              If PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = element Then
@@ -1087,6 +1088,14 @@ Namespace Game.BetretenVerboten
                                                                                  nr = element
                                                                              End If
                                                                          Next
+
+                                                                         'Check for landing on suicide field
+                                                                         If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
+                                                                             saucertrigger = False
+                                                                             PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
+                                                                             SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
+                                                                             KickedByGod(FigurFaderZiel.Item1, FigurFaderZiel.Item2)
+                                                                         End If
 
                                                                          'Trigger UFO, falls auf Feld gelandet
                                                                          If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < PlCount * SpceCount Then TriggerSaucer(nr) Else If Status <> SpielStatus.SpielZuEnde Then SwitchPlayer()
