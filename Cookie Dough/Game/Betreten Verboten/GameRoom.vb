@@ -541,9 +541,10 @@ Namespace Game.BetretenVerboten
 
 
                                                 'Risk: nicht auf das Startfeld/den Eingangsbereich eines gegners stellen da eine neue figur erscheinen könnte.
-                                                Dim aimpl As Integer = Math.Floor(Globpos(1) / SpceCount)
-                                                Dim ishomeregionbusy As Boolean = locpos(1) < PlCount * SpceCount And aimpl <> SpielerIndex AndAlso GetHomebaseIndex(aimpl) > -1
-                                                If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 And ishomeregionbusy Then
+                                                Dim aimpl As Integer = Math.Floor(Globpos(1) / SpceCount) 'The player who's section the figure will land on
+                                                Dim ishomeregionbusy As Boolean = locpos(1) < PlCount * SpceCount And aimpl <> SpielerIndex AndAlso GetHomebaseIndex(aimpl) > -1 'The home base linked to the area the piece is gonna land in, houses playing pieces.
+                                                Dim isfieldcoveredbyUFO As Boolean = SaucerFields.Contains(PlayerFieldToGlobalField(locpos(1), SpielerIndex))
+                                                If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 And ishomeregionbusy And Not isfieldcoveredbyUFO Then
                                                     Scores(element) /= 4
                                                 ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 And ishomeregionbusy Then
                                                     Scores(element) /= 2
