@@ -52,11 +52,6 @@ Namespace Game.BetretenVerboten
         Public Property AdditionalPoints As Integer = 0
 
         ''' <summary>
-        ''' Gibt die Schwierigkeitstufe der CPU an
-        ''' </summary>
-        Public Property Schwierigkeit As Difficulty = Difficulty.Smart
-
-        ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server
         ''' </summary>
         <JsonIgnore>
@@ -99,9 +94,8 @@ Namespace Game.BetretenVerboten
         ''' </summary>
         Public Property MOTD As String = My.Settings.MOTD Implements IPlayer.MOTD
 
-        Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)
+        Sub New(typ As SpielerTyp)
             Me.Typ = typ
-            Me.Schwierigkeit = schwierigkeit
         End Sub
 
     End Class

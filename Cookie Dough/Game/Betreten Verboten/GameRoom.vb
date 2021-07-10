@@ -30,6 +30,7 @@ Namespace Game.BetretenVerboten
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
+        Friend Difficulty As Difficulty
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
         Private StopWhenRealStart As Boolean = False
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
@@ -484,7 +485,7 @@ Namespace Game.BetretenVerboten
                                     'Prüfe ob Zug möglich
                                     If ichmagzüge.Count = 0 Then SwitchPlayer() : Exit Select
 
-                                    Select Case Spielers(SpielerIndex).Schwierigkeit
+                                    Select Case Difficulty
                                         Case Difficulty.Brainless
 
                                             'Berechne zufällig das zu fahrende Feld

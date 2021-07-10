@@ -153,17 +153,18 @@ Namespace Game.BetretenVerboten
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.GameMode = Mode
             AktuellesSpiel.NetworkMode = False
+            AktuellesSpiel.Difficulty = My.Settings.Schwierigkeitsgrad
             For i As Integer = 0 To AktuellesSpiel.PlCount - 1
                 Select Case NewGamePlayers(i)
                     Case SpielerTyp.Local
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local, My.Settings.Schwierigkeitsgrad) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, "")}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, "")}
                         local_count += 1
                     Case SpielerTyp.CPU
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU, Difficulty.Smart) With {.Name = Farben(i)}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU) With {.Name = Farben(i)}
                     Case SpielerTyp.Online
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Online, My.Settings.Schwierigkeitsgrad) With {.Bereit = False}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Online) With {.Bereit = False}
                     Case SpielerTyp.None
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.None, My.Settings.Schwierigkeitsgrad) With {.Bereit = True}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.None) With {.Bereit = True}
                 End Select
             Next
             AktuellesSpiel.LoadContent()

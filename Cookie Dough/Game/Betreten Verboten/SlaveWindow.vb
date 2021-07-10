@@ -580,7 +580,6 @@ Namespace Game.BetretenVerboten
                             Spielers(i).Name = sp.Spielers(i).Name
                             Spielers(i).MOTD = sp.Spielers(i).MOTD
                             Spielers(i).Typ = sp.Spielers(i).Typ
-                            Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
                             Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
@@ -658,7 +657,6 @@ Namespace Game.BetretenVerboten
                             Spielers(i).Name = sp.Spielers(i).Name
                             Spielers(i).OriginalType = sp.Spielers(i).OriginalType
                             Spielers(i).MOTD = sp.Spielers(i).MOTD
-                            Spielers(i).Schwierigkeit = sp.Spielers(i).Schwierigkeit
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).Angered = sp.Spielers(i).Angered
                             Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
