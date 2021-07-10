@@ -136,6 +136,10 @@ Namespace Cookie_Dough
                 If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.6
             End If
 
+            If GetStackKeystroke({Keys.Y, Keys.O, Keys.S, Keys.H, Keys.A}) Then
+                Client.NetworkLog = Client.NetworkLog
+            End If
+
             If GetStackKeystroke({Keys.R, Keys.E, Keys.C, Keys.T, Keys.A, Keys.N, Keys.G, Keys.L, Keys.E}) Then
                 MediaPlayer.Play(triumph)
                 MediaPlayer.Volume = 0.4

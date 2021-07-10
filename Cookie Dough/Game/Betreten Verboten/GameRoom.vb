@@ -19,7 +19,7 @@ Namespace Game.BetretenVerboten
         Inherits Scene
         Implements IGameWindow
 
-        'Instance flags
+        'Instance fields
         Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
         Friend FigCount As Integer 'Gibt an wieviele Figuren jeder Spieler hat
@@ -30,17 +30,17 @@ Namespace Game.BetretenVerboten
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
-        Friend Difficulty As Difficulty
+        Friend Difficulty As Difficulty 'Declares the difficulty of the CPU
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
-        Private StopWhenRealStart As Boolean = False
+        Private StopWhenRealStart As Boolean = False 'Notices, that the game is supposed to be interrupted, as soon as it's being started
         Private lastmstate As MouseState 'Enthält den Status der Maus aus dem letzten Frame
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
         Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
         Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
 
-        'Game flags
-        Private WürfelAktuelleZahl As Integer 'Speichert den WErt des momentanen Würfels
+        'Game fields
+        Private WürfelAktuelleZahl As Integer 'Speichert den Wert des momentanen Würfels
         Private WürfelWerte As Integer() 'Speichert die Werte der Würfel
         Private WürfelTimer As Double 'Wird genutzt um den Würfelvorgang zu halten
         Private WürfelAnimationTimer As Double 'Implementiert einen Cooldown für die Würfelanimation
@@ -48,7 +48,7 @@ Namespace Game.BetretenVerboten
         Private DreifachWürfeln As Boolean 'Gibt an(am Anfang des Spiels), dass ma drei Versuche hat um eine 6 zu bekommen
         Private Fahrzahl As Integer 'Anzahl der Felder die gefahren werden kann
         Private MoveActive As Boolean = False 'Gibt an, ob eine Figuranimation in Gange ist
-        Private SaucerFields As New List(Of Integer)
+        Private SaucerFields As New List(Of Integer) 'Keeps track of which fields are covered by a UFO fields
         Private DontKickSacrifice As Boolean 'Gibt an, ob die zu opfernde Figur nicht gekickt werden soll
 
         'Assets
@@ -80,10 +80,7 @@ Namespace Game.BetretenVerboten
         Private ShowDice As Boolean = False
         Private Chat As List(Of (String, Color))
 
-        'Keystack & other debug shit
-        Private keysa As New List(Of Keys)
-        Private ButtonStack As New List(Of Keys)
-        Private oldpress As New List(Of Keys)
+        'Debug shit
         Private Shared dbgKickuser As Integer = -1
         Private Shared dbgExecSync As Boolean = False
         Private Shared dbgPlaceCmd As (Integer, Integer, Integer)
