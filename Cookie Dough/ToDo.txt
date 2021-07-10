@@ -1,14 +1,13 @@
 ﻿BV:
+-Suicide field does not count by UFO
+-After slave rejoining, no host data synced
+-Improve CPU: Ignore home fields when UFO is on it
+-Fix highscoring(Not getting logged up): SIMULATE HIGHSCORE ALGORITHM!
 -Fix none-players online issues
 -Fix whitelisting with > 2 players
 -Add intro animation for all maps
 
 -Work on DC
-
-Engine Fixes:
--Blurry Scaling(Anisotropic or point filtering???)
--Pixelated PPFX and shapes
--Weird HQBloom port job
 
 
 -Monopoly(Mit Ereignisfeldern + Kaufbaren Feldern)

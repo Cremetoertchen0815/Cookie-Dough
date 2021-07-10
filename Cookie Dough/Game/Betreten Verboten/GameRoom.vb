@@ -734,6 +734,7 @@ Namespace Game.BetretenVerboten
 
                             SendPlayerLeft(source)
                         Case "h"c 'Afk button toggled
+                            If SpielerIndex = source And Status = SpielStatus.Waitn Then Status = SpielStatus.Würfel
                             Spielers(source).IsAFK = Not Spielers(source).IsAFK
                             SendSync()
                         Case "j"c 'God got activated
