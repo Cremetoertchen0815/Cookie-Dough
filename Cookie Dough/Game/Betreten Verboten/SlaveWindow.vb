@@ -705,22 +705,20 @@ Namespace Game.BetretenVerboten
                 LocalClient.WriteStream("a" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Nujoin
             End If
         End Sub
-
         Private Sub SendChatMessage(text As String)
             LocalClient.WriteStream("c" & text)
         End Sub
         Private Sub SendGameClosed()
             LocalClient.WriteStream("e")
         End Sub
+        Private Sub SendAfkSignal() Handles HUDAfkBtn.Clicked
+            LocalClient.WriteStream("i")
+        End Sub
         Private Sub SendGod(figur As Integer)
             LocalClient.WriteStream("j" & figur.ToString)
         End Sub
         Private Sub SendAngered()
             LocalClient.WriteStream("p")
-        End Sub
-
-        Private Sub SendAfkSignal() Handles HUDAfkBtn.Clicked
-            LocalClient.WriteStream("h")
         End Sub
 
         Private Sub SendSoundFile()
