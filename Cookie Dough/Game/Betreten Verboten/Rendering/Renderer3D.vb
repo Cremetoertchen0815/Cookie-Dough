@@ -338,8 +338,15 @@ Namespace Game.BetretenVerboten.Rendering
 
         Private Sub PlayerAnimation()
 
+            'Find next player, if available
+            BeginCurrentPlayer += 1
+            For i As Integer = BeginCurrentPlayer To Game.Spielers.Length
+                'Let the counter overflow if no valid player can be found
+                If i >= Game.Spielers.Length OrElse Game.Spielers(i).OriginalType <> SpielerTyp.None Then BeginCurrentPlayer = i : Exit For
+            Next
+
             'End loop if end reached
-            If BeginCurrentPlayer + 1 >= Game.Spielers.Length Then
+            If BeginCurrentPlayer >= Game.Spielers.Length Then
 
                 'Prepare HUD
                 Game.HUDmotdLabel.Active = False
@@ -353,12 +360,6 @@ Namespace Game.BetretenVerboten.Rendering
 
                 Return 'End this looping hell
             End If
-
-            'Find next player, if available
-            BeginCurrentPlayer += 1
-            For i As Integer = BeginCurrentPlayer To Game.Spielers.Length - 1
-                If Game.Spielers(i).Typ <> SpielerTyp.None Then BeginCurrentPlayer = i : Exit For
-            Next
 
             'Play sound
             Game.Spielers(BeginCurrentPlayer).CustomSound(0).Play()

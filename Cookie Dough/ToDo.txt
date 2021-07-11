@@ -1,6 +1,5 @@
 ﻿BV:
 -Fix highscoring(Not getting logged up): SIMULATE HIGHSCORE ALGORITHM!
--Fix none-players online issues
 -Fix whitelisting with > 2 players
 -Add intro animation for all maps
 
