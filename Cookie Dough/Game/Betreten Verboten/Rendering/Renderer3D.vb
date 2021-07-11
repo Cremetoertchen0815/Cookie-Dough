@@ -127,10 +127,6 @@ Namespace Game.BetretenVerboten.Rendering
             Material.BlendState = BlendState.NonPremultiplied
             batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
 
-            'Draw connections
-            batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
-            batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
-
             'Draw fields
             For j = 0 To Game.Spielers.Length - 1
                 'Draw player thumbnail
@@ -142,6 +138,10 @@ Namespace Game.BetretenVerboten.Rendering
             batchlor.End()
             Material.BlendState = BlendState.AlphaBlend
             batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
+
+            'Draw field connections + border
+            batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
+            batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             For j = 0 To Game.Spielers.Length - 1
                 'Zeichne Spielfeld
