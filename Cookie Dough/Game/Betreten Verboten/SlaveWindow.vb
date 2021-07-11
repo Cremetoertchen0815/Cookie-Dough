@@ -571,21 +571,6 @@ Namespace Game.BetretenVerboten
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         HUDInstructions.Text = "Welcome back!"
-                        Dim str As String = element.Substring(2)
-                        Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
-                        For i As Integer = 0 To PlCount - 1
-                            For j As Integer = 0 To FigCount - 1
-                                Spielers(i).Spielfiguren(j) = sp.Spielers(i).Spielfiguren(j)
-                            Next
-                            Spielers(i).Name = sp.Spielers(i).Name
-                            Spielers(i).MOTD = sp.Spielers(i).MOTD
-                            Spielers(i).Typ = sp.Spielers(i).Typ
-                            Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
-                            Spielers(i).Angered = sp.Spielers(i).Angered
-                            Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
-                        Next
-                        If UserIndex > -1 AndAlso Spielers(UserIndex).Angered Then HUDBtnC.Active = False
-                        SaucerFields = sp.SaucerFields
                         SendSoundFile()
                     Case "s"c 'Create transition
                         Dim playr As Integer = CInt(element(1).ToString)

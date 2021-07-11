@@ -861,8 +861,8 @@ Namespace Game.BetretenVerboten
             SendNetworkMessageToAll("n" & who.ToString)
         End Sub
         Private Sub SendPlayerBack(index As Integer)
-            Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))
-            SendNetworkMessageToAll("r" & index.ToString & str)
+            SendNetworkMessageToAll("r" & index.ToString)
+            SendSync()
             SendPlayerData()
         End Sub
 
@@ -892,12 +892,12 @@ Namespace Game.BetretenVerboten
 
                     'Send Sound B
                     snd = GetPlayerAudio(i, True, txt)
-                    LocalClient.WriteStream("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
+                    SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
 
                     'Send Thumbnail
                     txt = ""
                     If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                    LocalClient.WriteStream("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                    SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
                 End If
             Next
         End Sub

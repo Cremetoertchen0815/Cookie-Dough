@@ -137,7 +137,7 @@ Namespace Cookie_Dough
             End If
 
             If GetStackKeystroke({Keys.Y, Keys.O, Keys.S, Keys.H, Keys.A}) Then
-                Client.NetworkLog = Client.NetworkLog
+                Client.NetworkLog = Not Client.NetworkLog
             End If
 
             If GetStackKeystroke({Keys.R, Keys.E, Keys.C, Keys.T, Keys.A, Keys.N, Keys.G, Keys.L, Keys.E}) Then

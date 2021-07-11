@@ -126,7 +126,7 @@ Namespace Framework.Networking
             Try
                 Dim tmp As String = streamr.ReadLine
                 If Not Server.ServerActive And Not tmp.Contains("_TATA_") Then Console.WriteLine("[Client/I]" & tmp)
-                If NetworkLog Then OutputDelegate.Invoke("[Client/I]" & tmp)
+                If NetworkLog And Not tmp.Contains("_TATA_") Then OutputDelegate.Invoke("[Client/I]" & tmp)
                 Return tmp
             Catch ex As Exception
                 NoteError(ex, False)
@@ -138,7 +138,7 @@ Namespace Framework.Networking
         Friend Sub WriteString(str As String)
             Try
                 If Not Server.ServerActive And Not str.Contains("_TATA_") Then Console.WriteLine("[Client/O]" & str)
-                If NetworkLog Then OutputDelegate.Invoke("[Client/O]" & str)
+                If NetworkLog And Not str.Contains("_TATA_") Then OutputDelegate.Invoke("[Client/O]" & str)
                 streamw.WriteLine(str)
             Catch ex As Exception
                 NoteError(ex, False)
