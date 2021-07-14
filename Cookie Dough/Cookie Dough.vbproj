@@ -211,7 +211,6 @@
   </ItemGroup>
   <ItemGroup>
     <Import Include="Cookie_Dough" />
-    <Import Include="Cookie_Dough.Cookie_Dough.Program" />
     <Import Include="Cookie_Dough.Framework.Graphics" />
     <Import Include="Cookie_Dough.Framework.Misc" />
     <Import Include="Cookie_Dough.Framework.Tweening" />

@@ -466,7 +466,7 @@ Namespace Game.DuoCard
                 Dim pl = Spielers(i)
                 If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
                     'Send Sound A
-                    Dim txt As String
+                    Dim txt As String = ""
                     Dim snd As IdentType = GetPlayerAudio(i, False, txt)
                     SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
 

@@ -75,7 +75,7 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDmotdLabel As Controls.Label
         Private InstructionFader As PropertyTransition
         Private ShowDice As Boolean = False
-        Private HUDColor As Color
+        'Private HUDColor As Color
         Private Chat As List(Of (String, Color))
 
         'Keystack

@@ -1,5 +1,4 @@
-﻿Imports Betreten_Verboten.Framework.Misc
-Imports Microsoft.Xna.Framework
+﻿Imports Microsoft.Xna.Framework
 
 Namespace Framework.Tweening.ManagedTypes
 

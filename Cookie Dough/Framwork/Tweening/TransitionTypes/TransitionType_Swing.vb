@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Generic
-Imports Betreten_Verboten.Framework.Misc
 
 Namespace Framework.Tweening.TransitionTypes
 

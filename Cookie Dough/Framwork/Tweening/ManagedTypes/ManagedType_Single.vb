@@ -1,6 +1,4 @@
-﻿Imports Betreten_Verboten.Framework.Misc
-
-Namespace Framework.Tweening.ManagedTypes
+﻿Namespace Framework.Tweening.ManagedTypes
 
     <TestState(TestState.Finalized)>
     Friend Class ManagedType_Single
