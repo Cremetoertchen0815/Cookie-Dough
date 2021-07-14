@@ -1,5 +1,10 @@
 ﻿BV:
--Fix highscoring(Not getting logged up): SIMULATE HIGHSCORE ALGORITHM!
+-Make new version incompatible with old
+-CPU sounds
+-Fix player numbering on creator menu
+-Default HUD color white
+-Open up first player slot for none/online
+-CPU personalities
 -Fix whitelisting with > 2 players
 -Add intro animation for all maps
 

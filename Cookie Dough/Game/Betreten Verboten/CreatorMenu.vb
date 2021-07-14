@@ -72,14 +72,7 @@ Namespace Game.BetretenVerboten
                     If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then Mode = If(Mode = GameMode.Casual, GameMode.Competetive, GameMode.Casual)
                     If New Rectangle(560, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel -= 1 : SFX(2).Play()
                     If New Rectangle(960, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel += 1 : SFX(2).Play()
-                    If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then
-                        If PlayerSel = 0 Then
-                            NewGamePlayers(PlayerSel) = (NewGamePlayers(PlayerSel) + 1) Mod 2
-                        Else
-                            NewGamePlayers(PlayerSel) = (NewGamePlayers(PlayerSel) + 1) Mod If(IsConnectedToServer, 4, 3)
-                        End If
-                        SFX(2).Play()
-                    End If
+                    If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then NewGamePlayers(PlayerSel) = (NewGamePlayers(PlayerSel) + 1) Mod If(IsConnectedToServer, 4, 3) : SFX(2).Play()
                     If New Rectangle(560, 900, 400, 100).Contains(mpos) And OneshotPressed Then Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene)) : MenuAktiviert = False
                     If New Rectangle(960, 900, 400, 100).Contains(mpos) And OneshotPressed Then
                         SFX(2).Play()
@@ -99,7 +92,7 @@ Namespace Game.BetretenVerboten
                             StartNewRound("")
                         End If
                     End If
-                Else
+                    Else
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
                     If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
                     If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
