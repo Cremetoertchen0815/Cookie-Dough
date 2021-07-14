@@ -135,6 +135,13 @@ Namespace Game.BetretenVerboten
         Private Sub StartNewRound(servername As String)
             If Not MenuAktiviert Then Return
 
+            'Check if all is "none-players"
+            Dim allnone As Boolean = True
+            For i As Integer = 0 To GetMapSize(Map) - 1
+                If NewGamePlayers(i) <> SpielerTyp.None Then allnone = False : Exit For
+            Next
+            If allnone Then Microsoft.VisualBasic.MsgBox("All players are none! Not a valid player selection!") : Return
+
             Dim Internetz As Boolean = False
             For i As Integer = 0 To GetMapSize(Map) - 1
                 If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For

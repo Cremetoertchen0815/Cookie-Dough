@@ -1,8 +1,7 @@
 ﻿BV:
+-Check for all none players
 -Custom CPU sounds
--Open up first player slot for none/online
 -CPU personalities
--Fix whitelisting with > 2 players
 -Add intro animation for all maps
 
 -Work on DC
