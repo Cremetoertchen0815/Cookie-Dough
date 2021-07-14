@@ -1,5 +1,4 @@
 ﻿BV:
--Make new version incompatible with old
 -CPU sounds
 -Fix player numbering on creator menu
 -Default HUD color white
