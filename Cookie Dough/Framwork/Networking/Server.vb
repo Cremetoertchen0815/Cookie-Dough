@@ -417,7 +417,7 @@ Namespace Framework.Networking
 
         Private Sub SendToAllGameClients(gaem As IGame, msg As String, Optional IgnoreLocals As Boolean = True)
             'Send to online players
-            For i As Integer = 1 To gaem.Players.Length - 1
+            For i As Integer = 0 To gaem.Players.Length - 1
                 If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, msg)
             Next
 

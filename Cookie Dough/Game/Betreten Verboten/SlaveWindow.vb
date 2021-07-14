@@ -651,40 +651,43 @@ Namespace Game.BetretenVerboten
                         If UserIndex > -1 Then HUDAfkBtn.Text = If(Spielers(UserIndex).IsAFK, "Back Again", "AFK")
                         SaucerFields = sp.SaucerFields
                     Case "z"c 'Receive sound
-                        Dim source As Integer = CInt(element(1).ToString)
-                        Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim SoundNr As Integer = CInt(element(3).ToString)
-                        Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-                        If source = UserIndex Then Continue For
-                        Dim sound As SoundEffect
+                        Dim dataReceiver As New Threading.Thread(Sub()
+                                                                     Dim source As Integer = CInt(element(1).ToString)
+                                                                     Dim IdentSound As IdentType = CInt(element(2).ToString)
+                                                                     Dim SoundNr As Integer = CInt(element(3).ToString)
+                                                                     Dim dat As String = element.Substring(4).Replace("_TATA_", "")
+                                                                     If source = UserIndex Then Exit Sub
+                                                                     Dim sound As SoundEffect
 
-                        If SoundNr = 9 Then
-                            Try
-                                'Receive sound
-                                If IdentSound = IdentType.Custom Then
-                                    File.WriteAllBytes("Cache\client\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-                                    Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\client\" & Spielers(source).Name & "_pp.png")
-                                End If
-                            Catch ex As Exception
-                            End Try
-                        Else
-                            Try
-                                'Receive sound
-                                If IdentSound = IdentType.Custom Then
-                                    File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                    sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
-                                Else
-                                    sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                                End If
-                            Catch ex As Exception
-                                'Data damaged, send standard sound
-                                IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                                sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                            End Try
+                                                                     If SoundNr = 9 Then
+                                                                         Try
+                                                                             'Receive sound
+                                                                             If IdentSound = IdentType.Custom Then
+                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\client\" & Spielers(source).Name & "_pp.png")
+                                                                             End If
+                                                                         Catch ex As Exception
+                                                                         End Try
+                                                                     Else
+                                                                         Try
+                                                                             'Receive sound
+                                                                             If IdentSound = IdentType.Custom Then
+                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                                                                             Else
+                                                                                 sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                             End If
+                                                                         Catch ex As Exception
+                                                                             'Data damaged, send standard sound
+                                                                             IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
+                                                                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                         End Try
 
-                            'Set sound for player
-                            Spielers(source).CustomSound(SoundNr) = sound
-                        End If
+                                                                         'Set sound for player
+                                                                         Spielers(source).CustomSound(SoundNr) = sound
+                                                                     End If
+                                                                 End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+                        dataReceiver.Start()
 
                 End Select
             Next
@@ -722,17 +725,21 @@ Namespace Game.BetretenVerboten
 
         Private Sub SendSoundFile()
             If UserIndex < 0 Then Return
-            Dim txt As String = ""
-            If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
-            LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt)
 
-            txt = ""
-            If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
-            LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+            Dim dataSender As New Threading.Thread(Sub()
+                                                       Dim txt As String = ""
+                                                       If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt)
 
-            txt = ""
-            If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-            LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                       txt = ""
+                                                       If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+
+                                                       txt = ""
+                                                       If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
+                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                   End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+            dataSender.Start()
         End Sub
 
         Private Sub SubmitResults(figur As Integer, destination As Integer)

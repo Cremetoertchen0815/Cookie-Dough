@@ -56,6 +56,7 @@ Namespace Game.BetretenVerboten
         Private DamDamDaaaam As Song
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
+        Private DataTransmissionThread As Threading.Thread
 
         'Renderer
         Friend Renderer As Renderer3D
@@ -123,6 +124,7 @@ Namespace Game.BetretenVerboten
             Chat = New List(Of (String, Color))
             Status = SpielStatus.WarteAufOnlineSpieler
             SpielerIndex = -1
+            UserIndex = -1
             MoveActive = False
             Me.Map = Map
 
@@ -774,35 +776,39 @@ Namespace Game.BetretenVerboten
                         Case "y"c 'Sync requested
                             SendSync()
                         Case "z"c 'Transmit user data
-                            Dim IdentSound As IdentType = CInt(element(2).ToString)
-                            Dim dataNr As Integer = CInt(element(3).ToString)
-                            Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-                            Try
-                                If dataNr = 9 Then
-                                    'Receive pfp
-                                    If IdentSound = IdentType.Custom Then
-                                        IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-                                        Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\server\" & Spielers(source).Name & "_pp.png")
-                                    End If
-                                    SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
-                                Else
-                                    'Receive sound
-                                    If IdentSound = IdentType.Custom Then
-                                        IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav")
-                                    Else
-                                        Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                                    End If
-                                    SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
-                                End If
+                            Dim s As New Threading.Thread(Sub()
+                                                              Dim IdentSound As IdentType = CInt(element(2).ToString)
+                                                              Dim dataNr As Integer = CInt(element(3).ToString)
+                                                              Dim dat As String = element.Substring(4).Replace("_TATA_", "")
+                                                              Try
+                                                                  If dataNr = 9 Then
+                                                                      'Receive pfp
+                                                                      If IdentSound = IdentType.Custom Then
+                                                                          IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                          Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\server\" & Spielers(source).Name & "_pp.png")
+                                                                      End If
+                                                                      SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
+                                                                  Else
+                                                                      'Receive sound
+                                                                      If IdentSound = IdentType.Custom Then
+                                                                          IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav")
+                                                                      Else
+                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                      End If
+                                                                      SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
+                                                                  End If
 
-                            Catch ex As Exception
-                                'Data damaged, send standard sound
-                                If dataNr = 9 Then Exit Select
-                                IdentSound = If(dataNr = 0, IdentType.TypeB, IdentType.TypeA)
-                                Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                                SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_")
-                            End Try
+                                                              Catch ex As Exception
+                                                                  'Data damaged, send standard sound
+                                                                  If dataNr = 9 Then Exit Sub
+                                                                  IdentSound = If(dataNr = 0, IdentType.TypeB, IdentType.TypeA)
+                                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                  SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_")
+                                                              End Try
+                                                          End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+                            s.Start()
+
                     End Select
                 Next
 
@@ -880,24 +886,27 @@ Namespace Game.BetretenVerboten
             SendNetworkMessageToAll("y" & str)
         End Sub
         Private Sub SendPlayerData()
-            For i As Integer = 0 To Spielers.Length - 1
-                Dim pl = Spielers(i)
-                If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
-                    'Send Sound A
-                    Dim txt As String = ""
-                    Dim snd As IdentType = GetPlayerAudio(i, False, txt)
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
+            Dim dataSender As New Threading.Thread(Sub()
+                                                       For i As Integer = 0 To Spielers.Length - 1
+                                                           Dim pl = Spielers(i)
+                                                           If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
+                                                               'Send Sound A
+                                                               Dim txt As String = ""
+                                                               Dim snd As IdentType = GetPlayerAudio(i, False, txt)
+                                                               SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
 
-                    'Send Sound B
-                    snd = GetPlayerAudio(i, True, txt)
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
+                                                               'Send Sound B
+                                                               snd = GetPlayerAudio(i, True, txt)
+                                                               SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
 
-                    'Send Thumbnail
-                    txt = ""
-                    If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                    SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
-                End If
-            Next
+                                                               'Send Thumbnail
+                                                               txt = ""
+                                                               If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
+                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                           End If
+                                                       Next
+                                                   End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+            dataSender.Start()
         End Sub
 
         Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType
@@ -1569,7 +1578,7 @@ Namespace Game.BetretenVerboten
             HUDBtnD.Active = SpielerIndex = UserIndex
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
-            HUD.TweenColorTo(hudcolors(UserIndex), 0.5).SetEaseType(EaseType.CubicInOut).Start()
+            HUD.TweenColorTo(If(UserIndex >= 0, hudcolors(UserIndex), Color.White), 0.5).SetEaseType(EaseType.CubicInOut).Start()
             HUDNameBtn.Active = True
         End Sub
 #End Region
@@ -1580,8 +1589,13 @@ Namespace Game.BetretenVerboten
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()
             LaunchInputBox(Sub(x)
-                               SendChatMessage(UserIndex, x)
-                               PostChat("[" & Spielers(UserIndex).Name & "]: " & x, hudcolors(UserIndex))
+                               If UserIndex >= 0 Then
+                                   SendChatMessage(UserIndex, x)
+                                   PostChat("[" & Spielers(UserIndex).Name & "]: " & x, hudcolors(UserIndex))
+                               Else
+                                   SendMessage("[ADMIN]:" & x)
+                                   PostChat("[ADMIN]: " & x, Color.White)
+                               End If
                            End Sub, ChatFont, "Enter your message: ", "Send message")
         End Sub
         Private Sub VolumeButton() Handles HUDMusicBtn.Clicked
@@ -1600,7 +1614,7 @@ Namespace Game.BetretenVerboten
             End If
         End Sub
         Private Sub AngerButton() Handles HUDBtnC.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating Then
+            If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex >= 0 Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
@@ -1628,7 +1642,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub SacrificeButton() Handles HUDBtnD.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 Then
+            If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex >= 0 AndAlso Spielers(UserIndex).SacrificeCounter <= 0 Then
                 StopUpdating = True
                 Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
                 If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
@@ -1648,7 +1662,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub AwayFromKeyboardButton() Handles HUDAfkBtn.Clicked
-            If SpielerIndex < 0 OrElse Spielers(SpielerIndex).OriginalType <> SpielerTyp.Local Then Return
+            If SpielerIndex < 0 OrElse Spielers(SpielerIndex).OriginalType <> SpielerTyp.Local Or UserIndex < 0 Then Return
             Spielers(SpielerIndex).IsAFK = Not Spielers(SpielerIndex).IsAFK
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             ResetHUD()
