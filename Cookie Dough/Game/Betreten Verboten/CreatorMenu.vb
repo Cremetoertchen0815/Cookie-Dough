@@ -273,7 +273,7 @@ Namespace Game.BetretenVerboten
                     Dim offset As Integer = 0
                     For i As Integer = 0 To instance.NewGamePlayers.Length - 1
                         If instance.NewGamePlayers(i) = SpielerTyp.Online Then
-                            Dim str As String = "Player " & i.ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item2
+                            Dim str As String = "Player " & (i + 1).ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item2
                             batcher.DrawHollowRect(New Rectangle(560, 350 + offset * 150 - CInt(instance.SM4Scroll), 800, 100), FgColor)
                             batcher.DrawString(MediumFont, str, New Vector2(1920.0F / 2 - MediumFont.MeasureString(str).X / 2, 375 + offset * 150 - CInt(instance.SM4Scroll)), FgColor)
                             offset += 1

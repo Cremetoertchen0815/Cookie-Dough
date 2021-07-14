@@ -1,6 +1,5 @@
 ﻿BV:
--CPU sounds
--Fix player numbering on creator menu
+-Custom CPU sounds
 -Default HUD color white
 -Open up first player slot for none/online
 -CPU personalities
