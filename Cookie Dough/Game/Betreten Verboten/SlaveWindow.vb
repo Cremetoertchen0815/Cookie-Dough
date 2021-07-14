@@ -72,10 +72,9 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDMusicBtn As Button
         Private WithEvents HUDAfkBtn As Button
         Private WithEvents HUDDiceBtn As GameRenderable
-        Private WithEvents HUDmotdLabel As Controls.Label
+        Private WithEvents HUDmotdLabel As Label
         Private InstructionFader As PropertyTransition
         Private ShowDice As Boolean = False
-        'Private HUDColor As Color
         Private Chat As List(Of (String, Color))
 
         'Keystack

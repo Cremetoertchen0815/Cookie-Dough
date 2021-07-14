@@ -6,11 +6,10 @@ Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
 
-Namespace Cookie_Dough
-    ' <summary>
-    ' This is the main type for your game.
-    ' </summary>
-    Public Class Game1
+' <summary>
+' This is the main type for your game.
+' </summary>
+Public Class Game1
         Inherits Core
         Sub New()
             MyBase.New(1920, 1080, False, "Cookie Dough - Just another games collection", "Content")
@@ -153,5 +152,4 @@ Namespace Cookie_Dough
                 MusicCounter = (MusicCounter + 1) Mod 4
             End If
         End Sub
-    End Class
-End Namespace
+End Class

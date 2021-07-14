@@ -1,6 +1,5 @@
 ﻿BV:
 -Custom CPU sounds
--Default HUD color white
 -Open up first player slot for none/online
 -CPU personalities
 -Fix whitelisting with > 2 players

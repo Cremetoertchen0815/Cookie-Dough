@@ -179,7 +179,7 @@ Namespace Game.BetretenVerboten
             HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             CreateEntity("HUD").AddComponent(HUD)
-            HUD.Color = hudcolors(0)
+            HUD.Color = Color.White
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
@@ -1062,6 +1062,7 @@ Namespace Game.BetretenVerboten
             Return (-1, -1)
         End Function
 
+
         Private Sub TriggerSaucer(last As Integer)
             SaucerFields.Remove(last)
             Status = SpielStatus.SaucerFlight
@@ -1568,7 +1569,7 @@ Namespace Game.BetretenVerboten
             HUDBtnD.Active = SpielerIndex = UserIndex
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
-            HUD.Color = hudcolors(UserIndex)
+            HUD.TweenColorTo(hudcolors(UserIndex), 0.5).SetEaseType(EaseType.CubicInOut).Start()
             HUDNameBtn.Active = True
         End Sub
 #End Region

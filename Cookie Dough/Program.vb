@@ -5,11 +5,10 @@ Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 
-Namespace Cookie_Dough
-    ' <summary>
-    ' The main class.
-    ' </summary>
-    Public Module Program
+' <summary>
+' The main class.
+' </summary>
+Public Module Program
         'Old Beacon-tweening system for backwards compatibility for BV
         Friend Property VersionString As String = "Cookie Dough V0.2C"
         Friend Property Automator As TweenManager
@@ -55,5 +54,4 @@ Namespace Cookie_Dough
             StopServer()
             Process.GetCurrentProcess.Kill()
         End Sub
-    End Module
-End Namespace
+End Module
