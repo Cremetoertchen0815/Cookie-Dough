@@ -24,7 +24,6 @@ Namespace Framework.UI.Controls
 
         Dim workingtext As String
         Dim rect As Rectangle
-        Dim par As IParent
 
         Sub New(text As String, location As Vector2)
             Me.Text = text
@@ -41,7 +40,6 @@ Namespace Framework.UI.Controls
 
         Public Overrides Sub Init(system As IParent)
             If Font Is Nothing Then Font = system.Font
-            par = system
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, color As Color)

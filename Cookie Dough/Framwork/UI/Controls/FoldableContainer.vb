@@ -21,7 +21,6 @@ Namespace Framework.UI.Controls
         Public Text As String
         Dim rect As Rectangle
         Dim header As Rectangle
-        Dim par As IParent
 
         Sub New(text As String, location As Vector2, size As Vector2)
             Me.Text = text
@@ -33,7 +32,6 @@ Namespace Framework.UI.Controls
 
         Public Overrides Sub Init(system As IParent)
             If Font Is Nothing Then Font = system.Font
-            par = system
 
             For Each element In Me.Children
                 element.Init(Me)
@@ -44,7 +42,6 @@ Namespace Framework.UI.Controls
             MyBase.Unload()
             For Each element In Children
                 element.Unload()
-                element = Nothing
             Next
         End Sub
 

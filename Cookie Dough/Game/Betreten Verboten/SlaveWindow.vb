@@ -762,7 +762,7 @@ Namespace Game.BetretenVerboten
 
             If Is6InDiceList() And homebase > -1 And Not startfd Then 'Falls Homebase noch eine Figur enthält und 6 gewürfelt wurde, setze Figur auf Feld 0 und fahre anschließend x Felder nach vorne
                 'Bereite das Homebase-verlassen vor
-                Fahrzahl = GetSecondDiceAfterSix(SpielerIndex)
+                Fahrzahl = GetSecondDiceAfterSix()
                 HUDInstructions.Text = "Move Character out of your homebase and move him " & Fahrzahl & " spaces!"
                 FigurFaderZiel = (SpielerIndex, homebase)
                 'Animiere wie die Figur sich nach vorne bewegt, anschließend prüfe ob andere Spieler rausgeschmissen wurden
@@ -997,7 +997,7 @@ Namespace Game.BetretenVerboten
             Return (field + player * SpceCount) Mod (PlCount * SpceCount)
         End Function
 
-        Private Function GetSecondDiceAfterSix(player As Integer) As Integer
+        Private Function GetSecondDiceAfterSix() As Integer
             Dim findex As Integer = -1
             Dim sum As Integer = 0
             For i As Integer = 0 To WürfelWerte.Length - 1
