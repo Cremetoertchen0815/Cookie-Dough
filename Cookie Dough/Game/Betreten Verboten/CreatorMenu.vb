@@ -35,7 +35,6 @@ Namespace Game.BetretenVerboten
             MyBase.Initialize()
 
             'Lade Assets
-            DefaultFont = Content.Load(Of SpriteFont)("font\fnt_HKG_17_M")
             Arrow = Core.Content.LoadTexture("arrow_left")
             Dev = Core.GraphicsDevice
             ClearColor = Color.Black

@@ -28,7 +28,6 @@ Namespace Game.DropTrop
             MyBase.Initialize()
 
             'Lade Assets
-            DefaultFont = Content.Load(Of SpriteFont)("font\fnt_HKG_17_M")
             Dev = Core.GraphicsDevice
             ClearColor = Color.Black
 

@@ -15,7 +15,6 @@ Public Module Program
     Friend Property Automator As TweenManager
     Friend Property ReferencePixelTrans As Texture2D
     Friend Property Dev As GraphicsDevice
-    Friend Property DefaultFont As SpriteFont
     Friend Property DebugTexture As Texture2D
     Friend Property LocalClient As Client
     Friend Property SFX As SoundEffect()

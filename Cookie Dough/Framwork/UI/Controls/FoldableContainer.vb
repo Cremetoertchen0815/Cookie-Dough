@@ -60,7 +60,7 @@ Namespace Framework.UI.Controls
 
             batcher.DrawRect(header, Color.DarkMagenta)
             batcher.DrawHollowRect(header, Color.White, 2)
-            batcher.DrawString(DefaultFont, Text, header.Location.ToVector2 - New Vector2(-3, 3), color)
+            batcher.DrawString(Font, Text, header.Location.ToVector2 - New Vector2(-3, 3), color)
         End Sub
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)
