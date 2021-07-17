@@ -491,7 +491,7 @@ Namespace Game.BetretenVerboten
                                             k = ichmagzüge(Nez.Random.Range(0, ichmagzüge.Count))
 
                                         Case Difficulty.Smart
-
+                                            Dim behaviour As CpuBehaviour = CpuBehaviour.Behaviour(SpielerIndex)
                                             Dim Scores As New Dictionary(Of Integer, Single) ' im INteger ist der Index der FIgur und im Single der Score
                                             For Each element In ichmagzüge
                                                 Scores.Add(element, 1)
@@ -504,7 +504,7 @@ Namespace Game.BetretenVerboten
                                             Next
                                             counts = counts.OrderBy(Function(x) x.Item2).ToList()
                                             For i As Integer = 0 To counts.Count - 1
-                                                Scores(counts(i).Item1) *= 1 + i * 0.1F
+                                                Scores(counts(i).Item1) *= 1 + i * behaviour.DistanceMultiplier
                                             Next
 
                                             For Each element In ichmagzüge
@@ -518,10 +518,10 @@ Namespace Game.BetretenVerboten
                                                             Dim GlobposB As Integer = PlayerFieldToGlobalField(locposB, ALVSP)
                                                             'Falls momentane Position in Feindlichiem Feld, verbessere Score(fliehen)
                                                             If GlobposB < Globpos(0) And GlobposB >= Globpos(0) - 6 Then
-                                                                Scores(element) *= 1.4F
+                                                                Scores(element) *= behaviour.PieceDzLeavingMultiplier
                                                             ElseIf GlobposB < Globpos(1) And GlobposB >= Globpos(1) - 6 And locpos(1) < PlCount * SpceCount And locposB > -1 And Not (GlobposB < Globpos(0) And GlobposB >= Globpos(0) - 6) Then
                                                                 'Falls momentanes Feld nicht in feindlichem Gebiet, aber zukünftiges, verschlechtere Score
-                                                                Scores(element) /= 1.5F
+                                                                Scores(element) *= behaviour.PieceDzEnteringMultiplier
                                                             End If
                                                         Next
                                                     End If
@@ -529,13 +529,13 @@ Namespace Game.BetretenVerboten
 
                                                 ' Destiny: landet der zug im Haus? 
                                                 If locpos(1) >= PlCount * SpceCount Then
-                                                    Scores(element) *= 10.0F
+                                                    Scores(element) *= behaviour.ManifestDestinyMultiplier
                                                 End If
 
                                                 ' Attackopportunity: kann der zug einen Feindlichen spieler eleminieren? 
                                                 Dim Ergebnis As (Integer, Integer) = GetKickFigur(SpielerIndex, element, Fahrzahl)
                                                 If Ergebnis.Item1 <> -1 And Ergebnis.Item2 <> -1 Then
-                                                    Scores(element) *= 2.2F
+                                                    Scores(element) *= behaviour.AttackOpportunityMultiplier
                                                 End If
 
 
@@ -544,14 +544,14 @@ Namespace Game.BetretenVerboten
                                                 Dim ishomeregionbusy As Boolean = locpos(1) < PlCount * SpceCount And aimpl <> SpielerIndex AndAlso GetHomebaseIndex(aimpl) > -1 'The home base linked to the area the piece is gonna land in, houses playing pieces.
                                                 Dim isfieldcoveredbyUFO As Boolean = SaucerFields.Contains(PlayerFieldToGlobalField(locpos(1), SpielerIndex))
                                                 If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 And ishomeregionbusy And Not isfieldcoveredbyUFO Then
-                                                    Scores(element) /= 4
+                                                    Scores(element) *= behaviour.HomeFieldEnteringMultiplier
                                                 ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 And ishomeregionbusy Then
-                                                    Scores(element) /= 2
+                                                    Scores(element) *= behaviour.HomeDzEnteringMultiplier
                                                 End If
 
                                                 'Flee: führt der Zug die Figur aus einem Startbereich heraus
                                                 If locpos(0) > 6 And (locpos(0) Mod SpceCount) < 7 And (locpos(1) Mod SpceCount) > 6 Then
-                                                    Scores(element) *= 1.3F
+                                                    Scores(element) *= behaviour.HomeDzLeavingMultiplier
                                                 End If
                                             Next
 

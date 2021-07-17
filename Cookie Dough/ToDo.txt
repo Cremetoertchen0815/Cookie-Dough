@@ -1,10 +1,5 @@
 ﻿BV:
--Check for all none players
 -Custom CPU sounds
--CPU personalities
 -Add intro animation for all maps
 
 -Work on DC
-
-
--Monopoly(Mit Ereignisfeldern + Kaufbaren Feldern)

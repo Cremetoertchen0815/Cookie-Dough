@@ -61,6 +61,7 @@
     <Compile Include="Framwork\Networking\IPlayer.vb" />
     <Compile Include="Enums.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
+    <Compile Include="Game\Betreten Verboten\CpuBehaviour.vb" />
     <Compile Include="Game\CommonCards\CardGameState.vb" />
     <Compile Include="Game\CommonCards\Cards.vb" />
     <Compile Include="Game\CommonCards\CardRenderer.vb" />
