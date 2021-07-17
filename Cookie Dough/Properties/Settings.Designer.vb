@@ -79,7 +79,7 @@ Partial Public NotInheritable Class Settings
     
     <Global.System.Configuration.UserScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+     Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
     Public Property Schwierigkeitsgrad() As Integer
         Get
             Return CType(Me("Schwierigkeitsgrad"),Integer)
