@@ -24,5 +24,6 @@
         Public HomeFieldEnteringMultiplier As Single 'Gives figures a disadvantage if they are going to enter the spawn field of an enemy
         Public ManifestDestinyMultiplier As Single 'Gives figures an advantage if they'll enter the house with this move
         Public AttackOpportunityMultiplier As Single 'Gives figures an advantage if they'll kick an enemy figure with this move
+        Public DeezNuts As Object ' Does absolutely nothing, but Jakob wanted me to add it, oh well...
     End Structure
 End Namespace

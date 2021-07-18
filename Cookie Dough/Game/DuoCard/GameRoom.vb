@@ -286,7 +286,7 @@ Namespace Game.DuoCard
                                                                   Dim res As Card = DrawRandomCard()
                                                                   Spielers(UserIndex).HandDeck.Add(res)
                                                                   StopUpdating = True
-                                                                  Core.Schedule(0.2, AddressOf SwitchPlayer)
+                                                                  Core.Schedule(0.5, AddressOf SwitchPlayer)
                                                               End Sub)
                         End If
                     Case CardGameState.WarteAufOnlineSpieler
