@@ -16,13 +16,13 @@
         End Sub
 
         'Fields
-        Public DistanceMultiplier As Single
-        Public PieceDzLeavingMultiplier As Single
-        Public PieceDzEnteringMultiplier As Single
-        Public HomeDzLeavingMultiplier As Single
-        Public HomeDzEnteringMultiplier As Single
-        Public HomeFieldEnteringMultiplier As Single
-        Public ManifestDestinyMultiplier As Single
-        Public AttackOpportunityMultiplier As Single
+        Public DistanceMultiplier As Single 'Gives figures an advantage if they are further
+        Public PieceDzLeavingMultiplier As Single 'Gives figures an advantage if they are in front of an enemy figures, so they flee from that figure
+        Public PieceDzEnteringMultiplier As Single 'Gives figures a disadvantage if they are going to go in front of an enemy figure this round
+        Public HomeDzLeavingMultiplier As Single 'Gives figures an advantage if they are in the spawn danger zone and this move will bring them out of this danger zone
+        Public HomeDzEnteringMultiplier As Single 'Gives figures a disadvantage if they are going to enter the danger zone of an enemy
+        Public HomeFieldEnteringMultiplier As Single 'Gives figures a disadvantage if they are going to enter the spawn field of an enemy
+        Public ManifestDestinyMultiplier As Single 'Gives figures an advantage if they'll enter the house with this move
+        Public AttackOpportunityMultiplier As Single 'Gives figures an advantage if they'll kick an enemy figure with this move
     End Structure
 End Namespace
