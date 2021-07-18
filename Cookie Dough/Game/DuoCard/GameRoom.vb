@@ -305,7 +305,7 @@ Namespace Game.DuoCard
                                                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(1500), New Keyframe3D, StdCam, Sub()
                                                                                                                                                                                     SwitchPlayer()
                                                                                                                                                                                     If StopWhenRealStart Then StopUpdating = True
-                                                                                                                                                                                End Sub) With {.Value = StdCam}
+                                                                                                                                                                                End Sub)
                                                Automator.Add(FigurFaderCamera)
                                                SendBeginGaem()
                                            End Sub)
