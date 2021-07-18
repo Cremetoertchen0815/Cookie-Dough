@@ -848,7 +848,7 @@ Namespace Game.BetretenVerboten
         Private Sub SendHighscore()
             Dim pls As New List(Of (String, Integer))
             For i As Integer = 0 To Spielers.Length - 1
-                If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).OriginalType = SpielerTyp.Online Then pls.Add((Spielers(i).ID, GetScore(i)))
+                If Spielers(i).OriginalType = SpielerTyp.Local Or Spielers(i).OriginalType = SpielerTyp.Online Then pls.Add((Spielers(i).ID, GetScore(i)))
             Next
             SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
         End Sub
