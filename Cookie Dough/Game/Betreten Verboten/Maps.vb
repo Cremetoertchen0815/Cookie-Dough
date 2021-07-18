@@ -66,21 +66,21 @@ Namespace Game.BetretenVerboten
                 Case GaemMap.Default8Players
                     Select Case player
                         Case 0
-                            If Not ending Then Return New Keyframe3D(-70, 57, -546, 5.31, 1.39, 0.17, False) Else Return New Keyframe3D(145, 57, -546, 5.31, 1.39, 0.17, False)
+                            If Not ending Then Return New Keyframe3D(-325, -196, -990, 2.08, 0.77, 0, False) Else Return New Keyframe3D(245, -280, -1117, 3.55, 0.77, 0, False)
                         Case 1
-                            If Not ending Then Return New Keyframe3D(225, -162, -1206, 1.91, 1.19, 0.17, False) Else Return New Keyframe3D(111, -165, -1278, 1.44, 1.19, 0.17, False)
+                            If Not ending Then Return New Keyframe3D(-329, 50, -601, 0, 1.25, 0, False) Else Return New Keyframe3D(-140, 100, -567, -0.64, 1.25, 0, False)
                         Case 2
-                            If Not ending Then Return New Keyframe3D(245, -110, -1326, 0.78, 1.31, 0.17, False) Else Return New Keyframe3D(-50, -145, -1372, -0.07, 1.31, 0.17, False)
+                            If Not ending Then Return New Keyframe3D(-100, -43, -560, 4.65, 1.6, 0.17, False) Else Return New Keyframe3D(-150, -43, -560, 4.65, 1.6, 0.17, False)
                         Case 3
-                            If Not ending Then Return New Keyframe3D(140, 50, -460, 2.21, 1.31, 0.17, False) Else Return New Keyframe3D(18, 95, -550, 2.21, 1.31, 0.17, False)
+                            If Not ending Then Return New Keyframe3D(-11, 400, -828, 3.59, 0.48, 0.17, False) Else Return New Keyframe3D(-11, 73, -560, 3.59, 1.37, 0.17, False)
                         Case 4
-                            If Not ending Then Return New Keyframe3D(-354, 241, -1078, 2.21, -0.09, 0.17, False) Else Return New Keyframe3D(-36, 434, -890, 1.36, -0.06, 0.13, False)
+                            If Not ending Then Return New Keyframe3D(-246, 335, -973, 3.59, -0.23, 0.17, False) Else Return New Keyframe3D(-360, 250, -876, 3.59, -0.34, 0.17, False)
                         Case 5
-                            If Not ending Then Return New Keyframe3D(280, 75, -680, 5.67, 1.2, 0.17, False) Else Return New Keyframe3D(420, 75, -680, 5.67, 1.2, 0.17, False)
+                            If Not ending Then Return New Keyframe3D(-212, -146, -1375, 4.66, 1.22, 0.17, False) Else Return New Keyframe3D(-212, -100, -1262, 4.66, 1.22, 0.17, False)
                         Case 6
-                            If Not ending Then Return New Keyframe3D(-354, 241, -1078, 2.21, -0.09, 0.17, False) Else Return New Keyframe3D(-36, 434, -890, 1.36, -0.06, 0.13, False)
+                            If Not ending Then Return New Keyframe3D(217, -382, -1042, 4.82, -0.0699, 0.17, False) Else Return New Keyframe3D(217, -382, -900, 4.82, -0.0699, 0.17, False)
                         Case 7
-                            If Not ending Then Return New Keyframe3D(280, 75, -680, 5.67, 1.2, 0.17, False) Else Return New Keyframe3D(420, 75, -680, 5.67, 1.2, 0.17, False)
+                            If Not ending Then Return New Keyframe3D(424, -37, -802, 5.1, 1.54, 0.17, False) Else Return New Keyframe3D(424, -37, -802, 5.5, 1.54, 0.17, False)
                     End Select
             End Select
         End Function

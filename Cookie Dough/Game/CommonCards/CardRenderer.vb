@@ -13,6 +13,7 @@ Namespace Game.CommonCards
         Private card_Matrix As Matrix
         Private card_deck_model As Model
         Private card_deck_Matrix As Matrix
+        Private card_deck_top_pos As Transition(Of Vector3)
         Private TableModel As Model
         Private TableMatrix As Matrix
         Private CardTextures As List(Of Texture2D)
@@ -51,6 +52,7 @@ Namespace Game.CommonCards
 
             card_deck_model = scene.Content.Load(Of Model)("games/Cards/card_deck")
             card_deck_Matrix = Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(150) * Matrix.CreateTranslation(150, 0, -50)
+            card_deck_top_pos = New Transition(Of Vector3) With {.Value = New Vector3(0, 0, -0.1)}
             ApplyDefaultFX(card_deck_model, Projection, Color.White)
 
             TableModel = scene.Content.Load(Of Model)("mesh/table")
@@ -62,6 +64,7 @@ Namespace Game.CommonCards
             For Each element In Card.GetAllCards
                 CardTextures.Add(scene.Content.LoadTexture("games/Cards/" & element.GetTextureName))
             Next
+            CardTextures.Add(scene.Content.LoadTexture("games/Cards/back"))
 
             Dim vertices As New List(Of VertexPositionColorTexture) From {
                 New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX),
@@ -119,6 +122,13 @@ Namespace Game.CommonCards
                 element.Draw()
             Next
 
+            'Draw deck top card
+            card_fx.Texture = CardTextures(CardTextures.Count - 1)
+            For Each element In card_model.Meshes
+                ApplyFX(element, element.ParentBone.ModelTransform * card_deck_Matrix * Matrix.CreateTranslation(card_deck_top_pos.Value))
+                element.Draw()
+            Next
+
             'Draw Table
             For Each element In TableModel.Meshes
                 ApplyFX(element, element.ParentBone.ModelTransform * TableMatrix)
@@ -171,7 +181,11 @@ Namespace Game.CommonCards
 #End Region
 
 #Region "Animation"
-
+        Friend Sub TriggerDeckPullAnimation(final As Transition(Of Vector3).FinishedDelegate)
+            If card_deck_top_pos.State = TransitionState.InProgress Then Return
+            card_deck_top_pos = New Transition(Of Vector3)(New TransitionTypes.TransitionType_Acceleration(500), New Vector3(0, 0, -0.1), New Vector3(0, -700, -0.1), final)
+            Automator.Add(card_deck_top_pos)
+        End Sub
 #End Region
 
     End Class

@@ -27,6 +27,7 @@ Namespace Game.DuoCard
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
+        Private SelectionState As SelectionMode = SelectionMode.Standard
         Private stat As CardGameState 'Speichert den aktuellen Status des Spiels
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
         Private StopWhenRealStart As Boolean = False
@@ -250,32 +251,43 @@ Namespace Game.DuoCard
                 'TODO: Show remaining cards in player title
                 Select Case Status
                     Case CardGameState.SelectAction
+                        Select Case SelectionState
+                            Case SelectionMode.Standard
+                                'Lay down card
+                                For i As Integer = 0 To 6
+                                    Dim card_nr As Integer = i + 7 * DeckScroll
+                                    If card_nr >= HandDeck.Count Then Exit For
 
-                        'Lay down card
-                        For i As Integer = 0 To 6
-                            Dim card_nr As Integer = i + 7 * DeckScroll
-                            If card_nr >= HandDeck.Count Then Exit For
-
-                            If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(i * 140 + 470, 740, 120, 200).Contains(mpos) Then
-                                If IsLayingCardValid(Spielers(UserIndex).HandDeck(card_nr)) Then
-                                    'Read and pop card from hand deck
-                                    Dim card As Card = Spielers(UserIndex).HandDeck(card_nr)
-                                    Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
-                                    DebugConsole.Instance.Log(card.ToString)
-                                    LayCard(card)
-                                Else
-                                    HUDInstructions.Text = "Card invalid!"
-                                End If
-                                Exit For
-                            End If
-                        Next
+                                    If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(i * 140 + 470, 740, 120, 200).Contains(mpos) Then
+                                        If IsLayingCardValid(Spielers(UserIndex).HandDeck(card_nr)) Then
+                                            'Read and pop card from hand deck
+                                            Dim card As Card = Spielers(UserIndex).HandDeck(card_nr)
+                                            Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
+                                            DebugConsole.Instance.Log(card.ToString)
+                                            LayCard(card)
+                                        Else
+                                            HUDInstructions.Text = "Card invalid!"
+                                        End If
+                                        Exit For
+                                    End If
+                                Next
+                            Case SelectionMode.Suit
+                                For i As Integer = 0 To 3
+                                    If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(i * 140 + 470, 740, 120, 200).Contains(mpos) Then
+                                        LayCard(SuitStack(i))
+                                        Exit For
+                                    End If
+                                Next
+                        End Select
 
                         'Draw card
                         If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(710, 420, 220, 270).Contains(mpos) AndAlso CardStack.Count > 0 Then
-                            Dim res As Card = DrawRandomCard()
-                            Spielers(UserIndex).HandDeck.Add(res)
-                            StopUpdating = True
-                            Core.Schedule(0.5, AddressOf SwitchPlayer)
+                            Renderer.TriggerDeckPullAnimation(Sub()
+                                                                  Dim res As Card = DrawRandomCard()
+                                                                  Spielers(UserIndex).HandDeck.Add(res)
+                                                                  StopUpdating = True
+                                                                  Core.Schedule(0.2, AddressOf SwitchPlayer)
+                                                              End Sub)
                         End If
                     Case CardGameState.WarteAufOnlineSpieler
 
@@ -505,14 +517,6 @@ Namespace Game.DuoCard
             If NetworkMode Then LocalClient.WriteStream(message)
         End Sub
 #End Region
-
-        ''' <summary>
-        ''' Prüft nach dem Würfeln, wie der Zug weitergeht(Ist Zug möglich, muss Figur ausgewählt werden, ...)
-        ''' </summary>
-        Private Sub CalcMoves()
-
-        End Sub
-
 #Region "Hilfsfunktionen"
         Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
             If ident <> IdentType.Custom Then
@@ -542,12 +546,19 @@ Namespace Game.DuoCard
         End Function
 
         Private Sub LayCard(card As Card)
-            Status = CardGameState.CardAnimationActive
-            HUDInstructions.Text = ""
             TableCard = card
             If CardStack.Contains(card) Then CardStack.Remove(card)
-            StopUpdating = True
-            Core.Schedule(0.5, AddressOf SwitchPlayer)
+            Status = CardGameState.CardAnimationActive
+            If card.Type <> CardType.Jack Then
+                StopUpdating = True
+                Core.Schedule(0.5, AddressOf SwitchPlayer)
+            Else
+                Core.Schedule(0.5, Sub()
+                                       HUDInstructions.Text = "Select wishing suit!"
+                                       SelectionState = SelectionMode.Suit
+                                       Status = CardGameState.SelectAction
+                                   End Sub)
+            End If
         End Sub
 
         Private Function DrawRandomCard() As Card
@@ -573,6 +584,7 @@ Namespace Game.DuoCard
             If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
             'Set game flags
             StopUpdating = False
+            SelectionState = SelectionMode.Standard
             SendGameActive()
             HUDInstructions.Text = "Lol"
         End Sub
@@ -645,8 +657,10 @@ Namespace Game.DuoCard
             End Get
         End Property
 
+        Private SuitStack = New List(Of Card) From {New Card(CardType.Ace, CardSuit.Clubs), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Hearts), New Card(CardType.Ace, CardSuit.Spades)}
         Public ReadOnly Property HandDeck As List(Of Card) Implements ICardRendererWindow.HandDeck
             Get
+                If SelectionState = SelectionMode.Suit Then Return SuitStack
                 Return Spielers(UserIndex).HandDeck
             End Get
         End Property

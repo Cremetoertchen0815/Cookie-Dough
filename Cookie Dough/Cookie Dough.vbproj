@@ -145,6 +145,7 @@
     <Compile Include="Game\DuoCard\Networking\SyncMessage.vb" />
     <Compile Include="Game\DuoCard\Player.vb" />
     <Compile Include="Game\DuoCard\Rendering\GameRenderable.vb" />
+    <Compile Include="Game\DuoCard\SelectionMode.vb" />
     <Compile Include="Game\DuoCard\SlaveWindow.vb" />
     <Compile Include="Game\Megäa\Enums.vb" />
     <Compile Include="Game\Megäa\IObject3D.vb" />

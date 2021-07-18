@@ -1,5 +1,4 @@
 ﻿BV:
 -Custom CPU sounds
--Add intro animation for all maps
 
 -Work on DC
