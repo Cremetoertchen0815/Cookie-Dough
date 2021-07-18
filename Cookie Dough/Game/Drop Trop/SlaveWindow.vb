@@ -227,7 +227,6 @@ Namespace Game.DropTrop
                         If UserIndex = SpielerIndex AndAlso GetPlayerInput() AndAlso CalcMove() Then
                             StopUpdating = True
                             SendMoves()
-                            Core.Schedule(CPUThinkingTime, AddressOf SendSwitch)
                         End If
 
 
@@ -288,7 +287,6 @@ Namespace Game.DropTrop
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
-                        SendSoundFile()
                         StopUpdating = False
                         Status = SpielStatus.Waitn
                         PostChat("The game has started!", Color.White)
@@ -332,7 +330,6 @@ Namespace Game.DropTrop
                         For Each el In sp.Fields
                             Spielfeld(el.Key) = el.Value
                         Next
-                        SendSoundFile()
                     Case "s"c 'Create transition
                         Dim dat As String = element.Substring(1)
                         Dim movs As List(Of (Vector2, Integer)) = JsonConvert.DeserializeObject(Of List(Of (Vector2, Integer)))(dat)
@@ -390,29 +387,6 @@ Namespace Game.DropTrop
                         For Each el In sp.Fields
                             Spielfeld(el.Key) = el.Value
                         Next
-                    Case "z"c
-                        Dim source As Integer = CInt(element(1).ToString)
-                        Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim dat As String = element.Substring(3).Replace("_TATA_", "")
-                        If source = UserIndex Then Continue For
-                        Dim sound As SoundEffect
-
-                        If IdentSound = IdentType.Custom Then
-                            File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            sound = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
-                        Else
-                            sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                        End If
-
-                        If Spielers(source).Typ = SpielerTyp.Local Then
-                            'Set sound for every local player
-                            For Each pl In Spielers
-                                If pl.Typ <> SpielerTyp.Online Then pl.CustomSound(0) = sound
-                            Next
-                        Else
-                            'Set sound for player
-                            Spielers(source).CustomSound(0) = sound
-                        End If
                 End Select
             Next
         End Sub
@@ -435,11 +409,6 @@ Namespace Game.DropTrop
         End Sub
         Private Sub SendMoves()
             LocalClient.WriteStream("p" & JsonConvert.SerializeObject(CurrentCursor))
-        End Sub
-        Private Sub SendSoundFile()
-            Dim txt As String = ""
-            If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(File.ReadAllBytes("Cache\client\sound.audio")))
-            LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "_TATA_" & txt)
         End Sub
 
         Private Sub SendSwitch()

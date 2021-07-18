@@ -14,10 +14,12 @@ Namespace Game.DropTrop
         Private MenuAktiviert As Boolean = True
         Private lastmstate As MouseState
         Private NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
+        Protected Whitelist As Integer() = {0, 0, 0, 0}
         Private ChangeNameButtonPressed As Boolean = False
         Private PlayerCount As Integer = 2
         Private PlayerSel As Integer = 0
         Private Map As GaemMap = GaemMap.Smol
+        Private Mode As GameMode = GameMode.Competetive
         Protected Schwarzblende As New Transition(Of Single)
 
         'Konstanten
@@ -66,6 +68,7 @@ Namespace Game.DropTrop
                         Case GaemMap.TREMENNNDOUS
                             ReDim NewGamePlayers(7)
                     End Select
+                    ReDim Whitelist(NewGamePlayers.Length - 1)
                     PlayerCount = NewGamePlayers.Length
                     SFX(2).Play()
                 End If
@@ -133,7 +136,11 @@ Namespace Game.DropTrop
             Core.StartSceneTransition(New FadeTransition(Function() AktuellesSpiel)).OnScreenObscured = Sub()
                                                                                                             AktuellesSpiel.LoadContent()
                                                                                                             If Internetz Then
-                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
+                                                                                                                Dim wtlst As String() = New String(Whitelist.Length - 1) {}
+                                                                                                                For i As Integer = 0 To Whitelist.Length - 1
+                                                                                                                    wtlst(i) = ""
+                                                                                                                Next
+                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                             End If
                                                                                                         End Sub
 

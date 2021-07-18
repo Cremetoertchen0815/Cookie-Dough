@@ -14,7 +14,7 @@ Namespace Game.DropTrop.Networking
         Public Property HostConnection As Connection Implements IGame.HostConnection
         Public ReadOnly Property Type As GameType = GameType.DropTrop Implements IGame.Type
         Public Property WhiteList As String() Implements IGame.WhiteList
-        Public Property Viewers As List(Of Connection) Implements IGame.Viewers
+        Public Property Viewers As New List(Of Connection) Implements IGame.Viewers
 
         Private ReadOnly Property IGame_Players As IPlayer() Implements IGame.Players
             Get
@@ -53,6 +53,7 @@ Namespace Game.DropTrop.Networking
             Dim cnt As Integer = CInt(ReadString(con))
             Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Map = map}
             ReDim nugaem.Players(cnt - 1)
+            ReDim nugaem.WhiteList(cnt - 1)
             Dim types As SpielerTyp() = New SpielerTyp(cnt - 1) {}
             'Receive player data
             For i As Integer = 0 To types.Length - 1
@@ -61,17 +62,22 @@ Namespace Game.DropTrop.Networking
                     Case SpielerTyp.Local
                         Dim name As String = ReadString(con)
                         nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .Connection = con}
+                        nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.CPU
                         Dim name As String = ReadString(con)
                         nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True}
+                        nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.None
                         nugaem.Players(i) = New Player(types(i)) With {.Bereit = True}
+                        nugaem.WhiteList(i) = con.Identifier
+                    Case SpielerTyp.Online
+                        nugaem.WhiteList(i) = ReadString(con)
                 End Select
             Next
             Return nugaem
         End Function
 
-        Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player()) As Boolean
+        Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player(), whitelist As String(), casual As Boolean) As Boolean
             'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
             If client.blastmode Or Not client.Connected Then Return False
 
@@ -82,7 +88,8 @@ Namespace Game.DropTrop.Networking
             client.WriteString(types.Length)
             For i As Integer = 0 To types.Length - 1
                 client.WriteString(CInt(types(i).Typ).ToString)
-                If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name)
+                If types(i).Typ = SpielerTyp.Online Then client.WriteString(whitelist(i)) 'Send whitelist slot
+                If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name) : types(i).ID = client.UniqueIdentifier 'Send name
             Next
             Return client.CreateGameFinal()
         End Function

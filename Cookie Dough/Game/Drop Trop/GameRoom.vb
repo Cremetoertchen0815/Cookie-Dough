@@ -137,13 +137,6 @@ Namespace Game.DropTrop
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
 
-
-            Dim sf As SoundEffect = GetLocalAudio(My.Settings.SoundA)
-            For i As Integer = 0 To Spielers.Length - 1
-                Dim pl = Spielers(i)
-                If pl.Typ <> SpielerTyp.Online Then Spielers(i).CustomSound(0) = sf
-            Next
-
             'Generate Spielfeld
             For x As Integer = 0 To SpielfeldSize.X - 1
                 For y As Integer = 0 To SpielfeldSize.Y - 1
@@ -300,8 +293,6 @@ Namespace Game.DropTrop
                         If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
                         If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
                         SendPlayerLeft(source)
-                    Case "n"c 'Switch player
-                        SwitchPlayer()
                     Case "p"c 'Pressed on piece
                         If SpielerIndex = source Then NetworkLocation = JsonConvert.DeserializeObject(Of Vector2)(element.Substring(2))
                     Case "r"c 'Player is back
@@ -315,17 +306,6 @@ Namespace Game.DropTrop
                             If Not pl.Bereit Then everythere = False
                         Next
                         If everythere Then StopUpdating = False : SendGameActive()
-                    Case "z"c 'Sound recieved
-                        Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim dat As String = element.Substring(3).Replace("_TATA_", "")
-
-                        If IdentSound = IdentType.Custom Then
-                            IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            Spielers(source).CustomSound(0) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & ".wav")
-                        Else
-                            Spielers(source).CustomSound(0) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                        End If
-                        SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & "_TATA_" & dat)
                 End Select
             Next
         End Sub
@@ -336,7 +316,6 @@ Namespace Game.DropTrop
         End Sub
         Private Sub SendBeginGaem()
             SendNetworkMessageToAll("b")
-            SendSoundFile()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
@@ -356,7 +335,6 @@ Namespace Game.DropTrop
         Private Sub SendPlayerBack(index As Integer)
             Dim str As String = JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, Spielfeld))
             SendNetworkMessageToAll("r" & index.ToString & str)
-            SendSoundFile()
         End Sub
 
         Private Sub SendMoves()
@@ -373,16 +351,6 @@ Namespace Game.DropTrop
         Private Sub SendSync()
             Dim str As String = JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, Spielfeld))
             SendNetworkMessageToAll("y" & str)
-        End Sub
-        Private Sub SendSoundFile()
-            For i As Integer = 0 To Spielers.Length - 1
-                Dim pl = Spielers(i)
-                If pl.Typ = SpielerTyp.Local Then
-                    Dim txt As String = ""
-                    If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\sound.audio")))
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(My.Settings.SoundA).ToString & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
-                End If
-            Next
         End Sub
 
         Private Sub SendNetworkMessageToAll(message As String)

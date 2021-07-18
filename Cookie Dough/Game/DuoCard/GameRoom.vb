@@ -163,16 +163,9 @@ Namespace Game.DuoCard
                 Dim pl = Spielers(i)
                 Select Case pl.Typ
                     Case SpielerTyp.Local
-                        Spielers(i).CustomSound = sf
                         Spielers(i).MOTD = My.Settings.MOTD
                     Case SpielerTyp.CPU
                         Spielers(i).MOTD = CPU_MOTDs(i)
-                        If i <> 0 Then
-                            Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
-                        Else
-                            Dim sff = SoundEffect.FromFile("Content\prep\tele.wav")
-                            Spielers(i).CustomSound = {sff, sff}
-                        End If
                 End Select
                 If Spielers(i).Typ <> SpielerTyp.None Then Spielers(i).HandDeck = New List(Of Card) From {DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard(), DrawRandomCard()}
             Next
@@ -404,25 +397,6 @@ Namespace Game.DuoCard
                         If everythere And StopWhenRealStart Then StopWhenRealStart = False
                     Case "y"c
                         SendSync()
-                    Case "z"c
-                        Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        Dim SoundNr As Integer = CInt(element(3).ToString)
-                        Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-                        Try
-                            'Receive sound
-                            If IdentSound = IdentType.Custom Then
-                                IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & SoundNr.ToString & ".wav")
-                            Else
-                                Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                            End If
-                            SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_" & dat)
-                        Catch ex As Exception
-                            'Data damaged, send standard sound
-                            IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                            Spielers(source).CustomSound(SoundNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
-                            SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & SoundNr.ToString & "_TATA_")
-                        End Try
                 End Select
             Next
         End Sub
@@ -438,7 +412,6 @@ Namespace Game.DuoCard
             Next
             SendNetworkMessageToAll("b" & appendix)
             SendSync()
-            SendSoundFile()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
@@ -470,7 +443,6 @@ Namespace Game.DuoCard
         Private Sub SendPlayerBack(index As Integer)
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers))
             SendNetworkMessageToAll("r" & index.ToString & str)
-            SendSoundFile()
         End Sub
 
         Private Sub SendFigureTransition(who As Integer, figur As Integer, destination As Integer)
@@ -487,21 +459,6 @@ Namespace Game.DuoCard
         Private Sub SendSync()
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers))
             SendNetworkMessageToAll("y" & str)
-        End Sub
-        Private Sub SendSoundFile()
-            For i As Integer = 0 To Spielers.Length - 1
-                Dim pl = Spielers(i)
-                If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
-                    'Send Sound A
-                    Dim txt As String = ""
-                    Dim snd As IdentType = GetPlayerAudio(i, False, txt)
-                    SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
-
-                    'Send Sound B
-                    snd = GetPlayerAudio(i, True, txt)
-                    LocalClient.WriteStream("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
-                End If
-            Next
         End Sub
 
         Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType
