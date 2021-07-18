@@ -55,6 +55,7 @@ Namespace Game.DuoCard
         Public Property ID As String Implements IPlayer.ID
         Public Property MOTD As String Implements IPlayer.MOTD
 
+
         Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub

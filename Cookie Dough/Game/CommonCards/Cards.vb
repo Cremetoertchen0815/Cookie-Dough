@@ -15,6 +15,7 @@ Namespace Game.CommonCards
         Jack = 11
         Queen = 12
         King = 13
+        Clear = 14
     End Enum
 
     Public Enum CardSuit
@@ -55,18 +56,18 @@ Namespace Game.CommonCards
 
         Public Property ID As Integer
             Get
-                Return 13 * Suit + Type - 1
+                Return 14 * Suit + Type - 1
             End Get
             Set(value As Integer)
-                Suit = Math.Floor(value / 13)
-                Type = (value Mod 13) + 1
+                Suit = Math.Floor(value / 14)
+                Type = (value Mod 14) + 1
             End Set
         End Property
 
         Shared Function GetAllCards() As Card()
             Dim lst As New List(Of Card)
             For a As Integer = 0 To 3
-                For b As Integer = 1 To 13
+                For b As Integer = 1 To 14
                     lst.Add(New Card(b, a))
                 Next
             Next
@@ -76,7 +77,6 @@ Namespace Game.CommonCards
         Public Overrides Function ToString() As String
             Return Type.ToString & "/" & Suit.ToString
         End Function
-
 
     End Structure
 End Namespace

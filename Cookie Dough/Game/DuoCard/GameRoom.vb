@@ -37,6 +37,8 @@ Namespace Game.DuoCard
         Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
         Private CardStack As List(Of Card)
+        Private BeSkipped As Boolean = False
+        Private DrawForces As Integer = 0
 
         'Game flags
         Private MoveActive As Boolean = False 'Gibt an, ob eine Figuranimation in Gange ist
@@ -122,8 +124,8 @@ Namespace Game.DuoCard
             HUD = New GuiSystem
             HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
-            HUDArrowUp = New TextureButton(DebugTexture, New Vector2(935, 700), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowUp)
-            HUDArrowDown = New TextureButton(DebugTexture, New Vector2(935, 970), New Vector2(50, 20)) : HUD.Controls.Add(HUDArrowDown)
+            HUDArrowUp = New TextureButton(DebugTexture, New Vector2(935, 700), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowUp)
+            HUDArrowDown = New TextureButton(DebugTexture, New Vector2(935, 970), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowDown)
             HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
@@ -259,9 +261,9 @@ Namespace Game.DuoCard
                                     If card_nr >= HandDeck.Count Then Exit For
 
                                     If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(i * 140 + 470, 740, 120, 200).Contains(mpos) Then
-                                        If IsLayingCardValid(Spielers(UserIndex).HandDeck(card_nr)) Then
+                                        Dim card = Spielers(UserIndex).HandDeck(card_nr)
+                                        If IsLayingCardValid(card) Then
                                             'Read and pop card from hand deck
-                                            Dim card As Card = Spielers(UserIndex).HandDeck(card_nr)
                                             Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
                                             DebugConsole.Instance.Log(card.ToString)
                                             LayCard(card)
@@ -280,14 +282,27 @@ Namespace Game.DuoCard
                                 Next
                         End Select
 
-                        'Draw card
+                        'Card stack pressed
                         If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(710, 420, 220, 270).Contains(mpos) AndAlso CardStack.Count > 0 Then
-                            Renderer.TriggerDeckPullAnimation(Sub()
-                                                                  Dim res As Card = DrawRandomCard()
-                                                                  Spielers(UserIndex).HandDeck.Add(res)
-                                                                  StopUpdating = True
-                                                                  Core.Schedule(0.5, AddressOf SwitchPlayer)
-                                                              End Sub)
+                            If BeSkipped Then
+                                'Skip player
+                                StopUpdating = True
+                                BeSkipped = False
+                                Core.Schedule(0.5, AddressOf SwitchPlayer)
+                            ElseIf DrawForces > 0 Then
+                                'Draw cards that you're forced to
+                                StopUpdating = True
+
+                                If DrawForces > 0 Then
+                                    DrawForces -= 1
+                                    Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                                Else
+                                    Core.Schedule(0.5, AddressOf SwitchPlayer)
+                                End If
+                            Else
+                                'Draw card
+                                Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                            End If
                         End If
                     Case CardGameState.WarteAufOnlineSpieler
 
@@ -532,6 +547,8 @@ Namespace Game.DuoCard
         End Sub
 
         Private Function IsLayingCardValid(card As Card) As Boolean
+            If BeSkipped And card.Type <> CardType.Eight Then Return False
+            If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
             Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
         End Function
         Private Function GetScore(i As Integer) As Integer
@@ -545,20 +562,46 @@ Namespace Game.DuoCard
             Return False
         End Function
 
+        Private Sub CheckDrawForces()
+            Dim res As Card = DrawRandomCard()
+            Spielers(UserIndex).HandDeck.Add(res)
+            StopUpdating = True
+
+            If DrawForces > 0 Then
+                DrawForces -= 1
+                Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+            Else
+                Core.Schedule(0.5, AddressOf SwitchPlayer)
+            End If
+        End Sub
+
         Private Sub LayCard(card As Card)
             TableCard = card
             If CardStack.Contains(card) Then CardStack.Remove(card)
             Status = CardGameState.CardAnimationActive
-            If card.Type <> CardType.Jack Then
-                StopUpdating = True
-                Core.Schedule(0.5, AddressOf SwitchPlayer)
-            Else
-                Core.Schedule(0.5, Sub()
-                                       HUDInstructions.Text = "Select wishing suit!"
-                                       SelectionState = SelectionMode.Suit
-                                       Status = CardGameState.SelectAction
-                                   End Sub)
-            End If
+
+            Select Case card.Type
+                Case CardType.Jack
+                    Core.Schedule(0.5, Sub()
+                                           HUDInstructions.Text = "Select wishing suit!"
+                                           SelectionState = SelectionMode.Suit
+                                           Status = CardGameState.SelectAction
+                                       End Sub)
+                Case CardType.Seven
+                    DrawForces += 2
+                    StopUpdating = True
+                    Core.Schedule(0.5, AddressOf SwitchPlayer)
+                Case CardType.Eight
+                    BeSkipped = True
+                    StopUpdating = True
+                    Core.Schedule(0.5, AddressOf SwitchPlayer)
+                Case CardType.Nine
+                    Status = CardGameState.SelectAction
+                    SelectionState = SelectionMode.Standard
+                Case Else
+                    StopUpdating = True
+                    Core.Schedule(0.5, AddressOf SwitchPlayer)
+            End Select
         End Sub
 
         Private Function DrawRandomCard() As Card
@@ -585,6 +628,8 @@ Namespace Game.DuoCard
             'Set game flags
             StopUpdating = False
             SelectionState = SelectionMode.Standard
+            HUDArrowUp.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
+            HUDArrowDown.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
             SendGameActive()
             HUDInstructions.Text = "Lol"
         End Sub
@@ -657,7 +702,7 @@ Namespace Game.DuoCard
             End Get
         End Property
 
-        Private SuitStack = New List(Of Card) From {New Card(CardType.Ace, CardSuit.Clubs), New Card(CardType.Ace, CardSuit.Diamonds), New Card(CardType.Ace, CardSuit.Hearts), New Card(CardType.Ace, CardSuit.Spades)}
+        Private SuitStack = New List(Of Card) From {New Card(CardType.Clear, CardSuit.Clubs), New Card(CardType.Clear, CardSuit.Diamonds), New Card(CardType.Clear, CardSuit.Hearts), New Card(CardType.Clear, CardSuit.Spades)}
         Public ReadOnly Property HandDeck As List(Of Card) Implements ICardRendererWindow.HandDeck
             Get
                 If SelectionState = SelectionMode.Suit Then Return SuitStack
