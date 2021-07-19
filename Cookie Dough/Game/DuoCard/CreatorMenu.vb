@@ -166,11 +166,11 @@ Namespace Game.DuoCard
             Core.StartSceneTransition(New FadeTransition(Function() AktuellesSpiel)).OnScreenObscured = Sub()
                                                                                                             AktuellesSpiel.LoadContent()
                                                                                                             If Internetz Then
-                                                                                                                Dim wtlst As String() = New String(Whitelist.Length - 1) {}
+                                                                                                                Dim wtlst As String() = New String(AktuellesSpiel.Spielers.Length - 1) {}
                                                                                                                 For i As Integer = 0 To Whitelist.Length - 1
                                                                                                                     wtlst(i) = AllUser(Whitelist(i)).Item1
                                                                                                                 Next
-                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, AktuellesSpiel.Spielers) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
+                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, AktuellesSpiel.Spielers.Length, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                             End If
                                                                                                         End Sub
 

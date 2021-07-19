@@ -339,7 +339,7 @@ Namespace Menu.MainMenu
                         If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False
-                        Microsoft.VisualBasic.MsgBox("Error connecting!")
+                        Microsoft.VisualBasic.MsgBox("Error connecting!" & ex.ToString)
                     End Try
                 Case GameType.DropTrop
                     Try
@@ -348,7 +348,16 @@ Namespace Menu.MainMenu
                         If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False
-                        Microsoft.VisualBasic.MsgBox("Error connecting!")
+                        Microsoft.VisualBasic.MsgBox("Error connecting!" & ex.ToString)
+                    End Try
+                Case GameType.DuoCard
+                    Try
+                        BlockOnlineJoin = True
+                        Dim client As New Game.DuoCard.SlaveWindow(ins)
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                    Catch ex As Exception
+                        BlockOnlineJoin = False
+                        Microsoft.VisualBasic.MsgBox("Error connecting! " & ex.ToString)
                     End Try
             End Select
         End Sub

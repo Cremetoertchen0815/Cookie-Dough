@@ -54,6 +54,7 @@ Namespace Game.CommonCards
             Return appnd
         End Function
 
+        <Newtonsoft.Json.JsonIgnore>
         Public Property ID As Integer
             Get
                 Return 14 * Suit + Type - 1

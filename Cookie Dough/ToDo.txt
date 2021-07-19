@@ -1,6 +1,6 @@
 ﻿BV:
 -Custom CPU sounds
 
--Work on DC
+-Work on DC(network)
 -Shoots n Ladders BV map
 -Pac Man 3D first person

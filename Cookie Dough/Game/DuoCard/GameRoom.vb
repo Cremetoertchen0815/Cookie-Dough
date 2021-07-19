@@ -69,6 +69,7 @@ Namespace Game.DuoCard
         Private WithEvents HUDdbgLabel As Label
         Private WithEvents HUDmotdLabel As Label
         Private WithEvents HUDSoftBtn As GameRenderable
+        Private WithEvents HUDAfkBtn As Button
         Private DeckScroll As Integer
         Private InstructionFader As ITween(Of Color)
         Private Chat As List(Of (String, Color))
@@ -135,8 +136,9 @@ Namespace Game.DuoCard
             HUDNameBtn = New Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
             HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
+            HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             CreateEntity("HUD").AddComponent(HUD)
-            HUD.Color = hudcolors(0)
+            HUD.Color = Color.White
 
             Renderer = AddRenderer(New CardRenderer(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
@@ -294,7 +296,7 @@ Namespace Game.DuoCard
                                 End If
                             Else
                                 'Draw card
-                                Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                                If Renderer.card_deck_top_pos Is Nothing OrElse Renderer.card_deck_top_pos.State <> TransitionState.InProgress Then Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
                             End If
                         End If
                     Case CardGameState.WarteAufOnlineSpieler
@@ -375,12 +377,39 @@ Namespace Game.DuoCard
                         'If Renderer.BeginTriggered Then StopWhenRealStart = True
 
                         SendPlayerLeft(source)
+                    Case "f"c 'Slave layed down card
+                        Dim card_nr As Integer = CInt(element.Substring(2))
+                        Dim card As Card = Spielers(source).HandDeck(card_nr)
+                        'Place card
+                        Spielers(SpielerIndex).HandDeck.RemoveAt(card_nr)
+                        DebugConsole.Instance.Log(Card.ToString)
+                        LayCard(card)
+                    Case "g"c
+                        Dim card As New Card(CInt(element.Substring(3)), CInt(element(2).ToString))
+                        TableCard = card
+                        StopUpdating = True
+                        Core.Schedule(0.5, AddressOf SwitchPlayer)
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(2)
                         PostChat(msg, Color.White)
                     Case "n"c 'Switch player
                         SwitchPlayer()
-                    Case "r"c 'Player is back
+                    Case "p"c 'Card stack pressed
+                        If BeSkipped Then
+                            'Skip player
+                            BeSkipped = False
+                            Core.Schedule(0.5, AddressOf SwitchPlayer)
+                        ElseIf DrawForces > 0 Then
+                            'Draw cards that you're forced to
+                            StopUpdating = True
+
+                            DrawForces -= 1
+                            Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                        Else
+                            'Draw card
+                            If Renderer.card_deck_top_pos Is Nothing OrElse Renderer.card_deck_top_pos.State <> TransitionState.InProgress Then Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                        End If
+                            Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
@@ -416,8 +445,15 @@ Namespace Game.DuoCard
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
         End Sub
+        Private Sub SendDrawCard(card As Card)
+            LocalClient.WriteStream("d" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
+        End Sub
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
+        End Sub
+
+        Private Sub SendLayCard(card As Card)
+            LocalClient.WriteStream("f" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
         End Sub
         Private Sub SendHighscore()
             Dim pls As New List(Of (String, Integer))
@@ -440,13 +476,12 @@ Namespace Game.DuoCard
         Private Sub SendNewPlayerActive(who As Integer)
             SendNetworkMessageToAll("n" & who.ToString)
         End Sub
+        Private Sub SendParamUpdate()
+            SendNetworkMessageToAll("s" & If(BeSkipped, 1, 0).ToString & DrawForces.ToString)
+        End Sub
         Private Sub SendPlayerBack(index As Integer)
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers))
             SendNetworkMessageToAll("r" & index.ToString & str)
-        End Sub
-
-        Private Sub SendFigureTransition(who As Integer, figur As Integer, destination As Integer)
-            SendNetworkMessageToAll("s" & who.ToString & figur.ToString & destination.ToString)
         End Sub
         Private Sub SendWinFlag()
             SendSync()
@@ -457,7 +492,7 @@ Namespace Game.DuoCard
         End Sub
 
         Private Sub SendSync()
-            Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers))
+            Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers) With {.TableCard = TableCard})
             SendNetworkMessageToAll("y" & str)
         End Sub
 
@@ -521,7 +556,8 @@ Namespace Game.DuoCard
 
         Private Sub CheckDrawForces()
             Dim res As Card = DrawRandomCard()
-            Spielers(UserIndex).HandDeck.Add(res)
+            Spielers(SpielerIndex).HandDeck.Add(res)
+            SendDrawCard(res)
             StopUpdating = True
 
             If DrawForces > 0 Then
@@ -536,14 +572,15 @@ Namespace Game.DuoCard
             TableCard = card
             If CardStack.Contains(card) Then CardStack.Remove(card)
             Status = CardGameState.CardAnimationActive
+            SendLayCard(card)
 
             Select Case card.Type
                 Case CardType.Jack
-                    Core.Schedule(0.5, Sub()
-                                           HUDInstructions.Text = "Select wishing suit!"
-                                           SelectionState = SelectionMode.Suit
-                                           Status = CardGameState.SelectAction
-                                       End Sub)
+                    If SpielerIndex = UserIndex Then Core.Schedule(0.5, Sub()
+                                                                            HUDInstructions.Text = "Select wishing suit!"
+                                                                            SelectionState = SelectionMode.Suit
+                                                                            Status = CardGameState.SelectAction
+                                                                        End Sub)
                 Case CardType.Seven
                     DrawForces += 2
                     StopUpdating = True
@@ -553,8 +590,7 @@ Namespace Game.DuoCard
                     StopUpdating = True
                     Core.Schedule(0.5, AddressOf SwitchPlayer)
                 Case CardType.Nine
-                    Status = CardGameState.SelectAction
-                    SelectionState = SelectionMode.Standard
+                    If SpielerIndex = UserIndex Then Status = CardGameState.SelectAction : SelectionState = SelectionMode.Standard
                 Case Else
                     StopUpdating = True
                     Core.Schedule(0.5, AddressOf SwitchPlayer)
@@ -587,8 +623,19 @@ Namespace Game.DuoCard
             SelectionState = SelectionMode.Standard
             HUDArrowUp.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
             HUDArrowDown.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
+            SendParamUpdate()
             SendGameActive()
+            ResetHUD()
             HUDInstructions.Text = "Lol"
+        End Sub
+
+        Private Sub ResetHUD()
+            'HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
+            'HUDBtnD.Active = SpielerIndex = UserIndex
+            'HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
+            HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
+            HUD.TweenColorTo(If(UserIndex >= 0, hudcolors(UserIndex), Color.White), 0.5).SetEaseType(EaseType.CubicInOut).Start()
+            HUDNameBtn.Active = True
         End Sub
 #End Region
 #Region "Knopfgedrücke"

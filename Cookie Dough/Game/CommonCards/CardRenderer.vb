@@ -13,7 +13,7 @@ Namespace Game.CommonCards
         Private card_Matrix As Matrix
         Private card_deck_model As Model
         Private card_deck_Matrix As Matrix
-        Private card_deck_top_pos As Transition(Of Vector3)
+        Public card_deck_top_pos As Transition(Of Vector3)
         Private TableModel As Model
         Private TableMatrix As Matrix
         Private CardTextures As List(Of Texture2D)
@@ -182,7 +182,7 @@ Namespace Game.CommonCards
 
 #Region "Animation"
         Friend Sub TriggerDeckPullAnimation(final As Transition(Of Vector3).FinishedDelegate)
-            If card_deck_top_pos.State = TransitionState.InProgress Then Return
+
             card_deck_top_pos = New Transition(Of Vector3)(New TransitionTypes.TransitionType_Acceleration(500), New Vector3(0, 0, -0.1), New Vector3(0, -700, -0.1), final)
             Automator.Add(card_deck_top_pos)
         End Sub

@@ -20,7 +20,18 @@ Namespace Game.DuoCard
         ''' <summary>
         ''' Deklariert ob der Spieler lokal, durch eine KI, oder über eine Netzwerkverbindung gesteuert wird
         ''' </summary>
-        Public Property Typ As SpielerTyp = SpielerTyp.CPU Implements IPlayer.Typ
+        <Newtonsoft.Json.JsonIgnore>
+        Friend Property Typ As SpielerTyp Implements IPlayer.Typ
+            Get
+                Return If(IsAFK And OriginalType <> SpielerTyp.CPU And OriginalType <> SpielerTyp.None, SpielerTyp.CPU, OriginalType)
+            End Get
+            Set(value As SpielerTyp)
+                OriginalType = value
+            End Set
+        End Property
+        Public Property OriginalType As SpielerTyp = SpielerTyp.CPU
+
+        Public Property IsAFK As Boolean = False
 
         ''' <summary>
         ''' Gibt an, wieviele Zusatzpunkte der Spieler hat.
@@ -39,7 +50,7 @@ Namespace Game.DuoCard
         Public Property Bereit As Boolean = True Implements IPlayer.Bereit
 
 
-        Public Property HandDeck As List(Of Card)
+        Public Property HandDeck As New List(Of Card)
 
         ''' <summary>
         ''' Der Sound, der abgespielt wird, wenn man gekickt wird
