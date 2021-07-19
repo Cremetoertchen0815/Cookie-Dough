@@ -15,12 +15,12 @@ Namespace Game.DuoCard
         Private MenuAktiviert As Boolean = True
         Private lastmstate As MouseState
         Private ChangeNameButtonPressed As Boolean = False
-        Private PlayerCount As Integer = 8
         Private PlayerSel As Integer = 0
         Private Mode As GameMode = GameMode.Competetive
+        Private Size As Integer = 2
         Friend Arrow As Texture2D
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
-        Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.None, SpielerTyp.None, SpielerTyp.None, SpielerTyp.None, SpielerTyp.None, SpielerTyp.None}
+        Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local}
         Protected Whitelist As Integer() = {0, 0, 0, 0}
         Protected SecondScreen As Boolean = False
         Protected SM4Scroll As Single
@@ -39,7 +39,6 @@ Namespace Game.DuoCard
             ClearColor = Color.Black
 
             'Init values
-            NewGamePlayers = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
             PlayerSel = 0
             MenuAktiviert = True
 
@@ -59,12 +58,12 @@ Namespace Game.DuoCard
 
                 If Not SecondScreen Then
 
-                    'If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
-                    '    Map = (Map + 1) Mod 3
-                    '    ReDim NewGamePlayers(GetMapSize(Map) - 1)
-                    '    ReDim Whitelist(GetMapSize(Map) - 1)
-                    '    SFX(2).Play()
-                    'End If
+                    If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
+                        Size = Size Mod 6 + 1
+                        ReDim NewGamePlayers(Size - 1)
+                        ReDim Whitelist(Size - 1)
+                        SFX(2).Play()
+                    End If
                     If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then Mode = If(Mode = GameMode.Casual, GameMode.Competetive, GameMode.Casual)
                     If New Rectangle(560, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel -= 1 : SFX(2).Play()
                     If New Rectangle(960, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel += 1 : SFX(2).Play()
@@ -81,7 +80,7 @@ Namespace Game.DuoCard
                         SFX(2).Play()
 
                         Dim Internetz As Boolean = False
-                        For i As Integer = 0 To 7
+                        For i As Integer = 0 To Size - 1
                             If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
                         Next
 
@@ -122,7 +121,7 @@ Namespace Game.DuoCard
                     Next
                 End If
 
-                PlayerSel = Math.Min(Math.Max(PlayerSel, 0), PlayerCount - 1)
+                PlayerSel = Math.Min(Math.Max(PlayerSel, 0), Size - 1)
             End If
 
             lastmstate = mstate
@@ -138,7 +137,7 @@ Namespace Game.DuoCard
             If Not MenuAktiviert Then Return
 
             Dim Internetz As Boolean = False
-            For i As Integer = 0 To PlayerCount - 1
+            For i As Integer = 0 To Size - 1
                 If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
             Next
             If Internetz Then LocalClient.AutomaticRefresh = False
@@ -245,9 +244,7 @@ Namespace Game.DuoCard
                     batcher.DrawHollowRect(New Rectangle(560, 650, 800, 100), FgColor)
 
                     'Draw contents
-                    batcher.DrawLine(New Vector2(1920.0F / 2, 200), New Vector2(1920.0F / 2, 300), FgColor)
-                    'batcher.DrawString(MediumFont, "Map: " & GetMapName(instance.Map), New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Map: " & GetMapName(instance.Map)).X / 2, 225), FgColor)
-                    batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 225), FgColor)
+                    batcher.DrawString(MediumFont, instance.Size.ToString & " Player", New Vector2(1920.0F / 2 - MediumFont.MeasureString(instance.Size.ToString & " Player").X / 2, 225), FgColor)
 
                     batcher.DrawString(MediumFont, "Mode: " & instance.Mode.ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Mode: " & instance.Mode.ToString).X / 2, 375), FgColor)
 
@@ -284,7 +281,7 @@ Namespace Game.DuoCard
 
                 'Draw heading
                 batcher.DrawRect(New Rectangle(0, 0, 1920, 150), Color.Black)
-                batcher.DrawString(TitleFont, "Betreten Verboten", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Betreten Verboten").X / 2, 50), FgColor)
+                batcher.DrawString(TitleFont, "Duo Card", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Duo Card").X / 2, 50), FgColor)
 
                 batcher.DrawRect(New Rectangle(0, 0, 1920, 1080), Color.Black * instance.Schwarzblende.Value)
             End Sub
