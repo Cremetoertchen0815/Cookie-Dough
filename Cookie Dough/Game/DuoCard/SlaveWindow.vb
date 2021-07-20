@@ -6,7 +6,7 @@ Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
 Imports Cookie_Dough.Game.DuoCard.Networking
 Imports Cookie_Dough.Game.DuoCard.Rendering
-Imports Cookie_Dough.Game.CommonCards
+Imports Cookie_Dough.Game.Common
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics

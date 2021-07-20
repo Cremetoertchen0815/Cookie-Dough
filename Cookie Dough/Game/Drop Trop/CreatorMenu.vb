@@ -7,7 +7,7 @@ Namespace Game.DropTrop
     ''' <summary>
     ''' Enthällt das Menu des Spiels und verwaltet die Spiele-Session
     ''' </summary>
-    Public Class GameInstance
+    Public Class CreatorMenu
         Inherits Scene
 
         'Menü Flags
@@ -118,13 +118,13 @@ Namespace Game.DropTrop
             Dim AktuellesSpiel As New GameRoom(Map) With {.PlCount = PlayerCount}
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.NetworkMode = False
-            AktuellesSpiel.Spielers(0) = New Player(NewGamePlayers(0)) With {.Name = If(NewGamePlayers(0) = SpielerTyp.Local, My.Settings.Username, farben(0))}
+            AktuellesSpiel.Spielers(0) = New Player(NewGamePlayers(0)) With {.Name = If(NewGamePlayers(0) = SpielerTyp.Local, My.Settings.Username, Farben(0))}
             For i As Integer = 1 To AktuellesSpiel.PlCount - 1
                 Select Case NewGamePlayers(i)
                     Case SpielerTyp.Local
                         AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local) With {.Name = My.Settings.Username & "-" & (i + 1).ToString}
                     Case SpielerTyp.CPU
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU) With {.Name = farben(i)}
+                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU) With {.Name = Farben(i)}
                     Case SpielerTyp.Online
                         AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Online) With {.Bereit = False}
                     Case SpielerTyp.None
@@ -182,9 +182,9 @@ Namespace Game.DropTrop
 
             Private TitleFont As NezSpriteFont
             Private MediumFont As NezSpriteFont
-            Private instance As GameInstance
+            Private instance As CreatorMenu
 
-            Sub New(instance As GameInstance)
+            Sub New(instance As CreatorMenu)
                 MyBase.New()
                 Me.instance = instance
             End Sub

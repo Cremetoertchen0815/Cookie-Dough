@@ -32,10 +32,6 @@
         Haus4
     End Enum
 
-    Public Enum Difficulty
-        Brainless = 0
-        Smart = 1
-    End Enum
 
     Public Enum GaemMap
         Default4Players = 0

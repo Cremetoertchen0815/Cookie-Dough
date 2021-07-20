@@ -6,7 +6,7 @@
     DuoCard
     DooDooHead
     Megäa
-    GuessSHit
+    Barrelled
     DropTrop
 End Enum
 Public Enum SpielerTyp
@@ -18,6 +18,10 @@ End Enum
 Public Enum GameMode
     Casual = 0
     Competetive = 1
+End Enum
+Public Enum Difficulty
+    Brainless = 0
+    Smart = 1
 End Enum
 Public Enum IdentType
     TypeA

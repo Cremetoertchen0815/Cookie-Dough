@@ -1,6 +1,6 @@
 ﻿Imports Microsoft.Xna.Framework
 
-Namespace Game.Megäa.Renderers
+Namespace Game.Common
     Public Class CrosshairRenderable
         Inherits RenderableComponent
         Public Overrides Sub Render(batcher As Batcher, camera As Camera)

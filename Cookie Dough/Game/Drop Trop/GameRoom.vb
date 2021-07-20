@@ -87,7 +87,7 @@ Namespace Game.DropTrop
         Sub New(map As GaemMap)
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
-            SpielfeldSize = GameInstance.GetMapSize(map)
+            SpielfeldSize = CreatorMenu.GetMapSize(map)
             LocalClient.LeaveFlag = False
             LocalClient.IsHost = True
             Chat = New List(Of (String, Color))
@@ -244,8 +244,8 @@ Namespace Game.DropTrop
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
-                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -672,7 +672,7 @@ Namespace Game.DropTrop
                 SFX(2).Play()
                 SendGameClosed()
                 NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
         End Sub
 #End Region

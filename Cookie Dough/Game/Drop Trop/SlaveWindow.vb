@@ -93,7 +93,7 @@ Namespace Game.DropTrop
 
             If Not LocalClient.JoinGame(ins, Sub(x)
                                                  Map = CInt(x())
-                                                 SpielfeldSize = GameInstance.GetMapSize(Map)
+                                                 SpielfeldSize = CreatorMenu.GetMapSize(Map)
                                                  Select Case Map
                                                      Case GaemMap.Smol
                                                          PlCount = 2
@@ -249,8 +249,8 @@ Namespace Game.DropTrop
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
-                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -662,7 +662,7 @@ Namespace Game.DropTrop
                 SFX(2).Play()
                 SendGameClosed()
                 NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New GameInstance))
+                Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
         End Sub
 #End Region

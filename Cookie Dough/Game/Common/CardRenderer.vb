@@ -2,7 +2,7 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 
-Namespace Game.CommonCards
+Namespace Game.Common
     Public Class CardRenderer
         Inherits Renderer
 

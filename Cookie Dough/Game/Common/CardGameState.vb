@@ -1,4 +1,4 @@
-﻿Namespace Game.CommonCards
+﻿Namespace Game.Common
     Public Enum CardGameState
         SelectAction = 0
         CardAnimationActive = 1

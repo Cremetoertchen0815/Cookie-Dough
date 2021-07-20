@@ -1,6 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
-Imports Cookie_Dough.Game.CommonCards
+Imports Cookie_Dough.Game.Common
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Newtonsoft.Json

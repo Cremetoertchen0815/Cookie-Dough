@@ -1,16 +1,16 @@
 ﻿Imports System.Collections.Generic
-Imports System.Linq
 Imports Cookie_Dough.Framework.UI
+Imports Cookie_Dough.Game.Barrelled.Renderers
 Imports Cookie_Dough.Game.Common
-Imports Cookie_Dough.Game.Megäa.Renderers
 Imports Cookie_Dough.Menu.MainMenu
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
+Imports Nez.Tiled
 Imports Nez.Tweens
 
-Namespace Game.Megäa
+Namespace Game.Barrelled
     Public Class GameRoom
         Inherits Scene
 
@@ -22,8 +22,8 @@ Namespace Game.Megäa
         Friend PlayerIndexList As Integer() = {0}
         Friend StopUpdating As Boolean = False
         Friend NetworkMode As Boolean = False
+        Friend Map As Map = Map.Classic
         Friend Status As GameStatus
-        Friend TotemPressedForCurrentCardSet As Boolean = False
         Friend CanStart As Boolean = False
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
@@ -37,7 +37,6 @@ Namespace Game.Megäa
         Private VerticalVel As Single
         Friend Colliders As BoundingBox()
         Friend ObjectHandler As Object3DHandler
-        Friend Totem As Totem
         Friend Table As Table
         Friend Crosshair As CrosshairRenderable
 
@@ -50,7 +49,7 @@ Namespace Game.Megäa
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnA As Controls.Button
         Private WithEvents HUDBtnB As Controls.Button
-        Private WithEvents HUDBtnC As Controls.Button
+        'Private WithEvents HUDBtnC As Controls.Button
         Private WithEvents HUDChat As Controls.TextscrollBox
         Private WithEvents HUDChatBtn As Controls.Button
         Private WithEvents HUDInstructions As Controls.Label
@@ -63,19 +62,15 @@ Namespace Game.Megäa
         Private Chat As List(Of (String, Color))
         Private InputBoxFlag As Boolean = False
 
+        'Map
+        Public TileMap As TmxMap
+
         'Constants
         Private Const WaitinTime As Integer = 1500
         Private Const MouseSensivity As Single = 232
         Private Const Speed As Single = 12
         Private Const JumpHeight As Single = 20
         Private Const Gravity As Single = 65
-
-        '---TODO---
-        '-Implement move reaction
-        '-Implement a slave version
-        '-Implement network functionality fully
-        '-Implement faces on the figures
-        '-Implement sounds
 
         Public Sub New()
             Chat = New List(Of (String, Color))
@@ -114,24 +109,31 @@ Namespace Game.Megäa
             AddRenderer(New PsygroundRenderer(0, 0.85F))
             Renderer = AddRenderer(New Renderer3D(Me, 1))
             AddRenderer(New DefaultRenderer(2))
-            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.55).SetThreshold(0.45)
+            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.55F).SetThreshold(0.45F)
+
+            'Load Map
+            TileMap = Content.LoadTiledMap("Maps\Barrelled\" & Map.ToString & ".tmx")
+            Player.Map = TileMap
+            Renderer.GenerateMapMatrices(TileMap)
+
 
             'Load players
             Spielers = New List(Of Player)
             Spielers.AddRange({New Player(SpielerTyp.Local), New Player(SpielerTyp.CPU) With {.Location = New Vector3(-6, 0, 0), .Direction = Vector3.Right},
-                              New Player(SpielerTyp.CPU) With {.Location = New Vector3(0, 0, -6), .Direction = Vector3.Forward}, New Player(SpielerTyp.CPU) With {.Location = New Vector3(6, 0, 0), .Direction = Vector3.Left}})
+                               New Player(SpielerTyp.CPU) With {.Location = New Vector3(0, 0, -6), .Direction = Vector3.Forward}, New Player(SpielerTyp.CPU) With {.Location = New Vector3(6, 0, 0), .Direction = Vector3.Left}})
+
+            CreateEntity("Player0").AddComponent(Spielers(0))
 
             'Create entities and components
             AddSceneComponent(New Object3DHandler(Spielers(UserIndex), Me))
             Crosshair = CreateEntity("crosshair").AddComponent(Of CrosshairRenderable)()
             Table = CreateEntity("table").AddComponent(Of Table)()
-            Totem = CreateEntity("totem").AddComponent(Of Totem)()
 
             'Load HUD
             HUD = New GuiSystem()
             HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnA)
             HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnB)
-            HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnC)
+            'HUDBtnC = New Controls.Button("Anger", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnC)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Controls.Label("Click on the totem to start the game...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
@@ -180,12 +182,12 @@ Namespace Game.Megäa
                 movDir.Normalize()
 
                 'Move player
-                If Not .PositionLocked And GameFocused Then 'When focussed
+                If GameFocused Then 'When focussed
                     SPEEEN += MovementBtn.Value.Y * movDir * Speed * delta
                     SPEEEN += MovementBtn.Value.X * Vector3.Cross(Vector3.Up, movDir) * New Vector3(Speed, 0, Speed) * delta
                     If .Location.Y <= 0 And Not JumpBtn.IsPressed Then .Location = New Vector3(.Location.X, 0, .Location.Z) : VerticalVel = 0
                     SPEEEN += New Vector3(0, VerticalVel * delta, 0)
-                ElseIf Not .PositionLocked Then 'When unfocussed
+                Else 'When unfocussed
                     If .Location.Y <= 0 And Not JumpBtn.IsPressed Then .Location = New Vector3(.Location.X, 0, .Location.Z) : VerticalVel = 0
                     SPEEEN += New Vector3(0, VerticalVel * delta, 0)
                 End If
@@ -202,7 +204,7 @@ Namespace Game.Megäa
                 .Location = .Location - SPEEEN
 
                 'Clamp position
-                .Location = New Vector3(Mathf.Clamp(.Location.X, -19, 19), Mathf.Clamp(.Location.Y, 0, 6), Mathf.Clamp(.Location.Z, -19, 19))
+                .Location = New Vector3(.Location.X, Mathf.Clamp(.Location.Y, 0, 6), .Location.Z)
 
                 'Generate view matrix and ray
                 Dim camShift As Vector3 = Spielers(UserIndex).Direction : camShift.Y = 0 : camShift.Normalize() : camShift *= 0.5
@@ -221,7 +223,7 @@ Namespace Game.Megäa
                     Mouse.SetPosition(CInt(pos.X / 2), CInt(pos.Y / 2))
                 End If
 
-                If NetworkMode And Not .PositionLocked Then SendPlayerMoved(UserIndex, .Location, .Direction)
+                If NetworkMode Then SendPlayerMoved(UserIndex, .Location, .Direction)
             End With
 
             'Focus/Unfocus game
@@ -235,18 +237,10 @@ Namespace Game.Megäa
             If Status = GameStatus.WaitingForOnlinePlayers Then
                 CanStart = True
                 For i As Integer = 1 To Spielers.Count - 1
-                    If Not Spielers(i).Bereit Or Not Spielers(i).PositionLocked Then CanStart = False : Exit For
+                    If Not Spielers(i).Bereit Then CanStart = False : Exit For
                 Next
             Else
                 CanStart = False
-            End If
-
-            'CPU "AI"
-            Dim Spielberg As Player = Spielers(SpielerIndex)
-            If Spielberg.Typ = SpielerTyp.CPU And Status = GameStatus.GameActive And Spielberg.Deck.Count > 0 And Not Player.CardBeingPlaced Then
-                Spielberg.LayCard(AddressOf SwitchPlayer)
-                TotemPressedForCurrentCardSet = False
-                SendCardPlaced(SpielerIndex, Spielberg.HandCard)
             End If
 
             'Network stuff
@@ -260,15 +254,7 @@ Namespace Game.Megäa
 
             'Set HUD color
             HUDColor = playcolor(UserIndex)
-            HUDBtnA.Color = HUDColor : HUDBtnA.Border = New ControlBorder(HUDColor, HUDBtnA.Border.Width)
-            HUDBtnB.Color = HUDColor : HUDBtnB.Border = New ControlBorder(HUDColor, HUDBtnB.Border.Width)
-            HUDBtnC.Color = HUDColor : HUDBtnC.Border = New ControlBorder(HUDColor, HUDBtnC.Border.Width)
-            HUDChat.Color = HUDColor : HUDChat.Border = New ControlBorder(HUDColor, HUDChat.Border.Width)
-            HUDChatBtn.Color = HUDColor : HUDChatBtn.Border = New ControlBorder(HUDColor, HUDChatBtn.Border.Width)
-            HUDFullscrBtn.Color = HUDColor : HUDFullscrBtn.Border = New ControlBorder(HUDColor, HUDFullscrBtn.Border.Width)
-            HUDMusicBtn.Color = HUDColor : HUDMusicBtn.Border = New ControlBorder(HUDColor, HUDMusicBtn.Border.Width)
             HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name, "")
-            HUDNameBtn.Color = If(SpielerIndex > -1, playcolor(SpielerIndex), Color.White)
             HUDInstructions.Active = Status <> GameStatus.GameActive OrElse (Spielers(SpielerIndex).Typ = SpielerTyp.Local)
 
             lastmstate = Mouse.GetState
@@ -309,23 +295,12 @@ Namespace Game.Megäa
                         user.Direction = txt(1)
                     Case "n"c
                         SwitchPlayer()
-                    Case "p"c 'Place card
-                        Dim user As Player = Spielers(source)
-                        If Status = GameStatus.GameActive And user.Deck.Count > 0 And Not Player.CardBeingPlaced And source = SpielerIndex Then
-                            user.LayCard(Sub() Return)
-                            TotemPressedForCurrentCardSet = False
-                            SendCardPlaced(source, user.HandCard)
-                        End If
                     Case "r"c 'Player is back
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         SendPlayerBack(source)
                         StopUpdating = False
                         If SpielerIndex = source Then SendNewPlayerActive(SpielerIndex)
-                    Case "t"c 'Totem was pressed
-                        If TotemPressedForCurrentCardSet Then Return 'If totem was already pressed, don't react
-                        Status = GameStatus.Waitn
-                        CalcTotemResponse(source)
 
                 End Select
             Next
@@ -378,110 +353,6 @@ Namespace Game.Megäa
             SpielerIndex = PlayerIndexList(PlayerIndexIndex)
             SendNewPlayerActive(SpielerIndex)
             'TD: Send switch player command to clients
-        End Sub
-
-        Friend Sub TotemClicked(index As Integer)
-            Dim user As Player = Spielers(index)
-
-            'Start game
-            If Not user.PositionLocked And Status = GameStatus.WaitingForOnlinePlayers Then
-                'TD: Delist round from server
-
-                'Create player, abs. angle dictionary
-                Dim angles As New List(Of (Integer, Single)) '(Player index, angle)
-                Dim hostangle As Single = Spielers(UserIndex).GetRelativeAngle
-
-                For i As Integer = 0 To Spielers.Count - 1
-                    Dim pl = Spielers(i)
-                    'Send start command to all clients
-                    Select Case pl.Typ
-                        Case SpielerTyp.Local, SpielerTyp.CPU
-                            pl.SetLockPosition()
-                        Case SpielerTyp.Online
-                            'Send command
-                    End Select
-
-                    'Add player to player-angle dict.
-                    angles.Add((i, pl.GetRelativeAngle(hostangle)))
-                Next
-
-                'Sort players by position
-                angles.Sort(Function(x, y) x.Item2.CompareTo(y.Item2))
-                PlayerIndexList = New Integer(angles.Count - 1) {}
-                For x As Integer = 0 To angles.Count - 1
-                    PlayerIndexList(x) = angles(x).Item1
-                Next
-
-                HUDInstructions.Text = "Click on the table to lay a card!"
-                Status = GameStatus.GameActive
-                SendBeginGaem()
-                GenerateDecks()
-                Return
-            End If
-
-            If TotemPressedForCurrentCardSet Then Return 'If totem was already pressed, don't react
-            Status = GameStatus.Waitn
-            CalcTotemResponse(UserIndex)
-        End Sub
-
-        Friend Sub GenerateDecks()
-            Dim div As Integer = CInt(Math.Ceiling(80 / Spielers.Count))
-            For Each pl In Spielers
-                pl.Deck.Clear()
-
-                For i As Integer = 1 To div
-                    pl.Deck.Add(CType(Nez.Random.Range(0, 75), Card))
-                Next
-            Next
-        End Sub
-
-        Private Sub CalcTotemResponse(presser As Integer)
-            TotemPressedForCurrentCardSet = True
-            Dim battleplayerA As Integer = -1
-            Dim battleplayerB As Integer = -1
-            If IsDoubleCard(battleplayerA, battleplayerB) AndAlso (presser = battleplayerA Or presser = battleplayerB) Then
-                RewardPlayer(If(presser = battleplayerA, (battleplayerA, battleplayerB), (battleplayerB, battleplayerA)))
-            Else
-                PunishPlayer(presser)
-            End If
-        End Sub
-
-        Private Function IsDoubleCard(ByRef battleplayerA As Integer, ByRef battleplayerB As Integer) As Boolean
-            'Get table card architype for each player
-            Dim architypes As Integer() = New Integer(Spielers.Count) {}
-            For i As Integer = 0 To Spielers.Count - 1
-                With Spielers(i)
-                    architypes(i) = CInt(Math.Floor(.TableCard / 4))
-                    If .TableCard > 71 Or .TableCard < 0 Then architypes(i) = -1
-                End With
-            Next
-
-            For a As Integer = 0 To Spielers.Count - 1
-                For b As Integer = a + 1 To Spielers.Count
-                    If architypes(a) = architypes(b) And architypes(a) > 0 Then
-                        battleplayerA = a
-                        battleplayerB = b
-                        Return True
-                    End If
-                Next
-            Next
-            Return False
-        End Function
-
-        Private Sub PunishPlayer(user As Integer)
-            PostChat("Falsch, " & user.ToString & "!", Color.Lime)
-            Core.Schedule(2, Sub()
-                                 Status = GameStatus.GameActive
-                                 SwitchPlayer()
-                             End Sub)
-        End Sub
-
-        Private Sub RewardPlayer(WinnerLoser As (Integer, Integer))
-            PostChat("Winer, looser, " & WinnerLoser.ToString & "!", Color.Lime)
-            Core.Schedule(2, Sub()
-                                 Status = GameStatus.GameActive
-                                 SwitchPlayer()
-                             End Sub)
         End Sub
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))

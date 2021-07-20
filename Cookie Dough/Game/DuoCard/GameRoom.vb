@@ -2,7 +2,7 @@
 Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
-Imports Cookie_Dough.Game.CommonCards
+Imports Cookie_Dough.Game.Common
 Imports Cookie_Dough.Game.DuoCard.Rendering
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
@@ -382,7 +382,7 @@ Namespace Game.DuoCard
                         Dim card As Card = Spielers(source).HandDeck(card_nr)
                         'Place card
                         Spielers(SpielerIndex).HandDeck.RemoveAt(card_nr)
-                        DebugConsole.Instance.Log(Card.ToString)
+                        DebugConsole.Instance.Log(card.ToString)
                         LayCard(card)
                     Case "g"c
                         Dim card As New Card(CInt(element.Substring(3)), CInt(element(2).ToString))
@@ -409,7 +409,7 @@ Namespace Game.DuoCard
                             'Draw card
                             If Renderer.card_deck_top_pos Is Nothing OrElse Renderer.card_deck_top_pos.State <> TransitionState.InProgress Then Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
                         End If
-                            Case "r"c 'Player is back
+                    Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)

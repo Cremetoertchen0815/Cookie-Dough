@@ -1,4 +1,4 @@
-﻿Imports Cookie_Dough.Game.CommonCards
+﻿Imports Cookie_Dough.Game.Common
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 

@@ -1,6 +1,5 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
-Imports Cookie_Dough.Game.BetretenVerboten
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -43,7 +42,7 @@ Namespace Menu.MainMenu
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
             GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", False), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
-                        ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Guess Shit", "Stadt, Land, Fluss", False), ("Drop Trop", "Just try it out already.", True)}
+                        ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Just try it out already.", True)}
         End Sub
 
         Public Overrides Sub Update()
@@ -77,7 +76,9 @@ Namespace Menu.MainMenu
                                 Case GameType.DuoCard
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.CreatorMenu))
                                 Case GameType.DropTrop
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.GameInstance))
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.CreatorMenu))
+                                Case GameType.Barrelled
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.GameRoom))
                                 Case GameList.Length
                                     SwitchToSubmenu(0)
                             End Select
@@ -569,8 +570,6 @@ Namespace Menu.MainMenu
                         Return "DooDoo-Head"
                     Case GameType.Megäa
                         Return "Megäaaa"
-                    Case GameType.GuessSHit
-                        Return "Guess Shitn"
                     Case GameType.DropTrop
                         Return "Drop Trop"
                     Case Else
