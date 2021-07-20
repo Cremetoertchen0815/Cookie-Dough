@@ -18,6 +18,8 @@ Namespace Game.Corridor.Rendering
         Private TableModel As Model
         Private TableMatrix As Matrix
         Private ResolutionMultiplier As Single = 3
+        Private rects As Dictionary(Of Vector2, Rectangle)
+        Private Spielfeldsize As Vector2
 
         Private SaucerModel As Model
         Private SaucerLift As Transition(Of Single)
@@ -51,13 +53,6 @@ Namespace Game.Corridor.Rendering
 
             dev = Core.GraphicsDevice
 
-            figur_model = scene.Content.Load(Of Model)("mesh\piece_std")
-            Pfeil = scene.Content.Load(Of Texture2D)("games\BV\arrow_right")
-
-            'Load table 
-            TableModel = scene.Content.Load(Of Model)("mesh/table")
-            ApplyDefaultFX(TableModel, Projection)
-
             Dim vertices As New List(Of VertexPositionColorTexture)
             vertices.Add(New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX))
             vertices.Add(New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero))
@@ -89,39 +84,75 @@ Namespace Game.Corridor.Rendering
 
             batchlor = New Batcher(dev)
 
-            SaucerModel = scene.Content.Load(Of Model)("mesh/saucer")
-            SaucerMover = New Transition(Of Vector2) With {.Value = New Vector2(SaucerDefaultPosition.X, SaucerDefaultPosition.Y)}
-            SaucerLift = New Transition(Of Single) With {.Value = SaucerDefaultPosition.Z}
 
+            rects = New Dictionary(Of Vector2, Rectangle)
+            Spielfeldsize = New Vector2(8, 8)
+
+            Dim sizz As New Vector2(950 * ResolutionMultiplier / Spielfeldsize.X, 950 * ResolutionMultiplier / Spielfeldsize.Y)
+            For x As Integer = 0 To Spielfeldsize.X
+                For y As Integer = 0 To Spielfeldsize.X
+                    rects.Add(New Vector2(x, y), New Rectangle(sizz.X * x, sizz.Y * y, sizz.X, sizz.Y))
+                Next
+            Next
         End Sub
 
 #Region "Rendering"
 
+
+
         Public Overrides Sub Render(scene As Scene)
 
-            CamMatrix = If(BeginTriggered, BeginCam.Value, Game.GetCamPos).GetMatrix
+            Dim cam = Game.GetCamPos
+            CamMatrix = Matrix.CreateFromYawPitchRoll(cam.Yaw, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
+            'If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(dev.Viewport.Width, dev.Viewport.Height, 1, 100000)
-
 
             dev.SetRenderTarget(SpielfeldTextur)
             dev.Clear(Color.Black)
 
-            Material.SamplerState = SamplerState.AnisotropicWrap
-            Material.BlendState = BlendState.NonPremultiplied
-            batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
+            batchlor.Begin()
+
+
+            'Zeichne Spielfeld
+            For x As Integer = 0 To Spielfeldsize.X - 1
+                For y As Integer = 0 To Spielfeldsize.X - 1
+                    If (x + y) Mod 2 = 0 Then Continue For
+                    batchlor.DrawRect(rects(New Vector2(x, y)), Color.White * 0.35)
+                Next
+            Next
+
+            'Zeichne Verbindungen
+            batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             batchlor.End()
 
-            '---RENDERER 3D---
 
             dev.SetRenderTarget(RenderTexture)
             dev.Clear(Color.Transparent)
 
+
+            'Zeichne figuren
             dev.RasterizerState = RasterizerState.CullNone
             dev.DepthStencilState = DepthStencilState.Default
 
+
+
+            EffectA.World = Matrix.Identity
+            EffectA.View = View
+            EffectA.Projection = Projection
+            EffectA.TextureEnabled = True
+            EffectA.Texture = SpielfeldTextur
+
+            For Each pass As EffectPass In EffectA.CurrentTechnique.Passes
+                dev.SetVertexBuffer(MapBuffer)
+                pass.Apply()
+
+                dev.DrawPrimitives(PrimitiveType.TriangleList, 0, MapBuffer.VertexCount)
+            Next
         End Sub
+
+
 
 #End Region
 
