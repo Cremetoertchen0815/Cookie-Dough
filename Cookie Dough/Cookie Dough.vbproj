@@ -62,6 +62,15 @@
     <Compile Include="Enums.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
     <Compile Include="Game\Barrelled\CreatorMenu.vb" />
+    <Compile Include="Game\Common\GameRoomTemplate.vb" />
+    <Compile Include="Game\Corridor\CreatorMenu.vb" />
+    <Compile Include="Game\Corridor\Enums.vb" />
+    <Compile Include="Game\Corridor\GameRoom.vb" />
+    <Compile Include="Game\Corridor\IGameWindow.vb" />
+    <Compile Include="Game\Corridor\Networking\ExtGame.vb" />
+    <Compile Include="Game\Corridor\Player.vb" />
+    <Compile Include="Game\Corridor\Rendering\GameRenderable.vb" />
+    <Compile Include="Game\Corridor\Rendering\Renderer3D.vb" />
     <Compile Include="Game\Betreten Verboten\CpuBehaviour.vb" />
     <Compile Include="Game\Common\CardGameState.vb" />
     <Compile Include="Game\Common\Cards.vb" />

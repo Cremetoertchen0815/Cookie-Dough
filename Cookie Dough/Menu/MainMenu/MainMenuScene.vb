@@ -41,7 +41,7 @@ Namespace Menu.MainMenu
             ClearColor = Color.Black
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
-            GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", False), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
+            GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
                         ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Just try it out already.", True)}
         End Sub
 
@@ -79,6 +79,8 @@ Namespace Menu.MainMenu
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.CreatorMenu))
                                 Case GameType.Barrelled
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.GameRoom))
+                                Case GameType.Corridor
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Corridor.GameRoom))
                                 Case GameList.Length
                                     SwitchToSubmenu(0)
                             End Select
