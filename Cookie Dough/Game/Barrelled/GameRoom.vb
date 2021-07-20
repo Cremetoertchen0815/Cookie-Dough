@@ -39,6 +39,7 @@ Namespace Game.Barrelled
         Friend ObjectHandler As Object3DHandler
         Friend Table As Table
         Friend Crosshair As CrosshairRenderable
+        Friend lastMousePos As Vector2 = Mouse.GetState.Position.ToVector2
 
         'Assets & rendering
         Private ButtonFont As NezSpriteFont
@@ -211,11 +212,14 @@ Namespace Game.Barrelled
                 Dim campos As Vector3 = Spielers(UserIndex).Location + camShift + New Vector3(0, 5.5, 0)
                 Renderer.View = Matrix.CreateLookAt(campos, campos + Spielers(UserIndex).Direction, Vector3.Up)
 
+                'Smooth out mouse movement
+                lastMousePos = Vector2.Lerp(mstate.Position.ToVector2, lastMousePos, 0.4)
+
                 'Calculate direction from mouse
                 If Core.Instance.IsActive And GameFocused Then
                     Dim nudirection As Vector3 = .Direction
-                    nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Up, (-MathHelper.PiOver4 / MouseSensivity) * (mstate.X - lastmstate.X)))
-                    nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Cross(Vector3.Up, nudirection), (MathHelper.PiOver4 / MouseSensivity) * (mstate.Y - lastmstate.Y)))
+                    nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Up, (-MathHelper.PiOver4 / MouseSensivity) * (lastMousePos.X - lastmstate.X)))
+                    nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Cross(Vector3.Up, nudirection), (MathHelper.PiOver4 / MouseSensivity) * (lastMousePos.Y - lastmstate.Y)))
                     nudirection.Normalize()
                     .Direction = nudirection
 
