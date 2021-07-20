@@ -136,7 +136,7 @@ Namespace Game.Corridor.Rendering
             dev.RasterizerState = RasterizerState.CullNone
             dev.DepthStencilState = DepthStencilState.Default
 
-
+            'ja na Tach32
 
             EffectA.World = Matrix.Identity
             EffectA.View = View
