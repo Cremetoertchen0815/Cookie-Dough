@@ -7,48 +7,38 @@ Namespace Game.Corridor.Rendering
     Public Class Renderer3D
         Inherits Renderer
 
-        Private figur_model As Model
+
         Private batchlor As Batcher
         Private dev As GraphicsDevice
         Private EffectA As BasicEffect
         Private SpielfeldTextur As RenderTarget2D
-        Private SpielfeldVerbindungen As Texture2D
-        Private Pfeil As Texture2D
+        Private Cubus As Model
         Private MapBuffer As VertexBuffer
-        Private TableModel As Model
-        Private TableMatrix As Matrix
+
         Private ResolutionMultiplier As Single = 3
         Private rects As Dictionary(Of Vector2, Rectangle)
+        Private thingcountlibre As Dictionary(Of Vector2, Rectangle)
         Private Spielfeldsize As Vector2
 
-        Private SaucerModel As Model
-        Private SaucerLift As Transition(Of Single)
-        Private SaucerTarget As (Integer, Integer) = (-1, -1)
-        Private SaucerMover As Transition(Of Vector2)
-        Private SaucerPickedUp As Boolean = False
-        Private SaucerDefaultPosition As New Vector3(0, 0, 1000)
-
-        Private BeginCurrentPlayer As Integer
-        Friend BeginTriggered As Boolean
-        Private BeginCam As Transition(Of Keyframe3D)
 
         Private View As Matrix
         Private Projection As Matrix
         Private CamMatrix As Matrix
 
         Private Game As IGameWindow
-        Private FigCount As Integer
-        Private SpceCount As Integer
+
         Private Feld As Rectangle
         Private Center As Vector2
-        Private transmatrices As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)}
-        Friend AdditionalZPos As New Transition(Of Single)
+
+        Private thingycounter As Integer = 0
+
         Sub New(game As IGameWindow, Optional order As Integer = 0)
             MyBase.New(order)
             Me.Game = game
+
         End Sub
 
-        Public Overrides Sub OnAddedToScene(scene As Scene)
+        Public Overrides Sub OnAddedToScene(scene As Scene) 'INITIALIZE
             MyBase.OnAddedToScene(scene)
 
             dev = Core.GraphicsDevice
@@ -65,6 +55,9 @@ Namespace Game.Corridor.Rendering
 
             Feld = New Rectangle(500, 70, 950, 950)
             Center = Feld.Center.ToVector2
+
+            Cubus = scene.Content.Load(Of Model)("mesh/Cowboy_Checkers_V1") 'load cube
+
 
             SpielfeldTextur = New RenderTarget2D(
             dev,
@@ -88,9 +81,9 @@ Namespace Game.Corridor.Rendering
             rects = New Dictionary(Of Vector2, Rectangle)
             Spielfeldsize = New Vector2(8, 8)
 
-            Dim sizz As New Vector2(950 * ResolutionMultiplier / Spielfeldsize.X, 950 * ResolutionMultiplier / Spielfeldsize.Y)
-            For x As Integer = 0 To Spielfeldsize.X
-                For y As Integer = 0 To Spielfeldsize.X
+            Dim sizz As New Vector2(950 / Spielfeldsize.X, 950 / Spielfeldsize.Y)
+            For x As Integer = 0 To Spielfeldsize.X - 1
+                For y As Integer = 0 To Spielfeldsize.X - 1
                     rects.Add(New Vector2(x, y), New Rectangle(sizz.X * x, sizz.Y * y, sizz.X, sizz.Y))
                 Next
             Next
@@ -102,7 +95,7 @@ Namespace Game.Corridor.Rendering
 
         Public Overrides Sub Render(scene As Scene)
 
-            Dim cam = Game.GetCamPos
+            Dim cam = New Keyframe3D(0, 0, 0, 0, 0.75, 0, False) '0.75, 0, False)
             CamMatrix = Matrix.CreateFromYawPitchRoll(cam.Yaw, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
             'If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
@@ -111,7 +104,8 @@ Namespace Game.Corridor.Rendering
             dev.SetRenderTarget(SpielfeldTextur)
             dev.Clear(Color.Black)
 
-            batchlor.Begin()
+            batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
+
 
 
             'Zeichne Spielfeld
@@ -136,7 +130,6 @@ Namespace Game.Corridor.Rendering
             dev.RasterizerState = RasterizerState.CullNone
             dev.DepthStencilState = DepthStencilState.Default
 
-            'ja na Tach32
 
             EffectA.World = Matrix.Identity
             EffectA.View = View
@@ -149,6 +142,33 @@ Namespace Game.Corridor.Rendering
                 pass.Apply()
 
                 dev.DrawPrimitives(PrimitiveType.TriangleList, 0, MapBuffer.VertexCount)
+            Next
+
+            'zeichne Figuren
+            'thingcountlibre = New Dictionary(Of Vector2, Rectangle)
+            'For Each IDC In rects
+            '    thingcountlibre.Add(New Vector2(IDC.Value.X, IDC.Value.Y), New Rectangle())
+            '    thingycounter += 1
+            '    If thingycounter = 16 Then Exit For
+            'Next
+
+            For Each IDK In rects 'thingcountlibre
+
+                For Each thingy In Cubus.Meshes
+
+
+                    For Each element As BasicEffect In thingy.Effects
+                        element.TextureEnabled = False
+                        element.World = Matrix.CreateScale(90.01 / 2) * Matrix.CreateTranslation(New Vector3(IDK.Value.Center.X - 475, IDK.Value.Center.Y - 475, +25)) 'Matrix.CreateRotationZ(0.75) * Matrix.CreateRotationX(-0.175) * 
+                        element.View = View
+                        element.Projection = Projection
+                        element.LightingEnabled = False
+                        element.EnableDefaultLighting()
+
+                    Next
+                    thingy.Draw()
+
+                Next
             Next
         End Sub
 

@@ -124,7 +124,7 @@ Namespace Game.Corridor
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
-            Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
+            'Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
             AddRenderer(New DefaultRenderer(1))
 
             AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
@@ -215,7 +215,7 @@ Namespace Game.Corridor
 
                 'Set HUD color
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name, "")
-                If Not Renderer.BeginTriggered Then HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
+                HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex > -1 AndAlso Spielers(SpielerIndex).Typ = SpielerTyp.Local)
             End If
 
@@ -270,7 +270,7 @@ Namespace Game.Corridor
                             PostChat(Spielers(source).Name & " left!", Color.White)
                             If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
                             If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
-                            If Renderer.BeginTriggered Then StopWhenRealStart = True
+                            StopWhenRealStart = True
 
                             SendPlayerLeft(source)
                         Case "m"c 'Sent chat message
@@ -480,7 +480,7 @@ Namespace Game.Corridor
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtnB.Clicked
-            If Not Renderer.BeginTriggered AndAlso Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
+            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                 SFX(2).Play()
                 SendGameClosed()
                 NetworkMode = False
