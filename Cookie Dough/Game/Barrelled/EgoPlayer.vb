@@ -20,6 +20,7 @@ Namespace Game.Barrelled
         'Misc
         Friend CameraPosition As Vector3
         Friend Map As TmxMap
+        Private CollisionLayers As TmxLayer()
         Private Mover As TiledMapMover
         Private MovementBtn As VirtualJoystick
         Private JumpBtn As VirtualButton
@@ -38,7 +39,7 @@ Namespace Game.Barrelled
 
         'Constants
         Private Const MouseSensivity As Single = 232
-        Private Const Speed As Single = 12
+        Private Const Speed As Single = 120
         Private Const JumpHeight As Single = 50
         Private Const Gravity As Single = 85
 
@@ -59,7 +60,8 @@ Namespace Game.Barrelled
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
-            Mover = Entity.AddComponent(New TiledMapMover(Map.TileLayers(0)))
+            CollisionLayers = {Map.GetLayer(Of TmxLayer)("Collision"), Map.GetLayer(Of TmxLayer)("High")}
+            Mover = Entity.AddComponent(New TiledMapMover(CollisionLayers(0)))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
             Entity.AddComponent(New PrototypeSpriteRenderer(12, 12)).SetRenderLayer(5)
 
@@ -81,23 +83,22 @@ Namespace Game.Barrelled
             Dim mstate As MouseState = Mouse.GetState
             Dim SPEEEN As New Vector3
             Dim Location As Vector3 = GetLocation()
-            Dim delta As Single = Math.Min(Time.DeltaTime, 0.1F) ' Limit the max. delta time, so the player can't clip through collision
 
             'Apply gravity
-            VelocityY += Gravity * delta
+            VelocityY += Gravity * Time.DeltaTime
 
             'Grab jump
-            If JumpBtn.IsPressed Then VelocityY = -JumpHeight
+            If JumpBtn.IsPressed And LocationY - VelocityY * Time.DeltaTime <= 0 Then VelocityY = -JumpHeight
 
             'Get horizontal movement vector
             Dim movDir As New Vector3(Direction.X, 0, Direction.Z) : movDir.Normalize()
             Dim lastJoystickPos = MovementBtn.Value * New Vector2(0.5, 1)
 
             'Move player
-            SPEEEN += lastJoystickPos.Y * movDir * Speed * delta
-            SPEEEN += lastJoystickPos.X * Vector3.Cross(Vector3.Up, movDir) * New Vector3(Speed, 0, Speed) * delta
+            SPEEEN += lastJoystickPos.Y * movDir * Speed
+            SPEEEN += lastJoystickPos.X * Vector3.Cross(Vector3.Up, movDir) * New Vector3(Speed, 0, Speed)
             If Location.Y <= 0 And Not JumpBtn.IsPressed Then Location = New Vector3(Location.X, 0, Location.Z) : VelocityY = 0
-            SPEEEN += New Vector3(0, VelocityY * delta, 0)
+            SPEEEN += New Vector3(0, VelocityY, 0)
 
             ''Collision check with Colliders
             'Dim checkX As New BoundingBox(.Location + New Vector3(-2 - SPEEEN.X, 0, -2), .Location + New Vector3(2 - SPEEEN.X, 5, 2))
@@ -116,10 +117,10 @@ Namespace Game.Barrelled
 
             'Collision
             Dim state As New TiledMapMover.CollisionState
-            Dim velocity2D As New Vector2(SPEEEN.X, SPEEEN.Z) : If velocity2D <> Vector2.Zero Then velocity2D.Normalize()
-            Console.WriteLine(SPEEEN.ToString.ToString & velocity2D.ToString)
-            lastSpeen = Vector2.LerpPrecise(lastSpeen, velocity2D * -120, 1)
-            If LocationY <  Then Entity.Position = Entity.Position + lastSpeen / 50 Else Mover.Move(lastSpeen / 50, Collider, state)
+            Dim velocity2D As Vector2 = New Vector2(SPEEEN.X, SPEEEN.Z) * -Time.DeltaTime
+            'Console.WriteLine(SPEEEN.ToString.ToString & velocity2D.ToString)
+            Mover.CollisionLayer = CollisionLayers(If(LocationY > 10, 1, 0)) 'Adapt collision layer for jump
+            Mover.Move(velocity2D, Collider, state)
             Location = GetLocation()
 
             'Generate view matrix and ray
@@ -127,7 +128,7 @@ Namespace Game.Barrelled
             CameraPosition = Location + camShift + New Vector3(0, 6, 0)
 
             'Smooth out mouse movement
-            lastMousePos = Vector2.Lerp(mstate.Position.ToVector2, lastMousePos, 0.5)
+            lastMousePos = Vector2.Lerp(mstate.Position.ToVector2, lastMousePos, 0.2)
 
             'Calculate direction from mouse
             If Core.Instance.IsActive Then

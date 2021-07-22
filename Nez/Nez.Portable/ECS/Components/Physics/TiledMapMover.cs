@@ -120,7 +120,7 @@ namespace Nez.Tiled
 		/// <summary>
 		/// temporary storage to avoid having to pass it around
 		/// </summary>
-		Rectangle _boxColliderBounds;
+		RectangleF _boxColliderBounds;
 
 
 		public TiledMapMover()
@@ -143,15 +143,18 @@ namespace Nez.Tiled
 			if (TiledMap == null)
 				return;
 
+			System.Console.WriteLine(motion.ToString());
+
 			// test for collisions then move the Entity
 			TestCollisions(ref motion, boxCollider.Bounds, collisionState);
+			System.Console.WriteLine(motion.ToString());
 
 			boxCollider.UnregisterColliderWithPhysicsSystem();
 			boxCollider.Entity.Transform.Position += motion;
 			boxCollider.RegisterColliderWithPhysicsSystem();
 		}
 
-		public void TestCollisions(ref Vector2 motion, Rectangle boxColliderBounds, CollisionState collisionState)
+		public void TestCollisions(ref Vector2 motion, RectangleF boxColliderBounds, CollisionState collisionState)
 		{
 			_boxColliderBounds = boxColliderBounds;
 
@@ -162,8 +165,8 @@ namespace Nez.Tiled
 			collisionState.Reset(ref motion);
 
 			// reset rounded motion for us while dealing with subpixel movement so fetch the rounded values to use for our actual detection
-			var motionX = (int)motion.X;
-			var motionY = (int)motion.Y;
+			var motionX = (float)motion.X;
+			var motionY = (float)motion.Y;
 
 			// first, check movement in the horizontal dir
 			if (motionX != 0)
@@ -484,9 +487,9 @@ namespace Nez.Tiled
 		/// <returns>The rect for side.</returns>
 		/// <param name="side">Side.</param>
 		/// <param name="motion">Motion.</param>
-		Rectangle CollisionRectForSide(Edge side, int motion)
+		Rectangle CollisionRectForSide(Edge side, float motion)
 		{
-			Rectangle bounds;
+			RectangleF bounds;
 
 			// for horizontal collision checks we use just a sliver for our bounds. Vertical gets the half rect so that it can properly push
 			// up when intersecting a slope which is ignored when moving horizontally.
@@ -497,12 +500,12 @@ namespace Nez.Tiled
 
 			// we contract horizontally for vertical movement and vertically for horizontal movement
 			if (side.IsVertical())
-				RectangleExt.Contract(ref bounds, ColliderHorizontalInset, 0);
+				RectangleF.Contract(ref bounds, ColliderHorizontalInset, 0);
 			else
-				RectangleExt.Contract(ref bounds, 0, ColliderVerticalInset);
+				RectangleF.Contract(ref bounds, 0, ColliderVerticalInset);
 
 			// finally expand the side in the direction of movement
-			RectangleExt.ExpandSide(ref bounds, side, motion);
+			RectangleF.ExpandSide(ref bounds, side, motion);
 
 			return bounds;
 		}

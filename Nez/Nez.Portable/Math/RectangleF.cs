@@ -145,6 +145,14 @@ namespace Nez
 			Height = height;
 		}
 
+		public RectangleF(Rectangle rect)
+		{
+			X = rect.X;
+			Y = rect.Y;
+			Width = rect.Width;
+			Height = rect.Height;
+		}
+
 
 		/// <summary>
 		/// Creates a new instance of <see cref="RectangleF"/> struct, with the specified

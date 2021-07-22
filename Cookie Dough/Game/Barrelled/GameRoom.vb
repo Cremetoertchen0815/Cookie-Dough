@@ -183,6 +183,9 @@ Namespace Game.Barrelled
             End If
             ReadAndProcessInputData()
 
+
+            If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(3, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
+
             'Set HUD color
             HUDColor = playcolor(UserIndex)
             HUDInstructions.Active = Status <> GameStatus.GameActive OrElse (OtherSpielers(SpielerIndex).Typ = SpielerTyp.Local)

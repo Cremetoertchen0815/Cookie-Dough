@@ -14,7 +14,7 @@ Namespace Game.Barrelled.Renderers
 
         'Base shit
         Friend View As Matrix
-        Private Projection As Matrix
+        Friend Projection As Matrix
         Friend BaseClass As GameRoom
 
         'Quad rendering
@@ -112,7 +112,7 @@ Namespace Game.Barrelled.Renderers
         End Sub
 
         Public Sub DrawDebug()
-            DebugEffect.World = Matrix.Identity
+            DebugEffect.World = Matrix.CreateScale(0.03) * Matrix.CreateTranslation(30, 15, 30)
             DebugEffect.View = View
             DebugEffect.Projection = Projection
 
@@ -160,7 +160,7 @@ Namespace Game.Barrelled.Renderers
             MyBase.OnAddedToScene(scene)
 
             Dev = Core.GraphicsDevice
-            Projection = Matrix.CreatePerspectiveFieldOfView(1.2, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 350)
+            Projection = Matrix.CreatePerspectiveFieldOfView(1.2, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Generate quads
             Dim vert As New List(Of VertexPositionNormalTexture)
@@ -178,14 +178,14 @@ Namespace Game.Barrelled.Renderers
 
             'Load quad effect
             QuadEffect = New BasicEffect(Dev) With {.TextureEnabled = True}
-            ApplyDefaultFX(QuadEffect, Projection)
+            ApplyDefaultFX(QuadEffect)
 
             'Load player
             PlayerModel = scene.Content.Load(Of Model)("mesh/piece_filled")
             PlayerModelHeadless = scene.Content.Load(Of Model)("mesh/piece_filled_headless")
             PlayerTransform = Matrix.CreateScale(0.27)
-            ApplyDefaultFX(PlayerModel, Projection)
-            ApplyDefaultFX(PlayerModelHeadless, Projection)
+            ApplyDefaultFX(PlayerModel, Color.White)
+            ApplyDefaultFX(PlayerModelHeadless, Color.White)
 
             'Load debug cube
             DebugEffect = New BasicEffect(Dev)
@@ -193,7 +193,7 @@ Namespace Game.Barrelled.Renderers
             DebugEffect.VertexColorEnabled = True
             CreateBoxBuffer()
             CubeModel = scene.Content.Load(Of Model)("mesh/Have_A_Cube")
-            ApplyDefaultFX(CubeModel, Projection, Color.Red)
+            ApplyDefaultFX(CubeModel, Color.Red)
 
             'Load room
             FloorTexture = scene.Content.LoadTexture("3Droom_floor")
@@ -207,8 +207,17 @@ Namespace Game.Barrelled.Renderers
             For x As Integer = 0 To 8
                 For y As Integer = 0 To 7
 
-                    ApplyFX(QuadEffect, Matrix.Identity)
+                    QuadEffect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1, 1)
                     QuadEffect.World = Matrix.CreateTranslation(New Vector3(x, y, 0)) * Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, -20)
+                    QuadEffect.View = View
+                    QuadEffect.Projection = Projection
+                    QuadEffect.EmissiveColor = Vector3.One * 0.8
+                    QuadEffect.DirectionalLight0.Enabled = False
+                    QuadEffect.DirectionalLight1.Enabled = False
+                    QuadEffect.DirectionalLight2.Enabled = False
+                    QuadEffect.FogStart = 50
+                    QuadEffect.FogEnd = 80
+                    QuadEffect.FogColor = Vector3.Zero
                     QuadEffect.Texture = FloorTexture
                     For Each pass As EffectPass In QuadEffect.CurrentTechnique.Passes
                         Dev.SetVertexBuffer(QuadClockwise)
@@ -220,7 +229,7 @@ Namespace Game.Barrelled.Renderers
             Next
 
             'Draw debug cube
-            'DrawDebug()
+            DrawDebug()
 
             'Draw local player
             For i As Integer = 0 To PlayerModelHeadless.Meshes.Count - 1
@@ -260,21 +269,16 @@ Namespace Game.Barrelled.Renderers
 
         End Sub
 
-        'Apply the current lighting data
-        Private Sub ApplyFX(effect As BasicEffect, world As Matrix, Optional yflip As Integer = 1)
-            effect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1 * yflip, 1)
-            effect.World = world
-            effect.View = View
-        End Sub
         Private Sub ApplyFX(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)
             For Each effect As BasicEffect In mesh.Effects
                 effect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1 * yflip, 1)
                 effect.DiffuseColor = DiffuseColor.ToVector3
                 effect.World = world
                 effect.View = View
+                effect.Projection = Projection
             Next
         End Sub
-        Friend Sub ApplyDefaultFX(effect As BasicEffect, Projection As Matrix, Optional yflip As Integer = 1)
+        Friend Sub ApplyDefaultFX(effect As BasicEffect, Optional yflip As Integer = 1)
             effect.LightingEnabled = True
             effect.AmbientLightColor = Color.White.ToVector3 * 0.06
             effect.DirectionalLight0.Enabled = True
@@ -294,9 +298,8 @@ Namespace Game.Barrelled.Renderers
             effect.FogColor = Vector3.One
             effect.SpecularPower = 15
             effect.Alpha = 1
-            effect.Projection = Projection
         End Sub
-        Friend Sub ApplyDefaultFX(effect As BasicEffect, Projection As Matrix, color As Color)
+        Friend Sub ApplyDefaultFX(effect As BasicEffect, color As Color)
             effect.LightingEnabled = True
             effect.AmbientLightColor = Color.White.ToVector3 * 0.06
             effect.DirectionalLight0.Enabled = True
@@ -313,19 +316,18 @@ Namespace Game.Barrelled.Renderers
             effect.DiffuseColor = color.ToVector3
             effect.SpecularPower = 15
             effect.Alpha = 1
-            effect.Projection = Projection
         End Sub
-        Friend Sub ApplyDefaultFX(model As Model, Projection As Matrix, color As Color)
+        Friend Sub ApplyDefaultFX(model As Model, color As Color)
             For Each element In model.Meshes
                 For Each fx As BasicEffect In element.Effects
-                    ApplyDefaultFX(fx, Projection, color)
+                    ApplyDefaultFX(fx, color)
                 Next
             Next
         End Sub
         Friend Sub ApplyDefaultFX(model As Model, Projection As Matrix, Optional yflip As Integer = 1)
             For Each element In model.Meshes
                 For Each fx As BasicEffect In element.Effects
-                    ApplyDefaultFX(fx, Projection, yflip)
+                    ApplyDefaultFX(fx, yflip)
                 Next
             Next
         End Sub
