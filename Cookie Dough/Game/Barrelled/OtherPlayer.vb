@@ -5,9 +5,9 @@ Imports Microsoft.Xna.Framework.Graphics
 Imports Nez.Tiled
 
 Namespace Game.Barrelled
-    Public Class Player
+    Public Class OtherPlayer
         Inherits Component
-        Implements IPlayer, IUpdatable
+        Implements IPlayer
 
         'Properties
         Public Property Connection As Connection Implements IPlayer.Connection
@@ -27,24 +27,8 @@ Namespace Game.Barrelled
         Private Mover As TiledMapMover
         Private AxisMover As VirtualJoystick
 
-        Private ReadOnly Property IUpdatable_Enabled As Boolean Implements IUpdatable.Enabled
-            Get
-                Return Enabled
-            End Get
-        End Property
-
-        Private ReadOnly Property IUpdatable_UpdateOrder As Integer Implements IUpdatable.UpdateOrder
-            Get
-                Return 0
-            End Get
-        End Property
-
         Sub New(type As SpielerTyp)
             Me.Typ = type
-            If type = SpielerTyp.Local Then
-                Mover = New TiledMapMover(Map.TileLayers(0))
-                AxisMover = New VirtualJoystick(False, New VirtualJoystick.KeyboardKeys(VirtualInput.OverlapBehavior.TakeNewer, Input.Keys.A, Input.Keys.D, Input.Keys.W, Input.Keys.S))
-            End If
         End Sub
 
         Friend Function GetRelativeAngle(Optional preangle As Single = 0) As Single
@@ -60,9 +44,5 @@ Namespace Game.Barrelled
             Dim rotation As Single = Mathf.AngleBetweenVectors(New Vector2(Direction.X, -Direction.Z), Vector2.UnitY) * -2
             Return Matrix.CreateRotationY(rotation) * Matrix.CreateTranslation(Location)
         End Function
-
-        Public Sub Update() Implements IUpdatable.Update
-
-        End Sub
     End Class
 End Namespace

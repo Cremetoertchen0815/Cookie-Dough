@@ -20,7 +20,7 @@ Namespace Game.Barrelled.Networking
         Public Property Viewers As New List(Of Connection) Implements IGame.Viewers
 
         'Houses all the players internally
-        Private Players As New List(Of Player)
+        Private Players As New List(Of OtherPlayer)
 
 
         '-----SERVER-----
@@ -29,7 +29,7 @@ Namespace Game.Barrelled.Networking
         'Read data from client to initiate the creation of a new game
         Public Shared Function ServerSendCreateData(ReadString As Func(Of Connection, String), con As Connection, gamename As String, Key As Integer) As IGame
             Dim tmp As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key}
-            tmp.Players.Add(New Player(SpielerTyp.Local) With {.Bereit = True, .Connection = con})
+            tmp.Players.Add(New OtherPlayer(SpielerTyp.Local) With {.Bereit = True, .Connection = con})
             Return tmp
         End Function
 
@@ -49,7 +49,7 @@ Namespace Game.Barrelled.Networking
 
         'If the player is new to the round, register him and send him data about the other players
         Public Sub ServerSendJoinNujoinData(index As Integer, con As Connection, writer As Action(Of Connection, String)) Implements IGame.ServerSendJoinNujoinData
-            Players.Add(New Player(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick})
+            Players.Add(New OtherPlayer(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick})
             For i As Integer = 0 To Players.Count - 1
                 writer(con, CInt(Players(i).Typ))
                 writer(con, Players(i).Name)

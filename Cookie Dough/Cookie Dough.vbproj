@@ -62,6 +62,8 @@
     <Compile Include="Enums.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
     <Compile Include="Game\Barrelled\CreatorMenu.vb" />
+    <Compile Include="Game\Barrelled\EgoPlayer.vb" />
+    <Compile Include="Game\Barrelled\Renderers\TargetRendererable.vb" />
     <Compile Include="Game\Common\GameRoomTemplate.vb" />
     <Compile Include="Game\Corridor\CreatorMenu.vb" />
     <Compile Include="Game\Corridor\Enums.vb" />
@@ -162,7 +164,7 @@
     <Compile Include="Game\Barrelled\IObject3D.vb" />
     <Compile Include="Game\Barrelled\Networking\ExtGame.vb" />
     <Compile Include="Game\Barrelled\Object3DHandler.vb" />
-    <Compile Include="Game\Barrelled\Player.vb" />
+    <Compile Include="Game\Barrelled\OtherPlayer.vb" />
     <Compile Include="Game\Common\CrosshairRenderable.vb" />
     <Compile Include="Game\Barrelled\Renderers\Renderer3D.vb" />
     <Compile Include="Game\Barrelled\Table.vb" />

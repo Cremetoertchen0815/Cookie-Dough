@@ -29,13 +29,12 @@ Namespace Game.Barrelled.Renderers
         Friend PlayerTransform As Matrix
 
         'Room
-        Private TableModel As Model
-        Private WallModel As Model
-        Private WallTransforms As Matrix() = {}
-        Private RoomTextures As Texture2D() = {}
+        Private FloorTexture As Texture2D
 
         'Map
-        Private MapMatrices As Matrix()
+        Private HiMapMatrices As Matrix()
+        Private LoMapMatrices As Matrix()
+        Private CeilingMapMatrices As Matrix()
         Private CubeModel As Model
 
         'Debug Box Buffer
@@ -133,8 +132,10 @@ Namespace Game.Barrelled.Renderers
             For Each element In map.GetLayer(Of TmxLayer)("High").GetCollisionRectangles
                 Dim pos As Vector2 = element.Location.ToVector2 / 3
                 Dim size As Vector2 = element.Size.ToVector2 / 6
-                lst.Add(Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(size.X, 10, size.Y)) * Matrix.CreateTranslation(New Vector3(pos.X, 0, pos.Y)))
+                lst.Add(Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(size.X, 15, size.Y)) * Matrix.CreateTranslation(New Vector3(pos.X, 0, pos.Y)))
             Next
+            HiMapMatrices = lst.ToArray
+            lst.Clear()
 
             'Low
             For Each element In map.GetLayer(Of TmxLayer)("Low").GetCollisionRectangles
@@ -142,14 +143,24 @@ Namespace Game.Barrelled.Renderers
                 Dim size As Vector2 = element.Size.ToVector2 / 6
                 lst.Add(Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(size.X, 5, size.Y)) * Matrix.CreateTranslation(New Vector3(pos.X, 0, pos.Y)))
             Next
-            MapMatrices = lst.ToArray
+            LoMapMatrices = lst.ToArray
+            lst.Clear()
+
+            'Low
+            For Each element In map.GetLayer(Of TmxLayer)("Ceiling").GetCollisionRectangles
+                Dim pos As Vector2 = element.Location.ToVector2 / 3
+                Dim size As Vector2 = element.Size.ToVector2 / 6
+                lst.Add(Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(size.X, 1, size.Y)) * Matrix.CreateTranslation(New Vector3(pos.X, 30, pos.Y)))
+            Next
+            CeilingMapMatrices = lst.ToArray
+            lst.Clear()
         End Sub
 
         Public Overrides Sub OnAddedToScene(scene As Scene)
             MyBase.OnAddedToScene(scene)
 
             Dev = Core.GraphicsDevice
-            Projection = Matrix.CreatePerspectiveFieldOfView(1.2, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 150)
+            Projection = Matrix.CreatePerspectiveFieldOfView(1.2, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 350)
 
             'Generate quads
             Dim vert As New List(Of VertexPositionNormalTexture)
@@ -184,81 +195,49 @@ Namespace Game.Barrelled.Renderers
             CubeModel = scene.Content.Load(Of Model)("mesh/Have_A_Cube")
             ApplyDefaultFX(CubeModel, Projection, Color.Red)
 
-            'Load table 
-            TableModel = scene.Content.Load(Of Model)("mesh/table")
-            ApplyDefaultFX(TableModel, Projection)
-
             'Load room
-            WallTransforms = {Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(0 * Math.PI) * Matrix.CreateTranslation(-0, 6, 20),
-                              Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(0.5 * Math.PI) * Matrix.CreateTranslation(20, 6, 0),
-                              Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(1 * Math.PI) * Matrix.CreateTranslation(0, 6, -20),
-                              Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(1.5 * Math.PI) * Matrix.CreateTranslation(-20, 6, 0),
-                              Matrix.CreateScale(40) * Matrix.CreateRotationX(-0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, 20),
-                              Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 12, -20)}
-            RoomTextures = {scene.Content.LoadTexture("3Droom_floor"), DebugTexture}
-            WallModel = scene.Content.Load(Of Model)("mesh\wall")
-            ApplyDefaultFX(WallModel, Projection)
+            FloorTexture = scene.Content.LoadTexture("3Droom_floor")
         End Sub
 
         Public Overrides Sub Render(scene As Scene)
             Dev.RasterizerState = RasterizerState.CullNone
             Dev.DepthStencilState = DepthStencilState.Default
-            WallTransforms = {Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(1 * Math.PI) * Matrix.CreateTranslation(-0, 6, 20),
-                              Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(1.5 * Math.PI) * Matrix.CreateTranslation(20, 6, 0),
-                              Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(0 * Math.PI) * Matrix.CreateTranslation(0, 6, -20),
-                              Matrix.CreateScale(20 * New Vector3(1, 0.3, 1)) * Matrix.CreateRotationY(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 6, 0),
-                              Matrix.CreateScale(40) * Matrix.CreateRotationX(-0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, 20),
-                              Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 12, -20)}
 
-            'Draw walls
-            For i As Integer = 0 To 3
-                For Each element In WallModel.Meshes
-                    ApplyFX(element, Color.White, WallTransforms(i))
-                    element.Draw()
-                Next
-            Next
             'Draw floor/ceiling on a quad
-            ApplyFX(QuadEffect, Matrix.Identity)
-            For i As Integer = 4 To 5
-                QuadEffect.World = WallTransforms(i)
-                QuadEffect.Texture = RoomTextures(i - 4)
-                For Each pass As EffectPass In QuadEffect.CurrentTechnique.Passes
-                    Dev.SetVertexBuffer(QuadClockwise)
-                    pass.Apply()
+            For x As Integer = 0 To 8
+                For y As Integer = 0 To 7
 
-                    Dev.DrawPrimitives(PrimitiveType.TriangleList, 0, 2)
+                    ApplyFX(QuadEffect, Matrix.Identity)
+                    QuadEffect.World = Matrix.CreateTranslation(New Vector3(x, y, 0)) * Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, -20)
+                    QuadEffect.Texture = FloorTexture
+                    For Each pass As EffectPass In QuadEffect.CurrentTechnique.Passes
+                        Dev.SetVertexBuffer(QuadClockwise)
+                        pass.Apply()
+
+                        Dev.DrawPrimitives(PrimitiveType.TriangleList, 0, 2)
+                    Next
                 Next
-            Next
-
-            'Draw Table
-            For Each element In TableModel.Meshes
-                ApplyFX(element, Color.White, element.ParentBone.ModelTransform * BaseClass.Table.TransformMatrix)
-                element.Draw()
             Next
 
             'Draw debug cube
             'DrawDebug()
 
-            'Draw players and accesories
-            Dim user = BaseClass.Spielers(BaseClass.UserIndex)
-            For p As Integer = 0 To BaseClass.Spielers.Count - 1
-                Dim player = BaseClass.Spielers(p)
-                'Draw player himself
-                If player Is user Then
-                    'Draw local player
-                    For i As Integer = 0 To PlayerModelHeadless.Meshes.Count - 1
-                        Dim element As ModelMesh = PlayerModelHeadless.Meshes(If(i = 2, 1, i))
-                        ApplyFX(element, playcolor(p), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * player.GetWorldMatrix)
-                        element.Draw()
-                    Next
-                Else
-                    'Draw other player
-                    For i As Integer = 0 To PlayerModel.Meshes.Count - 1
-                        Dim element As ModelMesh = PlayerModel.Meshes(i)
-                        ApplyFX(element, If(i = 2, Color.White, playcolor(p)), element.ParentBone.ModelTransform * PlayerTransform * player.GetWorldMatrix)
-                        element.Draw()
-                    Next
-                End If
+            'Draw local player
+            For i As Integer = 0 To PlayerModelHeadless.Meshes.Count - 1
+                Dim element As ModelMesh = PlayerModelHeadless.Meshes(If(i = 2, 1, i))
+                ApplyFX(element, playcolor(BaseClass.UserIndex), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * BaseClass.EgoPlayer.GetWorldMatrix)
+                element.Draw()
+            Next
+
+            'Draw other players
+            For p As Integer = 0 To BaseClass.OtherSpielers.Count - 1
+                Dim player = BaseClass.OtherSpielers(p)
+                'Draw other player
+                For i As Integer = 0 To PlayerModel.Meshes.Count - 1
+                    Dim element As ModelMesh = PlayerModel.Meshes(i)
+                    ApplyFX(element, If(i = 2, Color.White, playcolor(p)), element.ParentBone.ModelTransform * PlayerTransform * player.GetWorldMatrix)
+                    element.Draw()
+                Next
                 'Reset Rasterizer state
                 Dev.RasterizerState = RasterizerState.CullNone
             Next
@@ -266,7 +245,15 @@ Namespace Game.Barrelled.Renderers
             'Draw map
             Dev.RasterizerState = RasterizerState.CullCounterClockwise
             Dim mesh = CubeModel.Meshes(0)
-            For Each element In MapMatrices
+            For Each element In HiMapMatrices
+                ApplyFX(mesh, Color.White, element)
+                mesh.Draw()
+            Next
+            For Each element In LoMapMatrices
+                ApplyFX(mesh, Color.White, element)
+                mesh.Draw()
+            Next
+            For Each element In CeilingMapMatrices
                 ApplyFX(mesh, Color.White, element)
                 mesh.Draw()
             Next
@@ -275,16 +262,71 @@ Namespace Game.Barrelled.Renderers
 
         'Apply the current lighting data
         Private Sub ApplyFX(effect As BasicEffect, world As Matrix, Optional yflip As Integer = 1)
-            effect.DirectionalLight2.Direction = BaseClass.Spielers(BaseClass.UserIndex).Direction * New Vector3(1, -1 * yflip, 1)
+            effect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1 * yflip, 1)
             effect.World = world
             effect.View = View
         End Sub
         Private Sub ApplyFX(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)
             For Each effect As BasicEffect In mesh.Effects
-                effect.DirectionalLight2.Direction = BaseClass.Spielers(BaseClass.UserIndex).Direction * New Vector3(1, -1 * yflip, 1)
+                effect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1 * yflip, 1)
                 effect.DiffuseColor = DiffuseColor.ToVector3
                 effect.World = world
                 effect.View = View
+            Next
+        End Sub
+        Friend Sub ApplyDefaultFX(effect As BasicEffect, Projection As Matrix, Optional yflip As Integer = 1)
+            effect.LightingEnabled = True
+            effect.AmbientLightColor = Color.White.ToVector3 * 0.06
+            effect.DirectionalLight0.Enabled = True
+            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight0.Direction = New Vector3(0.7, yflip, 0.7)
+            effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+            effect.DirectionalLight1.Enabled = True
+            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight1.Direction = New Vector3(-0.7, yflip, -0.7)
+            effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+            effect.DirectionalLight2.Enabled = True
+            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.35
+            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.1
+            effect.FogEnabled = True
+            effect.FogStart = 0.5
+            effect.FogEnd = 30
+            effect.FogColor = Vector3.One
+            effect.SpecularPower = 15
+            effect.Alpha = 1
+            effect.Projection = Projection
+        End Sub
+        Friend Sub ApplyDefaultFX(effect As BasicEffect, Projection As Matrix, color As Color)
+            effect.LightingEnabled = True
+            effect.AmbientLightColor = Color.White.ToVector3 * 0.06
+            effect.DirectionalLight0.Enabled = True
+            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight0.Direction = New Vector3(0.7, 1, 0.7)
+            effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+            effect.DirectionalLight1.Enabled = True
+            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight1.Direction = New Vector3(-0.7, 1, -0.7)
+            effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+            effect.DirectionalLight2.Enabled = True
+            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.35
+            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.1
+            effect.DiffuseColor = color.ToVector3
+            effect.SpecularPower = 15
+            effect.Alpha = 1
+            effect.Projection = Projection
+        End Sub
+        Friend Sub ApplyDefaultFX(model As Model, Projection As Matrix, color As Color)
+            For Each element In model.Meshes
+                For Each fx As BasicEffect In element.Effects
+                    ApplyDefaultFX(fx, Projection, color)
+                Next
+            Next
+        End Sub
+        Friend Sub ApplyDefaultFX(model As Model, Projection As Matrix, Optional yflip As Integer = 1)
+            For Each element In model.Meshes
+                For Each fx As BasicEffect In element.Effects
+                    ApplyDefaultFX(fx, Projection, yflip)
+                Next
             Next
         End Sub
 

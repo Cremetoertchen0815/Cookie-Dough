@@ -24,7 +24,7 @@ Namespace Game.Barrelled
         End Sub
 
         Public Sub ClickedFunction(sender As GameRoom) Implements IObject3D.ClickedFunction
-            Dim user As Player = sender.Spielers(sender.UserIndex)
+            Dim user = sender.EgoPlayer
 
         End Sub
     End Class
