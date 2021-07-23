@@ -1,6 +1,14 @@
 ﻿BV:
 -Custom CPU sounds
 
+BR:
+-Remove online dependency (for now, only comment out)
+-Camera higher
+-Minimap arrow to indicate view direction
+-Ask johannes for art direction
+-Collect ideas for gameplay, game goals, pups, etc.
+
+
 -Work on DC CPU + highscore
 -Shoots n Ladders BV map
 -Pac Man 3D first person
