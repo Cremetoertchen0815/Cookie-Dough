@@ -160,7 +160,7 @@ Namespace Game.Barrelled.Renderers
             MyBase.OnAddedToScene(scene)
 
             Dev = Core.GraphicsDevice
-            Projection = Matrix.CreatePerspectiveFieldOfView(1.2, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
+            Projection = Matrix.CreatePerspectiveFieldOfView(1.15, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Generate quads
             Dim vert As New List(Of VertexPositionNormalTexture)
@@ -215,8 +215,8 @@ Namespace Game.Barrelled.Renderers
                     QuadEffect.DirectionalLight0.Enabled = False
                     QuadEffect.DirectionalLight1.Enabled = False
                     QuadEffect.DirectionalLight2.Enabled = False
-                    QuadEffect.FogStart = 50
-                    QuadEffect.FogEnd = 80
+                    QuadEffect.FogStart = 45
+                    QuadEffect.FogEnd = 90
                     QuadEffect.FogColor = Vector3.Zero
                     QuadEffect.Texture = FloorTexture
                     For Each pass As EffectPass In QuadEffect.CurrentTechnique.Passes
@@ -255,15 +255,15 @@ Namespace Game.Barrelled.Renderers
             Dev.RasterizerState = RasterizerState.CullCounterClockwise
             Dim mesh = CubeModel.Meshes(0)
             For Each element In HiMapMatrices
-                ApplyFX(mesh, Color.White, element)
+                ApplyFX(mesh, Color.Magenta, element)
                 mesh.Draw()
             Next
             For Each element In LoMapMatrices
-                ApplyFX(mesh, Color.White, element)
+                ApplyFX(mesh, Color.Lime, element)
                 mesh.Draw()
             Next
             For Each element In CeilingMapMatrices
-                ApplyFX(mesh, Color.White, element)
+                ApplyFX(mesh, Color.Cyan, element)
                 mesh.Draw()
             Next
 
@@ -276,6 +276,11 @@ Namespace Game.Barrelled.Renderers
                 effect.World = world
                 effect.View = View
                 effect.Projection = Projection
+
+                effect.FogEnabled = True
+                effect.FogStart = 45
+                effect.FogEnd = 90
+                effect.FogColor = Vector3.Zero
             Next
         End Sub
         Friend Sub ApplyDefaultFX(effect As BasicEffect, Optional yflip As Integer = 1)

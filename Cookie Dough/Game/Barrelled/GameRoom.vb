@@ -43,6 +43,9 @@ Namespace Game.Barrelled
         Private Renderer As Renderer3D
         Private MinimapRenderer As RenderLayerRenderer
 
+        'Debug and eastereggs
+        Private fov As Single = 1.15
+
         'HUD
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnA As Controls.Button
@@ -184,7 +187,8 @@ Namespace Game.Barrelled
             ReadAndProcessInputData()
 
 
-            If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(3, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
+            'FOVVVVVVVVVVVVV
+            If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then fov = Math.Min(Math.PI - 0.001F, fov + 0.2) : Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(fov, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Set HUD color
             HUDColor = playcolor(UserIndex)

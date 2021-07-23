@@ -39,7 +39,7 @@ Namespace Game.Barrelled
 
         'Constants
         Private Const MouseSensivity As Single = 232
-        Private Const Speed As Single = 120
+        Private Const Speed As Single = 130
         Private Const JumpHeight As Single = 50
         Private Const Gravity As Single = 85
 
@@ -111,13 +111,13 @@ Namespace Game.Barrelled
             'Next
 
             'Clamp and move Y-Pos
-            LocationY = Mathf.Clamp(Location.Y - SPEEEN.Y, 0, 15)
+            LocationY = Mathf.Clamp(Location.Y - SPEEEN.Y * Time.DeltaTime, 0, 15)
 
             'Enable/Disable collision when jumping
 
             'Collision
             Dim state As New TiledMapMover.CollisionState
-            Dim velocity2D As Vector2 = New Vector2(SPEEEN.X, SPEEEN.Z) * -Time.DeltaTime
+            Dim velocity2D As Vector2 = New Vector2(SPEEEN.X, SPEEEN.Z) * -Time.DeltaTime * 2
             'Console.WriteLine(SPEEEN.ToString.ToString & velocity2D.ToString)
             Mover.CollisionLayer = CollisionLayers(If(LocationY > 10, 1, 0)) 'Adapt collision layer for jump
             Mover.Move(velocity2D, Collider, state)
