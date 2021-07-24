@@ -152,23 +152,32 @@ Namespace Game.Corridor.Rendering
             '    If thingycounter = 16 Then Exit For
             'Next
 
-            For Each IDK In rects 'thingcountlibre
 
+
+
+
+
+
+
+
+            For Each IDK In Game.Spielers(0).Figuren 'thingcountlibre
+                Dim Zwischenspeicher As Rectangle
+                Zwischenspeicher = rects(IDK.Location)
                 For Each thingy In Cubus.Meshes
 
 
                     For Each element As BasicEffect In thingy.Effects
-                        element.TextureEnabled = False
-                        element.World = Matrix.CreateScale(90.01 / 2) * Matrix.CreateTranslation(New Vector3(IDK.Value.Center.X - 475, IDK.Value.Center.Y - 475, +25)) 'Matrix.CreateRotationZ(0.75) * Matrix.CreateRotationX(-0.175) * 
+                    element.TextureEnabled = False
+                        element.World = Matrix.CreateScale(90.01 / 2) * Matrix.CreateTranslation(New Vector3(Zwischenspeicher.Center.X - 475, Zwischenspeicher.Center.Y - 475, +25)) 'Matrix.CreateRotationZ(0.75) * Matrix.CreateRotationX(-0.175) * 
                         element.View = View
-                        element.Projection = Projection
-                        element.LightingEnabled = False
-                        element.EnableDefaultLighting()
-
-                    Next
-                    thingy.Draw()
+                    element.Projection = Projection
+                    element.LightingEnabled = False
+                    element.EnableDefaultLighting()
 
                 Next
+                thingy.Draw()
+
+            Next
             Next
         End Sub
 

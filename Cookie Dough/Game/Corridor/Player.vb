@@ -1,15 +1,18 @@
 ﻿Imports Cookie_Dough.Framework.Networking
+Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Newtonsoft.Json
 
 Namespace Game.Corridor
+
     ''' <summary>
     ''' Kapselt alle wichtigen Eigenschaften und Methoden eine Spielers
     ''' </summary>
     Public Class Player
         Implements IPlayer
 
+        Public Figuren As Figure() = {New Figure(New Vector2(0, 7), Figure.Figurenarten.Turm)}
         ''' <summary>
         ''' Identifiziert den Spieler in der Anwendung
         ''' </summary>
@@ -69,4 +72,27 @@ Namespace Game.Corridor
         End Sub
 
     End Class
+
+    Public Class Figure
+        Public Location As Vector2
+        Public Figurart As Figurenarten
+
+        Enum Figurenarten
+            King = 1
+            Queen = 2
+            Turm = 3
+            Pferd = 4
+            Springer = 5
+            Bauer = 6
+        End Enum
+
+        Sub New(Baustelle As Vector2, Frankensteinsmonster As Figurenarten)
+            Location = Baustelle
+            Figurart = Frankensteinsmonster
+
+        End Sub
+    End Class
+
+
+
 End Namespace
