@@ -127,7 +127,7 @@ Namespace Game.Corridor
             'Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
             AddRenderer(New DefaultRenderer(1))
 
-            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
+            'AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
             ClearColor = Color.Black
             Material.DefaultMaterial.SamplerState = SamplerState.AnisotropicClamp
 

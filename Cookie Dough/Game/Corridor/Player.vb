@@ -12,7 +12,7 @@ Namespace Game.Corridor
     Public Class Player
         Implements IPlayer
 
-        Public Figuren As Figure() = {New Figure(New Vector2(0, 7), Figure.Figurenarten.Turm)}
+        Public Figuren As Figure() = {New Figure(New Vector2(0, 0), Figure.Figurenarten.Turm)}
         ''' <summary>
         ''' Identifiziert den Spieler in der Anwendung
         ''' </summary>

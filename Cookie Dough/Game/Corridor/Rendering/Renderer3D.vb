@@ -161,23 +161,28 @@ Namespace Game.Corridor.Rendering
 
 
             For Each IDK In Game.Spielers(0).Figuren 'thingcountlibre
-                Dim Zwischenspeicher As Rectangle
-                Zwischenspeicher = rects(IDK.Location)
+                Dim Zwischenspeicher As Rectangle = rects(IDK.Location)
+
                 For Each thingy In Cubus.Meshes
 
 
                     For Each element As BasicEffect In thingy.Effects
-                    element.TextureEnabled = False
-                        element.World = Matrix.CreateScale(90.01 / 2) * Matrix.CreateTranslation(New Vector3(Zwischenspeicher.Center.X - 475, Zwischenspeicher.Center.Y - 475, +25)) 'Matrix.CreateRotationZ(0.75) * Matrix.CreateRotationX(-0.175) * 
+                        element.TextureEnabled = False
+                        element.World = Matrix.CreateRotationX(Math.PI) * Matrix.CreateScale(90.01 / 2) * Matrix.CreateTranslation(New Vector3(Zwischenspeicher.Center.X - 475, Zwischenspeicher.Center.Y - 475, -75)) 'Matrix.CreateRotationZ(0.75) * Matrix.CreateRotationX(-0.175) * 
                         element.View = View
-                    element.Projection = Projection
-                    element.LightingEnabled = False
-                    element.EnableDefaultLighting()
+                        element.Projection = Projection
+                        element.LightingEnabled = True
+                        element.AmbientLightColor = New Vector3(0, 0, 0) * 0
+                        element.EnableDefaultLighting()
+                        element.DirectionalLight2.DiffuseColor = New Vector3(0, 0.375, 0.4)
+
+
+
+
+                    Next
+                    thingy.Draw()
 
                 Next
-                thingy.Draw()
-
-            Next
             Next
         End Sub
 
