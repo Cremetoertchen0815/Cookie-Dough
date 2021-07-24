@@ -215,7 +215,7 @@ Namespace Game.Barrelled.Renderers
                     QuadEffect.DirectionalLight0.Enabled = False
                     QuadEffect.DirectionalLight1.Enabled = False
                     QuadEffect.DirectionalLight2.Enabled = False
-                    QuadEffect.FogStart = 45
+                    QuadEffect.FogStart = 25
                     QuadEffect.FogEnd = 90
                     QuadEffect.FogColor = Vector3.Zero
                     QuadEffect.Texture = FloorTexture
@@ -278,9 +278,20 @@ Namespace Game.Barrelled.Renderers
                 effect.Projection = Projection
 
                 effect.FogEnabled = True
-                effect.FogStart = 45
+                effect.FogStart = 25
                 effect.FogEnd = 90
                 effect.FogColor = Vector3.Zero
+                effect.DirectionalLight0.Enabled = False
+                effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.25
+                effect.DirectionalLight0.Direction = New Vector3(0.7, yflip, 0.7)
+                effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+                effect.DirectionalLight1.Enabled = False
+                effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.25
+                effect.DirectionalLight1.Direction = New Vector3(-0.7, yflip, -0.7)
+                effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
+                effect.DirectionalLight2.Enabled = True
+                effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.35
+                effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.1
             Next
         End Sub
         Friend Sub ApplyDefaultFX(effect As BasicEffect, Optional yflip As Integer = 1)

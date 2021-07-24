@@ -3,7 +3,7 @@
 
 BR:
 -Minimap arrow to indicate view direction
--Ask johannes for art direction
+-Ask johannes for art direction ok
 -Collect ideas for gameplay, game goals, pups, etc.
 
 
