@@ -23,7 +23,7 @@ Namespace Game.Barrelled
         Friend PlayerIndexList As Integer() = {0}
         Friend StopUpdating As Boolean = False
         Friend NetworkMode As Boolean = False
-        Friend Map As Map = Map.Classic
+        Friend Map As Map = Map.Mainland
         Friend Status As GameStatus
         Friend CanStart As Boolean = False
         Friend WaitingTimeFlag As Boolean = False
@@ -108,8 +108,10 @@ Namespace Game.Barrelled
             'AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.55F).SetThreshold(0.45F)
 
             'Load Map
+            Map = Map.Classic
             TileMap = Content.LoadTiledMap("Maps\Barrelled\" & Map.ToString & ".tmx")
             Renderer.GenerateMapMatrices(TileMap)
+            Renderer.Floorsize = New Vector2(TileMap.Properties("floor_size_X"), TileMap.Properties("floor_size_Y"))
 
             'Load minimap renderer
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
@@ -123,7 +125,7 @@ Namespace Game.Barrelled
 
             'Create entities and components
             'AddSceneComponent(New Object3DHandler(Spielers(UserIndex), Me))
-            Crosshair = CreateEntity("crosshair").AddComponent(Of CrosshairRenderable)()
+            Crosshair = CreateEntity("crosshair").AddComponent(Of CrosshairRenderable)().SetRenderLayer(-4)
             Table = CreateEntity("table").AddComponent(Of Table)()
 
             'Load HUD

@@ -60,6 +60,8 @@
     <Compile Include="Framwork\Misc\VertexExtractor.vb" />
     <Compile Include="Framwork\Networking\IPlayer.vb" />
     <Compile Include="Enums.vb" />
+    <Compile Include="Framwork\Physics\AABB.vb" />
+    <Compile Include="Framwork\Physics\TiledMapCollisionResolver.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
     <Compile Include="Game\Barrelled\CreatorMenu.vb" />
     <Compile Include="Game\Barrelled\EgoPlayer.vb" />

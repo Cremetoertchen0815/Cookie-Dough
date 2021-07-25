@@ -2,10 +2,28 @@
 -Custom CPU sounds
 
 BR:
--Minimap arrow to indicate view direction
--Ask johannes for art direction ok
+-
+-Implement sprinting(with boost meter) and sneaking
+-Implement networking
+-Implement basic game stuff(different roles, being caught, landing in prison, freeing others, etc.)
+-Update minimap to actually be useful and look pretty(custom map scaling, character rendering, Minimap arrow to indicate view direction, etc.)
+-Implement winning
+-3D sound
+-Different terrain(high grass[vision is disturbed, louder noises, you can hide], water[constant sneaking speed], aerial faithplates[bounces you to a set location], )
+-Implement pups(lazer[notify barrels when rebel is treading], stun[shoot at ppl]
+-Music(volume depends on own speed, sirens from barrels)
+
 -Collect ideas for gameplay, game goals, pups, etc.
 
 
 -Work on DC CPU + highscore
 -Shoots n Ladders BV map
+
+
+räuber und Schandan meets Packman meets Hide and seek meets 3D
+-All players start in the middle, rebbels can run first, after a while barrels can roam too
+-Barrels must catch all the rebbels, if all rebels are caught, the barrels win
+-If the timer runs out, the rebels win
+-If a rebel is being caught, he lands in prison
+-Another rebel can run up to the prison and free him
+

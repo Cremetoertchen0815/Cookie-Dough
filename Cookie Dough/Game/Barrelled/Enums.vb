@@ -2,6 +2,7 @@
 
     Public Enum Map
         Classic
+        Mainland
     End Enum
 
     Public Enum PlayerMode

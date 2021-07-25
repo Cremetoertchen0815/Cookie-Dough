@@ -1,4 +1,5 @@
 ﻿Imports Cookie_Dough.Framework.Networking
+Imports Cookie_Dough.Framework.Physics
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -21,7 +22,7 @@ Namespace Game.Barrelled
         Friend CameraPosition As Vector3
         Friend Map As TmxMap
         Private CollisionLayers As TmxLayer()
-        Private Mover As TiledMapMover
+        Private Mover As TiledMapCollisionResolver
         Private MovementBtn As VirtualJoystick
         Private JumpBtn As VirtualButton
         Private lastMousePos As Vector2 = Mouse.GetState.Position.ToVector2
@@ -39,7 +40,8 @@ Namespace Game.Barrelled
 
         'Constants
         Private Const MouseSensivity As Single = 232
-        Private Const Speed As Single = 130
+        Private Const SprintSpeed As Single = 130
+        Private Const Speed As Single = 100 '40
         Private Const JumpHeight As Single = 50
         Private Const Gravity As Single = 85
 
@@ -61,7 +63,7 @@ Namespace Game.Barrelled
 
         Public Overrides Sub OnAddedToEntity()
             CollisionLayers = {Map.GetLayer(Of TmxLayer)("Collision"), Map.GetLayer(Of TmxLayer)("High")}
-            Mover = Entity.AddComponent(New TiledMapMover(CollisionLayers(0)))
+            Mover = Entity.AddComponent(New TiledMapCollisionResolver(Map, "Collision"))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
             Entity.AddComponent(New PrototypeSpriteRenderer(12, 12)).SetRenderLayer(5)
 
@@ -120,7 +122,7 @@ Namespace Game.Barrelled
             Dim velocity2D As Vector2 = New Vector2(SPEEEN.X, SPEEEN.Z) * -Time.DeltaTime * 2
             'Console.WriteLine(SPEEEN.ToString.ToString & velocity2D.ToString)
             Mover.CollisionLayer = CollisionLayers(If(LocationY > 10, 1, 0)) 'Adapt collision layer for jump
-            Mover.Move(velocity2D, Collider, state)
+            Mover.Move(velocity2D, Collider)
             Location = GetLocation()
 
             'Generate view matrix and ray
