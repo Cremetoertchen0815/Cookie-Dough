@@ -143,11 +143,8 @@ namespace Nez.Tiled
 			if (TiledMap == null)
 				return;
 
-			System.Console.WriteLine(motion.ToString());
-
 			// test for collisions then move the Entity
 			TestCollisions(ref motion, boxCollider.Bounds, collisionState);
-			System.Console.WriteLine(motion.ToString());
 
 			boxCollider.UnregisterColliderWithPhysicsSystem();
 			boxCollider.Entity.Transform.Position += motion;

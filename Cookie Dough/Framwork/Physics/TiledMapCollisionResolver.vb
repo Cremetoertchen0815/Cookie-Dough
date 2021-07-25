@@ -12,7 +12,7 @@ Namespace Framework.Physics
         Friend mAABB As New AABB(New Vector2(0, 0), New Vector2(0, 0)) 'The rectangle of the player
         Private mFastMover As TiledMapMover
         Private mTileSize As Integer = 16
-        Private Const SpeedThreshold As Single = 1
+        Private Const SpeedThreshold As Single = 2.3
 
 
         'Variables for collision
@@ -30,7 +30,7 @@ Namespace Framework.Physics
         End Sub
 
         Friend Sub Move(mSpeed As Vector2, collider As BoxCollider)
-            If mSpeed.Length > SpeedThreshold Then mFastMover.Move(mSpeed, collider, New TiledMapMover.CollisionState) : Return Else Console.WriteLine("s")
+            If mSpeed.Length > SpeedThreshold Then mFastMover.Move(mSpeed, collider, New TiledMapMover.CollisionState) : Return
 
             Dim mPosition As Vector2 = collider.AbsolutePosition
             Dim groundY As Single = 0.0F
