@@ -240,8 +240,8 @@ Namespace Game.Barrelled.Renderers
             Next
 
             'Draw other players
-            For p As Integer = 0 To BaseClass.OtherSpielers.Count - 1
-                Dim player = BaseClass.OtherSpielers(p)
+            For p As Integer = 1 To BaseClass.Spielers.Length - 1
+                Dim player = BaseClass.Spielers(p)
                 'Draw other player
                 For i As Integer = 0 To PlayerModel.Meshes.Count - 1
                     Dim element As ModelMesh = PlayerModel.Meshes(i)

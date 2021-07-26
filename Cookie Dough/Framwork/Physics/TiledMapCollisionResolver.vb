@@ -12,7 +12,7 @@ Namespace Framework.Physics
         Friend mAABB As New AABB(New Vector2(0, 0), New Vector2(0, 0)) 'The rectangle of the player
         Private mFastMover As TiledMapMover
         Private mTileSize As Integer = 16
-        Private Const SpeedThreshold As Single = 2.3
+        Private Const SpeedThreshold As Single = 2.5
 
 
         'Variables for collision
@@ -23,6 +23,10 @@ Namespace Framework.Physics
         Public Sub New(map As TmxMap, layer As String)
             mMap = map.GetLayer(Of TmxLayer)(layer)
             mTileSize = map.TileWidth
+        End Sub
+
+        Public Sub New(layer As TmxLayer, Optional tile_size As Integer = 16)
+
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
@@ -198,9 +202,9 @@ Namespace Framework.Physics
 
             wallX = 0.0F
 
-            Dim oldBottomLeft As Vector2 = RoundVector(oldCenter - mAABB.halfSize - New Vector2(1, 0))
-            Dim newBottomLeft As Vector2 = RoundVector(center - mAABB.halfSize - New Vector2(1, 0))
-            Dim newTopLeft As Vector2 = RoundVector(newBottomLeft + New Vector2(0.0F, mAABB.halfSize.Y * 2.0F))
+            Dim oldBottomLeft As Vector2 = oldCenter - mAABB.halfSize - New Vector2(1, 0)
+            Dim newBottomLeft As Vector2 = center - mAABB.halfSize - New Vector2(1, 0)
+            Dim newTopLeft As Vector2 = newBottomLeft + New Vector2(0.0F, mAABB.halfSize.Y * 2.0F)
 
             Dim tileIndexY As Integer
 
@@ -253,7 +257,7 @@ Namespace Framework.Physics
                 Dim bottomRight As Vector2 = Vector2.Lerp(newBottomRight, oldBottomRight, CSng(Math.Abs(endX - tileIndexX)) / dist)
                 Dim topRight As Vector2 = bottomRight + New Vector2(0.0F, mAABB.halfSize.Y * 2.0F)
 
-                Dim checkedTile As Vector2 = bottomRight
+                Dim checkedTile As Vector2 = bottomRight + New Vector2(0, 5)
                 Do
                     checkedTile.Y = Math.Min(checkedTile.Y, topRight.Y)
 

@@ -78,7 +78,7 @@ Namespace Menu.MainMenu
                                 Case GameType.DropTrop
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.CreatorMenu))
                                 Case GameType.Barrelled
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.GameRoom))
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.CreatorMenu))
                                 Case GameType.Corridor
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Corridor.GameRoom))
                                 Case GameList.Length

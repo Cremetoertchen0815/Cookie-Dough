@@ -1,11 +1,12 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Game.Barrelled.Players
 Imports Microsoft.Xna.Framework
 
 Namespace Game.Barrelled
     Public Class Object3DHandler
         Inherits SceneComponent
 
-        Sub New(user As OtherPlayer, owner As GameRoom)
+        Sub New(user As EgoPlayer, owner As GameRoom)
             Me.user = user
             Me.owner = owner
             InteractBtn = New VirtualButton(New VirtualButton.MouseLeftButton)
@@ -15,7 +16,7 @@ Namespace Game.Barrelled
         Friend Property ViewRay As Ray
 
         Private InteractBtn As VirtualButton
-        Private user As OtherPlayer
+        Private user As EgoPlayer
         Private owner As GameRoom
         Private Const ClickRange As Single = 8
 

@@ -17,4 +17,10 @@
         GameFinished
         Waitn
     End Enum
+
+    Public Enum PlayerStatus
+        Normal
+        Sneaky
+        Sprinty
+    End Enum
 End Namespace

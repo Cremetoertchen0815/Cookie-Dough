@@ -1,101 +1,100 @@
-﻿Imports Cookie_Dough.Framework.Networking
-Imports Cookie_Dough.Framework.Physics
+﻿Imports Cookie_Dough.Framework.Physics
 Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Audio
-Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Nez.Tiled
 
-Namespace Game.Barrelled
+Namespace Game.Barrelled.Players
     Public Class EgoPlayer
-        Inherits Component
-        Implements IUpdatable
+        Inherits CommonPlayer
 
-        'Properties
-        Public Property Bereit As Boolean = True
-        Public Property Mode As PlayerMode = PlayerMode.Chased
-        Public Property CustomSound As SoundEffect() = {SFX(3), SFX(4)}
-        Public Property Thumbnail As Texture2D
-        Public Property MOTD As String
 
         'Misc
         Friend CameraPosition As Vector3
-        Friend Map As TmxMap
-        Private CollisionLayers As TmxLayer()
-        Private Mover As TiledMapCollisionResolver
-        Private MovementBtn As VirtualJoystick
-        Private JumpBtn As VirtualButton
-        Friend SneakBtn As VirtualButton
         Private lastMousePos As Vector2 = Mouse.GetState.Position.ToVector2
         Private lastSpeen As Vector2
         Private lastmstate As MouseState = Mouse.GetState
+        Private movDir As Vector3
 
-        'Friend GameFocused As Boolean = True
+        'Virtual game pad
+        Private MovementBtn As VirtualJoystick
+        Private JumpBtn As VirtualButton
+        Private SneakBtn As VirtualButton
+        Private SprintBtn As VirtualButton
 
         'Movement
         Private LocationY As Single = 4
         Private VelocityY As Single = 0
         Private Collider As BoxCollider
-        Public Direction As Vector3 = Vector3.Backward
-        Public DisableCollision As Boolean = True
         Public Velocity As Vector2
+        Public RunningMode As PlayerStatus
+        Public SprintLeft As Single = 1
+        Public Focused As Boolean = True
 
         'Constants
         Private Const MouseSensivity As Single = 232
-        Private Const SprintSpeed As Single = 130
+        Private Const SprintSpeed As Single = 150
         Private Const SneakSpeed As Single = 8
-        Private Const Speed As Single = 50 '40
+        Private Const Speed As Single = 60 '40
         Private Const JumpHeight As Single = 50
         Private Const Gravity As Single = 85
         Private Const Acc As Single = 180
-        Private Const Dec As Single = 210
+        Private Const Dec As Single = 220
+        Private Const SprintMeterDrain As Single = 0.1
 
-        Private ReadOnly Property IUpdatable_Enabled As Boolean Implements IUpdatable.Enabled
+        Public Overrides Property Location As Vector3
             Get
-                Return Enabled
+                Return New Vector3(Entity.LocalPosition.X / 3, LocationY, Entity.LocalPosition.Y / 3)
             End Get
+            Set(value As Vector3)
+                Throw New NotImplementedException()
+            End Set
         End Property
+        Public Overrides Property Direction As Vector3 = Vector3.Backward
 
-        Private ReadOnly Property IUpdatable_UpdateOrder As Integer Implements IUpdatable.UpdateOrder
-            Get
-                Return 0
-            End Get
-        End Property
-
-        Sub New(map As TmxMap)
-            Me.Map = map
+        Sub New(typ As SpielerTyp)
+            Me.Typ = typ
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
-            CollisionLayers = {Map.GetLayer(Of TmxLayer)("Collision"), Map.GetLayer(Of TmxLayer)("High")}
-            Mover = Entity.AddComponent(New TiledMapCollisionResolver(Map, "Collision"))
+            Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0)))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
-            Entity.AddComponent(New PrototypeSpriteRenderer(12, 12)).SetRenderLayer(5)
+            Entity.AddComponent(New PrototypeSpriteRenderer(15, 15)).SetRenderLayer(5)
 
             'Assign virtual buttons
             MovementBtn = New VirtualJoystick(False, New VirtualJoystick.KeyboardKeys(VirtualInput.OverlapBehavior.TakeNewer, Keys.A, Keys.D, Keys.W, Keys.S))
             JumpBtn = New VirtualButton(New VirtualButton.KeyboardKey(Keys.Space))
             SneakBtn = New VirtualButton(New VirtualButton.KeyboardKey(Keys.LeftShift))
+            SprintBtn = New VirtualButton(New VirtualButton.KeyboardKey(Keys.LeftControl))
         End Sub
 
-        Friend Function GetWorldMatrix() As Matrix
+        Friend Overrides Function GetWorldMatrix() As Matrix
             Dim rotation As Single = Mathf.AngleBetweenVectors(New Vector2(Direction.X, -Direction.Z), Vector2.UnitY) * -2
-            Return Matrix.CreateScale(1, If(SneakBtn IsNot Nothing AndAlso SneakBtn.IsDown, 0.6, 1), 1) * Matrix.CreateRotationY(rotation) * Matrix.CreateTranslation(GetLocation)
+            Return Matrix.CreateScale(1, If(RunningMode = PlayerStatus.Sneaky, 0.6, 1), 1) * Matrix.CreateRotationY(rotation) * Matrix.CreateTranslation(Me.Location)
         End Function
 
-        Friend Function GetLocation() As Vector3
-            Return New Vector3(Entity.LocalPosition.X / 3, LocationY, Entity.LocalPosition.Y / 3)
-        End Function
-
-        Public Sub Update() Implements IUpdatable.Update
+        Public Overrides Sub Update()
             Dim mstate As MouseState = Mouse.GetState
-            Dim Location As Vector3 = GetLocation()
+            Dim Location As Vector3 = Me.Location
+            Dim stickPos As Vector2
+            Dim maxSpeed As Vector2
 
-            'Manage two-dimensional movement
-            Dim movDir As New Vector3(Direction.X, 0, Direction.Z) : movDir.Normalize()
-            Dim stickPos As Vector2 = MovementBtn.Value * New Vector2(0.75, 1)
-            Dim maxSpeed As Vector2 = Vector2.One * Speed
-            If SneakBtn.IsDown Then maxSpeed = Vector2.One * SneakSpeed
+            If Focused Then
+                'Sneaking and sprinting
+                RunningMode = PlayerStatus.Normal
+                If SneakBtn.IsDown And Location.Y <= 0 Then RunningMode = PlayerStatus.Sneaky
+                If SprintBtn.IsDown And SprintLeft > 0 Then RunningMode = PlayerStatus.Sprinty
+                If RunningMode = PlayerStatus.Sprinty Then SprintLeft = Math.Max(SprintLeft - SprintMeterDrain * Time.DeltaTime, 0)
+
+                'Manage two-dimensional movement
+                movDir = New Vector3(Direction.X, 0, Direction.Z) : movDir.Normalize()
+                stickPos = MovementBtn.Value * New Vector2(0.75, 1)
+                maxSpeed = Vector2.One * Speed
+                If RunningMode = PlayerStatus.Sneaky Then maxSpeed = Vector2.One * SneakSpeed
+                If RunningMode = PlayerStatus.Sprinty Then maxSpeed = Vector2.One * SprintSpeed
+
+                'Apply jump
+                If JumpBtn.IsPressed And LocationY - VelocityY * Time.DeltaTime <= 0 Then VelocityY = -JumpHeight
+            End If
 
             'Calculate player velocity for X-Axis
             If stickPos.X < 0 And Velocity.X >= maxSpeed.X * stickPos.X Then 'Move the character to the left
@@ -109,7 +108,6 @@ Namespace Game.Barrelled
                     If Velocity.X < -Dec * Time.DeltaTime And Velocity.X + Dec * Time.DeltaTime < 0 Then Velocity.X += Dec * Time.DeltaTime Else Velocity.X = 0
                 End If
             End If
-            Velocity.X = Mathf.Clamp(Velocity.X, -maxSpeed.X, maxSpeed.X) 'Clamp speed
 
             'Calculate player velocity for Y-Axis
             If stickPos.Y < 0 And Velocity.Y >= maxSpeed.Y * stickPos.Y Then 'Move the character to the left
@@ -123,13 +121,9 @@ Namespace Game.Barrelled
                     If Velocity.Y < -Dec * Time.DeltaTime And Velocity.Y + Dec * Time.DeltaTime < 0 Then Velocity.Y += Dec * Time.DeltaTime Else Velocity.Y = 0
                 End If
             End If
-            Velocity.Y = Mathf.Clamp(Velocity.Y, -maxSpeed.Y, maxSpeed.Y) 'Clamp speed
 
             'Apply gravity
             VelocityY += Gravity * Time.DeltaTime
-
-            'Apply jump
-            If JumpBtn.IsPressed And LocationY - VelocityY * Time.DeltaTime <= 0 Then VelocityY = -JumpHeight
 
             'Move player in 3D space
             Dim Velocity3D As New Vector3
@@ -146,26 +140,27 @@ Namespace Game.Barrelled
             Dim velocity2D As Vector2 = New Vector2(Velocity3D.X, Velocity3D.Z) * -Time.DeltaTime * 2
             Mover.CollisionLayer = CollisionLayers(If(LocationY > 10, 1, 0)) 'Adapt collision layer for jump
             Mover.Move(velocity2D, Collider)
-            Location = GetLocation()
+            Location = Me.Location
 
             'Generate camera position
             Dim camShift As Vector3 = Direction : camShift.Y = 0 : camShift.Normalize() : camShift *= 0.5
-            CameraPosition = Location + camShift + New Vector3(0, If(SneakBtn.IsDown, 3, 6), 0)
+            CameraPosition = Location + camShift + New Vector3(0, If(RunningMode = PlayerStatus.Sneaky, 3, 6), 0)
+
+
+            If Not Core.Instance.IsActive Or Not Focused Then Return
 
             'Smooth out mouse movement
             lastMousePos = Vector2.Lerp(mstate.Position.ToVector2, lastMousePos, 0.25)
 
             'Calculate direction from mouse
-            If Core.Instance.IsActive Then
-                Dim nudirection As Vector3 = Direction
-                nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Up, (-MathHelper.PiOver4 / MouseSensivity) * (lastMousePos.X - lastmstate.X)))
-                nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Cross(Vector3.Up, nudirection), (MathHelper.PiOver4 / MouseSensivity) * (lastMousePos.Y - lastmstate.Y)))
-                nudirection.Normalize()
-                Direction = nudirection
+            Dim nudirection As Vector3 = Direction
+            nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Up, (-MathHelper.PiOver4 / MouseSensivity) * (lastMousePos.X - lastmstate.X)))
+            nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Cross(Vector3.Up, nudirection), (MathHelper.PiOver4 / MouseSensivity) * (lastMousePos.Y - lastmstate.Y)))
+            nudirection.Normalize()
+            Direction = nudirection
 
-                Dim pos = Core.Instance.Window.ClientBounds.Size
-                Mouse.SetPosition(CInt(pos.X / 2), CInt(pos.Y / 2))
-            End If
+            Dim pos = Core.Instance.Window.ClientBounds.Size
+            Mouse.SetPosition(CInt(pos.X / 2), CInt(pos.Y / 2))
 
             lastmstate = Mouse.GetState
         End Sub
