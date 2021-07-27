@@ -65,6 +65,8 @@
     <Compile Include="Framwork\UI\Controls\ProgressBar.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
     <Compile Include="Game\Barrelled\CreatorMenu.vb" />
+    <Compile Include="Game\Barrelled\IGameWindow.vb" />
+    <Compile Include="Game\Barrelled\SlaveWindow.vb" />
     <Compile Include="Game\Barrelled\MapHelper.vb" />
     <Compile Include="Game\Barrelled\Players\BaitNSwitchPlayer.vb" />
     <Compile Include="Game\Barrelled\Players\EgoPlayer.vb" />
@@ -173,7 +175,6 @@
     <Compile Include="Game\Barrelled\Players\OtherPlayer.vb" />
     <Compile Include="Game\Common\CrosshairRenderable.vb" />
     <Compile Include="Game\Barrelled\Renderers\Renderer3D.vb" />
-    <Compile Include="Game\Barrelled\Table.vb" />
     <Compile Include="Game\Megäa\Enums.vb" />
     <Compile Include="Game\Megäa\IObject3D.vb" />
     <Compile Include="Game\Megäa\GameRoom.vb" />

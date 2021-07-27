@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.Barrelled.Players
 Imports Cookie_Dough.Game.Barrelled.Renderers
@@ -12,13 +13,14 @@ Imports Nez.Tiled
 Imports Nez.Tweens
 
 Namespace Game.Barrelled
-    Public Class GameRoom
+    Public Class SlaveWindow
         Inherits Scene
         Implements IGameWindow
 
         'Gameplay fields
         Friend Spielers As CommonPlayer()
         Friend EgoPlayer As EgoPlayer
+        Friend Rejoin As Boolean = False
         Friend UserIndex As Integer = 0
         Friend PlCount As Integer = 2
         Friend PlayerIndexIndex As Integer
@@ -72,13 +74,42 @@ Namespace Game.Barrelled
         'Constants
         Private Const WaitinTime As Integer = 1500
 
-        Public Sub New(map As Map)
+        Sub New(ins As OnlineGameInstance)
+            LocalClient.AutomaticRefresh = False
+            NetworkMode = False
+
+            If Not LocalClient.JoinGame(ins, Sub(x)
+                                                 'Load map info
+                                                 Map = CInt(x())
+                                                 PlCount = GetMapSize(Map)
+                                                 GameMode = If(CBool(x()), GameMode.Casual, GameMode.Competetive)
+
+                                                 'Load player info
+                                                 ReDim Spielers(PlCount - 1)
+                                                 UserIndex = CInt(x())
+                                                 For i As Integer = 0 To PlCount - 1
+                                                     Dim type As SpielerTyp = CInt(x())
+                                                     Dim name As String = x()
+                                                     If i <> UserIndex Then
+                                                         Spielers(i) = New OtherPlayer(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = name}
+                                                     Else
+                                                         Spielers(i) = New EgoPlayer(SpielerTyp.Online) With {.Name = My.Settings.Username}
+                                                     End If
+                                                 Next
+
+                                                 'Set rejoin flag
+                                                 Rejoin = x() = "Rejoin"
+                                             End Sub) Then LocalClient.AutomaticRefresh = True : Return
+
+            'Bereite Flags und Variablen vor
+
             Chat = New List(Of (String, Color))
             PlayerIndexIndex = -1
-            Me.Map = map
-            PlCount = GetMapSize(map)
+            PlCount = GetMapSize(Map)
             Status = GameStatus.WaitingForOnlinePlayers
-            Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
+            Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
+
+            LoadContent()
         End Sub
 
         Public Overrides Sub Unload()
@@ -115,7 +146,7 @@ Namespace Game.Barrelled
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
             CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New TargetRendererable(MinimapRenderer))
 
-            EgoPlayer = CreateEntity("EgoPlayer").SetPosition(PlayerSpawn).AddComponent(Spielers(0))
+            EgoPlayer = CreateEntity("EgoPlayer").SetPosition(PlayerSpawn).AddComponent(Spielers(UserIndex))
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
             'Create entities and components
@@ -129,7 +160,7 @@ Namespace Game.Barrelled
             HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow, .Progress = Function() EgoPlayer.SprintLeft} : HUD.Controls.Add(HUDSprintBar)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDChatBtn)
-            HUDInstructions = New Controls.Label("Run around and do stuff!", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
+            HUDInstructions = New Controls.Label("Click on the totem to start the game...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
             InstructionFader = HUDInstructions.Tween("Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), 0.7).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut) : InstructionFader.Start()
             HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDMusicBtn)
@@ -183,11 +214,20 @@ Namespace Game.Barrelled
             ReadAndProcessInputData()
 
 
+            'Network stuff
+            If NetworkMode Then
+                If Not LocalClient.Connected And Status <> CardGameState.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If LocalClient.LeaveFlag And Status <> CardGameState.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+            End If
+
+            If NetworkMode Then ReadAndProcessInputData()
+
             'FOVVVVVVVVVVVVV
             If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then fov = Math.Min(Math.PI - 0.001F, fov + 0.2) : Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(fov, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Set HUD color
             HUDColor = playcolor(UserIndex)
+            HUDInstructions.Active = Status <> GameStatus.GameActive OrElse (Spielers(UserIndex).Typ = SpielerTyp.Local)
 
             lastmstate = Mouse.GetState
         End Sub
@@ -317,8 +357,5 @@ Namespace Game.Barrelled
             End Get
         End Property
 #End Region
-
-
-
     End Class
 End Namespace
