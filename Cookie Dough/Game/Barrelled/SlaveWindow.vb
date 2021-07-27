@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports System.IO
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.Barrelled.Players
@@ -6,6 +7,7 @@ Imports Cookie_Dough.Game.Barrelled.Renderers
 Imports Cookie_Dough.Game.Common
 Imports Cookie_Dough.Menu.MainMenu
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
@@ -108,6 +110,7 @@ Namespace Game.Barrelled
             PlCount = GetMapSize(Map)
             Status = GameStatus.WaitingForOnlinePlayers
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
+            NetworkMode = True
 
             LoadContent()
         End Sub
@@ -237,49 +240,171 @@ Namespace Game.Barrelled
         ''' Liest die Daten aus dem Stream des Servers
         ''' </summary>
         Private Sub ReadAndProcessInputData()
-            'If MoveActive Then Return
 
+            'Implement move active
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
-                Dim source As Integer = CInt(element(0).ToString)
-                Dim command As Char = element(1)
+                Dim command As Char = element(0)
                 Select Case command
                     Case "a"c 'Player arrived
-                        CreateEntity(element.Substring(2)).AddComponent(Spielers(source))
-                        Spielers(source).Name = element.Substring(2)
+                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim txt As String() = element.Substring(2).Split("|")
+                        Spielers(source).Name = txt(0)
+                        Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
-                        SendPlayerArrived(source, Spielers(source).Name)
+                    Case "b"c 'Begin gaem
+                        'Set local vs online players
+                        Dim stuff As String = element.Substring(1)
+                        For i As Integer = 0 To Spielers.Length - 1
+                            If stuff.Contains(CStr(i)) Then Spielers(i).Typ = SpielerTyp.Local
+                        Next
+                        'Init game
+                        SendSoundFile()
+                        StopUpdating = False
+                        Status = CardGameState.Waitn
+                        PostChat("The game has started!", Color.White)
                     Case "c"c 'Sent chat message
-                        Dim text As String = element.Substring(2)
-                        PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
-                        SendChatMessage(source, text)
+                        Dim source As Integer = CInt(element(1).ToString)
+                        If source = 9 Then
+                            Dim text As String = element.Substring(2)
+                            PostChat("[Guest]: " & text, Color.Gray)
+                        Else
+                            PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
+                        End If
                     Case "e"c 'Suspend gaem
-                        If Status <> GameStatus.WaitingForOnlinePlayers Then StopUpdating = True
-                        PostChat(Spielers(source).Name & " left!", Color.White)
+                        Dim who As Integer = CInt(element(1).ToString)
+                        StopUpdating = True
+                        Spielers(who).Bereit = False
+                        PostChat(Spielers(who).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
-                        SendPlayerLeft(source)
-                    Case "g"c
-                        Dim txt As Vector3() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Vector3())(element.Substring(2))
-                        Dim user = Spielers(source)
-                        user.Location = txt(0)
-                        user.Direction = txt(1)
-                    Case "r"c 'Player is back
+                    Case "m"c 'Sent chat message
+                        Dim msg As String = element.Substring(1)
+                        PostChat(msg, Color.White)
+                    Case "r"c 'Player returned and sync every player
+                        Dim source As Integer = CInt(element(1).ToString)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
-                        SendPlayerBack(source)
+                        HUDInstructions.Text = "Welcome back!"
+                        SendSoundFile()
+                    Case "w"c 'Spieler hat gewonnen
+                        'HUDInstructions.Text = "Game over!"
+                        'If MediaPlayer.IsRepeating Then
+                        '    MediaPlayer.Play(DamDamDaaaam)
+                        '    MediaPlayer.Volume = 0.8
+                        'Else
+                        '    MediaPlayer.Play(Fanfare)
+                        '    MediaPlayer.Volume = 0.3
+                        'End If
+                        'MediaPlayer.IsRepeating = False
+
+                        ''Berechne Rankings
+                        'Core.Schedule(1, Sub()
+                        '                     Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
+                        '                     For i As Integer = 0 To PlCount - 1
+                        '                         ranks.Add((i, GetScore(i)))
+                        '                     Next
+                        '                     ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
+                        '                     ranks.Reverse()
+
+                        '                     For i As Integer = 0 To ranks.Count - 1
+                        '                         Dim ia As Integer = i
+
+                        '                         Select Case i
+                        '                             Case 0
+                        '                                 Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                        '                             Case 1
+                        '                                 Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                        '                             Case 2
+                        '                                 Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                        '                             Case Else
+                        '                                 Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                        '                         End Select
+                        '                     Next
+
+                        '                     'Update K/D
+                        '                     If ranks(0).Item1 = UserIndex Then
+                        '                         If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
+                        '                     Else
+                        '                         If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
+                        '                     End If
+                        '                     My.Settings.Save()
+                        '                 End Sub)
+                        ''Set flags
+                        'Status = CardGameState.SpielZuEnde
+                        'FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                    Case "x"c 'Continue with game
                         StopUpdating = False
+                    Case "y"c 'Synchronisiere Daten
+                        'Dim str As String = element.Substring(1)
+                        'Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
+                        'For i As Integer = 0 To PlCount - 1
+                        '    Spielers(i).HandDeck.Clear()
+                        '    Spielers(i).HandDeck.AddRange(sp.Spielers(i).HandDeck)
+                        '    Spielers(i).Name = sp.Spielers(i).Name
+                        '    Spielers(i).OriginalType = sp.Spielers(i).OriginalType
+                        '    Spielers(i).MOTD = sp.Spielers(i).MOTD
+                        '    Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
+                        '    Spielers(i).IsAFK = sp.Spielers(i).IsAFK
+                        'Next
+                        'TableCard = sp.TableCard
+                        'If UserIndex > -1 Then HUDAfkBtn.Text = If(Spielers(UserIndex).IsAFK, "Back Again", "AFK")
+                    Case "z"c 'Receive sound
+                        Dim dataReceiver As New Threading.Thread(Sub()
+                                                                     Dim source As Integer = CInt(element(1).ToString)
+                                                                     Dim IdentSound As IdentType = CInt(element(2).ToString)
+                                                                     Dim SoundNr As Integer = CInt(element(3).ToString)
+                                                                     Dim dat As String = element.Substring(4).Replace("_TATA_", "")
+                                                                     If source = UserIndex Then Exit Sub
+                                                                     Dim sound As SoundEffect
+
+                                                                     If SoundNr = 9 Then
+                                                                         Try
+                                                                             'Receive sound
+                                                                             If IdentSound = IdentType.Custom Then
+                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\client\" & Spielers(source).Name & "_pp.png")
+                                                                             End If
+                                                                         Catch ex As Exception
+                                                                         End Try
+                                                                     Else
+                                                                         Try
+                                                                             'Receive sound
+                                                                             If IdentSound = IdentType.Custom Then
+                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                                                                             Else
+                                                                                 sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                             End If
+                                                                         Catch ex As Exception
+                                                                             'Data damaged, send standard sound
+                                                                             IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
+                                                                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                         End Try
+
+                                                                         'Set sound for player
+                                                                         Spielers(source).CustomSound(SoundNr) = sound
+                                                                     End If
+                                                                 End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+                        dataReceiver.Start()
 
                 End Select
             Next
         End Sub
 
         ' ---Methoden um Daten via den Server an die Clients zu senden---
-        Private Sub SendPlayerArrived(index As Integer, name As String)
-            SendNetworkMessageToAll("a" & index.ToString & name)
-        End Sub
-        Private Sub SendBeginGaem()
-            SendNetworkMessageToAll("b")
+
+        Friend Sub SendArrived()
+            If UserIndex < 0 Then
+                LocalClient.WriteStream("y") 'request refresh
+                Return
+            End If
+
+            If Rejoin Then
+                LocalClient.WriteStream("r" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Rejoin
+            Else
+                LocalClient.WriteStream("a" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Nujoin
+            End If
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
@@ -299,6 +424,24 @@ Namespace Game.Barrelled
         End Sub
         Private Sub SendWinFlag()
             SendNetworkMessageToAll("w")
+        End Sub
+        Private Sub SendSoundFile()
+            If UserIndex < 0 Then Return
+
+            Dim dataSender As New Threading.Thread(Sub()
+                                                       Dim txt As String = ""
+                                                       If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt)
+
+                                                       txt = ""
+                                                       If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+
+                                                       txt = ""
+                                                       If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
+                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                   End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+            dataSender.Start()
         End Sub
 
         Private Sub SendNetworkMessageToAll(message As String)

@@ -37,6 +37,7 @@ Namespace Game.Barrelled.Players
 
         'Collision
         Friend Shared CollisionLayers As TmxLayer()
+        Friend Shared PlayerSpawn As Vector2
         Protected Mover As TiledMapCollisionResolver
     End Class
 End Namespace

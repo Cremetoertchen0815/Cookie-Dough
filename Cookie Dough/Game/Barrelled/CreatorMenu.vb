@@ -128,18 +128,7 @@ Namespace Game.Barrelled
         Private Sub StartNewRound(servername As String)
             If Not MenuAktiviert Then Return
 
-            'Check if all is "none-players"
-            Dim allnone As Boolean = True
-            For i As Integer = 0 To GetMapSize(Map) - 1
-                If NewGamePlayers(i) <> SpielerTyp.None Then allnone = False : Exit For
-            Next
-            If allnone Then Microsoft.VisualBasic.MsgBox("All players are none! Not a valid player selection!") : Return
-
-            Dim Internetz As Boolean = False
-            For i As Integer = 0 To GetMapSize(Map) - 1
-                If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
-            Next
-            If Internetz Then LocalClient.AutomaticRefresh = False
+            LocalClient.AutomaticRefresh = False
 
             Dim local_count As Integer = 1
             Dim AktuellesSpiel As New GameRoom(Map)
@@ -158,13 +147,11 @@ Namespace Game.Barrelled
 
             'Blende über
             Core.StartSceneTransition(New FadeTransition(Function() AktuellesSpiel)).OnScreenObscured = Sub()
-                                                                                                            If Internetz Then
-                                                                                                                Dim wtlst As String() = New String(Whitelist.Length - 1) {}
-                                                                                                                For i As Integer = 0 To Whitelist.Length - 1
-                                                                                                                    wtlst(i) = AllUser(Whitelist(i)).Item1
-                                                                                                                Next
-                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
-                                                                                                            End If
+                                                                                                            Dim wtlst As String() = New String(Whitelist.Length - 1) {}
+                                                                                                            For i As Integer = 0 To Whitelist.Length - 1
+                                                                                                                wtlst(i) = AllUser(Whitelist(i)).Item1
+                                                                                                            Next
+                                                                                                            If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                         End Sub
 
             MenuAktiviert = False

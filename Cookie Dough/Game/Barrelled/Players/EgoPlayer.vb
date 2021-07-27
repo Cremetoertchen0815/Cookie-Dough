@@ -59,6 +59,7 @@ Namespace Game.Barrelled.Players
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0)))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
             Entity.AddComponent(New PrototypeSpriteRenderer(15, 15)).SetRenderLayer(5)
+            Entity.SetPosition(PlayerSpawn)
 
             'Assign virtual buttons
             MovementBtn = New VirtualJoystick(False, New VirtualJoystick.KeyboardKeys(VirtualInput.OverlapBehavior.TakeNewer, Keys.A, Keys.D, Keys.W, Keys.S))

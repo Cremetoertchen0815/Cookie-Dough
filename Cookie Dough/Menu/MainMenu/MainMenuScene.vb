@@ -335,6 +335,15 @@ Namespace Menu.MainMenu
         Private Sub OpenGaemViaNetwork(ins As OnlineGameInstance)
             If BlockOnlineJoin Then Return
             Select Case ins.Type
+                Case GameType.Barrelled
+                    Try
+                        BlockOnlineJoin = True
+                        Dim client As New Game.Barrelled.SlaveWindow(ins)
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                    Catch ex As Exception
+                        BlockOnlineJoin = False
+                        Microsoft.VisualBasic.MsgBox("Error connecting!" & ex.ToString)
+                    End Try
                 Case GameType.BetretenVerboten
                     Try
                         BlockOnlineJoin = True

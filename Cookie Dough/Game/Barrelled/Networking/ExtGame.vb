@@ -89,7 +89,7 @@ Namespace Game.Barrelled.Networking
 
             client.WriteString("create")
             client.WriteString(name)
-            client.WriteString(GameType.BetretenVerboten.ToString)
+            client.WriteString(GameType.Barrelled.ToString)
             client.WriteString(CInt(map).ToString)
             client.WriteString(casual.ToString)
             For i As Integer = 0 To GetMapSize(map) - 1
