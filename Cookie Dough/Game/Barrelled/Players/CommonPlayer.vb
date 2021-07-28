@@ -36,12 +36,13 @@ Namespace Game.Barrelled.Players
         End Property
 
 
-        'Collision
+        'Collision and Misc
         Friend Shared CollisionLayers As TmxLayer()
         Friend Shared PlayerSpawn As Vector2
         Private Shared PlaceholderFace As Texture2D = Core.Content.LoadTexture("games/BR/face_placeholder")
+        Friend RunningMode As PlayerStatus
+        Friend MatchedColor As Color
         Protected Mover As TiledMapCollisionResolver
-        Public RunningMode As PlayerStatus
 
     End Class
 End Namespace

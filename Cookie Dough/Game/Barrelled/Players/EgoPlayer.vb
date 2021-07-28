@@ -68,7 +68,7 @@ Namespace Game.Barrelled.Players
         Public Overrides Sub OnAddedToEntity()
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0)))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
-            Entity.AddComponent(New PrototypeSpriteRenderer(15, 15)).SetRenderLayer(5)
+            Entity.AddComponent(New PrototypeSpriteRenderer(15, 15)).SetColor(MatchedColor).SetRenderLayer(5)
             Entity.SetPosition(PlayerSpawn)
 
             'Assign virtual buttons

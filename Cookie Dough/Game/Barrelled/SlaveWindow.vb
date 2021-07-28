@@ -158,7 +158,7 @@ Namespace Game.Barrelled
                 Else
                     CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
                 End If
-
+                Spielers(i).MatchedColor = playcolor(i)
             Next
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 

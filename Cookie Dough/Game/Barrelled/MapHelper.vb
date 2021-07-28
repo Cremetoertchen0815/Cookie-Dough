@@ -1,7 +1,7 @@
 ﻿Namespace Game.Barrelled
     Public Module MapHelper
         Public Function GetMapSize(mp As Map) As Integer
-            Return 2
+            Return 3
         End Function
         Public Function GetMapName(mp As Map) As String
             Select Case mp

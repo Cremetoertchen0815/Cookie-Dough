@@ -116,6 +116,7 @@ Namespace Game.Barrelled
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
             CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New TargetRendererable(MinimapRenderer))
 
+            Spielers(0).MatchedColor = playcolor(0)
             EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(0))
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
@@ -210,6 +211,7 @@ Namespace Game.Barrelled
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
+                        Spielers(source).MatchedColor = playcolor(source)
                         CreateEntity(txt(0)).AddComponent(Spielers(source))
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                         SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD)

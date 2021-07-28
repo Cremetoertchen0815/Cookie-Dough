@@ -22,7 +22,7 @@ Namespace Game.Barrelled
         Private Mode As GameMode = GameMode.Competetive
         Friend Arrow As Texture2D
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
-        Protected NewGamePlayers As PlayerMode() = {PlayerMode.Ghost, PlayerMode.Ghost, PlayerMode.Ghost, PlayerMode.Ghost}
+        Protected NewGamePlayers As PlayerMode()
         Protected Whitelist As Integer() = {0, 0, 0, 0}
         Protected SecondScreen As Boolean = False
         Protected SM4Scroll As Single
@@ -41,7 +41,7 @@ Namespace Game.Barrelled
             ClearColor = Color.Black
 
             'Init values
-            NewGamePlayers = {PlayerMode.Ghost, PlayerMode.Ghost, PlayerMode.Ghost, PlayerMode.Ghost}
+            NewGamePlayers = {PlayerMode.Ghost, PlayerMode.Ghost, PlayerMode.Ghost}
             Map = Map.Classic
             PlayerCount = 4
             PlayerSel = 0

@@ -2,9 +2,7 @@
 -Custom CPU sounds
 
 BR:
--Implement networking
 -Implement jump meter(???)
--Implement networking
 -Implement basic game stuff(different roles, being caught, landing in prison, freeing others, etc.)
 -Update minimap to actually be useful and look pretty(custom map scaling, character rendering, Minimap arrow to indicate view direction, etc.)
 -Implement winning

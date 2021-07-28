@@ -55,7 +55,7 @@ Namespace Game.Barrelled.Players
 
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0), 16))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
-            Entity.AddComponent(New PrototypeSpriteRenderer(15, 15) With {.Color = Color.Red}).SetRenderLayer(5)
+            Entity.AddComponent(New PrototypeSpriteRenderer(15, 15)).SetColor(MatchedColor).SetRenderLayer(5)
             Entity.SetPosition(PlayerSpawn)
         End Sub
 
