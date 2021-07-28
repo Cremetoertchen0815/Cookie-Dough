@@ -18,7 +18,7 @@ Namespace Game.Barrelled.Players
         Public Property MOTD As String Implements IPlayer.MOTD
         Public Property ID As String Implements IPlayer.ID
         Public Property CustomSound As SoundEffect() Implements IPlayer.CustomSound
-        Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
+        Public Property Thumbnail As Texture2D = PlaceholderFace Implements IPlayer.Thumbnail
         Public MustOverride Property Location As Vector3
         Public MustOverride Property Direction As Vector3
         Public Overridable Property ThreeDeeVelocity As Vector3
@@ -39,6 +39,7 @@ Namespace Game.Barrelled.Players
         'Collision
         Friend Shared CollisionLayers As TmxLayer()
         Friend Shared PlayerSpawn As Vector2
+        Private Shared PlaceholderFace As Texture2D = Core.Content.LoadTexture("games/BR/face_placeholder")
         Protected Mover As TiledMapCollisionResolver
         Public RunningMode As PlayerStatus
 

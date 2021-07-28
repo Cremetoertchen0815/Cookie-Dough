@@ -77,7 +77,7 @@ Namespace Game.Barrelled
 
         'Constants
         Private Const WaitinTime As Integer = 1500
-        Private Const SyncLoc As Single = 0.1F
+        Private Const SyncLoc As Single = 0.05F
 
         Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False

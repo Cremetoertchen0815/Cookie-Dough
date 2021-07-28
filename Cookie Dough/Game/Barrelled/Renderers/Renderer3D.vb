@@ -246,7 +246,13 @@ Namespace Game.Barrelled.Renderers
                 'Draw other player
                 For i As Integer = 0 To PlayerModel.Meshes.Count - 1
                     Dim element As ModelMesh = PlayerModel.Meshes(i)
-                    ApplyFX(element, If(i = 2, Color.White, playcolor(p)), element.ParentBone.ModelTransform * PlayerTransform * player.GetWorldMatrix)
+                    For Each fx As BasicEffect In PlayerModel.Meshes(i).Effects
+                        fx.World = element.ParentBone.ModelTransform * PlayerTransform * player.GetWorldMatrix
+                        fx.View = View
+                        fx.Projection = Projection
+                        fx.DiffuseColor = If(i = 2, Color.White, playcolor(p)).ToVector3
+                        fx.Texture = player.Thumbnail
+                    Next
                     element.Draw()
                 Next
                 'Reset Rasterizer state
@@ -278,42 +284,26 @@ Namespace Game.Barrelled.Renderers
                 effect.World = world
                 effect.View = View
                 effect.Projection = Projection
-
-                effect.FogEnabled = True
-                effect.FogStart = 25
-                effect.FogEnd = 90
-                effect.FogColor = Vector3.Zero
-                effect.DirectionalLight0.Enabled = True
-                effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.35
-                effect.DirectionalLight0.Direction = New Vector3(0.7, yflip, 0.7)
-                effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
-                effect.DirectionalLight1.Enabled = True
-                effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.35
-                effect.DirectionalLight1.Direction = New Vector3(-0.7, yflip, -0.7)
-                effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
-                effect.DirectionalLight2.Enabled = True
-                effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.25
-                effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.08
             Next
         End Sub
         Friend Sub ApplyDefaultFX(effect As BasicEffect, Optional yflip As Integer = 1)
             effect.LightingEnabled = True
             effect.AmbientLightColor = Color.White.ToVector3 * 0.06
             effect.DirectionalLight0.Enabled = True
-            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.35
             effect.DirectionalLight0.Direction = New Vector3(0.7, yflip, 0.7)
             effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
             effect.DirectionalLight1.Enabled = True
-            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.35
             effect.DirectionalLight1.Direction = New Vector3(-0.7, yflip, -0.7)
             effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
             effect.DirectionalLight2.Enabled = True
-            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.35
-            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.1
+            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.08
             effect.FogEnabled = True
-            effect.FogStart = 0.5
-            effect.FogEnd = 30
-            effect.FogColor = Vector3.One
+            effect.FogStart = 25
+            effect.FogEnd = 90
+            effect.FogColor = Vector3.Zero
             effect.SpecularPower = 15
             effect.Alpha = 1
         End Sub
@@ -321,17 +311,21 @@ Namespace Game.Barrelled.Renderers
             effect.LightingEnabled = True
             effect.AmbientLightColor = Color.White.ToVector3 * 0.06
             effect.DirectionalLight0.Enabled = True
-            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight0.DiffuseColor = Color.White.ToVector3 * 0.35
             effect.DirectionalLight0.Direction = New Vector3(0.7, 1, 0.7)
             effect.DirectionalLight0.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
             effect.DirectionalLight1.Enabled = True
-            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight1.DiffuseColor = Color.White.ToVector3 * 0.35
             effect.DirectionalLight1.Direction = New Vector3(-0.7, 1, -0.7)
             effect.DirectionalLight1.SpecularColor = Color.SkyBlue.ToVector3 * 0.5
             effect.DirectionalLight2.Enabled = True
-            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.35
-            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.1
+            effect.DirectionalLight2.DiffuseColor = Color.White.ToVector3 * 0.25
+            effect.DirectionalLight2.SpecularColor = Color.SkyBlue.ToVector3 * 0.08
             effect.DiffuseColor = color.ToVector3
+            effect.FogEnabled = True
+            effect.FogStart = 25
+            effect.FogEnd = 90
+            effect.FogColor = Vector3.Zero
             effect.SpecularPower = 15
             effect.Alpha = 1
         End Sub

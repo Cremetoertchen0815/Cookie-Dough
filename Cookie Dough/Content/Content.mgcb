@@ -290,6 +290,18 @@
 #begin fx/textures/textureWipeTransition/wink.xnb
 /copy:fx/textures/textureWipeTransition/wink.xnb
 
+#begin games/BR/face_placeholder.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:games/BR/face_placeholder.png
+
 #begin games/BV/arrow_right.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2058,6 +2070,18 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:mesh/debug_cube.fbx
+
+#begin mesh/face_placeholder.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mesh/face_placeholder.png
 
 #begin mesh/Have_A_Cube.fbx
 /importer:FbxImporter
