@@ -235,7 +235,7 @@ Namespace Game.Barrelled.Renderers
             'Draw local player
             For i As Integer = 0 To PlayerModelHeadless.Meshes.Count - 1
                 Dim element As ModelMesh = PlayerModelHeadless.Meshes(If(i = 2, 1, i))
-                ApplyFX(element, playcolor(0), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * BaseClass.EgoPlayer.GetWorldMatrix)
+                ApplyFX(element, playcolor(BaseClass.UserIndex), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * BaseClass.EgoPlayer.GetWorldMatrix)
                 element.Draw()
             Next
 
