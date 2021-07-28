@@ -151,7 +151,7 @@ namespace Nez.Tiled
 			boxCollider.RegisterColliderWithPhysicsSystem();
 		}
 
-		public void TestCollisions(ref Vector2 motion, Rectangle boxColliderBounds, CollisionState collisionState)
+		public void TestCollisions(ref Vector2 motion, RectangleF boxColliderBounds, CollisionState collisionState)
 		{
 			_boxColliderBounds = boxColliderBounds;
 
@@ -197,7 +197,7 @@ namespace Nez.Tiled
 				if (TestMapCollision(sweptBounds, direction, collisionState, out collisionResponse))
 				{
 					// react to collision. get the distance between our leading edge and what we collided with
-					motion.Y = collisionResponse - boxColliderBounds.GetSide(direction);
+					 motion.Y = collisionResponse - boxColliderBounds.GetSide(direction);
 					collisionState.Above = direction == Edge.Top;
 					collisionState.Below = direction == Edge.Bottom;
 					collisionState._movementRemainderY.Reset();

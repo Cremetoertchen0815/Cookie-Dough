@@ -78,6 +78,7 @@ Namespace Game.Corridor.Networking
             '    End Select
             'Next
             'Return nugaem
+            Return Nothing
         End Function
 
         'Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player(), whitelist As String(), casual As Boolean) As Boolean

@@ -222,6 +222,8 @@ Namespace Framework.Networking
 
         Private Function CallFittingMethod(type As GameType, con As Connection, gamename As String, Key As Integer) As IGame
             Select Case type
+                Case GameType.Barrelled
+                    Return Game.Barrelled.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case GameType.BetretenVerboten
                     Return Game.BetretenVerboten.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case GameType.Megäa

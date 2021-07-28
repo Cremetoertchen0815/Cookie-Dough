@@ -2,6 +2,7 @@
 
     Public Enum Map
         Classic
+        Mainland
     End Enum
 
     Public Enum PlayerMode
@@ -15,5 +16,11 @@
         GameActive
         GameFinished
         Waitn
+    End Enum
+
+    Public Enum PlayerStatus
+        Normal
+        Sneaky
+        Sprinty
     End Enum
 End Namespace

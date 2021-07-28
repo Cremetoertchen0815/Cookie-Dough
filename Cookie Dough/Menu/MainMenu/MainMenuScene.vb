@@ -78,7 +78,7 @@ Namespace Menu.MainMenu
                                 Case GameType.DropTrop
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.CreatorMenu))
                                 Case GameType.Barrelled
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.GameRoom))
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.CreatorMenu))
                                 Case GameType.Corridor
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Corridor.GameRoom))
                                 Case GameList.Length
@@ -335,6 +335,15 @@ Namespace Menu.MainMenu
         Private Sub OpenGaemViaNetwork(ins As OnlineGameInstance)
             If BlockOnlineJoin Then Return
             Select Case ins.Type
+                Case GameType.Barrelled
+                    Try
+                        BlockOnlineJoin = True
+                        Dim client As New Game.Barrelled.SlaveWindow(ins)
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                    Catch ex As Exception
+                        BlockOnlineJoin = False
+                        Microsoft.VisualBasic.MsgBox("Error connecting!" & ex.ToString)
+                    End Try
                 Case GameType.BetretenVerboten
                     Try
                         BlockOnlineJoin = True
