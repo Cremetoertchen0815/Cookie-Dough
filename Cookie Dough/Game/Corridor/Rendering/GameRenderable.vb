@@ -31,6 +31,7 @@ Namespace Game.Corridor.Rendering
 
         Public Overrides Sub Render(batcher As Batcher, color As Color)
             Core.GraphicsDevice.DepthStencilState = DepthStencilState.None
+            batcher.Draw(window.BGTexture, New Rectangle(0, 0, 1920, 1080), Nothing, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0)
 
         End Sub
     End Class

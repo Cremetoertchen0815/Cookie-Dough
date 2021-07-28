@@ -11,8 +11,6 @@ BR:
 -Implement pups(lazer[notify barrels when rebel is treading], stun[shoot at ppl]
 -Music(volume depends on own speed, sirens from barrels)
 
--Collect ideas for gameplay, game goals, pups, etc.
-
 
 -Work on DC CPU + highscore
 -Shoots n Ladders BV map
