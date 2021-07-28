@@ -25,8 +25,8 @@ Namespace Game.Barrelled.Players
         Private LocationY As Single = 4
         Private VelocityY As Single = 0
         Private Collider As BoxCollider
+        Private stickPos As Vector2
         Public Velocity As Vector2
-        Public RunningMode As PlayerStatus
         Public SprintLeft As Single = 1
         Public Focused As Boolean = True
 
@@ -44,6 +44,16 @@ Namespace Game.Barrelled.Players
         Public Overrides Property Location As Vector3
             Get
                 Return New Vector3(Entity.LocalPosition.X / 3, LocationY, Entity.LocalPosition.Y / 3)
+            End Get
+            Set(value As Vector3)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+
+        Public Overrides Property ThreeDeeVelocity As Vector3
+            Get
+                Return New Vector3(stickPos.X, VelocityY, stickPos.Y)
             End Get
             Set(value As Vector3)
                 Throw New NotImplementedException()
@@ -76,7 +86,6 @@ Namespace Game.Barrelled.Players
         Public Overrides Sub Update()
             Dim mstate As MouseState = Mouse.GetState
             Dim Location As Vector3 = Me.Location
-            Dim stickPos As Vector2
             Dim maxSpeed As Vector2
 
             If Focused Then
@@ -127,7 +136,7 @@ Namespace Game.Barrelled.Players
             VelocityY += Gravity * Time.DeltaTime
 
             'Move player in 3D space
-            Dim Velocity3D As New Vector3
+            Dim Velocity3D As Vector3 = Vector3.Zero
             Velocity3D += Velocity.Y * movDir
             Velocity3D += Velocity.X * Vector3.Cross(Vector3.Up, movDir) * New Vector3(1, 0, 1)
             If Location.Y <= 0 And Not JumpBtn.IsPressed Then Location = New Vector3(Location.X, 0, Location.Z) : VelocityY = 0

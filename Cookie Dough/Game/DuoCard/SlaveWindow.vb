@@ -91,10 +91,9 @@ Namespace Game.DuoCard
         Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
 
         'Konstanten
-        Private Const FigurSpeed As Integer = 450
-        Private Const ErrorCooldown As Integer = 1
-        Private Const CPUThinkingTime As Single = 0.6
-        Private Const CamSpeed As Integer = 1300
+        Private Const SyncLoc As Single = 1 / 2
+        Private Const SyncVelocity As Single = 1 / 8
+        Private Const SyncDirection As Single = 1 / 4
 
         Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False

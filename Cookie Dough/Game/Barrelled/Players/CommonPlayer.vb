@@ -21,6 +21,7 @@ Namespace Game.Barrelled.Players
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
         Public MustOverride Property Location As Vector3
         Public MustOverride Property Direction As Vector3
+        Public Overridable Property ThreeDeeVelocity As Vector3
         Public MustOverride Sub Update() Implements IUpdatable.Update
         Friend MustOverride Function GetWorldMatrix() As Matrix
         Private ReadOnly Property IUpdatable_Enabled As Boolean Implements IUpdatable.Enabled
@@ -39,5 +40,7 @@ Namespace Game.Barrelled.Players
         Friend Shared CollisionLayers As TmxLayer()
         Friend Shared PlayerSpawn As Vector2
         Protected Mover As TiledMapCollisionResolver
+        Public RunningMode As PlayerStatus
+
     End Class
 End Namespace

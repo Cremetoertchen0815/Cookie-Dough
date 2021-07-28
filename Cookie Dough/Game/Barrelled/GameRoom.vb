@@ -33,7 +33,8 @@ Namespace Game.Barrelled
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
 
-
+        'Networking
+        Private SyncPosCounter As Single = 0
 
         '3D movement & interaction
         Friend Colliders As BoundingBox()
@@ -70,6 +71,7 @@ Namespace Game.Barrelled
 
         'Constants
         Private Const WaitinTime As Integer = 1500
+        Private Const SyncLoc As Single = 0.1F
 
         Public Sub New(map As Map)
             Chat = New List(Of (String, Color))
@@ -153,7 +155,7 @@ Namespace Game.Barrelled
             Renderer.View = Matrix.CreateLookAt(EgoPlayer.CameraPosition, EgoPlayer.CameraPosition + EgoPlayer.Direction, Vector3.Up)
 
 
-            'If NetworkMode Then SendPlayerMoved(UserIndex, EgoPlayer.GetLocation, EgoPlayer.Direction)
+            If NetworkMode Then SendPlayerData()
 
             'Focus/Unfocus game
             If mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released Then
@@ -229,6 +231,14 @@ Namespace Game.Barrelled
                         'If Renderer.BeginTriggered Then StopWhenRealStart = True
 
                         SendPlayerLeft(source)
+                    Case "g"c
+                        Dim tx As String = element.Substring(2)
+                        Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(tx)
+                        Spielers(source).Location = dat.Item1
+                        Spielers(source).Direction = dat.Item2
+                        Spielers(source).ThreeDeeVelocity = dat.Item3
+                        Spielers(source).RunningMode = dat.Item4
+                        LocalClient.WriteStream("g" & source.ToString & tx)
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(2)
                         PostChat(msg, Color.White)
@@ -284,6 +294,15 @@ Namespace Game.Barrelled
             '    End If
             'Next
             'SendNetworkMessageToAll("h" & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
+        End Sub
+        Private Sub SendPlayerData()
+            Dim element = Spielers(UserIndex)
+
+            SyncPosCounter += Time.DeltaTime
+            If SyncPosCounter > SyncLoc Then
+                SyncPosCounter = 0
+                LocalClient.WriteStream("g" & UserIndex.ToString & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
+            End If
         End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
@@ -391,6 +410,12 @@ Namespace Game.Barrelled
         Private ReadOnly Property IGameWindow_Spielers As CommonPlayer() Implements IGameWindow.Spielers
             Get
                 Return Spielers
+            End Get
+        End Property
+
+        Private ReadOnly Property IGameWindow_UserIndex As Integer Implements IGameWindow.UserIndex
+            Get
+                Return UserIndex
             End Get
         End Property
 #End Region

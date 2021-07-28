@@ -37,6 +37,9 @@ Namespace Game.Barrelled
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
 
+        'Networking
+        Private SyncPosCounter As Single = 0
+
 
 
         '3D movement & interaction
@@ -75,6 +78,7 @@ Namespace Game.Barrelled
 
         'Constants
         Private Const WaitinTime As Integer = 1500
+        Private Const SyncLoc As Single = 0.1F
 
         Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
@@ -149,7 +153,14 @@ Namespace Game.Barrelled
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
             CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New TargetRendererable(MinimapRenderer))
 
-            EgoPlayer = CreateEntity("EgoPlayer").SetPosition(PlayerSpawn).AddComponent(Spielers(UserIndex))
+            For i As Integer = 0 To Spielers.Length - 1
+                If i = UserIndex Then
+                    EgoPlayer = CreateEntity("EgoPlayer").SetPosition(PlayerSpawn).AddComponent(Spielers(UserIndex))
+                Else
+                    CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
+                End If
+
+            Next
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
             'Create entities and components
@@ -188,7 +199,7 @@ Namespace Game.Barrelled
             Renderer.View = Matrix.CreateLookAt(EgoPlayer.CameraPosition, EgoPlayer.CameraPosition + EgoPlayer.Direction, Vector3.Up)
 
 
-            'If NetworkMode Then SendPlayerMoved(UserIndex, EgoPlayer.GetLocation, EgoPlayer.Direction)
+            If NetworkMode Then SendPlayerData()
 
             'Focus/Unfocus game
             If mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released Then
@@ -278,6 +289,14 @@ Namespace Game.Barrelled
                         Spielers(who).Bereit = False
                         PostChat(Spielers(who).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
+                    Case "g"c
+                        Dim pl As Integer = CInt(element(1).ToString)
+                        If pl = UserIndex Then Exit Select
+                        Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(element.Substring(2))
+                        Spielers(pl).Location = dat.Item1
+                        Spielers(pl).Direction = dat.Item2
+                        Spielers(pl).ThreeDeeVelocity = dat.Item3
+                        Spielers(pl).RunningMode = dat.Item4
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
@@ -412,6 +431,15 @@ Namespace Game.Barrelled
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
         End Sub
+        Private Sub SendPlayerData()
+            Dim element = Spielers(UserIndex)
+
+            SyncPosCounter += Time.DeltaTime
+            If SyncPosCounter > SyncLoc Then
+                SyncPosCounter = 0
+                LocalClient.WriteStream("g" & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
+            End If
+        End Sub
         Private Sub SendGameClosed()
             SendNetworkMessageToAll("l")
         End Sub
@@ -497,6 +525,12 @@ Namespace Game.Barrelled
         Private ReadOnly Property IGameWindow_Spielers As CommonPlayer() Implements IGameWindow.Spielers
             Get
                 Return Spielers
+            End Get
+        End Property
+
+        Private ReadOnly Property IGameWindow_UserIndex As Integer Implements IGameWindow.UserIndex
+            Get
+                Return UserIndex
             End Get
         End Property
 #End Region
