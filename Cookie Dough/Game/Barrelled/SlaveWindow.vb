@@ -46,7 +46,6 @@ Namespace Game.Barrelled
         Friend Colliders As BoundingBox()
         Friend ObjectHandler As Object3DHandler
         Friend Crosshair As CrosshairRenderable
-        Friend PlayerSpawn As Vector2
 
         'Assets & rendering
         Private ButtonFont As NezSpriteFont
@@ -145,7 +144,7 @@ Namespace Game.Barrelled
             For Each element In TileMap.GetObjectGroup("Objects").Objects
                 Select Case element.Type
                     Case "spawn"
-                        PlayerSpawn = New Vector2(element.X, element.Y)
+                        CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
                 End Select
             Next
 
@@ -155,7 +154,7 @@ Namespace Game.Barrelled
 
             For i As Integer = 0 To Spielers.Length - 1
                 If i = UserIndex Then
-                    EgoPlayer = CreateEntity("EgoPlayer").SetPosition(PlayerSpawn).AddComponent(Spielers(UserIndex))
+                    EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(UserIndex))
                 Else
                     CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
                 End If
