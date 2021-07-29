@@ -47,14 +47,14 @@ Namespace Game.DuoCard.Networking
         End Sub
 
         Public Sub ServerSendJoinGlobalData(con As Connection, writer As Action(Of Connection, String)) Implements IGame.ServerSendJoinGlobalData
-            writer(con, CInt(Size))
+            writer(con, Size)
             writer(con, Casual.ToString)
         End Sub
 
         Public Shared Function ServerSendCreateData(ReadString As Func(Of Connection, String), con As Connection, gamename As String, Key As Integer) As IGame
             'Read map from stream and resize arrays accordingly
-            Dim size As Integer = CInt(ReadString(con))
-            Dim casual As Boolean = CBool(ReadString(con))
+            Dim size As Integer = ReadString(con)
+            Dim casual As Boolean = ReadString(con)
             Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Size = size, .Casual = casual}
             ReDim nugaem.Players(size - 1)
             ReDim nugaem.WhiteList(size - 1)

@@ -32,7 +32,7 @@ Namespace Game.Common
         Private Feld As Rectangle
         Private Center As Vector2
 
-        Sub New(window As ICardRendererWindow, Optional order As Integer = 0)
+        Public Sub New(window As ICardRendererWindow, Optional order As Integer = 0)
             MyBase.New(order)
             Game = window
         End Sub

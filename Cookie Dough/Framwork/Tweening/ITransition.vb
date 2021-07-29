@@ -1,6 +1,4 @@
-﻿Imports Microsoft.Xna.Framework
-
-Namespace Framework.Tweening
+﻿Namespace Framework.Tweening
 
     <TestState(TestState.Finalized)>
     Public Interface ITransition

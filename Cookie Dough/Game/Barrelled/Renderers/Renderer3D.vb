@@ -7,7 +7,7 @@ Namespace Game.Barrelled.Renderers
     Public Class Renderer3D
         Inherits Renderer
 
-        Sub New(baseclass As IGameWindow, Optional order As Integer = 0)
+        Public Sub New(baseclass As IGameWindow, Optional order As Integer = 0)
             MyBase.New(order)
             Me.BaseClass = baseclass
         End Sub
@@ -39,8 +39,8 @@ Namespace Game.Barrelled.Renderers
         Private CubeModel As Model
 
         'Debug Box Buffer
-        Dim BoxVertexBuffer As VertexBuffer
-        Dim BoxIndexBuffer As IndexBuffer
+        Private BoxVertexBuffer As VertexBuffer
+        Private BoxIndexBuffer As IndexBuffer
         Private Sub CreateBoxBuffer()
 
             '---VERTICES---
@@ -161,16 +161,17 @@ Namespace Game.Barrelled.Renderers
             MyBase.OnAddedToScene(scene)
 
             Dev = Core.GraphicsDevice
-            Projection = Matrix.CreatePerspectiveFieldOfView(1.15, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
+            Projection = Matrix.CreatePerspectiveFieldOfView(1.15, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Generate quads
-            Dim vert As New List(Of VertexPositionNormalTexture)
-            vert.Add(New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(1, 0, 0), New Vector3(0, 0, -1), Vector2.UnitY))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(0, 1, 0), New Vector3(0, 0, -1), Vector2.UnitX))
+            Dim vert As New List(Of VertexPositionNormalTexture) From {
+                New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One),
+                New VertexPositionNormalTexture(New Vector3(1, 0, 0), New Vector3(0, 0, -1), Vector2.UnitY),
+                New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero),
+                New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One),
+                New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero),
+                New VertexPositionNormalTexture(New Vector3(0, 1, 0), New Vector3(0, 0, -1), Vector2.UnitX)
+            }
             QuadClockwise = New VertexBuffer(Dev, GetType(VertexPositionNormalTexture), vert.Count, BufferUsage.WriteOnly)
             QuadClockwise.SetData(vert.ToArray)
             vert.Reverse()
@@ -189,9 +190,10 @@ Namespace Game.Barrelled.Renderers
             ApplyDefaultFX(PlayerModelHeadless, Color.White)
 
             'Load debug cube
-            DebugEffect = New BasicEffect(Dev)
-            DebugEffect.TextureEnabled = False
-            DebugEffect.VertexColorEnabled = True
+            DebugEffect = New BasicEffect(Dev) With {
+                .TextureEnabled = False,
+                .VertexColorEnabled = True
+            }
             CreateBoxBuffer()
             CubeModel = scene.Content.Load(Of Model)("mesh/Have_A_Cube")
             ApplyDefaultFX(CubeModel, Color.Red)

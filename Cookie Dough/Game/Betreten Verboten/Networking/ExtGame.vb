@@ -54,7 +54,7 @@ Namespace Game.BetretenVerboten.Networking
         Public Shared Function ServerSendCreateData(ReadString As Func(Of Connection, String), con As Connection, gamename As String, Key As Integer) As IGame
             'Read map from stream and resize arrays accordingly
             Dim map As GaemMap = CInt(ReadString(con))
-            Dim casual As Boolean = CBool(ReadString(con))
+            Dim casual As Boolean = ReadString(con)
             Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Map = map, .Casual = casual}
             ReDim nugaem.Players(GetMapSize(map) - 1)
             ReDim nugaem.WhiteList(GetMapSize(map) - 1)

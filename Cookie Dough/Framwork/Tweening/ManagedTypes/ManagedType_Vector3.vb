@@ -11,13 +11,13 @@ Namespace Framework.Tweening.ManagedTypes
         End Function
 
         Public Function copy(ByVal o As Object) As Object Implements IManagedType.copy
-            Dim c As Vector3 = DirectCast(o, Vector3)
+            Dim c As Vector3 = o
             Return New Vector3(c.X, c.Y, c.Z)
         End Function
 
         Public Function getIntermediateValue(ByVal start As Object, ByVal [end] As Object, ByVal dPercentage As Double) As Object Implements IManagedType.getIntermediateValue
-            Dim startVector As Vector3 = DirectCast(start, Vector3)
-            Dim endVector As Vector3 = DirectCast([end], Vector3)
+            Dim startVector As Vector3 = start
+            Dim endVector As Vector3 = [end]
             Dim iStart_X As Single = startVector.X
             Dim iStart_Y As Single = startVector.Y
             Dim iStart_Z As Single = startVector.Z

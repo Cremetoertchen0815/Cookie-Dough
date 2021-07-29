@@ -65,7 +65,7 @@ Namespace Game.Common
             End Set
         End Property
 
-        Shared Function GetAllCards() As Card()
+        Public Shared Function GetAllCards() As Card()
             Dim lst As New List(Of Card)
             For a As Integer = 0 To 3
                 For b As Integer = 1 To 14

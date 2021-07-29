@@ -7,6 +7,7 @@ BR:
 -Update minimap to actually be useful and look pretty(custom map scaling, character rendering, Minimap arrow to indicate view direction, etc.)
 -Implement winning
 -3D sound
+-Implement rejoining(or maybe not rejoining)
 -Different terrain(high grass[vision is disturbed, louder noises, you can hide], water[constant sneaking speed], aerial faithplates[bounces you to a set location], )
 -Implement pups(lazer[notify barrels when rebel is treading], stun[shoot at ppl]
 -Music(volume depends on own speed, sirens from barrels)

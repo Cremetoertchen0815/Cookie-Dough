@@ -184,7 +184,7 @@ Namespace Game.DropTrop
             Private MediumFont As NezSpriteFont
             Private instance As CreatorMenu
 
-            Sub New(instance As CreatorMenu)
+            Public Sub New(instance As CreatorMenu)
                 MyBase.New()
                 Me.instance = instance
             End Sub
@@ -218,7 +218,7 @@ Namespace Game.DropTrop
                 batcher.DrawLine(New Vector2(1920.0F / 2, 500), New Vector2(1920.0F / 2, 600), FgColor)
                 batcher.DrawString(MediumFont, "←", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("←").X / 2, 525), FgColor)
                 batcher.DrawString(MediumFont, "→", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("→").X / 2, 525), FgColor)
-                batcher.DrawString(MediumFont, "Map: " & CType(instance.Map, GaemMap).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Map: " & instance.Map).X / 2, 225), FgColor)
+                batcher.DrawString(MediumFont, "Map: " & instance.Map.ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Map: " & instance.Map).X / 2, 225), FgColor)
                 batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 375), FgColor)
                 batcher.DrawString(MediumFont, "Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString).X / 2, 675), FgColor)
                 batcher.DrawHollowRect(New Rectangle(560, 900, 800, 100), FgColor)

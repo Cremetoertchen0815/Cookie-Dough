@@ -6,21 +6,21 @@ Namespace Framework.Graphics
         Inherits Renderer
 
         'Vertex & index buffers
-        Dim vertexlist As VertexPositionColorTexture()
-        Dim indexlist As Integer()
-        Dim vertexbuffer As DynamicVertexBuffer
-        Dim indexbuffer As IndexBuffer
-        Dim Effect As BasicEffect
+        Private vertexlist As VertexPositionColorTexture()
+        Private indexlist As Integer()
+        Private vertexbuffer As DynamicVertexBuffer
+        Private indexbuffer As IndexBuffer
+        Private Effect As BasicEffect
 
         'Color faders
-        Dim faderA As Transition(Of Color)
-        Dim faderB As Transition(Of Color)
-        Dim faderC As Transition(Of Color)
-        Dim faderD As Transition(Of Color)
+        Private faderA As Transition(Of Color)
+        Private faderB As Transition(Of Color)
+        Private faderC As Transition(Of Color)
+        Private faderD As Transition(Of Color)
 
         'Other junk
-        Dim loops As Boolean = True
-        Dim rand As New System.Random
+        Private loops As Boolean = True
+        Private rand As New System.Random
 
         'render stuff
         Protected Alpha As Single
@@ -34,7 +34,7 @@ Namespace Framework.Graphics
         Public Property Colors As Color() = {Color.Blue, Color.DarkCyan, Color.Purple, Color.Black, Color.Green}
         Public Property Speed As Integer = 10000
 
-        Sub New(Optional order As Integer = 0, Optional Alpha As Single = 0.3F)
+        Public Sub New(Optional order As Integer = 0, Optional Alpha As Single = 0.3F)
             MyBase.New(order)
             Me.Alpha = Alpha
         End Sub

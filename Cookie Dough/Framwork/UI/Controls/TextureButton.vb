@@ -14,10 +14,10 @@ Namespace Framework.UI.Controls
         End Property
 
         Public Event Clicked(ByVal sender As Object, ByVal e As EventArgs)
+        Private rect As Rectangle
+        Private par As IParent
 
-        Dim rect As Rectangle
-        Dim par As IParent
-        Sub New(text As Texture2D, location As Vector2, size As Vector2)
+        Public Sub New(text As Texture2D, location As Vector2, size As Vector2)
             Texture = text
             Me.Location = location
             Me.Size = size

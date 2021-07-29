@@ -16,16 +16,17 @@ Namespace Framework.UI.Controls
         Public Delegate Sub ExternalDraw(batcher As Batcher, InnerBounds As Rectangle, color As Color)
         Public Delegate Sub ExternalUpdate(mstate As GuiInput, InnerBounds As Rectangle)
 
-        Dim rect As Rectangle
-        Dim par As IParent
-        Sub New(draw As ExternalDraw, update As ExternalUpdate, location As Vector2, size As Vector2)
-            Me.UpdateSubroutine = update
-            Me.DrawSubroutine = draw
+        Private rect As Rectangle
+        Private par As IParent
+
+        Public Sub New(draw As ExternalDraw, update As ExternalUpdate, location As Vector2, size As Vector2)
+            UpdateSubroutine = update
+            DrawSubroutine = draw
             Me.Location = location
             Me.Size = size
-            Me.Color = Color.White
-            Me.Border = New ControlBorder(Color.White, 2)
-            Me.BackgroundColor = New Color(40, 40, 40, 255)
+            Color = Color.White
+            Border = New ControlBorder(Color.White, 2)
+            BackgroundColor = New Color(40, 40, 40, 255)
         End Sub
 
         Public Overrides Sub Init(system As IParent)

@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Generic
-Imports System.IO
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 
@@ -43,7 +42,8 @@ Namespace Game.Corridor.Rendering
         Private Center As Vector2
         Private transmatrices As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)}
         Friend AdditionalZPos As New Transition(Of Single)
-        Sub New(game As IGameWindow, Optional order As Integer = 0)
+
+        Public Sub New(game As IGameWindow, Optional order As Integer = 0)
             MyBase.New(order)
             Me.Game = game
         End Sub
@@ -53,13 +53,14 @@ Namespace Game.Corridor.Rendering
 
             dev = Core.GraphicsDevice
 
-            Dim vertices As New List(Of VertexPositionColorTexture)
-            vertices.Add(New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(475, -475, 0), Color.White, Vector2.UnitY))
-            vertices.Add(New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One))
+            Dim vertices As New List(Of VertexPositionColorTexture) From {
+                New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX),
+                New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero),
+                New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One),
+                New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero),
+                New VertexPositionColorTexture(New Vector3(475, -475, 0), Color.White, Vector2.UnitY),
+                New VertexPositionColorTexture(New Vector3(-475, -475, 0), Color.White, Vector2.One)
+            }
             MapBuffer = New VertexBuffer(dev, GetType(VertexPositionColorTexture), vertices.Count, BufferUsage.WriteOnly)
             MapBuffer.SetData(vertices.ToArray)
 

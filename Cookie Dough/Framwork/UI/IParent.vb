@@ -1,5 +1,4 @@
 ﻿Imports Microsoft.Xna.Framework
-Imports Nez
 
 Namespace Framework.UI
     Public Interface IParent

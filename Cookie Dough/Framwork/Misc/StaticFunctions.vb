@@ -1,9 +1,7 @@
-﻿Imports System.Collections.Generic
-Imports System.IO
+﻿Imports System.IO
 Imports System.Linq
 Imports System.Text
 Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Graphics
 Namespace Framework.Misc
 
     <TestState(TestState.WorkInProgress)>
@@ -19,7 +17,7 @@ Namespace Framework.Misc
             If u = Vector2.Zero Then Return Point
             Dim a = CSng(Math.Atan2(u.Y, u.X))
             a += rotation
-            u = u.Length() * New Vector2(CSng(Math.Cos(a)), CSng(Math.Sin(a)))
+            u = u.Length() * New Vector2(Math.Cos(a), Math.Sin(a))
             Return u + origin
         End Function
         Public Function WrapTextDifferently(ByVal text As String, ByVal width As Integer, ByVal overflow As Boolean) As String
@@ -103,11 +101,11 @@ Namespace Framework.Misc
         End Function
 
         Public Function interpolate(ByVal i1 As Integer, ByVal i2 As Integer, ByVal dPercentage As Double) As Integer
-            Return CInt(interpolate(CDbl(i1), CDbl(i2), dPercentage))
+            Return interpolate(i1, CDbl(i2), dPercentage)
         End Function
 
         Public Function interpolate(ByVal f1 As Single, ByVal f2 As Single, ByVal dPercentage As Double) As Single
-            Return CSng(interpolate(CDbl(f1), CDbl(f2), dPercentage))
+            Return interpolate(f1, CDbl(f2), dPercentage)
         End Function
 
         Public Function convertLinearToEaseInEaseOut(dElapsed As Double) As Double
@@ -134,10 +132,10 @@ Namespace Framework.Misc
         End Function
 
         Public Function PointsToRectangle(a As Vector2, b As Vector2, inflation As Vector2) As Rectangle
-            Dim smallestX As Integer = CInt(Math.Min(a.X, b.X))
-            Dim smallestY As Integer = CInt(Math.Min(a.Y, b.Y))
-            Dim largestX As Integer = CInt(Math.Max(a.X, b.X))
-            Dim largestY As Integer = CInt(Math.Max(a.Y, b.Y))
+            Dim smallestX As Integer = Math.Min(a.X, b.X)
+            Dim smallestY As Integer = Math.Min(a.Y, b.Y)
+            Dim largestX As Integer = Math.Max(a.X, b.X)
+            Dim largestY As Integer = Math.Max(a.Y, b.Y)
             Dim width As Integer = largestX - smallestX
             Dim height As Integer = largestY - smallestY
             Dim res As New Rectangle(smallestX - inflation.X, smallestY - inflation.Y, width + inflation.X * 2, height + inflation.Y * 2)

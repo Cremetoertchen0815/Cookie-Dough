@@ -11,7 +11,6 @@ Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
-Imports Nez
 
 Namespace Game.BetretenVerboten
     ''' <summary>
@@ -106,14 +105,14 @@ Namespace Game.BetretenVerboten
         Private Const CamSpeed As Integer = 1300
         Private Const SacrificeWait As Integer = 5
 
-        Sub New(ins As OnlineGameInstance)
+        Public Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
             NetworkMode = False
 
             If Not LocalClient.JoinGame(ins, Sub(x)
                                                  'Load map info
                                                  Map = CInt(x())
-                                                 GameMode = If(CBool(x()), GameMode.Casual, GameMode.Competetive)
+                                                 GameMode = If(x(), GameMode.Casual, GameMode.Competetive)
 
                                                  Select Case Map
                                                      Case GaemMap.Default4Players
@@ -291,7 +290,7 @@ Namespace Game.BetretenVerboten
             End If
         End Sub
 
-        Dim scheiß As New List(Of (Integer, Integer))
+        Private scheiß As New List(Of (Integer, Integer))
 
         Public Overrides Sub Update()
             MyBase.Update()
@@ -490,7 +489,7 @@ Namespace Game.BetretenVerboten
                 Dim command As Char = element(0)
                 Select Case command
                     Case "a"c 'Player arrived
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
@@ -500,7 +499,7 @@ Namespace Game.BetretenVerboten
                         'Set local vs online players
                         Dim stuff As String = element.Substring(1)
                         For i As Integer = 0 To Spielers.Length - 1
-                            If stuff.Contains(CStr(i)) Then Spielers(i).Typ = SpielerTyp.Local
+                            If stuff.Contains(i) Then Spielers(i).Typ = SpielerTyp.Local
                         Next
                         'Init game
                         SendSoundFile()
@@ -510,7 +509,7 @@ Namespace Game.BetretenVerboten
                         FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
                         Renderer.TriggerStartAnimation(Sub() Return)
                     Case "c"c 'Sent chat message
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         If source = 9 Then
                             Dim text As String = element.Substring(2)
                             PostChat("[Guest]: " & text, Color.Gray)
@@ -518,43 +517,43 @@ Namespace Game.BetretenVerboten
                             PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
                         End If
                     Case "d"c
-                        Dim source As Integer = CInt(element(1).ToString)
-                        Dim figure As Integer = CInt(element(2).ToString)
-                        Dim aim As Integer = CInt(element.Substring(3))
+                        Dim source As Integer = element(1).ToString
+                        Dim figure As Integer = element(2).ToString
+                        Dim aim As Integer = element.Substring(3)
                         Spielers(source).Spielfiguren(figure) = aim
                     Case "e"c 'Suspend gaem
-                        Dim who As Integer = CInt(element(1).ToString)
+                        Dim who As Integer = element(1).ToString
                         StopUpdating = True
                         Spielers(who).Bereit = False
                         PostChat(Spielers(who).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
                     Case "f"c 'Trigger flying saucer field
                         'Grab data and set flags
-                        Dim pl As Integer = CInt(element(1).ToString)
-                        Dim figur As Integer = CInt(element(2).ToString)
-                        Dim distance As Integer = CInt(element.Substring(3).Split("&"c)(0))
+                        Dim pl As Integer = element(1).ToString
+                        Dim figur As Integer = element(2).ToString
+                        Dim distance As Integer = element.Substring(3).Split("&"c)(0)
                         Dim Field As Integer = Spielers(pl).Spielfiguren(figur)
                         Status = SpielStatus.SaucerFlight
 
 
                         'MY NAME IS NATHAN FIELDING
-                        Dim Nathan_Fielding As Integer = CInt(element.Substring(3).Split("&"c)(1))
+                        Dim Nathan_Fielding As Integer = element.Substring(3).Split("&"c)(1)
 
 
                         If SaucerFields.Contains(Nathan_Fielding) Then SaucerFields.Remove(Nathan_Fielding)
                         Renderer.TriggerSaucerAnimation(FigurFaderZiel, Sub() Spielers(pl).Spielfiguren(figur) = distance, Nothing)
                     Case "g"c 'Generate flying saucer field
-                        Dim pos As Integer = CInt(element.Substring(1))
+                        Dim pos As Integer = element.Substring(1)
                         SaucerFields.Add(pos)
                     Case "k"c 'Kick player by god
-                        Dim pl As Integer = CInt(element(1).ToString)
-                        Dim fig As Integer = CInt(element(2).ToString)
+                        Dim pl As Integer = element(1).ToString
+                        Dim fig As Integer = element(2).ToString
                         KickedByGod(pl, fig)
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
                     Case "n"c 'New player active
-                        Dim who As Integer = CInt(element(1).ToString)
+                        Dim who As Integer = element(1).ToString
                         SpielerIndex = who
                         HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
                         HUDBtnD.Active = SpielerIndex = UserIndex
@@ -566,15 +565,15 @@ Namespace Game.BetretenVerboten
                             Status = SpielStatus.Waitn
                         End If
                     Case "r"c 'Player returned and sync every player
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         HUDInstructions.Text = "Welcome back!"
                         SendSoundFile()
                     Case "s"c 'Create transition
-                        Dim playr As Integer = CInt(element(1).ToString)
-                        Dim figur As Integer = CInt(element(2).ToString)
-                        Dim destination As Integer = CInt(element.Substring(3).ToString)
+                        Dim playr As Integer = element(1).ToString
+                        Dim figur As Integer = element(2).ToString
+                        Dim destination As Integer = element.Substring(3).ToString
 
                         Status = SpielStatus.FahreFelder
                         FigurFaderZiel = (playr, figur)
@@ -652,9 +651,9 @@ Namespace Game.BetretenVerboten
                         SaucerFields = sp.SaucerFields
                     Case "z"c 'Receive sound
                         Dim dataReceiver As New Threading.Thread(Sub()
-                                                                     Dim source As Integer = CInt(element(1).ToString)
+                                                                     Dim source As Integer = element(1).ToString
                                                                      Dim IdentSound As IdentType = CInt(element(2).ToString)
-                                                                     Dim SoundNr As Integer = CInt(element(3).ToString)
+                                                                     Dim SoundNr As Integer = element(3).ToString
                                                                      Dim dat As String = element.Substring(4).Replace("_TATA_", "")
                                                                      If source = UserIndex Then Exit Sub
                                                                      Dim sound As SoundEffect
@@ -729,15 +728,15 @@ Namespace Game.BetretenVerboten
             Dim dataSender As New Threading.Thread(Sub()
                                                        Dim txt As String = ""
                                                        If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
-                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & My.Settings.SoundA.ToString & "0" & "_TATA_" & txt)
 
                                                        txt = ""
                                                        If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
-                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
 
                                                        txt = ""
                                                        If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
             dataSender.Start()
         End Sub
@@ -1047,7 +1046,7 @@ Namespace Game.BetretenVerboten
 
 #Region "Knopfgedrücke"
 
-        Dim chatbtnpressed As Boolean = False
+        Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()
@@ -1082,7 +1081,7 @@ Namespace Game.BetretenVerboten
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                     Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", "You suck!")
                     Try
-                        Dim aim As Integer = CInt(res)
+                        Dim aim As Integer = res
                         Do Until aim < 13 And aim > 0
                             res = Microsoft.VisualBasic.InputBox("Screw you! I said 1 <= x <= 12 FIELDS!", "You suck!")
                             aim = CInt(res)

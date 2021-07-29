@@ -84,7 +84,8 @@ Namespace Game.DropTrop
         Private CPUThinkingTime As Single = 0.6
         Private CPUMoveTime As Integer = 100
         Private CamSpeed As Integer = 1300
-        Sub New(map As GaemMap)
+
+        Public Sub New(map As GaemMap)
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
             SpielfeldSize = CreatorMenu.GetMapSize(map)
@@ -274,7 +275,7 @@ Namespace Game.DropTrop
 
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
-                Dim source As Integer = CInt(element(0).ToString)
+                Dim source As Integer = element(0).ToString
                 Dim command As Char = element(1)
                 Select Case command
                     Case "a"c 'Player arrived
@@ -651,7 +652,7 @@ Namespace Game.DropTrop
 #End Region
 #Region "Knopfgedrücke"
 
-        Dim chatbtnpressed As Boolean = False
+        Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()

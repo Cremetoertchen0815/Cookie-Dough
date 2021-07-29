@@ -4,15 +4,14 @@ Imports System.Linq
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
+Imports Cookie_Dough.Game.Common
 Imports Cookie_Dough.Game.DuoCard.Networking
 Imports Cookie_Dough.Game.DuoCard.Rendering
-Imports Cookie_Dough.Game.Common
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
-Imports Nez
 Imports Nez.Console
 Imports Nez.Tweens
 
@@ -95,14 +94,14 @@ Namespace Game.DuoCard
         Private Const SyncVelocity As Single = 1 / 8
         Private Const SyncDirection As Single = 1 / 4
 
-        Sub New(ins As OnlineGameInstance)
+        Public Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
             NetworkMode = False
 
             If Not LocalClient.JoinGame(ins, Sub(x)
                                                  'Load map info
                                                  PlCount = CInt(x())
-                                                 GameMode = If(CBool(x()), GameMode.Casual, GameMode.Competetive)
+                                                 GameMode = If(x(), GameMode.Casual, GameMode.Competetive)
 
                                                  'Load player info
                                                  ReDim Spielers(PlCount - 1)
@@ -187,7 +186,7 @@ Namespace Game.DuoCard
             Client.OutputDelegate = Sub(x) Return
         End Sub
 
-        Dim scheiß As New List(Of (Integer, Integer))
+        Private scheiß As New List(Of (Integer, Integer))
 
         Public Overrides Sub Update()
             Dim mstate As MouseState = Mouse.GetState()
@@ -259,7 +258,7 @@ Namespace Game.DuoCard
                 Dim command As Char = element(0)
                 Select Case command
                     Case "a"c 'Player arrived
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
@@ -269,7 +268,7 @@ Namespace Game.DuoCard
                         'Set local vs online players
                         Dim stuff As String = element.Substring(1)
                         For i As Integer = 0 To Spielers.Length - 1
-                            If stuff.Contains(CStr(i)) Then Spielers(i).Typ = SpielerTyp.Local
+                            If stuff.Contains(i) Then Spielers(i).Typ = SpielerTyp.Local
                         Next
                         'Init game
                         SendSoundFile()
@@ -279,7 +278,7 @@ Namespace Game.DuoCard
                         FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(1500), New Keyframe3D, StdCam, Sub() StopUpdating = True)
                         Automator.Add(FigurFaderCamera)
                     Case "c"c 'Sent chat message
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         If source = 9 Then
                             Dim text As String = element.Substring(2)
                             PostChat("[Guest]: " & text, Color.Gray)
@@ -292,7 +291,7 @@ Namespace Game.DuoCard
                         StopUpdating = True
                         Renderer.TriggerDeckPullAnimation(Sub() Spielers(UserIndex).HandDeck.Add(card))
                     Case "e"c 'Suspend gaem
-                        Dim who As Integer = CInt(element(1).ToString)
+                        Dim who As Integer = element(1).ToString
                         StopUpdating = True
                         Spielers(who).Bereit = False
                         PostChat(Spielers(who).Name & " left!", Color.White)
@@ -308,7 +307,7 @@ Namespace Game.DuoCard
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
                     Case "n"c 'New player active
-                        Dim who As Integer = CInt(element(1).ToString)
+                        Dim who As Integer = element(1).ToString
                         SpielerIndex = who
                         HUDNameBtn.Active = True
                         If UserIndex < 0 Then Continue For
@@ -318,7 +317,7 @@ Namespace Game.DuoCard
                             Status = CardGameState.Waitn
                         End If
                     Case "r"c 'Player returned and sync every player
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         HUDInstructions.Text = "Welcome back!"
@@ -390,9 +389,9 @@ Namespace Game.DuoCard
                         If UserIndex > -1 Then HUDAfkBtn.Text = If(Spielers(UserIndex).IsAFK, "Back Again", "AFK")
                     Case "z"c 'Receive sound
                         Dim dataReceiver As New Threading.Thread(Sub()
-                                                                     Dim source As Integer = CInt(element(1).ToString)
+                                                                     Dim source As Integer = element(1).ToString
                                                                      Dim IdentSound As IdentType = CInt(element(2).ToString)
-                                                                     Dim SoundNr As Integer = CInt(element(3).ToString)
+                                                                     Dim SoundNr As Integer = element(3).ToString
                                                                      Dim dat As String = element.Substring(4).Replace("_TATA_", "")
                                                                      If source = UserIndex Then Exit Sub
                                                                      Dim sound As SoundEffect
@@ -470,15 +469,15 @@ Namespace Game.DuoCard
             Dim dataSender As New Threading.Thread(Sub()
                                                        Dim txt As String = ""
                                                        If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
-                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & My.Settings.SoundA.ToString & "0" & "_TATA_" & txt)
 
                                                        txt = ""
                                                        If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
-                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
 
                                                        txt = ""
                                                        If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
             dataSender.Start()
         End Sub
@@ -539,7 +538,7 @@ Namespace Game.DuoCard
 
 #Region "Knopfgedrücke"
 
-        Dim chatbtnpressed As Boolean = False
+        Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()

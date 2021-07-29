@@ -1,5 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-Imports System.Text
 
 Namespace Framework.Misc
     Public Class INIReader

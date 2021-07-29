@@ -6,7 +6,7 @@ Namespace Game.Barrelled
     Public Class Object3DHandler
         Inherits SceneComponent
 
-        Sub New(user As EgoPlayer, owner As GameRoom)
+        Public Sub New(user As EgoPlayer, owner As GameRoom)
             Me.user = user
             Me.owner = owner
             InteractBtn = New VirtualButton(New VirtualButton.MouseLeftButton)

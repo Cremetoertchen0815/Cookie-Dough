@@ -39,9 +39,11 @@ Namespace Game.Barrelled.Networking
             If index > -1 Then Players(index) = New BaitNSwitchPlayer(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick, .ID = con.Identifier}
             For i As Integer = 0 To Players.Length - 1
                 If Players(i) IsNot Nothing Then
+                    writer(con, 1.ToString)
                     writer(con, CInt(Players(i).Typ))
                     writer(con, Players(i).Name)
                 Else
+                    writer(con, 0.ToString)
                     writer(con, CInt(SpielerTyp.Online))
                     writer(con, "")
                 End If
@@ -56,7 +58,7 @@ Namespace Game.Barrelled.Networking
         Public Shared Function ServerSendCreateData(ReadString As Func(Of Connection, String), con As Connection, gamename As String, Key As Integer) As IGame
             'Read map from stream and resize arrays accordingly
             Dim map As Map = CInt(ReadString(con))
-            Dim casual As Boolean = CBool(ReadString(con))
+            Dim casual As Boolean = ReadString(con)
             Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .GaemMap = map, .Casual = casual}
             ReDim nugaem.Players(GetMapSize(map) - 1)
             ReDim nugaem.WhiteList(GetMapSize(map) - 1)

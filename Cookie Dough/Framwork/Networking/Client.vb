@@ -34,7 +34,7 @@ Namespace Framework.Networking
         Private naem As String
         Private _LeaveFlag As Boolean = False
 
-        Sub New()
+        Public Sub New()
             Directory.CreateDirectory("Cache\client\")
             If Not File.Exists("Cache\client\pp.png") Then File.Copy("Content\prep\plc.png", "Cache\client\pp.png", True)
         End Sub
@@ -169,10 +169,10 @@ Namespace Framework.Networking
                 Do
                     Dim firstline As String = ReadString()
                     If firstline <> "That's it!" Then
-                        Dim gaem As New OnlineGameInstance With {.Key = CInt(firstline),
+                        Dim gaem As New OnlineGameInstance With {.Key = firstline,
                                                                  .Name = ReadString(),
-                                                                 .Type = CType([Enum].Parse(GetType(GameType), ReadString()), GameType),
-                                                                 .PlayerCount = CInt(ReadString())}
+                                                                 .Type = [Enum].Parse(GetType(GameType), ReadString()),
+                                                                 .PlayerCount = ReadString()}
                         lst.Add(gaem)
                     Else
                         Exit Do
@@ -192,7 +192,7 @@ Namespace Framework.Networking
 
             Try
                 WriteString("membercount")
-                Return CInt(ReadString())
+                Return ReadString()
             Catch ex As Exception
                 NoteError(ex, False)
                 Disconnect()
@@ -202,7 +202,7 @@ Namespace Framework.Networking
 
         Public Function GetAllUsers() As (String, String)()
             WriteString("users")
-            Dim ret As (String, String)() = New(String, String)(CInt(ReadString())) {}
+            Dim ret As (String, String)() = New(String, String)(ReadString()) {}
             For i As Integer = 0 To ret.Length - 1
                 ret(i) = (ReadString(), ReadString())
             Next

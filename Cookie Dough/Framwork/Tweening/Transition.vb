@@ -1,14 +1,10 @@
-﻿
-
-Imports Microsoft.Xna.Framework
-
-Namespace Framework.Tweening
+﻿Namespace Framework.Tweening
 
     <TestState(TestState.Finalized)>
     Public Class Transition(Of T)
         Implements ITransition
 
-        Sub New(TransitionMethod As ITransitionType, StartValue As T, EndValue As T, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
+        Public Sub New(TransitionMethod As ITransitionType, StartValue As T, EndValue As T, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
             'Check whether the tweening manager supports this type
             Dim type As Type = GetType(T)
             If Automator.m_mapManagedTypes.ContainsKey(type) Then
@@ -16,29 +12,29 @@ Namespace Framework.Tweening
 
                 Me.StartValue = StartValue
                 Me.EndValue = EndValue
-                Me.Method = TransitionMethod
+                Method = TransitionMethod
                 Me.FinishAction = FinishAction
-                Me.State = TransitionState.Idle
-                Me.Value = StartValue
+                State = TransitionState.Idle
+                Value = StartValue
                 Me.Stubborn = stubborn
             Else
                 Throw New NotImplementedException("The tweening manager doesn't support " & GetType(T).Name & ".")
             End If
         End Sub
 
-        Sub New()
+        Public Sub New()
             'Check whether the tweening manager supports this type
             Dim type As Type = GetType(T)
             If Automator.m_mapManagedTypes.ContainsKey(type) Then
                 ManagedType = Automator.m_mapManagedTypes(type)
 
-                Me.State = TransitionState.Idle
+                State = TransitionState.Idle
             Else
                 Throw New NotImplementedException("The tweening manager doesn't support " & GetType(T).Name & ".")
             End If
         End Sub
 
-        Sub Update() Implements ITransition.Update
+        Public Sub Update() Implements ITransition.Update
             If Enabled And State = TransitionState.InProgress Then
                 Timer += CInt(Nez.Time.DeltaTime * 1000)
 

@@ -15,7 +15,7 @@ Namespace Game.DuoCard.Rendering
             End Get
         End Property
 
-        Sub New(window As ICardRendererWindow)
+        Public Sub New(window As ICardRendererWindow)
             MyBase.New()
             Me.window = window
         End Sub

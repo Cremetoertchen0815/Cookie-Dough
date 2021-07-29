@@ -186,7 +186,7 @@ Namespace Game.Barrelled
 
 
             'FOVVVVVVVVVVVVV
-            If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then fov = Math.Min(Math.PI - 0.001F, fov + 0.2) : Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(fov, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
+            If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then fov = Math.Min(Math.PI - 0.001F, fov + 0.2) : Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(fov, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Set HUD color
             HUDColor = playcolor(UserIndex)
@@ -203,7 +203,7 @@ Namespace Game.Barrelled
 
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
-                Dim source As Integer = CInt(element(0).ToString)
+                Dim source As Integer = element(0).ToString
                 Dim command As Char = element(1)
                 Select Case command
                     Case "a"c 'Player arrived

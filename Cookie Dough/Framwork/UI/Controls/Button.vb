@@ -3,7 +3,8 @@
 Namespace Framework.UI.Controls
     Public Class Button
         Inherits GuiControl
-        Dim _txt As String = ""
+
+        Private _txt As String = ""
         Public Property Text As String
             Get
                 Return _txt
@@ -19,16 +20,16 @@ Namespace Framework.UI.Controls
         End Property
 
         Public Event Clicked(ByVal sender As Object, ByVal e As EventArgs)
+        Private rect As Rectangle
+        Private par As IParent
 
-        Dim rect As Rectangle
-        Dim par As IParent
-        Sub New(text As String, location As Vector2, size As Vector2)
+        Public Sub New(text As String, location As Vector2, size As Vector2)
             Me.Text = text
             Me.Location = location
             Me.Size = size
-            Me.Color = Color.White
-            Me.Border = New ControlBorder(Color.White, 2)
-            Me.BackgroundColor = New Color(40, 40, 40, 255)
+            Color = Color.White
+            Border = New ControlBorder(Color.White, 2)
+            BackgroundColor = New Color(40, 40, 40, 255)
         End Sub
 
         Public Overrides Sub Init(system As IParent)

@@ -15,7 +15,7 @@ Namespace Game.DropTrop.Renderers
             End Get
         End Property
 
-        Sub New(window As IGameWindow)
+        Public Sub New(window As IGameWindow)
             MyBase.New()
             Me.window = window
         End Sub

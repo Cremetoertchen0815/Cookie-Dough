@@ -46,8 +46,7 @@ Namespace Game.Barrelled.Players
             End Set
         End Property
 
-
-        Sub New(typ As SpielerTyp)
+        Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub
 
@@ -55,7 +54,7 @@ Namespace Game.Barrelled.Players
 
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0), 16))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
-            Entity.AddComponent(New PrototypeSpriteRenderer(15, 15)).SetColor(MatchedColor).SetRenderLayer(5)
+            Entity.AddComponent(New Sprites.SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player"))).SetColor(MatchedColor).SetRenderLayer(5)
             Entity.SetPosition(PlayerSpawn)
         End Sub
 
@@ -126,9 +125,10 @@ Namespace Game.Barrelled.Players
             Mover.CollisionLayer = CollisionLayers(If(LocationY > 10, 1, 0)) 'Adapt collision layer for jump
             Mover.Move(velocity2D, Collider)
             Location = GetLocation()
+            Entity.SetLocalRotation(Mathf.AngleBetweenVectors(New Vector2(movDir.X, -movDir.Z), Vector2.UnitY) * -2 + Math.PI / 2)
 
             'Clamp position and move Y-Pos
-            LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 15)
+            LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 30)
         End Sub
     End Class
 End Namespace

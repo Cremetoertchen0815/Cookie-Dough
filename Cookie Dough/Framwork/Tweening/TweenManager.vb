@@ -7,7 +7,7 @@ Namespace Framework.Tweening
     Public Class TweenManager
         Inherits GlobalManager
 
-        Sub New()
+        Public Sub New()
             'Register Managed Types
             registerType(New ManagedType_Int())
             registerType(New ManagedType_Single())

@@ -1,14 +1,12 @@
 ﻿Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
-Imports Nez
 Imports Nez.UI
 
 Namespace Menu.Intro
     Public Class IntroScene
         Inherits Scene
 
-        Dim uicanvas As UICanvas
+        Private uicanvas As UICanvas
         Public Overrides Sub Initialize()
             MyBase.Initialize()
             ClearColor = Color.Black

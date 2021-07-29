@@ -7,9 +7,10 @@ Namespace Framework.Tweening.TransitionTypes
         Inherits TransitionType_UserDefined
 
         Public Sub New(ByVal iTransitionTime As Integer)
-            Dim elements As IList(Of TransitionElement) = New List(Of TransitionElement)()
-            elements.Add(New TransitionElement(50, 100, InterpolationMethod.Accleration))
-            elements.Add(New TransitionElement(100, 0, InterpolationMethod.Deceleration))
+            Dim elements As IList(Of TransitionElement) = New List(Of TransitionElement) From {
+                New TransitionElement(50, 100, InterpolationMethod.Accleration),
+                New TransitionElement(100, 0, InterpolationMethod.Deceleration)
+            }
             MyBase.setup(elements, iTransitionTime)
         End Sub
     End Class

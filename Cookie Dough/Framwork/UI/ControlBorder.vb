@@ -2,7 +2,7 @@
 
 Namespace Framework.UI
     Public Structure ControlBorder
-        Sub New(Color As Color, Width As Integer)
+        Public Sub New(Color As Color, Width As Integer)
             Me.Color = Color
             Me.Width = Width
         End Sub

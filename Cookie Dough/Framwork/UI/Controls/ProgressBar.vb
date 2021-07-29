@@ -11,16 +11,17 @@ Namespace Framework.UI.Controls
             End Get
         End Property
 
-        Dim rect As Rectangle
-        Dim par As IParent
-        Sub New(location As Vector2, size As Vector2)
-            Me.Progress = Function() 0.5
-            Me.Max = 1
+        Private rect As Rectangle
+        Private par As IParent
+
+        Public Sub New(location As Vector2, size As Vector2)
+            Progress = Function() 0.5
+            Max = 1
             Me.Location = location
             Me.Size = size
-            Me.Color = Color.White
-            Me.Border = New ControlBorder(Color.White, 2)
-            Me.BackgroundColor = New Color(40, 40, 40, 255)
+            Color = Color.White
+            Border = New ControlBorder(Color.White, 2)
+            BackgroundColor = New Color(40, 40, 40, 255)
         End Sub
 
         Public Overrides Sub Init(system As IParent)

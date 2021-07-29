@@ -1,6 +1,4 @@
-﻿Imports System.Collections.Generic
-
-Namespace Game.DuoCard.Networking
+﻿Namespace Game.DuoCard.Networking
     Public Structure SyncMessage
         Public Spielers As Player()
         Public TableCard As Common.Card

@@ -115,7 +115,8 @@ Namespace Game.BetretenVerboten
         Private Const CamSpeed As Integer = 1300
         Private Const SacrificeWait As Integer = 5
         Private SaucerChance As Integer = 18
-        Sub New(Map As GaemMap)
+
+        Public Sub New(Map As GaemMap)
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
             WürfelTimer = 0
@@ -704,7 +705,7 @@ Namespace Game.BetretenVerboten
             Try
                 Dim data As String() = LocalClient.ReadStream()
                 For Each element In data
-                    Dim source As Integer = CInt(element(0).ToString)
+                    Dim source As Integer = element(0).ToString
                     Dim command As Char = element(1)
                     Select Case command
                         Case "a"c 'Player arrived
@@ -738,7 +739,7 @@ Namespace Game.BetretenVerboten
                             Spielers(source).IsAFK = Not Spielers(source).IsAFK
                             SendSync()
                         Case "j"c 'God got activated
-                            Dim figur As Integer = CInt(element(2).ToString)
+                            Dim figur As Integer = element(2).ToString
                             DontKickSacrifice = Spielers(source).SacrificeCounter < 0
                             Spielers(source).SacrificeCounter = SacrificeWait
                             Sacrifice(source, figur)
@@ -765,8 +766,8 @@ Namespace Game.BetretenVerboten
                             If everythere And Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
                             If everythere And StopWhenRealStart Then StopWhenRealStart = False
                         Case "s"c 'Move figure
-                            Dim figur As Integer = CInt(element(2).ToString)
-                            Dim destination As Integer = CInt(element.Substring(3).ToString)
+                            Dim figur As Integer = element(2).ToString
+                            Dim destination As Integer = element.Substring(3).ToString
                             SendFigureTransition(source, figur, destination)
                             'Animiere wie die Figur sich nach vorne bewegt, anschließend kehre zurück zum nichts tun
                             Dim defaultmov As Integer = Math.Max(Spielers(source).Spielfiguren(figur), 0)
@@ -778,7 +779,7 @@ Namespace Game.BetretenVerboten
                         Case "z"c 'Transmit user data
                             Dim s As New Threading.Thread(Sub()
                                                               Dim IdentSound As IdentType = CInt(element(2).ToString)
-                                                              Dim dataNr As Integer = CInt(element(3).ToString)
+                                                              Dim dataNr As Integer = element(3).ToString
                                                               Dim dat As String = element.Substring(4).Replace("_TATA_", "")
                                                               Try
                                                                   If dataNr = 9 Then
@@ -902,7 +903,7 @@ Namespace Game.BetretenVerboten
                                                                'Send Thumbnail
                                                                txt = ""
                                                                If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = Global.Cookie_Dough.SpielerTyp.Local, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                            End If
                                                        Next
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
@@ -1584,7 +1585,7 @@ Namespace Game.BetretenVerboten
 #End Region
 #Region "Knopfgedrücke"
 
-        Dim chatbtnpressed As Boolean = False
+        Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()
@@ -1620,7 +1621,7 @@ Namespace Game.BetretenVerboten
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                     Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", "You suck!")
                     Try
-                        Dim aim As Integer = CInt(res)
+                        Dim aim As Integer = res
                         Do Until aim < 13 And aim > 0
                             res = Microsoft.VisualBasic.InputBox("Screw you! I said 1 <= x <= 12 FIELDS!", "You suck!")
                             aim = CInt(res)

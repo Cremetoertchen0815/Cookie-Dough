@@ -30,8 +30,8 @@ Namespace Game.Megäa
 
         Private HandTransformOrigin As Keyframe3D
 
-        Sub New(type As SpielerTyp)
-            Me.Typ = type
+        Public Sub New(type As SpielerTyp)
+            Typ = type
         End Sub
 
         Friend Sub SetLockPosition()

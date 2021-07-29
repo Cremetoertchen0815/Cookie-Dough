@@ -1,6 +1,4 @@
 ﻿Imports System.Reflection
-Imports Microsoft.Xna.Framework
-Imports Nez
 
 Namespace Framework.Tweening
 
@@ -8,7 +6,7 @@ Namespace Framework.Tweening
     Public Class PropertyTransition
         Implements ITransition
 
-        Sub New(TransitionMethod As ITransitionType, target As Object, propertyName As String, EndValue As Object, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
+        Public Sub New(TransitionMethod As ITransitionType, target As Object, propertyName As String, EndValue As Object, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
             'Check whether the tweening manager supports this type
 
             Dim targetType As Type = target.GetType()
@@ -25,18 +23,19 @@ Namespace Framework.Tweening
                 [Property] = propertyInfo
                 PropertyType = type
                 Me.Target = target
-                Me.StartValue = propertyInfo.GetValue(target)
+                StartValue = propertyInfo.GetValue(target)
                 Me.EndValue = EndValue
-                Me.Method = TransitionMethod
+                Method = TransitionMethod
                 Me.FinishAction = FinishAction
-                Me.State = TransitionState.Idle
-                Me.Value = StartValue
+                State = TransitionState.Idle
+                Value = StartValue
                 Me.Stubborn = stubborn
             Else
                 Throw New NotImplementedException("The tweening manager doesn't support " & type.Name & ".")
             End If
         End Sub
-        Sub New(TransitionMethod As ITransitionType, target As Object, propertyInfo As PropertyInfo, EndValue As Object, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
+
+        Public Sub New(TransitionMethod As ITransitionType, target As Object, propertyInfo As PropertyInfo, EndValue As Object, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
             'Check whether the tweening manager supports this type
 
             Dim type As Type = propertyInfo.PropertyType
@@ -47,17 +46,17 @@ Namespace Framework.Tweening
                 PropertyType = type
                 Me.Target = target
                 Me.EndValue = EndValue
-                Me.Method = TransitionMethod
+                Method = TransitionMethod
                 Me.FinishAction = FinishAction
-                Me.State = TransitionState.Idle
-                Me.Value = StartValue
+                State = TransitionState.Idle
+                Value = StartValue
                 Me.Stubborn = stubborn
             Else
                 Throw New NotImplementedException("The tweening manager doesn't support " & type.Name & ".")
             End If
         End Sub
 
-        Sub Update() Implements ITransition.Update
+        Public Sub Update() Implements ITransition.Update
             If Enabled And State = TransitionState.InProgress Then
                 Timer += CInt(Time.DeltaTime * 1000)
 

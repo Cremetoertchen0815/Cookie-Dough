@@ -1,6 +1,5 @@
 ﻿Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
-Imports Microsoft.Xna.Framework.Input
 
 Namespace Framework.UI.Controls
     Public Class NumericUpDown
@@ -38,14 +37,15 @@ Namespace Framework.UI.Controls
         Public Delegate Function OutputFormatter(input As Single) As String
 
         'Private flags
-        Dim rect As Rectangle
-        Dim bgrect As Rectangle
-        Dim par As IParent
-        Sub New(text As String, location As Vector2)
+        Private rect As Rectangle
+        Private bgrect As Rectangle
+        Private par As IParent
+
+        Public Sub New(text As String, location As Vector2)
             Me.Text = text
             Me.Location = location
-            Me.Color = Color.White
-            Me.Border = New ControlBorder(Color.White, 0)
+            Color = Color.White
+            Border = New ControlBorder(Color.White, 0)
         End Sub
 
         Public Overrides Sub Init(system As IParent)

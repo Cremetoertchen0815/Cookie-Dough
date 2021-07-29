@@ -8,7 +8,7 @@ Imports System.Threading
 Imports Nez.Console
 
 Namespace Framework.Networking
-    Module Server
+    Friend Module Server
         Public Property ServerActive As Boolean
 
         Public Const Port As Integer = 187
@@ -65,8 +65,9 @@ Namespace Framework.Networking
                         client = server.AcceptTcpClient
                         client.LingerState.Enabled = True
                         client.LingerState.LingerTime = 1000
-                        Dim c As New Connection ' und erstellen für die neue verbindung eine neue connection...
-                        c.Stream = client.GetStream
+                        Dim c As New Connection With {
+                            .Stream = client.GetStream
+                        } ' und erstellen für die neue verbindung eine neue connection...
                         c.StreamR = New StreamReader(c.Stream)
                         c.StreamW = New StreamWriter(c.Stream) With {.AutoFlush = True}
                         c.Client = client
@@ -148,7 +149,7 @@ Namespace Framework.Networking
                             Next
                         Case "join"
                             Try
-                                Dim id As Integer = CInt(ReadString(con))
+                                Dim id As Integer = ReadString(con)
                                 Dim gaem As IGame = games(id)
                                 Dim index As Integer = -1
                                 gaem.ServerSendJoinGlobalData(con, AddressOf WriteString)
@@ -318,8 +319,8 @@ Namespace Framework.Networking
                             SendToAllGameClients(gaem, nl)
                         Case "h"c
                             'Receive player scores
-                            Dim game As Integer = CInt(nl(1).ToString)
-                            Dim map As Integer = CInt(nl(2).ToString)
+                            Dim game As Integer = nl(1).ToString
+                            Dim map As Integer = nl(2).ToString
                             Dim path As String = "Save\highsc" & game.ToString & map.ToString & ".dat"
                             Dim highscore As List(Of (String, Integer))
                             Dim data As List(Of (String, Integer)) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(nl.Substring(3))
@@ -367,8 +368,8 @@ Namespace Framework.Networking
                             Exit Try
                         Case "e"c
                             'If remote client lost connection, send to all other remotes and add relist game
-                            Dim who As Integer = CInt(nl(1).ToString)
-                            If Not games.ContainsKey(gaem.Key) And Not gaem.Ended = EndingMode.Properly Then games.Add(gaem.Key, gaem)
+                            Dim who As Integer = nl(1).ToString
+                            If Not games.ContainsKey(gaem.Key) And Not gaem.Ended = Global.Cookie_Dough.EndingMode.Properly Then games.Add(gaem.Key, gaem)
 
                             SendToAllGameClients(gaem, nl)
 
@@ -420,7 +421,7 @@ Namespace Framework.Networking
         Private Sub SendToAllGameClients(gaem As IGame, msg As String, Optional IgnoreLocals As Boolean = True)
             'Send to online players
             For i As Integer = 0 To gaem.Players.Length - 1
-                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing Then WriteString(gaem.Players(i).Connection, msg)
+                If gaem.Players(i) IsNot Nothing AndAlso gaem.Players(i).Typ = SpielerTyp.Online AndAlso gaem.Players(i).Connection IsNot Nothing AndAlso (gaem.Type <> GameType.Barrelled OrElse gaem.Players(i).Bereit) Then WriteString(gaem.Players(i).Connection, msg)
             Next
 
             'Send to host

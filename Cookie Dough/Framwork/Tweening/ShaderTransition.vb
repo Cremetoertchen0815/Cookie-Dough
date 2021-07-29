@@ -1,13 +1,11 @@
-﻿
-Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Graphics
+﻿Imports Microsoft.Xna.Framework.Graphics
 Namespace Framework.Tweening
 
     <TestState(TestState.Finalized)>
     Public Class ShaderTransition
         Implements ITransition
 
-        Sub New(TransitionMethod As ITransitionType, StartValue As Object, EndValue As Object, shader As Effect, parameter As String, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
+        Public Sub New(TransitionMethod As ITransitionType, StartValue As Object, EndValue As Object, shader As Effect, parameter As String, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
             'Check whether the tweening manager supports this type
 
             Dim typeA As Type = StartValue.GetType()
@@ -18,7 +16,7 @@ Namespace Framework.Tweening
 
                 Me.StartValue = StartValue
                 Me.EndValue = EndValue
-                Me.Method = TransitionMethod
+                Method = TransitionMethod
                 Me.Shader = shader
                 Me.Parameter = shader.Parameters(parameter)
                 Me.FinishAction = FinishAction
@@ -27,11 +25,11 @@ Namespace Framework.Tweening
                 'If the type is correct, set parameter
                 Try
                     shader.Parameters(parameter).SetValue(StartValue)
-                    Me.State = TransitionState.Idle
+                    State = TransitionState.Idle
                 Catch ex As InvalidCastException
                     Throw New NotImplementedException("The named parameter doesn't correspond to the type of the start/end value!")
                 End Try
-                Me.State = TransitionState.Idle
+                State = TransitionState.Idle
             ElseIf typeA <> typeB Then
                 Throw New NotImplementedException("Start and End value are different types!")
             Else
@@ -39,7 +37,8 @@ Namespace Framework.Tweening
             End If
 
         End Sub
-        Sub New(TransitionMethod As ITransitionType, StartValue As Object, EndValue As Object, shader As Effect, parameter As Integer, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
+
+        Public Sub New(TransitionMethod As ITransitionType, StartValue As Object, EndValue As Object, shader As Effect, parameter As Integer, FinishAction As FinishedDelegate, Optional stubborn As Boolean = False)
             'Check whether the tweening manager supports this type
 
             Dim typeA As Type = StartValue.GetType()
@@ -50,7 +49,7 @@ Namespace Framework.Tweening
 
                 Me.StartValue = StartValue
                 Me.EndValue = EndValue
-                Me.Method = TransitionMethod
+                Method = TransitionMethod
                 Me.Shader = shader
                 Me.Parameter = shader.Parameters(parameter)
                 Me.FinishAction = FinishAction
@@ -59,11 +58,11 @@ Namespace Framework.Tweening
                 'If the type is correct, set parameter
                 Try
                     shader.Parameters(parameter).SetValue(StartValue)
-                    Me.State = TransitionState.Idle
+                    State = TransitionState.Idle
                 Catch ex As InvalidCastException
                     Throw New NotImplementedException("The named parameter doesn't correspond to the type of the start/end value!")
                 End Try
-                Me.State = TransitionState.Idle
+                State = TransitionState.Idle
             ElseIf typeA <> typeB Then
                 Throw New NotImplementedException("Start and End value are different types!")
             Else
@@ -72,12 +71,12 @@ Namespace Framework.Tweening
 
         End Sub
 
-        Sub New()
+        Public Sub New()
             ManagedType = Automator.m_mapManagedTypes(GetType(Single))
-            Me.State = TransitionState.Idle
+            State = TransitionState.Idle
         End Sub
 
-        Sub Update() Implements ITransition.Update
+        Public Sub Update() Implements ITransition.Update
             If Enabled And State = TransitionState.InProgress Then
                 Timer += CInt(Nez.Time.DeltaTime * 1000)
 

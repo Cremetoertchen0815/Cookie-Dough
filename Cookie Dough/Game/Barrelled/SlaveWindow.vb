@@ -79,7 +79,7 @@ Namespace Game.Barrelled
         Private Const WaitinTime As Integer = 1500
         Private Const SyncLoc As Single = 0.05F
 
-        Sub New(ins As OnlineGameInstance)
+        Public Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
             NetworkMode = False
 
@@ -87,19 +87,23 @@ Namespace Game.Barrelled
                                                  'Load map info
                                                  Map = CInt(x())
                                                  PlCount = GetMapSize(Map)
-                                                 GameMode = If(CBool(x()), GameMode.Casual, GameMode.Competetive)
+                                                 GameMode = If(x(), GameMode.Casual, GameMode.Competetive)
 
                                                  'Load player info
                                                  ReDim Spielers(PlCount - 1)
                                                  UserIndex = CInt(x())
                                                  For i As Integer = 0 To PlCount - 1
+                                                     Dim readde As Boolean = x() = 1 Or i = 0
                                                      Dim type As SpielerTyp = CInt(x())
                                                      Dim name As String = x()
                                                      If i <> UserIndex Then
-                                                         Spielers(i) = New OtherPlayer(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = name}
+                                                         Spielers(i) = New OtherPlayer(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = name, .Bereit = readde}
+                                                         If readde Then CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
                                                      Else
                                                          Spielers(i) = New EgoPlayer(SpielerTyp.Online) With {.Name = My.Settings.Username}
+                                                         EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(UserIndex))
                                                      End If
+                                                     Spielers(i).MatchedColor = playcolor(i)
                                                  Next
 
                                                  'Set rejoin flag
@@ -151,15 +155,6 @@ Namespace Game.Barrelled
             'Load minimap renderer
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
             CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New TargetRendererable(MinimapRenderer))
-
-            For i As Integer = 0 To Spielers.Length - 1
-                If i = UserIndex Then
-                    EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(UserIndex))
-                Else
-                    CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
-                End If
-                Spielers(i).MatchedColor = playcolor(i)
-            Next
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
             'Create entities and components
@@ -236,7 +231,7 @@ Namespace Game.Barrelled
             If NetworkMode Then ReadAndProcessInputData()
 
             'FOVVVVVVVVVVVVV
-            If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then fov = Math.Min(Math.PI - 0.001F, fov + 0.2) : Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(fov, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
+            If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then fov = Math.Min(Math.PI - 0.001F, fov + 0.2) : Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(fov, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Set HUD color
             HUDColor = playcolor(UserIndex)
@@ -257,17 +252,19 @@ Namespace Game.Barrelled
                 Dim command As Char = element(0)
                 Select Case command
                     Case "a"c 'Player arrived
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
+                        Spielers(source).MatchedColor = playcolor(source)
+                        If source <> UserIndex Then CreateEntity(txt(0)).AddComponent(Spielers(source))
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
                         'Set local vs online players
                         Dim stuff As String = element.Substring(1)
                         For i As Integer = 0 To Spielers.Length - 1
-                            If stuff.Contains(CStr(i)) Then Spielers(i).Typ = SpielerTyp.Local
+                            If stuff.Contains(i) Then Spielers(i).Typ = SpielerTyp.Local
                         Next
                         'Init game
                         SendSoundFile()
@@ -275,7 +272,7 @@ Namespace Game.Barrelled
                         Status = CardGameState.Waitn
                         PostChat("The game has started!", Color.White)
                     Case "c"c 'Sent chat message
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         If source = 9 Then
                             Dim text As String = element.Substring(2)
                             PostChat("[Guest]: " & text, Color.Gray)
@@ -283,13 +280,13 @@ Namespace Game.Barrelled
                             PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
                         End If
                     Case "e"c 'Suspend gaem
-                        Dim who As Integer = CInt(element(1).ToString)
+                        Dim who As Integer = element(1).ToString
                         StopUpdating = True
                         Spielers(who).Bereit = False
                         PostChat(Spielers(who).Name & " left!", Color.White)
                         PostChat("The game is being suspended!", Color.White)
                     Case "g"c
-                        Dim pl As Integer = CInt(element(1).ToString)
+                        Dim pl As Integer = element(1).ToString
                         If pl = UserIndex Then Exit Select
                         Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(element.Substring(2))
                         Spielers(pl).Location = dat.Item1
@@ -300,7 +297,7 @@ Namespace Game.Barrelled
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
                     Case "r"c 'Player returned and sync every player
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         HUDInstructions.Text = "Welcome back!"
@@ -369,9 +366,9 @@ Namespace Game.Barrelled
                         'If UserIndex > -1 Then HUDAfkBtn.Text = If(Spielers(UserIndex).IsAFK, "Back Again", "AFK")
                     Case "z"c 'Receive sound
                         Dim dataReceiver As New Threading.Thread(Sub()
-                                                                     Dim source As Integer = CInt(element(1).ToString)
+                                                                     Dim source As Integer = element(1).ToString
                                                                      Dim IdentSound As IdentType = CInt(element(2).ToString)
-                                                                     Dim SoundNr As Integer = CInt(element(3).ToString)
+                                                                     Dim SoundNr As Integer = element(3).ToString
                                                                      Dim dat As String = element.Substring(4).Replace("_TATA_", "")
                                                                      If source = UserIndex Then Exit Sub
                                                                      Dim sound As SoundEffect
@@ -458,15 +455,15 @@ Namespace Game.Barrelled
             Dim dataSender As New Threading.Thread(Sub()
                                                        Dim txt As String = ""
                                                        If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
-                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundA).ToString & "0" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & My.Settings.SoundA.ToString & "0" & "_TATA_" & txt)
 
                                                        txt = ""
                                                        If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
-                                                       LocalClient.WriteStream("z" & CInt(My.Settings.SoundB).ToString & "1" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
 
                                                        txt = ""
                                                        If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
             dataSender.Start()
         End Sub

@@ -1,8 +1,5 @@
 ﻿Imports System.Collections.Generic
 Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Graphics
-Imports Microsoft.Xna.Framework.Input
-Imports Nez
 
 Namespace Framework.UI
     Public MustInherit Class GuiControl

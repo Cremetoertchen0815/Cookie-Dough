@@ -9,13 +9,13 @@
         End Function
 
         Public Function copy(ByVal o As Object) As Object Implements IManagedType.copy
-            Dim f As Single = CSng(o)
+            Dim f As Single = o
             Return f
         End Function
 
         Public Function getIntermediateValue(ByVal start As Object, ByVal [end] As Object, ByVal dPercentage As Double) As Object Implements IManagedType.getIntermediateValue
-            Dim fStart As Single = CSng(start)
-            Dim fEnd As Single = CSng([end])
+            Dim fStart As Single = start
+            Dim fEnd As Single = [end]
             Return interpolate(fStart, fEnd, dPercentage)
         End Function
     End Class

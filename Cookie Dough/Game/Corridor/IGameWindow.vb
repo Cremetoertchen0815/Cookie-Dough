@@ -1,6 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.UI
-Imports Microsoft.Xna.Framework
+﻿Imports Cookie_Dough.Framework.UI
 Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Game.Corridor

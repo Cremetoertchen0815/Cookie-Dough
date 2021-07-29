@@ -91,7 +91,7 @@ Namespace Game.BetretenVerboten
                             StartNewRound("")
                         End If
                     End If
-                    Else
+                Else
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
                     If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
                     If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
@@ -220,7 +220,7 @@ Namespace Game.BetretenVerboten
             Private MediumFont As NezSpriteFont
             Private instance As CreatorMenu
 
-            Sub New(instance As CreatorMenu)
+            Public Sub New(instance As CreatorMenu)
                 MyBase.New()
                 Me.instance = instance
             End Sub

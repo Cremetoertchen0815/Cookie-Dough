@@ -2,7 +2,6 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
-Imports Nez
 
 Namespace Framework.UI
     Public Class GuiSystem
@@ -23,17 +22,16 @@ Namespace Framework.UI
         End Property
         Private ReadOnly Property IUpdatable_Enabled As Boolean = True Implements IUpdatable.Enabled
         Private ReadOnly Property IUpdatable_UpdateOrder As Integer = 0 Implements IUpdatable.UpdateOrder
-
-        Dim __Bounds As New Rectangle(0, 0, 1920, 1080)
+        Private __Bounds As New Rectangle(0, 0, 1920, 1080)
 
         Public Shared FastScrollThreshold As UInteger = 400
 
         'Fast Scrolling
-        Dim lens As Integer
-        Dim cnt As Integer
-        Dim fullblast As Boolean
+        Private lens As Integer
+        Private cnt As Integer
+        Private fullblast As Boolean
 
-        Dim lastmstate As MouseState
+        Private lastmstate As MouseState
 
         Public Overrides Sub OnAddedToEntity()
             GlobalFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/fnt_HKG_17_M"))

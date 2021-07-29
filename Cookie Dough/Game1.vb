@@ -11,7 +11,8 @@ Imports Microsoft.Xna.Framework.Media
 ' </summary>
 Public Class Game1
     Inherits Core
-    Sub New()
+
+    Public Sub New()
         MyBase.New(1920, 1080, False, "Cookie Dough - Just another games collection", "Content")
         Window.Title = " "
     End Sub

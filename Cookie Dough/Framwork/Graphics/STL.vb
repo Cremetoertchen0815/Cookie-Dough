@@ -95,8 +95,8 @@ Namespace Framework.Graphics
                         .nfacets = BitConverter.ToUInt32(tb, 0)
                     End With
                     Dim retval As Facet
-                    ReDim .Facets(CInt(.STLHeader.nfacets))
-                    For i As Int32 = 0 To CInt(.STLHeader.nfacets) - 1
+                    ReDim .Facets(.STLHeader.nfacets)
+                    For i As Integer = 0 To CInt(.STLHeader.nfacets) - 1
                         retval = New Facet
                         With retval
                             With .normal

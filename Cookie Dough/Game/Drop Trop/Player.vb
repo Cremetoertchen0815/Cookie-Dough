@@ -1,6 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
-Imports Microsoft.Xna.Framework
+﻿Imports Cookie_Dough.Framework.Networking
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Newtonsoft.Json
@@ -60,7 +58,7 @@ Namespace Game.DropTrop
         Public Property ID As String Implements IPlayer.ID
         Public Property MOTD As String Implements IPlayer.MOTD
 
-        Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)
+        Public Sub New(typ As SpielerTyp, Optional schwierigkeit As Difficulty = Difficulty.Smart)
             Me.Typ = typ
             Me.Schwierigkeit = schwierigkeit
         End Sub

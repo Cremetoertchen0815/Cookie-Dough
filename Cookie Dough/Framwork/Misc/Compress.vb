@@ -6,7 +6,7 @@ Public Module Compress
     ''' <summary>
     ''' Compresses a Byte() array using the GZIP algorithm
     ''' </summary>
-    Function Compress(ByVal toCompress As Byte()) As Byte()
+    Public Function Compress(ByVal toCompress As Byte()) As Byte()
         ' Get the stream of the source file.
         Using inputStream As MemoryStream = New MemoryStream(toCompress)
 
@@ -30,7 +30,7 @@ Public Module Compress
     ''' <summary>
     ''' Decompresses a Byte() array using the GZIP algorithm.
     ''' </summary>
-    Function Decompress(ByVal toDecompress As Byte()) As Byte()
+    Public Function Decompress(ByVal toDecompress As Byte()) As Byte()
         ' Get the stream of the source file.
         Using inputStream As MemoryStream = New MemoryStream(toDecompress)
 

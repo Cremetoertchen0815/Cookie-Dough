@@ -1,7 +1,7 @@
 ﻿Imports Microsoft.Xna.Framework
 
 Namespace Game.BetretenVerboten
-    Module Maps
+    Friend Module Maps
         Friend Function RollDice(Optional hard As Boolean = False) As Integer
             If hard Then Return (Nez.Random.Range(0, 17) Mod 6) + 1
             Return Nez.Random.Range(1, 7)

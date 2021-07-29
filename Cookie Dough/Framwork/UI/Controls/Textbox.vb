@@ -27,17 +27,17 @@ Namespace Framework.UI.Controls
         Public Delegate Sub ValueChange(x As String)
 
         Private Shared winopen As Boolean = False
-        Dim workingtext As String
-        Dim rect As Rectangle
-        Dim par As IParent
+        Private workingtext As String
+        Private rect As Rectangle
+        Private par As IParent
 
-        Sub New(location As Vector2, text As String, value As String, validcheck As ValidityCheck, Optional ValueChanger As ValueChange = Nothing)
+        Public Sub New(location As Vector2, text As String, value As String, validcheck As ValidityCheck, Optional ValueChanger As ValueChange = Nothing)
             Me.Text = text
             Me.Location = location
             Me.ValidCheck = validcheck
             Me.ValueChanger = ValueChanger
             Me.Value = value
-            Me.Color = Color.White
+            Color = Color.White
             workingtext = ""
         End Sub
 

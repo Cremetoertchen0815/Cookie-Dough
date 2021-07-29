@@ -15,7 +15,7 @@ Namespace Game.Barrelled.Players
         Public Overrides Sub Update()
         End Sub
 
-        Sub New(typ As SpielerTyp)
+        Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub
     End Class

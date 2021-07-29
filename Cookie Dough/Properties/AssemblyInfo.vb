@@ -1,6 +1,5 @@
-﻿Imports System.Resources
-Imports System.Reflection
-Imports System.Runtime.CompilerServices
+﻿Imports System.Reflection
+Imports System.Resources
 Imports System.Runtime.InteropServices
 
 ' General Information about an assembly is controlled through the following 

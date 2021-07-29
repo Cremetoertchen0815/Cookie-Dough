@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Generic
-Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.Common
 Imports Cookie_Dough.Game.Megäa.Renderers
@@ -218,7 +217,7 @@ Namespace Game.Megäa
                     .Direction = nudirection
 
                     Dim pos = Core.Instance.Window.ClientBounds.Size
-                    Mouse.SetPosition(CInt(pos.X / 2), CInt(pos.Y / 2))
+                    Mouse.SetPosition(pos.X / 2, pos.Y / 2)
                 End If
 
                 If NetworkMode And Not .PositionLocked Then SendPlayerMoved(UserIndex, .Location, .Direction)
@@ -283,7 +282,7 @@ Namespace Game.Megäa
 
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
-                Dim source As Integer = CInt(element(0).ToString)
+                Dim source As Integer = element(0).ToString
                 Dim command As Char = element(1)
                 Select Case command
                     Case "a"c 'Player arrived
@@ -425,12 +424,12 @@ Namespace Game.Megäa
         End Sub
 
         Friend Sub GenerateDecks()
-            Dim div As Integer = CInt(Math.Ceiling(80 / Spielers.Count))
+            Dim div As Integer = Math.Ceiling(80 / Spielers.Count)
             For Each pl In Spielers
                 pl.Deck.Clear()
 
                 For i As Integer = 1 To div
-                    pl.Deck.Add(CType(Nez.Random.Range(0, 75), Card))
+                    pl.Deck.Add(Nez.Random.Range(0, 75))
                 Next
             Next
         End Sub

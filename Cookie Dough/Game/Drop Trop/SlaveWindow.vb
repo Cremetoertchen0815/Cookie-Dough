@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Generic
-Imports System.IO
 Imports System.Linq
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
@@ -87,7 +86,8 @@ Namespace Game.DropTrop
         Private CPUThinkingTime As Single = 0.6
         Private CPUMoveTime As Integer = 100
         Private CamSpeed As Integer = 1300
-        Sub New(ins As OnlineGameInstance)
+
+        Public Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
             NetworkMode = False
 
@@ -124,7 +124,7 @@ Namespace Game.DropTrop
             Chat = New List(Of (String, Color))
             Status = SpielStatus.WarteAufOnlineSpieler
             MoveActive = False
-            Me.Map = Map
+            Map = Map
             CoreInstance = CType(Core.Instance, Cookie_Dough.Game1)
             Timer = New TimeSpan(0, 0, 22, 22, 22)
             LastTimer = Timer
@@ -282,7 +282,7 @@ Namespace Game.DropTrop
                 Dim command As Char = element(0)
                 Select Case command
                     Case "a"c 'Player arrived
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Spielers(source).Name = element.Substring(2)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
@@ -291,10 +291,10 @@ Namespace Game.DropTrop
                         Status = SpielStatus.Waitn
                         PostChat("The game has started!", Color.White)
                     Case "c"c 'Sent chat message
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
                     Case "e"c 'Suspend gaem
-                        Dim who As Integer = CInt(element(1).ToString)
+                        Dim who As Integer = element(1).ToString
                         StopUpdating = True
                         Spielers(who).Bereit = False
                         PostChat(Spielers(who).Name & " left!", Color.White)
@@ -303,7 +303,7 @@ Namespace Game.DropTrop
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
                     Case "n"c 'Next player
-                        Dim who As Integer = CInt(element(1).ToString)
+                        Dim who As Integer = element(1).ToString
                         SpielerIndex = who
                         If who = UserIndex Then
                             PrepareMove()
@@ -311,7 +311,7 @@ Namespace Game.DropTrop
                             Status = SpielStatus.Waitn
                         End If
                     Case "r"c 'Player returned and sync every player
-                        Dim source As Integer = CInt(element(1).ToString)
+                        Dim source As Integer = element(1).ToString
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         HUDInstructions.Text = "Welcome back!"
@@ -641,7 +641,7 @@ Namespace Game.DropTrop
 #End Region
 #Region "Knopfgedrücke"
 
-        Dim chatbtnpressed As Boolean = False
+        Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()

@@ -91,7 +91,7 @@ Namespace Framework.Physics
 
             Entity.Position = mPosition
 
-            End Sub
+        End Sub
 
         Public Shadows Property Enabled As Boolean
             Get
@@ -248,7 +248,7 @@ Namespace Framework.Physics
             Dim newTopRight As Vector2 = RoundVector(newBottomRight + New Vector2(0.0F, mAABB.halfSize.Y * 2.0F))
 
             Dim endX As Integer = GetMapTileXAtPoint(newBottomRight.X)
-            Dim begX As Integer = Math.Min(GetMapTileXAtPoint(oldBottomRight.X) + 1, endX)
+            Dim begX As Integer = Math.Min(GetMapTileXAtPoint(oldBottomRight.X) + 5, endX)
             Dim dist As Integer = Math.Max(Math.Abs(endX - begX), 1)
 
             Dim tileIndexY As Integer
@@ -279,11 +279,11 @@ Namespace Framework.Physics
 
 
         Private Function GetMapTileYAtPoint(ByVal y As Single) As Integer
-            Return CInt(Math.Truncate(y / CSng(mTileSize)))
+            Return Math.Truncate(y / mTileSize)
         End Function
 
         Private Function GetMapTileXAtPoint(ByVal x As Single) As Integer
-            Return CInt(Math.Truncate((x) / CSng(mTileSize)))
+            Return Math.Truncate((x) / mTileSize)
         End Function
     End Class
 End Namespace

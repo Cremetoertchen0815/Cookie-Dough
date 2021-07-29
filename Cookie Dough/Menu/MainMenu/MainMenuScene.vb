@@ -4,7 +4,6 @@ Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
-Imports Nez
 
 Namespace Menu.MainMenu
     Public Class MainMenuScene
@@ -12,7 +11,7 @@ Namespace Menu.MainMenu
 
         Friend GameList As (String, String, Boolean)() '(IG name, orig. name, is available)()
 
-        Dim rend As MainMenuRenderer
+        Private rend As MainMenuRenderer
         Private lastmstate As MouseState
 
         Private ChangeNameButtonPressed As Boolean = False
@@ -331,7 +330,7 @@ Namespace Menu.MainMenu
             End Get
         End Property
 
-        Dim BlockOnlineJoin As Boolean = False
+        Private BlockOnlineJoin As Boolean = False
         Private Sub OpenGaemViaNetwork(ins As OnlineGameInstance)
             If BlockOnlineJoin Then Return
             Select Case ins.Type
@@ -390,9 +389,9 @@ Namespace Menu.MainMenu
             Friend SmolFont As NezSpriteFont
             Friend Arrow As Texture2D
 
-            Sub New(Counterpart As MainMenuScene)
+            Public Sub New(Counterpart As MainMenuScene)
                 MyBase.New()
-                Me.CounterScene = Counterpart
+                CounterScene = Counterpart
             End Sub
 
             Public Overrides Sub Initialize()

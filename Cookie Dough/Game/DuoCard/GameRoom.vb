@@ -99,7 +99,7 @@ Namespace Game.DuoCard
         Private Const CPUThinkingTime As Single = 0.6
         Private Const CamSpeed As Integer = 1300
 
-        Sub New()
+        Public Sub New()
             'Bereite Flags und Variablen vor
             stat = CardGameState.WarteAufOnlineSpieler
             LocalClient.LeaveFlag = False
@@ -349,7 +349,7 @@ Namespace Game.DuoCard
 
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
-                Dim source As Integer = CInt(element(0).ToString)
+                Dim source As Integer = element(0).ToString
                 Dim command As Char = element(1)
                 Select Case command
                     Case "a"c 'Player arrived
@@ -378,7 +378,7 @@ Namespace Game.DuoCard
 
                         SendPlayerLeft(source)
                     Case "f"c 'Slave layed down card
-                        Dim card_nr As Integer = CInt(element.Substring(2))
+                        Dim card_nr As Integer = element.Substring(2)
                         Dim card As Card = Spielers(source).HandDeck(card_nr)
                         'Place card
                         Spielers(SpielerIndex).HandDeck.RemoveAt(card_nr)
@@ -640,7 +640,7 @@ Namespace Game.DuoCard
 #End Region
 #Region "Knopfgedrücke"
 
-        Dim chatbtnpressed As Boolean = False
+        Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()

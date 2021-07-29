@@ -50,7 +50,7 @@ Namespace Game.DropTrop.Networking
         Public Shared Function ServerSendCreateData(ReadString As Func(Of Connection, String), con As Connection, gamename As String, Key As Integer) As IGame
             'Read map from stream and resize arrays accordingly
             Dim map As GaemMap = CInt(ReadString(con))
-            Dim cnt As Integer = CInt(ReadString(con))
+            Dim cnt As Integer = ReadString(con)
             Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Map = map}
             ReDim nugaem.Players(cnt - 1)
             ReDim nugaem.WhiteList(cnt - 1)

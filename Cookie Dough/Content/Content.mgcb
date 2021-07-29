@@ -302,6 +302,18 @@
 /processorParam:TextureFormat=Color
 /build:games/BR/face_placeholder.png
 
+#begin games/BR/minimap_player.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:games/BR/minimap_player.png
+
 #begin games/BV/arrow_right.png
 /importer:TextureImporter
 /processor:TextureProcessor

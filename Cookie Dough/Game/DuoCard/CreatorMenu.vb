@@ -214,7 +214,7 @@ Namespace Game.DuoCard
             Private MediumFont As NezSpriteFont
             Private instance As CreatorMenu
 
-            Sub New(instance As CreatorMenu)
+            Public Sub New(instance As CreatorMenu)
                 MyBase.New()
                 Me.instance = instance
             End Sub

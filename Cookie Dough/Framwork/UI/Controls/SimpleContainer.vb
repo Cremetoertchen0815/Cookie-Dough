@@ -9,12 +9,12 @@ Namespace Framework.UI.Controls
             End Get
         End Property
 
-        Dim rect As Rectangle
-        Dim par As IParent
+        Private rect As Rectangle
+        Private par As IParent
 
-        Sub New(location As Vector2, size As Vector2)
+        Public Sub New(location As Vector2, size As Vector2)
             Me.Location = location
-            Me.Color = Color.White
+            Color = Color.White
             Me.Size = size
         End Sub
 
@@ -22,7 +22,7 @@ Namespace Framework.UI.Controls
             If Font Is Nothing Then Font = system.Font
             par = system
 
-            For Each element In Me.Children
+            For Each element In Children
                 element.Init(Me)
             Next
         End Sub

@@ -5,7 +5,7 @@ Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Framework.Misc
-    Class VertexExtractor
+    Friend Class VertexExtractor
         Public Shared Function CreateBoundingBox(ByVal model As Model, ByVal DefMatrix As Matrix) As BoundingBox
             Dim boneTransforms As Matrix() = New Matrix(model.Bones.Count - 1) {}
             model.CopyAbsoluteBoneTransformsTo(boneTransforms)
@@ -47,9 +47,10 @@ Namespace Framework.Misc
             Public PrimitiveCount As Integer
 
             Public Shared Function CreateBoundingBoxBuffers(ByVal boundingBox As BoundingBox, ByVal graphicsDevice As GraphicsDevice) As BoundingBoxBuffers
-                Dim boundingBoxBuffers As BoundingBoxBuffers = New BoundingBoxBuffers()
-                boundingBoxBuffers.PrimitiveCount = 24
-                boundingBoxBuffers.VertexCount = 48
+                Dim boundingBoxBuffers As BoundingBoxBuffers = New BoundingBoxBuffers With {
+                    .PrimitiveCount = 24,
+                    .VertexCount = 48
+                }
                 Dim vertexBuffer As VertexBuffer = New VertexBuffer(graphicsDevice, GetType(VertexPositionColor), boundingBoxBuffers.VertexCount, BufferUsage.[WriteOnly])
                 Dim vertices As List(Of VertexPositionColor) = New List(Of VertexPositionColor)()
                 Const ratio As Single = 5.0F

@@ -21,20 +21,20 @@ Namespace Framework.UI.Controls
         End Property
 
         Public Event Clicked(ByVal sender As Object, ByVal e As EventArgs)
+        Private workingtext As String
+        Private rect As Rectangle
 
-        Dim workingtext As String
-        Dim rect As Rectangle
-
-        Sub New(text As String, location As Vector2)
+        Public Sub New(text As String, location As Vector2)
             Me.Text = text
             Me.Location = location
-            Me.Color = Color.Transparent
+            Color = Color.Transparent
             workingtext = ""
         End Sub
-        Sub New(output As Func(Of String), location As Vector2)
-            Me.OutputFormat = output
+
+        Public Sub New(output As Func(Of String), location As Vector2)
+            OutputFormat = output
             Me.Location = location
-            Me.Color = Color.Transparent
+            Color = Color.Transparent
             workingtext = ""
         End Sub
 

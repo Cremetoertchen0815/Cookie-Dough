@@ -1,12 +1,10 @@
-﻿Imports Microsoft.Xna.Framework
-
-Namespace Game.Barrelled.Renderers
+﻿Namespace Game.Barrelled.Renderers
     Public Class TargetRendererable
         Inherits RenderableComponent
 
-        Dim r As Renderer
+        Private r As Renderer
 
-        Sub New(r As Renderer)
+        Public Sub New(r As Renderer)
             Me.r = r
         End Sub
 

@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Generic
-Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
 Imports Cookie_Dough.Game.Corridor.Rendering
@@ -79,7 +78,8 @@ Namespace Game.Corridor
         Private Const CamSpeed As Integer = 1300
         Private Const SacrificeWait As Integer = 5
         Private SaucerChance As Integer = 18
-        Sub New()
+
+        Public Sub New()
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
             LocalClient.LeaveFlag = False
@@ -244,7 +244,7 @@ Namespace Game.Corridor
             Try
                 Dim data As String() = LocalClient.ReadStream()
                 For Each element In data
-                    Dim source As Integer = CInt(element(0).ToString)
+                    Dim source As Integer = element(0).ToString
                     Dim command As Char = element(1)
                     Select Case command
                         Case "a"c 'Player arrived
@@ -298,7 +298,7 @@ Namespace Game.Corridor
                         Case "z"c 'Transmit user data
                             Dim s As New Threading.Thread(Sub()
                                                               Dim IdentSound As IdentType = CInt(element(2).ToString)
-                                                              Dim dataNr As Integer = CInt(element(3).ToString)
+                                                              Dim dataNr As Integer = element(3).ToString
                                                               Dim dat As String = element.Substring(4).Replace("_TATA_", "")
                                                               Try
                                                                   If dataNr = 9 Then
@@ -403,7 +403,7 @@ Namespace Game.Corridor
                                                                'Send Thumbnail
                                                                txt = ""
                                                                If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
+                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = Global.Cookie_Dough.SpielerTyp.Local, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                            End If
                                                        Next
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
@@ -458,7 +458,7 @@ Namespace Game.Corridor
 #End Region
 #Region "Knopfgedrücke"
 
-        Dim chatbtnpressed As Boolean = False
+        Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()

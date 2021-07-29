@@ -1,5 +1,4 @@
 ﻿Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Input
 
 Namespace Framework.UI.Controls
     Public Class FoldableContainer
@@ -19,21 +18,21 @@ Namespace Framework.UI.Controls
 
         Public Checked As Boolean = True
         Public Text As String
-        Dim rect As Rectangle
-        Dim header As Rectangle
+        Private rect As Rectangle
+        Private header As Rectangle
 
-        Sub New(text As String, location As Vector2, size As Vector2)
+        Public Sub New(text As String, location As Vector2, size As Vector2)
             Me.Text = text
             Me.Location = location
-            Me.Color = Color.White
-            Me.BackgroundColor = New Color(8, 8, 8, 225)
+            Color = Color.White
+            BackgroundColor = New Color(8, 8, 8, 225)
             Me.Size = size
         End Sub
 
         Public Overrides Sub Init(system As IParent)
             If Font Is Nothing Then Font = system.Font
 
-            For Each element In Me.Children
+            For Each element In Children
                 element.Init(Me)
             Next
         End Sub

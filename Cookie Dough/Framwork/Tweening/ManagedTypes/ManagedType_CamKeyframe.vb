@@ -10,13 +10,13 @@ Namespace Framework.Tweening.ManagedTypes
         End Function
 
         Public Function copy(ByVal o As Object) As Object Implements IManagedType.copy
-            Dim c As Keyframe3D = DirectCast(o, Keyframe3D)
+            Dim c As Keyframe3D = o
             Return New Keyframe3D(c.X, c.Y, c.Z, c.Yaw, c.Pitch, c.Roll, c.DefaultOrder)
         End Function
 
         Public Function getIntermediateValue(ByVal start As Object, ByVal [end] As Object, ByVal dPercentage As Double) As Object Implements IManagedType.getIntermediateValue
-            Dim startVector As Keyframe3D = DirectCast(start, Keyframe3D)
-            Dim endVector As Keyframe3D = DirectCast([end], Keyframe3D)
+            Dim startVector As Keyframe3D = start
+            Dim endVector As Keyframe3D = [end]
             Dim iStart_X As Single = startVector.X
             Dim iStart_Y As Single = startVector.Y
             Dim iStart_Z As Single = startVector.Z

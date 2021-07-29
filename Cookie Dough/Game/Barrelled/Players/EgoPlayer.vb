@@ -1,6 +1,7 @@
 ﻿Imports Cookie_Dough.Framework.Physics
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
+Imports Nez.Sprites
 Imports Nez.Tiled
 
 Namespace Game.Barrelled.Players
@@ -61,14 +62,14 @@ Namespace Game.Barrelled.Players
         End Property
         Public Overrides Property Direction As Vector3 = Vector3.Backward
 
-        Sub New(typ As SpielerTyp)
+        Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0)))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
-            Entity.AddComponent(New PrototypeSpriteRenderer(15, 15)).SetColor(MatchedColor).SetRenderLayer(5)
+            Entity.AddComponent(New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player"))).SetColor(MatchedColor).SetRenderLayer(5)
             Entity.SetPosition(PlayerSpawn)
 
             'Assign virtual buttons
@@ -80,7 +81,7 @@ Namespace Game.Barrelled.Players
 
         Friend Overrides Function GetWorldMatrix() As Matrix
             Dim rotation As Single = Mathf.AngleBetweenVectors(New Vector2(Direction.X, -Direction.Z), Vector2.UnitY) * -2
-            Return Matrix.CreateScale(1, If(RunningMode = PlayerStatus.Sneaky, 0.6, 1), 1) * Matrix.CreateRotationY(rotation) * Matrix.CreateTranslation(Me.Location)
+            Return Matrix.CreateScale(1, If(RunningMode = PlayerStatus.Sneaky, 0.6, 1), 1) * Matrix.CreateRotationY(rotation) * Matrix.CreateTranslation(Location)
         End Function
 
         Public Overrides Sub Update()
@@ -143,7 +144,7 @@ Namespace Game.Barrelled.Players
             Velocity3D += New Vector3(0, VelocityY, 0)
 
             'Clamp position and move Y-Pos
-            LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 15)
+            LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 30)
 
             'Collision
             Dim state As New TiledMapMover.CollisionState
@@ -168,9 +169,10 @@ Namespace Game.Barrelled.Players
             nudirection = Vector3.Transform(nudirection, Matrix.CreateFromAxisAngle(Vector3.Cross(Vector3.Up, nudirection), (MathHelper.PiOver4 / MouseSensivity) * (lastMousePos.Y - lastmstate.Y)))
             nudirection.Normalize()
             Direction = nudirection
+            Entity.SetLocalRotation(Mathf.AngleBetweenVectors(New Vector2(movDir.X, -movDir.Z), Vector2.UnitY) * -2 + Math.PI / 2)
 
             Dim pos = Core.Instance.Window.ClientBounds.Size
-            Mouse.SetPosition(CInt(pos.X / 2), CInt(pos.Y / 2))
+            Mouse.SetPosition(pos.X / 2, pos.Y / 2)
 
             lastmstate = Mouse.GetState
         End Sub

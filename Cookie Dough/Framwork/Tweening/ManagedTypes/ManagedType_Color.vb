@@ -11,14 +11,14 @@ Namespace Framework.Tweening.ManagedTypes
         End Function
 
         Public Function copy(ByVal o As Object) As Object Implements IManagedType.copy
-            Dim c As Color = DirectCast(o, Color)
+            Dim c As Color = o
             Dim result As Color = New Color(c.R, c.G, c.B, c.A)
             Return result
         End Function
 
         Public Function getIntermediateValue(ByVal start As Object, ByVal [end] As Object, ByVal dPercentage As Double) As Object Implements IManagedType.getIntermediateValue
-            Dim startColor As Color = DirectCast(start, Color)
-            Dim endColor As Color = DirectCast([end], Color)
+            Dim startColor As Color = start
+            Dim endColor As Color = [end]
             Dim iStart_R As Integer = startColor.R
             Dim iStart_G As Integer = startColor.G
             Dim iStart_B As Integer = startColor.B

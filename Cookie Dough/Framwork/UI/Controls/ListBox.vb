@@ -19,17 +19,17 @@ Namespace Framework.UI.Controls
         End Property
 
         Public Event SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private workingtext As String()
+        Private rect As Rectangle
+        Private par As IParent
+        Private offsetY As Integer
 
-        Dim workingtext As String()
-        Dim rect As Rectangle
-        Dim par As IParent
-        Dim offsetY As Integer
-        Sub New(output As Func(Of String()), location As Vector2, size As Vector2)
+        Public Sub New(output As Func(Of String()), location As Vector2, size As Vector2)
             Me.Output = output
             Me.Location = location
             Me.Size = size
-            Me.Color = Color.White
-            Me.Border = New ControlBorder(Color.White, 2)
+            Color = Color.White
+            Border = New ControlBorder(Color.White, 2)
             workingtext = {""}
         End Sub
 

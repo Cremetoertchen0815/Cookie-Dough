@@ -9,13 +9,13 @@
         End Function
 
         Public Function copy(ByVal o As Object) As Object Implements IManagedType.copy
-            Dim value As Integer = CInt(o)
+            Dim value As Integer = o
             Return value
         End Function
 
         Public Function getIntermediateValue(ByVal start As Object, ByVal [end] As Object, ByVal dPercentage As Double) As Object Implements IManagedType.getIntermediateValue
-            Dim iStart As Integer = CInt(start)
-            Dim iEnd As Integer = CInt([end])
+            Dim iStart As Integer = start
+            Dim iEnd As Integer = [end]
             Return interpolate(iStart, iEnd, dPercentage)
         End Function
     End Class

@@ -30,7 +30,7 @@ Namespace Framework.Physics
         End Property
 
         Public scale As Vector2
-        Dim rect As Rectangle
+        Public rect As Rectangle
 
         Public Sub New(ByVal center As Vector2, ByVal halfSize As Vector2)
             Me.center = center
@@ -69,7 +69,7 @@ Namespace Framework.Physics
         End Function
 
         Public Function Clone()
-            Return Me.MemberwiseClone
+            Return MemberwiseClone
         End Function
 
         Public Const DailiBuk As String = "Hewwo, i bims 1 Tagebuch. Wir schreiben den 25then Januaaar Tusausendswändie. Der liebge Jakub und der supa toole Mico sitzen vor dem Komputa und schreiben Kott. YEEEEEEEEEEET"

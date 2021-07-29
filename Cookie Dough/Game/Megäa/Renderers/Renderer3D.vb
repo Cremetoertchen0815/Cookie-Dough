@@ -6,7 +6,7 @@ Namespace Game.Megäa.Renderers
     Public Class Renderer3D
         Inherits Renderer
 
-        Sub New(baseclass As GameRoom, Optional order As Integer = 0)
+        Public Sub New(baseclass As GameRoom, Optional order As Integer = 0)
             MyBase.New(order)
             Me.BaseClass = baseclass
         End Sub
@@ -42,16 +42,17 @@ Namespace Game.Megäa.Renderers
             MyBase.OnAddedToScene(scene)
 
             Dev = Core.GraphicsDevice
-            Projection = Matrix.CreatePerspectiveFieldOfView(1, CSng(Core.Instance.Window.ClientBounds.Width) / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 10000000)
+            Projection = Matrix.CreatePerspectiveFieldOfView(1, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 10000000)
 
             'Generate quads
-            Dim vert As New List(Of VertexPositionNormalTexture)
-            vert.Add(New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(1, 0, 0), New Vector3(0, 0, -1), Vector2.UnitY))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero))
-            vert.Add(New VertexPositionNormalTexture(New Vector3(0, 1, 0), New Vector3(0, 0, -1), Vector2.UnitX))
+            Dim vert As New List(Of VertexPositionNormalTexture) From {
+                New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One),
+                New VertexPositionNormalTexture(New Vector3(1, 0, 0), New Vector3(0, 0, -1), Vector2.UnitY),
+                New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero),
+                New VertexPositionNormalTexture(New Vector3(0, 0, 0), New Vector3(0, 0, -1), Vector2.One),
+                New VertexPositionNormalTexture(New Vector3(1, 1, 0), New Vector3(0, 0, -1), Vector2.Zero),
+                New VertexPositionNormalTexture(New Vector3(0, 1, 0), New Vector3(0, 0, -1), Vector2.UnitX)
+            }
             QuadClockwise = New VertexBuffer(Dev, GetType(VertexPositionNormalTexture), vert.Count, BufferUsage.WriteOnly)
             QuadClockwise.SetData(vert.ToArray)
             vert.Reverse()

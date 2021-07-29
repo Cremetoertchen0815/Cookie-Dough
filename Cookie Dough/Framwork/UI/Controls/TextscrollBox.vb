@@ -18,15 +18,16 @@ Namespace Framework.UI.Controls
         Public Property LenLimit As Integer = 30
 
         Friend ScrollDown As Boolean = False
-        Dim scrolloffset As Integer = 0
-        Dim maxlines As Integer = 0
-        Dim workingtext As (String, Color)()
-        Dim rect As Rectangle
-        Dim par As IParent
-        Sub New(output As Func(Of (String, Color)()), location As Vector2, size As Vector2)
-            Me.OutputFormat = output
+        Private scrolloffset As Integer = 0
+        Private maxlines As Integer = 0
+        Private workingtext As (String, Color)()
+        Private rect As Rectangle
+        Private par As IParent
+
+        Public Sub New(output As Func(Of (String, Color)()), location As Vector2, size As Vector2)
+            OutputFormat = output
             Me.Location = location
-            Me.Color = Color.White
+            Color = Color.White
             Me.Size = size
             workingtext = {}
         End Sub
@@ -45,7 +46,7 @@ Namespace Framework.UI.Controls
             Next
         End Sub
 
-        Dim tmplist As New List(Of (String, Color))
+        Private tmplist As New List(Of (String, Color))
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)
 
             'Prepare text

@@ -1,14 +1,13 @@
 ﻿Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
-Imports Nez
 
 Namespace Menu.MainMenu
     Public Class SplashScreen
         Inherits Scene
 
-        Dim enterBtn As VirtualButton
-        Dim transitioning As Boolean = False
+        Private enterBtn As VirtualButton
+        Private transitioning As Boolean = False
         Public Overrides Sub Initialize()
             MyBase.Initialize()
             AddRenderer(New DefaultRenderer)
@@ -39,9 +38,9 @@ Namespace Menu.MainMenu
                 bottomFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MenuMain"))
             End Sub
 
-            Dim topFont As NezSpriteFont
-            Dim bottomFont As NezSpriteFont
-            Dim subtitleFont As NezSpriteFont
+            Private topFont As NezSpriteFont
+            Private bottomFont As NezSpriteFont
+            Private subtitleFont As NezSpriteFont
             Friend Property TransparancyTitle As Single = 0
             Friend Property TransparancySubtitle As Single = 0
             Friend Property TransparancyDescription As Single = 0
