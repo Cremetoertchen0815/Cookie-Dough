@@ -214,7 +214,7 @@ Namespace Game.Barrelled
                         Spielers(source).MatchedColor = playcolor(source)
                         CreateEntity(txt(0)).AddComponent(Spielers(source))
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
-                        SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD)
+                        SendPlayerArrived(source)
                     Case "c"c 'Sent chat message
                         Dim text As String = element.Substring(2)
                         If source = 9 Then
@@ -264,8 +264,8 @@ Namespace Game.Barrelled
         End Sub
 
         ' ---Methoden um Daten via den Server an die Clients zu senden---
-        Private Sub SendPlayerArrived(index As Integer, name As String, MOTD As String)
-            SendNetworkMessageToAll("a" & index.ToString & name & "|" & MOTD)
+        Private Sub SendPlayerArrived(index As Integer)
+            SendNetworkMessageToAll("a" & index.ToString & CInt(Spielers(index).Mode).ToString & Spielers(index).Name & "|" & Spielers(index).MOTD)
         End Sub
         Private Sub SendBeginGaem()
             Dim appendix As String = ""

@@ -24,6 +24,7 @@ Namespace Game.Barrelled.Players
         Public Overridable Property ThreeDeeVelocity As Vector3
         Public MustOverride Sub Update() Implements IUpdatable.Update
         Friend MustOverride Function GetWorldMatrix() As Matrix
+        Public Property Mode As PlayerMode
         Private ReadOnly Property IUpdatable_Enabled As Boolean Implements IUpdatable.Enabled
             Get
                 Return Enabled

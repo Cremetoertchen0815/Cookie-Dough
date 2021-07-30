@@ -138,9 +138,9 @@ Namespace Game.Barrelled
             AktuellesSpiel.Difficulty = My.Settings.Schwierigkeitsgrad
             For i As Integer = 0 To AktuellesSpiel.PlCount - 1
                 If i = 0 Then
-                    AktuellesSpiel.Spielers(i) = New EgoPlayer(SpielerTyp.Local) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, "")}
+                    AktuellesSpiel.Spielers(i) = New EgoPlayer(SpielerTyp.Local) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, ""), .Mode = NewGamePlayers(i)}
                 Else
-                    AktuellesSpiel.Spielers(i) = New OtherPlayer(SpielerTyp.Online) With {.Bereit = False}
+                    AktuellesSpiel.Spielers(i) = New OtherPlayer(SpielerTyp.Online) With {.Bereit = False, .Mode = NewGamePlayers(i)}
                 End If
             Next
             AktuellesSpiel.LoadContent()

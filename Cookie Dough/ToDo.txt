@@ -23,4 +23,3 @@ räuber und Schandan meets Packman meets Hide and seek meets 3D
 -If the timer runs out, the rebels win
 -If a rebel is being caught, he lands in prison
 -Another rebel can run up to the prison and free him
-

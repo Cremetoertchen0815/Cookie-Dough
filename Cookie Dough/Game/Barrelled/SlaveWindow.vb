@@ -253,10 +253,12 @@ Namespace Game.Barrelled
                 Select Case command
                     Case "a"c 'Player arrived
                         Dim source As Integer = element(1).ToString
-                        Dim txt As String() = element.Substring(2).Split("|")
+                        Dim MODE As Integer = CInt(element(2).ToString)
+                        Dim txt As String() = element.Substring(3).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
+                        Spielers(source).Mode = MODE
                         Spielers(source).MatchedColor = playcolor(source)
                         If source <> UserIndex Then CreateEntity(txt(0)).AddComponent(Spielers(source))
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
