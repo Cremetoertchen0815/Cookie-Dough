@@ -19,12 +19,7 @@ Namespace Game.Barrelled.Players
         Public Property ID As String Implements IPlayer.ID
         Public Property CustomSound As SoundEffect() Implements IPlayer.CustomSound
         Public Property Thumbnail As Texture2D = PlaceholderFace Implements IPlayer.Thumbnail
-        Public MustOverride Property Location As Vector3
-        Public MustOverride Property Direction As Vector3
-        Public Overridable Property ThreeDeeVelocity As Vector3
-        Public MustOverride Sub Update() Implements IUpdatable.Update
-        Friend MustOverride Function GetWorldMatrix() As Matrix
-        Public Property Mode As PlayerMode
+        Public Property Mode As PlayerMode = PlayerMode.Ghost
         Private ReadOnly Property IUpdatable_Enabled As Boolean Implements IUpdatable.Enabled
             Get
                 Return Enabled
@@ -35,6 +30,12 @@ Namespace Game.Barrelled.Players
                 Return 0
             End Get
         End Property
+        Public MustOverride Property Location As Vector3
+        Public MustOverride Property Direction As Vector3
+        Public Overridable Property ThreeDeeVelocity As Vector3
+        Public MustOverride Sub Update() Implements IUpdatable.Update
+        Friend MustOverride Function GetWorldMatrix() As Matrix
+        Friend MustOverride Sub SetColor(color As Color)
 
 
         'Collision and Misc
@@ -42,7 +43,7 @@ Namespace Game.Barrelled.Players
         Friend Shared PlayerSpawn As Vector2
         Private Shared PlaceholderFace As Texture2D = Core.Content.LoadTexture("games/BR/face_placeholder")
         Friend RunningMode As PlayerStatus
-        Friend MatchedColor As Color
+        'Friend MatchedColor As Color
         Protected Mover As TiledMapCollisionResolver
 
     End Class

@@ -18,5 +18,9 @@ Namespace Game.Barrelled.Players
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub
+
+        Friend Overrides Sub SetColor(color As Color)
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

@@ -16,6 +16,7 @@ Namespace Game.Barrelled.Players
         Private lastSpeen As Vector2
         Private lastmstate As MouseState = Mouse.GetState
         Private movDir As Vector3
+        Private MinimapSprite As SpriteRenderer
 
         'Virtual game pad
         Private MovementBtn As VirtualJoystick
@@ -65,12 +66,13 @@ Namespace Game.Barrelled.Players
 
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
+            MinimapSprite = New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player")).SetColor(PlayerColors(PlayerMode.Ghost)).SetRenderLayer(5)
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0)))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
-            Entity.AddComponent(New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player"))).SetColor(MatchedColor).SetRenderLayer(5)
+            Entity.AddComponent(MinimapSprite)
             Entity.SetPosition(PlayerSpawn)
 
             'Assign virtual buttons
@@ -179,6 +181,10 @@ Namespace Game.Barrelled.Players
             Mouse.SetPosition(pos.X / 2, pos.Y / 2)
 
             lastmstate = Mouse.GetState
+        End Sub
+
+        Friend Overrides Sub SetColor(color As Color)
+            MinimapSprite.SetColor(color)
         End Sub
     End Class
 End Namespace

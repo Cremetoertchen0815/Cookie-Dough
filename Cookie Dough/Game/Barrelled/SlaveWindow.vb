@@ -103,7 +103,6 @@ Namespace Game.Barrelled
                                                          Spielers(i) = New EgoPlayer(SpielerTyp.Online) With {.Name = My.Settings.Username}
                                                          EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(UserIndex))
                                                      End If
-                                                     Spielers(i).MatchedColor = playcolor(i)
                                                  Next
 
                                                  'Set rejoin flag
@@ -164,16 +163,16 @@ Namespace Game.Barrelled
             Crosshair = CreateEntity("crosshair").AddComponent(Of CrosshairRenderable)().SetRenderLayer(6)
 
             'Load HUD
-            HUD = New GuiSystem()
-            HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnA)
-            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDBtnB)
-            HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow, .Progress = Function() EgoPlayer.SprintLeft} : HUD.Controls.Add(HUDSprintBar)
-            HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
-            HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDChatBtn)
+            HUD = New GuiSystem() With {.Color = PlayerHUDColors(PlayerMode.Ghost)}
+            HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnA)
+            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Progress = Function() EgoPlayer.SprintLeft} : HUD.Controls.Add(HUDSprintBar)
+            HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
+            HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Controls.Label("Click on the totem to start the game...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
             InstructionFader = HUDInstructions.Tween("Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), 0.7).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut) : InstructionFader.Start()
-            HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDFullscrBtn)
-            HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Yellow} : HUD.Controls.Add(HUDMusicBtn)
+            HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
+            HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
 
             'Set colliders
@@ -236,7 +235,6 @@ Namespace Game.Barrelled
             If CType(Core.Instance, Game1).GetStackKeystroke({Keys.F, Keys.O, Keys.V}) Then fov = Math.Min(Math.PI - 0.001F, fov + 0.2) : Renderer.Projection = Matrix.CreatePerspectiveFieldOfView(fov, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
             'Set HUD color
-            HUDColor = playcolor(UserIndex)
             HUDInstructions.Active = Status <> GameStatus.GameActive OrElse (Spielers(UserIndex).Typ = SpielerTyp.Local)
 
             lastmstate = Mouse.GetState
@@ -261,7 +259,6 @@ Namespace Game.Barrelled
                         Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         Spielers(source).Mode = MODE
-                        Spielers(source).MatchedColor = playcolor(source)
                         If source <> UserIndex Then CreateEntity(txt(0)).AddComponent(Spielers(source))
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
@@ -357,19 +354,16 @@ Namespace Game.Barrelled
                     Case "x"c 'Continue with game
                         StopUpdating = False
                     Case "y"c 'Synchronisiere Daten
-                        'Dim str As String = element.Substring(1)
-                        'Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
-                        'For i As Integer = 0 To PlCount - 1
-                        '    Spielers(i).HandDeck.Clear()
-                        '    Spielers(i).HandDeck.AddRange(sp.Spielers(i).HandDeck)
-                        '    Spielers(i).Name = sp.Spielers(i).Name
-                        '    Spielers(i).OriginalType = sp.Spielers(i).OriginalType
-                        '    Spielers(i).MOTD = sp.Spielers(i).MOTD
-                        '    Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
-                        '    Spielers(i).IsAFK = sp.Spielers(i).IsAFK
-                        'Next
-                        'TableCard = sp.TableCard
-                        'If UserIndex > -1 Then HUDAfkBtn.Text = If(Spielers(UserIndex).IsAFK, "Back Again", "AFK")
+                        Dim str As String = element.Substring(1)
+                        Dim sp As CommonPlayer() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of CommonPlayer())(str)
+                        For i As Integer = 0 To PlCount - 1
+                            Spielers(i).Name = sp(i).Name
+                            Spielers(i).Typ = sp(i).Typ
+                            Spielers(i).MOTD = sp(i).MOTD
+                            Spielers(i).Mode = sp(i).Mode
+                            Spielers(i).SetColor(PlayerColors(Spielers(i).Mode))
+                        Next
+                        HUD.Color = PlayerHUDColors(Spielers(UserIndex).Mode)
                     Case "z"c 'Receive sound
                         Dim dataReceiver As New Threading.Thread(Sub()
                                                                      Dim source As Integer = element(1).ToString

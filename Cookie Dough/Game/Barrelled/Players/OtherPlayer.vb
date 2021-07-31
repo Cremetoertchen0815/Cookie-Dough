@@ -1,6 +1,7 @@
 ﻿Imports Cookie_Dough.Framework.Physics
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
+Imports Nez.Sprites
 Imports Nez.Tiled
 
 Namespace Game.Barrelled.Players
@@ -17,14 +18,17 @@ Namespace Game.Barrelled.Players
             End Set
         End Property
 
+        'Misc
+        Private MinimapSprite As SpriteRenderer
+
         'Movement
+        Public Velocity As Vector2
         Private LocationY As Single = 4
         Private VelocityY As Single = 0
         Private Collider As BoxCollider
         Private stickPos As Vector2
         Private TrueDirection As Vector3
         Private movDir As Vector3
-        Public Velocity As Vector2
 
         Private Const MouseSensivity As Single = 232
         Private Const SprintSpeed As Single = 150
@@ -48,13 +52,14 @@ Namespace Game.Barrelled.Players
 
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
+            MinimapSprite = New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player")).SetColor(PlayerColors(Mode)).SetRenderLayer(5)
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
 
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0), 16))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
-            Entity.AddComponent(New Sprites.SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player"))).SetColor(MatchedColor).SetRenderLayer(5)
+            Entity.AddComponent(MinimapSprite)
             Entity.SetPosition(PlayerSpawn)
         End Sub
 
@@ -129,6 +134,10 @@ Namespace Game.Barrelled.Players
 
             'Clamp position and move Y-Pos
             LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 30)
+        End Sub
+
+        Friend Overrides Sub SetColor(color As Color)
+            MinimapSprite.SetColor(color)
         End Sub
     End Class
 End Namespace

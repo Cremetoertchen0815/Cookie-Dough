@@ -1,4 +1,6 @@
-﻿Namespace Game.Barrelled
+﻿Imports Microsoft.Xna.Framework
+
+Namespace Game.Barrelled
     Public Module MapHelper
         Public Function GetMapSize(mp As Map) As Integer
             Return 3
@@ -13,5 +15,8 @@
                     Return "WTF???"
             End Select
         End Function
+
+        Public PlayerColors As Color() = {playcolor(2), playcolor(3), playcolor(4)}
+        Public PlayerHUDColors As Color() = {hudcolors(2), hudcolors(3), hudcolors(4)}
     End Module
 End Namespace
