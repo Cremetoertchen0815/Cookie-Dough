@@ -10,6 +10,7 @@ Namespace Game.Barrelled.Players
 
 
         'Misc
+        Friend Prison As (Boolean, Rectangle) = (False, Nothing)
         Friend CameraPosition As Vector3
         Private lastMousePos As Vector2 = Mouse.GetState.Position.ToVector2
         Private lastSpeen As Vector2
@@ -143,7 +144,7 @@ Namespace Game.Barrelled.Players
             If Location.Y <= 0 And Not JumpBtn.IsPressed Then Location = New Vector3(Location.X, 0, Location.Z) : VelocityY = 0
             Velocity3D += New Vector3(0, VelocityY, 0)
 
-            'Clamp position and move Y-Pos
+            'Clamp position and move on Y-Axis
             LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 30)
 
             'Collision
@@ -151,6 +152,9 @@ Namespace Game.Barrelled.Players
             Dim velocity2D As Vector2 = New Vector2(Velocity3D.X, Velocity3D.Z) * -Time.DeltaTime * 2
             Mover.CollisionLayer = CollisionLayers(If(LocationY > 10, 1, 0)) 'Adapt collision layer for jump
             Mover.Move(velocity2D, Collider)
+
+            'Clamp 2D coords
+            If Prison.Item1 Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, Prison.Item2.Left, Prison.Item2.Right), Mathf.Clamp(Entity.Position.Y, Prison.Item2.Top, Prison.Item2.Bottom))
             Location = Me.Location
 
             'Generate camera position

@@ -102,6 +102,11 @@ Namespace Game.Barrelled
 
             'Load Map
             TileMap = Content.LoadTiledMap("Maps\Barrelled\" & Map.ToString & ".tmx")
+
+            Spielers(0).MatchedColor = playcolor(0)
+            EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(0))
+            CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
+
             CommonPlayer.CollisionLayers = {TileMap.GetLayer(Of TmxLayer)("Collision"), TileMap.GetLayer(Of TmxLayer)("High")}
             Renderer.GenerateMapMatrices(TileMap)
             Renderer.Floorsize = New Vector2(TileMap.Properties("floor_size_X"), TileMap.Properties("floor_size_Y"))
@@ -109,16 +114,14 @@ Namespace Game.Barrelled
                 Select Case element.Type
                     Case "spawn"
                         CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
+                    Case "prison"
+                        EgoPlayer.Prison = (True, New Rectangle(element.X, element.Y, element.Width, element.Height))
                 End Select
             Next
 
             'Load minimap renderer
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
             CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New TargetRendererable(MinimapRenderer))
-
-            Spielers(0).MatchedColor = playcolor(0)
-            EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(0))
-            CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
             'Create entities and components
             'AddSceneComponent(New Object3DHandler(Spielers(UserIndex), Me))
@@ -157,6 +160,11 @@ Namespace Game.Barrelled
 
 
             If NetworkMode Then SendPlayerData()
+
+            Select Case Status
+                Case GameStatus.WaitingForOnlinePlayers
+
+            End Select
 
             'Focus/Unfocus game
             If mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released Then
@@ -319,8 +327,8 @@ Namespace Game.Barrelled
             SendNetworkMessageToAll("n" & who.ToString)
         End Sub
         Private Sub SendPlayerBack(index As Integer)
-            'Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers))
-            'SendNetworkMessageToAll("r" & index.ToString & str)
+            Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject((Spielers(index).Mode, Spielers(index).Location))
+            SendNetworkMessageToAll("r" & index.ToString & str)
         End Sub
         Private Sub SendWinFlag()
             SendSync()

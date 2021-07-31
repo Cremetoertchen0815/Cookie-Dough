@@ -149,6 +149,8 @@ Namespace Game.Barrelled
                 Select Case element.Type
                     Case "spawn"
                         CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
+                    Case "prison"
+                        EgoPlayer.Prison = (True, New Rectangle(element.X, element.Y, element.Width, element.Height))
                 End Select
             Next
 
@@ -300,7 +302,9 @@ Namespace Game.Barrelled
                         PostChat(msg, Color.White)
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString
-                        Spielers(source).Bereit = True
+                        Dim dat As (PlayerMode, Vector3) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (PlayerMode, Vector3))(element.Substring(2))
+                        Spielers(source).Mode = dat.Item1
+                        Spielers(source).Entity.Position = New Vector2(dat.Item2.X, dat.Item2.Z)
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         HUDInstructions.Text = "Welcome back!"
                         SendSoundFile()
