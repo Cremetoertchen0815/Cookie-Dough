@@ -26,6 +26,8 @@ Namespace Game.Barrelled.Renderers
         'Player
         Private PlayerModel As Model
         Private PlayerModelHeadless As Model
+        Private PlayerModelBoundingBox As VertexExtractor.BoundingBoxBuffers
+        Friend Shared PlayerModelExtremePoints As Vector3()
         Friend PlayerTransform As Matrix
 
         'Room
@@ -185,6 +187,8 @@ Namespace Game.Barrelled.Renderers
             'Load player
             PlayerModel = scene.Content.Load(Of Model)("mesh/piece_filled")
             PlayerModelHeadless = scene.Content.Load(Of Model)("mesh/piece_filled_headless")
+            PlayerModelExtremePoints = VertexExtractor.ExtractExtremeVerticesFromModel(PlayerModel)
+            PlayerModelBoundingBox = VertexExtractor.BoundingBoxBuffers.CreateBoundingBoxBuffers(BoundingBox.CreateFromPoints(PlayerModelExtremePoints), Dev)
             PlayerTransform = Matrix.CreateScale(0.27)
             ApplyDefaultFX(PlayerModel, Color.White)
             ApplyDefaultFX(PlayerModelHeadless, Color.White)
@@ -240,6 +244,8 @@ Namespace Game.Barrelled.Renderers
                 ApplyFX(element, PlayerColors(BaseClass.EgoPlayer.Mode), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * BaseClass.EgoPlayer.GetWorldMatrix)
                 element.Draw()
             Next
+            'Draw bounding box
+            DrawBoundingBox(PlayerModelBoundingBox, DebugEffect, Dev, Matrix.CreateScale(0.003) * BaseClass.EgoPlayer.GetWorldMatrix, View, Projection)
 
             'Draw other players
             For p As Integer = 0 To BaseClass.Spielers.Length - 1
@@ -259,6 +265,9 @@ Namespace Game.Barrelled.Renderers
                 Next
                 'Reset Rasterizer state
                 Dev.RasterizerState = RasterizerState.CullNone
+
+                'Draw bounding box
+                DrawBoundingBox(PlayerModelBoundingBox, DebugEffect, Dev, Matrix.CreateScale(0.003) * player.GetWorldMatrix(0), View, Projection)
             Next
 
             'Draw map
@@ -349,7 +358,7 @@ Namespace Game.Barrelled.Renderers
         Private Sub DrawBoundingBox(ByVal buffers As VertexExtractor.BoundingBoxBuffers, ByVal effect As BasicEffect, ByVal graphicsDevice As GraphicsDevice, ByVal world As Matrix, ByVal view As Matrix, ByVal projection As Matrix)
             graphicsDevice.SetVertexBuffer(buffers.Vertices)
             graphicsDevice.Indices = buffers.Indices
-            effect.World = Matrix.Identity
+            effect.World = world
             effect.View = view
             effect.Projection = projection
 

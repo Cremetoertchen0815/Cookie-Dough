@@ -9,19 +9,16 @@ Namespace Game.Barrelled.Players
 
     Public MustInherit Class CommonPlayer
         Inherits Component
-        Implements IUpdatable, IPlayer
+        Implements IUpdatable, IPlayer, IObject3D
 
         'Common properties & implemenation of interfaces
         Public Property Bereit As Boolean Implements IPlayer.Bereit
-        <Newtonsoft.Json.JsonIgnore>
         Public Property Connection As Connection Implements IPlayer.Connection
         Public Property Typ As SpielerTyp Implements IPlayer.Typ
         Public Property Name As String Implements IPlayer.Name
         Public Property MOTD As String Implements IPlayer.MOTD
         Public Property ID As String Implements IPlayer.ID
-        <Newtonsoft.Json.JsonIgnore>
         Public Property CustomSound As SoundEffect() Implements IPlayer.CustomSound
-        <Newtonsoft.Json.JsonIgnore>
         Public Property Thumbnail As Texture2D = PlaceholderFace Implements IPlayer.Thumbnail
         Public Property Mode As PlayerMode = PlayerMode.Ghost
         Private ReadOnly Property IUpdatable_Enabled As Boolean Implements IUpdatable.Enabled
@@ -36,10 +33,22 @@ Namespace Game.Barrelled.Players
         End Property
         Public MustOverride Property Location As Vector3
         Public MustOverride Property Direction As Vector3
-        <Newtonsoft.Json.JsonIgnore>
         Public Overridable Property ThreeDeeVelocity As Vector3
+        Public Overridable Sub ClickedFunction(sender As IGameWindow) Implements IObject3D.ClickedFunction
+            Throw New NotImplementedException
+        End Sub
+        Public Property Distance As Single Implements IObject3D.Distance
+        Public ReadOnly Property BoundingBox As BoundingBox Implements IObject3D.BoundingBox
+            Get
+                Dim pts As Vector3() = New Vector3(1) {}
+                Dim trans As Matrix = GetWorldMatrix(0)
+                Vector3.Transform(Renderers.Renderer3D.PlayerModelExtremePoints, Matrix.CreateScale(0.003) * trans, pts)
+                Return BoundingBox.CreateFromPoints(pts)
+            End Get
+        End Property
+
         Public MustOverride Sub Update() Implements IUpdatable.Update
-        Friend MustOverride Function GetWorldMatrix() As Matrix
+        Friend MustOverride Function GetWorldMatrix(Optional rotato As Single = 1) As Matrix
         Friend MustOverride Sub SetColor(color As Color)
 
 

@@ -8,7 +8,7 @@ Namespace Game.Barrelled.Players
         Public Overrides Property Location As Vector3
         Public Overrides Property Direction As Vector3
 
-        Friend Overrides Function GetWorldMatrix() As Matrix
+        Friend Overrides Function GetWorldMatrix(Optional rot As Single = 1) As Matrix
             Return Matrix.Identity
         End Function
 

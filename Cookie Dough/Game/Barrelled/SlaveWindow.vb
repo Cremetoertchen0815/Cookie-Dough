@@ -180,6 +180,11 @@ Namespace Game.Barrelled
             CreateEntity("HUD").AddComponent(HUD)
 
             'Set colliders
+            ObjectHandler = AddSceneComponent(New Object3DHandler(EgoPlayer, Me))
+            For i As Integer = 0 To Spielers.Length - 1
+                If i = UserIndex Then Continue For
+                ObjectHandler.Objects.Add(Spielers(i))
+            Next
             Colliders = {}
         End Sub
 
@@ -300,6 +305,9 @@ Namespace Game.Barrelled
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
+                    Case "p"c 'Player pressed
+                        Dim who As Integer = CInt(element(1).ToString)
+                        If who = UserIndex Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString
                         Dim dat As (PlayerMode, Vector3) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (PlayerMode, Vector3))(element.Substring(2))
@@ -378,6 +386,7 @@ Namespace Game.Barrelled
                             Spielers(i).Typ = sp(i).Typ
                             Spielers(i).MOTD = sp(i).MOTD
                             Spielers(i).Mode = sp(i).Mode
+                            Spielers(i).ID = sp(i).ID
                             If i <> UserIndex Then
                                 Spielers(i).SetColor(PlayerColors(Spielers(i).Mode))
                                 If Spielers(i).Bereit AndAlso FindEntity(Spielers(i).Name) Is Nothing Then CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
@@ -462,6 +471,14 @@ Namespace Game.Barrelled
         End Sub
         Private Sub SendMessage(msg As String)
             SendNetworkMessageToAll("m" & msg)
+        End Sub
+        Private Sub SendPlayerPressed(ID As String) Implements IGameWindow.PlayerPressed
+            For i As Integer = 0 To Spielers.Length - 1
+                If Spielers(i).ID = ID And i <> UserIndex Then
+                    SendNetworkMessageToAll("p" & i.ToString)
+                    Exit For
+                End If
+            Next
         End Sub
         Private Sub SendPlayerBack(index As Integer)
             'Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))

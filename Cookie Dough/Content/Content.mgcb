@@ -2436,9 +2436,21 @@
 /processorParam:Quality=Best
 /build:sfx/checkpoint.wav
 
-#begin sfx/DamDamDaaam.wav
+#begin sfx/countdown_A.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/countdown_A.wav
+
+#begin sfx/countdown_B.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/countdown_B.wav
+
+#begin sfx/DamDamDaaam.wav
+/importer:WavImporter
+/processor:SongProcessor
 /processorParam:Quality=Best
 /build:sfx/DamDamDaaam.wav
 

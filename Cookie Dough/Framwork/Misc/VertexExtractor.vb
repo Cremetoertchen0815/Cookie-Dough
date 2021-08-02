@@ -30,6 +30,34 @@ Namespace Framework.Misc
             Return BoundingBox.CreateFromPoints(transformedPositions)
         End Function
 
+        Friend Shared Function ExtractExtremeVerticesFromModel(ByVal model As Model) As Vector3()
+            Dim boneTransforms As Matrix() = New Matrix(model.Bones.Count - 1) {}
+            model.CopyAbsoluteBoneTransformsTo(boneTransforms)
+            Dim result As New List(Of Vector3)
+
+            For Each mesh As ModelMesh In model.Meshes
+
+                For Each meshPart As ModelMeshPart In mesh.MeshParts
+                    If meshPart.VertexBuffer Is Nothing Then Continue For
+                    Dim positions As Vector3() = GetVertexElement(meshPart, VertexElementUsage.Position)
+                    If positions Is Nothing Then Continue For
+                    Dim transformedPositions As Vector3() = New Vector3(positions.Length - 1) {}
+                    Vector3.Transform(positions, boneTransforms(mesh.ParentBone.Index), transformedPositions)
+                    result.AddRange(transformedPositions)
+                Next
+            Next
+
+            Return GetExtremeVertices(result.ToArray)
+        End Function
+
+        Private Shared Function GetExtremeVertices(inp As Vector3()) As Vector3()
+            Dim exX = From f In inp Order By f.X
+            Dim exY = From f In inp Order By f.Y
+            Dim exZ = From f In inp Order By f.Z
+            Return {New Vector3(exX(0).X, exY(0).Y, exZ(0).Z), New Vector3(exX(inp.Length - 1).X, exY(inp.Length - 1).Y, exZ(inp.Length - 1).Z)}
+        End Function
+
+
         Private Shared Function GetVertexElement(ByVal meshPart As ModelMeshPart, ByVal usage As VertexElementUsage) As Vector3()
             Dim vd As VertexDeclaration = meshPart.VertexBuffer.VertexDeclaration
             Dim elements As VertexElement() = vd.GetVertexElements()

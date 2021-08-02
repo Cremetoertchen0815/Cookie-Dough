@@ -6,7 +6,7 @@ Namespace Game.Barrelled
     Public Class Object3DHandler
         Inherits SceneComponent
 
-        Public Sub New(user As EgoPlayer, owner As GameRoom)
+        Public Sub New(user As EgoPlayer, owner As IGameWindow)
             Me.user = user
             Me.owner = owner
             InteractBtn = New VirtualButton(New VirtualButton.MouseLeftButton)
@@ -17,14 +17,12 @@ Namespace Game.Barrelled
 
         Private InteractBtn As VirtualButton
         Private user As EgoPlayer
-        Private owner As GameRoom
-        Private Const ClickRange As Single = 8
+        Private owner As IGameWindow
+        Private Const ClickRange As Single = 10
 
         Public Overrides Sub Update()
             'Get view ray
-            Dim camShift As Vector3 = user.Direction : camShift.Y = 0 : camShift.Normalize() : camShift *= 0.5
-            Dim campos As Vector3 = user.Location + camShift + New Vector3(0, 5, 0)
-            ViewRay = New Ray(campos, user.Direction)
+            ViewRay = New Ray(owner.EgoPlayer.CameraPosition, user.Direction)
 
             'Check interaction with objects
             Dim topmost As IObject3D = Nothing

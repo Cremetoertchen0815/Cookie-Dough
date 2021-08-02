@@ -7,6 +7,7 @@ Imports Nez.Tiled
 Namespace Game.Barrelled.Players
     Public Class OtherPlayer
         Inherits CommonPlayer
+
         Public Overrides Property Direction As Vector3 = Vector3.Backward
         Public Overrides Property Location As Vector3
             Get
@@ -63,9 +64,9 @@ Namespace Game.Barrelled.Players
             Entity.SetPosition(PlayerSpawn)
         End Sub
 
-        Friend Overrides Function GetWorldMatrix() As Matrix
+        Friend Overrides Function GetWorldMatrix(Optional rotatone As Single = 1) As Matrix
             Dim rotato As New Vector2(TrueDirection.X, -TrueDirection.Z) : rotato.Normalize()
-            Dim rotation As Single = Mathf.AngleBetweenVectors(rotato, Vector2.UnitY) * -2
+            Dim rotation As Single = Mathf.AngleBetweenVectors(rotato, Vector2.UnitY) * -2 * rotatone
             Return Matrix.CreateScale(New Vector3(1, If(RunningMode = PlayerStatus.Sneaky, 0.6, 1), 1) * 1.3) * Matrix.CreateRotationY(-rotation + Math.PI) * Matrix.CreateTranslation(GetLocation)
         End Function
 
@@ -138,6 +139,10 @@ Namespace Game.Barrelled.Players
 
         Friend Overrides Sub SetColor(color As Color)
             MinimapSprite.SetColor(color)
+        End Sub
+
+        Public Overrides Sub ClickedFunction(sender As IGameWindow)
+            sender.PlayerPressed(ID)
         End Sub
     End Class
 End Namespace

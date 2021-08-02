@@ -18,8 +18,8 @@ Namespace Game.Barrelled.Renderers
         Public Sub New(r As Renderer)
             Me.r = r
             SAnimFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
-            SAnimSoundA = Core.Content.Load(Of SoundEffect)("sfx/item_collect")
-            SAnimSoundB = Core.Content.Load(Of SoundEffect)("sfx/DamDamDaaam")
+            SAnimSoundA = Core.Content.Load(Of SoundEffect)("sfx/countdown_A")
+            SAnimSoundB = Core.Content.Load(Of SoundEffect)("sfx/countdown_B")
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, camera As Camera)

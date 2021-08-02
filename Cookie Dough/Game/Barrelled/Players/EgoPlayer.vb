@@ -83,9 +83,8 @@ Namespace Game.Barrelled.Players
             SprintBtn = New VirtualButton(New VirtualButton.KeyboardKey(Keys.LeftControl))
         End Sub
 
-        Friend Overrides Function GetWorldMatrix() As Matrix
-            Dim rotation As Single = Mathf.AngleBetweenVectors(New Vector2(Direction.X, -Direction.Z), Vector2.UnitY) * -2
-            Return Matrix.CreateScale(1, If(RunningMode = PlayerStatus.Sneaky, 0.6, 1), 1) * Matrix.CreateRotationY(rotation) * Matrix.CreateTranslation(Location)
+        Friend Overrides Function GetWorldMatrix(Optional rotato As Single = 1) As Matrix
+            Return Matrix.CreateScale(1, If(RunningMode = PlayerStatus.Sneaky, 0.6, 1), 1) * Matrix.CreateTranslation(Location)
         End Function
 
         Public Overrides Sub Update()

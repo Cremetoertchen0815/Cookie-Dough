@@ -5,5 +5,6 @@ Namespace Game.Barrelled
         ReadOnly Property EgoPlayer As EgoPlayer
         ReadOnly Property Spielers As CommonPlayer()
         ReadOnly Property UserIndex As Integer
+        Sub PlayerPressed(ID As String)
     End Interface
 End Namespace

@@ -144,6 +144,11 @@ Namespace Game.Barrelled
             CreateEntity("HUD").AddComponent(HUD)
 
             'Set colliders
+            ObjectHandler = AddSceneComponent(New Object3DHandler(EgoPlayer, Me))
+            For i As Integer = 0 To Spielers.Length - 1
+                If i = UserIndex Then Continue For
+                ObjectHandler.Objects.Add(Spielers(i))
+            Next
             Colliders = {}
         End Sub
 
@@ -247,6 +252,7 @@ Namespace Game.Barrelled
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
+                        Spielers(source).ID = txt(2)
                         'TRANSMIT MODE
                         Spielers(source).Bereit = True
                         Spielers(source).SetColor(PlayerColors(Spielers(source).Mode))
@@ -282,10 +288,14 @@ Namespace Game.Barrelled
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(2)
                         PostChat(msg, Color.White)
+                    Case "p"c 'Player pressed
+                        Dim who As Integer = CInt(element(2).ToString)
+                        If who = UserIndex Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
                     Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
                         Spielers(source).MOTD = txt(1)
+                        Spielers(source).ID = txt(2)
                         Spielers(source).Bereit = True
                         PostChat(Spielers(source).Name & " is back!", Color.White)
                         SendPlayerBack(source)
@@ -356,6 +366,14 @@ Namespace Game.Barrelled
         Private Sub SendNewPlayerActive(who As Integer)
             SendNetworkMessageToAll("n" & who.ToString)
         End Sub
+        Private Sub SendPlayerPressed(ID As String) Implements IGameWindow.PlayerPressed
+            For i As Integer = 0 To Spielers.Length - 1
+                If Spielers(i).ID = ID And i <> UserIndex Then
+                    SendNetworkMessageToAll("p" & i.ToString)
+                    Exit For
+                End If
+            Next
+        End Sub
         Private Sub SendPlayerBack(index As Integer)
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject((Spielers(index).Mode, Spielers(index).Location))
             SendNetworkMessageToAll("r" & index.ToString & str)
@@ -371,7 +389,7 @@ Namespace Game.Barrelled
         Private Sub SendSync()
             Dim lst As SyncMessage() = New SyncMessage(Spielers.Length - 1) {}
             For i As Integer = 0 To Spielers.Length - 1
-                lst(i) = New SyncMessage(Spielers(i).Name, Spielers(i).MOTD, Spielers(i).Typ, Spielers(i).Mode)
+                lst(i) = New SyncMessage(Spielers(i).Name, Spielers(i).MOTD, Spielers(i).ID, Spielers(i).Typ, Spielers(i).Mode)
             Next
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(lst)
             SendNetworkMessageToAll("y" & str)
@@ -442,6 +460,7 @@ Namespace Game.Barrelled
                 Core.StartSceneTransition(New FadeTransition(Function() New MainMenuScene))
             End If
         End Sub
+
 #End Region
 
 #Region "Schnittstellenimplementation"
