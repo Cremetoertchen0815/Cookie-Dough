@@ -2438,7 +2438,7 @@
 
 #begin sfx/DamDamDaaam.wav
 /importer:WavImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sfx/DamDamDaaam.wav
 

@@ -63,9 +63,11 @@ Namespace Game.Barrelled
         Private WithEvents HUDSprintBar As Controls.ProgressBar
         Private WithEvents HUDChat As Controls.TextscrollBox
         Private WithEvents HUDChatBtn As Controls.Button
+        Private WithEvents HUDNameBtn As Controls.Button
         Private WithEvents HUDInstructions As Controls.Label
         Private WithEvents HUDFullscrBtn As Controls.Button
         Private WithEvents HUDMusicBtn As Controls.Button
+        Private AdditionalHUDRend As AdditionalHUDRendererable
         Private InstructionFader As ITween(Of Color)
         Private ShowDice As Boolean = False
         Private HUDColor As Color
@@ -155,7 +157,7 @@ Namespace Game.Barrelled
 
             'Load minimap renderer
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
-            CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New TargetRendererable(MinimapRenderer))
+            AdditionalHUDRend = CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New AdditionalHUDRendererable(MinimapRenderer))
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
             'Create entities and components
@@ -169,6 +171,7 @@ Namespace Game.Barrelled
             HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Progress = Function() EgoPlayer.SprintLeft} : HUD.Controls.Add(HUDSprintBar)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
+            HUDNameBtn = New Controls.Button("", New Vector2(500, 40), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
             HUDInstructions = New Controls.Label("Click on the totem to start the game...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
             InstructionFader = HUDInstructions.Tween("Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), 0.7).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut) : InstructionFader.Start()
             HUDFullscrBtn = New Controls.Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
@@ -259,7 +262,12 @@ Namespace Game.Barrelled
                         Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         Spielers(source).Mode = MODE
-                        If source <> UserIndex Then CreateEntity(txt(0)).AddComponent(Spielers(source))
+                        If source <> UserIndex Then
+                            Spielers(source).SetColor(PlayerColors(Spielers(source).Mode))
+                            CreateEntity(txt(0)).AddComponent(Spielers(source))
+                        End If
+                        HUD.Color = PlayerHUDColors(EgoPlayer.Mode)
+                        HUDNameBtn.Text = EgoPlayer.Mode.ToString
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
                         'Set local vs online players
@@ -352,7 +360,21 @@ Namespace Game.Barrelled
                         'Status = CardGameState.SpielZuEnde
                         'FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                     Case "x"c 'Continue with game
-                        StopUpdating = False
+                        Select Case EgoPlayer.Mode
+                            Case PlayerMode.Chased
+                                AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
+                                                                                                              Crosshair.Enabled = True
+                                                                                                              EgoPlayer.Prison = (False, Nothing)
+                                                                                                              Status = GameStatus.GameActive
+                                                                                                          End Sub)
+                            Case PlayerMode.Chaser
+                                Core.Schedule(3, Sub() AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
+                                                                                                                                     Crosshair.Enabled = True
+                                                                                                                                     EgoPlayer.Prison = (False, Nothing)
+                                                                                                                                     Status = GameStatus.GameActive
+                                                                                                                                 End Sub))
+
+                        End Select
                     Case "y"c 'Synchronisiere Daten
                         Dim str As String = element.Substring(1)
                         Dim sp As CommonPlayer() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of CommonPlayer())(str)

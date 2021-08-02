@@ -57,9 +57,11 @@ Namespace Game.Barrelled
         Private WithEvents HUDSprintBar As Controls.ProgressBar
         Private WithEvents HUDChat As Controls.TextscrollBox
         Private WithEvents HUDChatBtn As Controls.Button
+        Private WithEvents HUDNameBtn As Controls.Button
         Private WithEvents HUDInstructions As Controls.Label
         Private WithEvents HUDFullscrBtn As Controls.Button
         Private WithEvents HUDMusicBtn As Controls.Button
+        Private AdditionalHUDRend As AdditionalHUDRendererable
         Private InstructionFader As ITween(Of Color)
         Private ShowDice As Boolean = False
         Private HUDColor As Color
@@ -120,18 +122,19 @@ Namespace Game.Barrelled
 
             'Load minimap renderer
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
-            CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New TargetRendererable(MinimapRenderer))
+            AdditionalHUDRend = CreateEntity("addition_render").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New AdditionalHUDRendererable(MinimapRenderer))
 
             'Create entities and components
             'AddSceneComponent(New Object3DHandler(Spielers(UserIndex), Me))
-            Crosshair = CreateEntity("crosshair").AddComponent(Of CrosshairRenderable)().SetRenderLayer(6)
+            Crosshair = CreateEntity("crosshair").AddComponent(Of CrosshairRenderable)().SetRenderLayer(6).SetEnabled(False)
 
             'Load HUD
-            HUD = New GuiSystem() With {.Color = PlayerHUDColors(PlayerMode.Ghost)}
+            HUD = New GuiSystem() With {.Color = PlayerHUDColors(EgoPlayer.Mode)}
             HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnA)
             HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
             HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Progress = Function() EgoPlayer.SprintLeft} : HUD.Controls.Add(HUDSprintBar)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
+            HUDNameBtn = New Controls.Button(EgoPlayer.Mode.ToString, New Vector2(500, 40), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Controls.Label("Run around and do stuff!", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
             InstructionFader = HUDInstructions.Tween("Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), 0.7).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut) : InstructionFader.Start()
@@ -151,18 +154,47 @@ Namespace Game.Barrelled
         Public Overrides Sub Update()
             MyBase.Update()
 
-            If StopUpdating Then Return
-
             Dim mstate As MouseState = Mouse.GetState
 
             Renderer.View = Matrix.CreateLookAt(EgoPlayer.CameraPosition, EgoPlayer.CameraPosition + EgoPlayer.Direction, Vector3.Up)
 
 
+            If StopUpdating Then Return
+
             If NetworkMode Then SendPlayerData()
 
             Select Case Status
                 Case GameStatus.WaitingForOnlinePlayers
+                    HUDInstructions.Text = "Waiting for all players to connect..."
 
+                    'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
+                    For Each sp In Spielers
+                        If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
+                    Next
+
+                    'Falls vollzählig, starte Spiel
+                    Status = GameStatus.Waitn
+                    Core.Schedule(0.8, Sub()
+                                           PostChat("The game has started!", Color.White)
+                                           SendGameActive()
+
+                                           Select Case EgoPlayer.Mode
+                                               Case PlayerMode.Chased
+                                                   AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
+                                                                                                                                 Crosshair.Enabled = True
+                                                                                                                                 EgoPlayer.Prison = (False, Nothing)
+                                                                                                                                 Status = GameStatus.GameActive
+                                                                                                                             End Sub)
+                                               Case PlayerMode.Chaser
+                                                   Core.Schedule(3, Sub() AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
+                                                                                                                                                        Crosshair.Enabled = True
+                                                                                                                                                        EgoPlayer.Prison = (False, Nothing)
+                                                                                                                                                        Status = GameStatus.GameActive
+                                                                                                                                                    End Sub))
+
+                                           End Select
+                                           SendBeginGaem()
+                                       End Sub)
             End Select
 
             'Focus/Unfocus game
@@ -336,8 +368,8 @@ Namespace Game.Barrelled
         End Sub
 
         Private Sub SendSync()
-            Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(Spielers)
-            SendNetworkMessageToAll("y" & str)
+            'Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(Spielers)
+            'SendNetworkMessageToAll("y" & str)
         End Sub
 
         Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType

@@ -71,7 +71,7 @@
     <Compile Include="Game\Barrelled\Players\BaitNSwitchPlayer.vb" />
     <Compile Include="Game\Barrelled\Players\EgoPlayer.vb" />
     <Compile Include="Game\Barrelled\Players\CommonPlayer.vb" />
-    <Compile Include="Game\Barrelled\Renderers\TargetRendererable.vb" />
+    <Compile Include="Game\Barrelled\Renderers\AdditionalHUDRendererable.vb" />
     <Compile Include="Game\Common\GameRoomTemplate.vb" />
     <Compile Include="Game\Corridor\CreatorMenu.vb" />
     <Compile Include="Game\Corridor\Enums.vb" />

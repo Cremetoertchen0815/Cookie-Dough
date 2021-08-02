@@ -148,7 +148,11 @@ Public Class Game1
 
         If MediaPlayer.State = MediaState.Stopped And Not MediaPlayer.IsRepeating Then
             MediaPlayer.Play(Content.Load(Of Song)("bgm/acc_" & (MusicCounter + 1).ToString))
+#If DEBUG Then
+            MediaPlayer.Volume = 0
+#Else
             If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.1
+#End If
             MediaPlayer.IsRepeating = False
             MusicCounter = (MusicCounter + 1) Mod 4
         End If

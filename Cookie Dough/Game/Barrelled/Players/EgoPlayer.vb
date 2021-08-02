@@ -66,7 +66,8 @@ Namespace Game.Barrelled.Players
 
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
-            MinimapSprite = New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player")).SetColor(PlayerColors(PlayerMode.Ghost)).SetRenderLayer(5)
+            Bereit = True
+            MinimapSprite = New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player")).SetRenderLayer(5)
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
@@ -156,7 +157,7 @@ Namespace Game.Barrelled.Players
             Mover.Move(velocity2D, Collider)
 
             'Clamp 2D coords
-            If Prison.Item1 Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, Prison.Item2.Left, Prison.Item2.Right), Mathf.Clamp(Entity.Position.Y, Prison.Item2.Top, Prison.Item2.Bottom))
+            If Mode <> PlayerMode.Ghost AndAlso Prison.Item1 Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, Prison.Item2.Left, Prison.Item2.Right), Mathf.Clamp(Entity.Position.Y, Prison.Item2.Top, Prison.Item2.Bottom))
             Location = Me.Location
 
             'Generate camera position
