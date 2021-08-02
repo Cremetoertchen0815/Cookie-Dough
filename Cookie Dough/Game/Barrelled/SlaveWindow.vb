@@ -2,6 +2,7 @@
 Imports System.IO
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
+Imports Cookie_Dough.Game.Barrelled.Networking
 Imports Cookie_Dough.Game.Barrelled.Players
 Imports Cookie_Dough.Game.Barrelled.Renderers
 Imports Cookie_Dough.Game.Common
@@ -262,12 +263,6 @@ Namespace Game.Barrelled
                         Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         Spielers(source).Mode = MODE
-                        If source <> UserIndex Then
-                            Spielers(source).SetColor(PlayerColors(Spielers(source).Mode))
-                            CreateEntity(txt(0)).AddComponent(Spielers(source))
-                        End If
-                        HUD.Color = PlayerHUDColors(EgoPlayer.Mode)
-                        HUDNameBtn.Text = EgoPlayer.Mode.ToString
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
                         'Set local vs online players
@@ -377,15 +372,19 @@ Namespace Game.Barrelled
                         End Select
                     Case "y"c 'Synchronisiere Daten
                         Dim str As String = element.Substring(1)
-                        Dim sp As CommonPlayer() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of CommonPlayer())(str)
+                        Dim sp As SyncMessage() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage())(str)
                         For i As Integer = 0 To PlCount - 1
                             Spielers(i).Name = sp(i).Name
                             Spielers(i).Typ = sp(i).Typ
                             Spielers(i).MOTD = sp(i).MOTD
                             Spielers(i).Mode = sp(i).Mode
-                            Spielers(i).SetColor(PlayerColors(Spielers(i).Mode))
+                            If i <> UserIndex Then
+                                Spielers(i).SetColor(PlayerColors(Spielers(i).Mode))
+                                If Spielers(i).Bereit AndAlso FindEntity(Spielers(i).Name) Is Nothing Then CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
+                            End If
                         Next
-                        HUD.Color = PlayerHUDColors(Spielers(UserIndex).Mode)
+                        HUD.Color = PlayerHUDColors(EgoPlayer.Mode)
+                        HUDNameBtn.Text = EgoPlayer.Mode.ToString
                     Case "z"c 'Receive sound
                         Dim dataReceiver As New Threading.Thread(Sub()
                                                                      Dim source As Integer = element(1).ToString

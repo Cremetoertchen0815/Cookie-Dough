@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.UI
+Imports Cookie_Dough.Game.Barrelled.Networking
 Imports Cookie_Dough.Game.Barrelled.Players
 Imports Cookie_Dough.Game.Barrelled.Renderers
 Imports Cookie_Dough.Game.Common
@@ -368,8 +369,12 @@ Namespace Game.Barrelled
         End Sub
 
         Private Sub SendSync()
-            'Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(Spielers)
-            'SendNetworkMessageToAll("y" & str)
+            Dim lst As SyncMessage() = New SyncMessage(Spielers.Length - 1) {}
+            For i As Integer = 0 To Spielers.Length - 1
+                lst(i) = New SyncMessage(Spielers(i).Name, Spielers(i).MOTD, Spielers(i).Typ, Spielers(i).Mode)
+            Next
+            Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(lst)
+            SendNetworkMessageToAll("y" & str)
         End Sub
 
         Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType
