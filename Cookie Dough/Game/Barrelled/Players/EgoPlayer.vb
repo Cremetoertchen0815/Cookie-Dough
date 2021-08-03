@@ -108,6 +108,8 @@ Namespace Game.Barrelled.Players
 
                 'Apply jump
                 If JumpBtn.IsPressed And LocationY - VelocityY * Time.DeltaTime <= 0 Then VelocityY = -JumpHeight
+            Else
+                stickPos = Vector2.Zero
             End If
 
             'Calculate player velocity for X-Axis

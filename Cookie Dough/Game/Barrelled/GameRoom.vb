@@ -162,38 +162,41 @@ Namespace Game.Barrelled
 
             Dim mstate As MouseState = Mouse.GetState
 
+            'Update da good stuff
+            If StopUpdating Then
+
+                If NetworkMode Then SendPlayerData()
+
+                Select Case Status
+                    Case GameStatus.WaitingForOnlinePlayers
+                        HUDInstructions.Text = "Waiting for all players to connect..."
+
+                        'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
+                        For Each sp In Spielers
+                            If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
+                        Next
+
+                        'Falls vollzählig, starte Spiel
+                        Status = GameStatus.Waitn
+                        Core.Schedule(0.8, Sub()
+                                               PostChat("The game has started!", Color.White)
+                                               SendGameActive()
+
+                                               Select Case EgoPlayer.Mode
+                                                   Case PlayerMode.Chased
+                                                       ActivateGame()
+                                                   Case PlayerMode.Chaser
+                                                       Core.Schedule(5, AddressOf ActivateGame)
+
+                                               End Select
+                                               SendBeginGaem()
+                                           End Sub)
+                End Select
+
+            End If
+
+            'Generate View matrix for Renderer3D
             Renderer.View = Matrix.CreateLookAt(EgoPlayer.CameraPosition, EgoPlayer.CameraPosition + EgoPlayer.Direction, Vector3.Up)
-
-
-            If StopUpdating Then Return
-
-            If NetworkMode Then SendPlayerData()
-
-            Select Case Status
-                Case GameStatus.WaitingForOnlinePlayers
-                    HUDInstructions.Text = "Waiting for all players to connect..."
-
-                    'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
-                    For Each sp In Spielers
-                        If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
-                    Next
-
-                    'Falls vollzählig, starte Spiel
-                    Status = GameStatus.Waitn
-                    Core.Schedule(0.8, Sub()
-                                           PostChat("The game has started!", Color.White)
-                                           SendGameActive()
-
-                                           Select Case EgoPlayer.Mode
-                                               Case PlayerMode.Chased
-                                                   ActivateGame()
-                                               Case PlayerMode.Chaser
-                                                   Core.Schedule(5, AddressOf ActivateGame)
-
-                                           End Select
-                                           SendBeginGaem()
-                                       End Sub)
-            End Select
 
             'Focus/Unfocus game
             If mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released Then
