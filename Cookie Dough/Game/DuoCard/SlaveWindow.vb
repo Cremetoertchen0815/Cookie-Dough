@@ -126,7 +126,6 @@ Namespace Game.DuoCard
             LocalClient.IsHost = True
             Chat = New List(Of (String, Color))
             SpielerIndex = -1
-            PlCount = 4
             MoveActive = False
             NetworkMode = True
 
@@ -212,6 +211,7 @@ Namespace Game.DuoCard
                                             Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
                                             DebugConsole.Instance.Log(card.ToString)
                                             SendPlayerCardLay(card_nr)
+                                            HUDInstructions.Text = ""
                                         Else
                                             HUDInstructions.Text = "Card invalid!"
                                         End If
@@ -302,6 +302,9 @@ Namespace Game.DuoCard
                         If SpielerIndex = UserIndex And card.Type = CardType.Jack Then
                             SelectionState = SelectionMode.Suit
                             Status = CardGameState.SelectAction
+                            HUDInstructions.Text = "Select suit that you wish for!"
+                        Else
+                            HUDInstructions.Text = ""
                         End If
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
@@ -518,8 +521,8 @@ Namespace Game.DuoCard
             Return False
         End Function
         Private Function IsLayingCardValid(card As Card) As Boolean
-            If BeSkipped And card.Type <> CardType.Eight Then Return False
-            If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
+            If BeSkipped And card.Type <> CardType.Eight Then HUDInstructions.Text = "Select suit that you wish for!" : Return False
+            If DrawForces > 0 And card.Type <> CardType.Seven Then HUDInstructions.Text = "Select suit that you wish for!" : Return False
             Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
         End Function
 

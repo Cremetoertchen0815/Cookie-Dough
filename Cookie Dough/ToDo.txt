@@ -1,6 +1,10 @@
 ﻿BV:
 -Custom CPU sounds
 
+DC:
+-Fix slave placing jack
+-Add CPU support
+
 BR:
 -Update minimap to actually be useful and look pretty(custom map scaling, character rendering, Minimap arrow to indicate view direction, etc.)
 -Implement basic game stuff(freeing others, etc.)

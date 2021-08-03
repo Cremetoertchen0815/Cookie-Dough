@@ -387,6 +387,7 @@ Namespace Game.DuoCard
                     Case "g"c
                         Dim card As New Card(CInt(element.Substring(3)), CInt(element(2).ToString))
                         TableCard = card
+                        SendLayCard(card)
                         StopUpdating = True
                         Core.Schedule(0.5, AddressOf SwitchPlayer)
                     Case "m"c 'Sent chat message

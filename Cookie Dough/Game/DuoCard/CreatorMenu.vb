@@ -21,7 +21,7 @@ Namespace Game.DuoCard
         Friend Arrow As Texture2D
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
         Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local}
-        Protected Whitelist As Integer() = {0, 0, 0, 0}
+        Protected Whitelist As Integer() = {0, 0}
         Protected SecondScreen As Boolean = False
         Protected SM4Scroll As Single
         Protected Schwarzblende As New Transition(Of Single)
@@ -143,10 +143,8 @@ Namespace Game.DuoCard
             If Internetz Then LocalClient.AutomaticRefresh = False
 
             Dim local_count As Integer = 1
-            Dim AktuellesSpiel As New GameRoom()
+            Dim AktuellesSpiel As New GameRoom() With {.GameMode = Mode, .PlCount = Size, .NetworkMode = False}
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
-            AktuellesSpiel.GameMode = Mode
-            AktuellesSpiel.NetworkMode = False
             For i As Integer = 0 To AktuellesSpiel.PlCount - 1
                 Select Case NewGamePlayers(i)
                     Case SpielerTyp.Local
