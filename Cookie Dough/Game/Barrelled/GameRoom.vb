@@ -282,7 +282,13 @@ Namespace Game.Barrelled
                         PostChat(msg, Color.White)
                     Case "p"c 'Player pressed
                         Dim who As Integer = element(2).ToString
-                        If who = UserIndex Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
+                        If who = UserIndex Then
+                            'Local player was touched by online player
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
+                        Else
+                            'Online player touched online player
+                            SendPlayerPressed(who, source)
+                        End If
                     Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
                         Spielers(source).Name = txt(0)
@@ -361,10 +367,14 @@ Namespace Game.Barrelled
         Private Sub SendPlayerPressed(ID As String) Implements IGameWindow.PlayerPressed
             For i As Integer = 0 To Spielers.Length - 1
                 If Spielers(i).ID = ID And i <> UserIndex Then
-                    SendNetworkMessageToAll("p" & i.ToString)
+                    SendNetworkMessageToAll("p" & i.ToString & UserIndex.ToString)
                     Exit For
                 End If
             Next
+        End Sub
+
+        Private Sub SendPlayerPressed(index As Integer, source As Integer)
+            SendNetworkMessageToAll("p" & index.ToString & source.ToString)
         End Sub
         Private Sub SendPlayerBack(index As Integer)
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject((Spielers(index).Mode, Spielers(index).Location))

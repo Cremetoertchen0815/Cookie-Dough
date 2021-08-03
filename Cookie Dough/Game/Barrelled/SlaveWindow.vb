@@ -305,7 +305,11 @@ Namespace Game.Barrelled
                         PostChat(msg, Color.White)
                     Case "p"c 'Player pressed
                         Dim who As Integer = CInt(element(1).ToString)
-                        If who = UserIndex Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
+                        Dim source As Integer = CInt(element(2).ToString)
+                        If who = UserIndex Then
+                            'Some chaser touched local, chased player
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
+                        End If
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString
                         Dim dat As (PlayerMode, Vector3) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (PlayerMode, Vector3))(element.Substring(2))
