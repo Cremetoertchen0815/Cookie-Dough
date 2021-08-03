@@ -4,13 +4,14 @@ This collection is meant to be included into another project of mine at a later 
 There are a couple of online-multiplayer compatible minigames in this collection already, one of them already being near completion.
 The list of games planned to/already in the collection amounts to:
 
-* Betreten Verboten(Lido) - near completion
+* Betreten Verboten(Lido) - in beta(additional maps might follow)
 * Timestein(Cowboy's checkers) - not yet begun
-* Corridor(Chess) - not yet begun
+* Corridor(Chess) - under development
 * pain.(Schlafmütze) - not yet begun
-* DuoCard(Uno) - under development
+* DuoCard(Uno) - polishing phase
 * DooDoo-Head(Durak) - not yet begun
 * Megäaaa(Jungle Speed) - postponed indefinetely
+* Barrelled(cops and robbers) - under development
 * DropTrop(???) - polishing phase
 
 As one can see, BV(Betreten Verboten) was the major focus and is already very close to completion(Just try it out already).
