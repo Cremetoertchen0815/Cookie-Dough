@@ -897,6 +897,7 @@ Namespace Game.BetretenVerboten
                                                                SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
 
                                                                'Send Sound B
+                                                               txt = ""
                                                                snd = GetPlayerAudio(i, True, txt)
                                                                SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
 

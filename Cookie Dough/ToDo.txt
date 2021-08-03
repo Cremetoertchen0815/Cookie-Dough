@@ -1,6 +1,8 @@
 ﻿-Test DC, BR and DT!
 
 BV:
+-Fix rejoining
+-Fix double "Game started" slave for slave
 -Custom CPU sounds
 -Shoots n Ladders BV map
 

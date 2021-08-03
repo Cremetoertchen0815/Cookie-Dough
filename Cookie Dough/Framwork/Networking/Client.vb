@@ -22,6 +22,7 @@ Namespace Framework.Networking
         Public Property AutomaticRefresh As Boolean = True
         Public Shared Property OutputDelegate As Action(Of String) = Sub(x) Return
         Public Shared Property NetworkLog As Boolean = False
+        Public Shared Blocker As New Object
 
 
         Private stream As NetworkStream
@@ -155,8 +156,10 @@ Namespace Framework.Networking
         End Function
 
         Friend Sub WriteStream(msg As String)
-            If (msg(0) = "l"c And IsHost) Or (msg(0) = "e"c And Not IsHost) Then blastmode = False
-            If Connected Then WriteString(msg)
+            SyncLock Blocker
+                If (msg(0) = "l"c And IsHost) Or (msg(0) = "e"c And Not IsHost) Then blastmode = False
+                If Connected Then WriteString(msg)
+            End SyncLock
         End Sub
 
         Public Function GetGamesList() As OnlineGameInstance()
