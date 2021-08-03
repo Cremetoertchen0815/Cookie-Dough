@@ -9,7 +9,7 @@ Imports Microsoft.Xna.Framework.Graphics
 ' </summary>
 Public Module Program
 
-    Friend Property VersionString As String = "Cookie Dough V0.2D"
+    Friend Property VersionString As String = "Cookie Dough V0.30"
     'Old Beacon-tweening system for backwards compatibility for BV
     Friend Property Automator As TweenManager
     Friend Property ReferencePixelTrans As Texture2D
