@@ -133,7 +133,7 @@ Namespace Game.Barrelled
             HUD = New GuiSystem() With {.Color = PlayerHUDColors(EgoPlayer.Mode)}
             HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnA)
             HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
-            HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Progress = Function() EgoPlayer.SprintLeft} : HUD.Controls.Add(HUDSprintBar)
+            HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Progress = Function() EgoPlayer.SprintLeft, .Active = False} : HUD.Controls.Add(HUDSprintBar)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
             HUDNameBtn = New Controls.Button(EgoPlayer.Mode.ToString, New Vector2(500, 40), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
@@ -186,17 +186,9 @@ Namespace Game.Barrelled
 
                                            Select Case EgoPlayer.Mode
                                                Case PlayerMode.Chased
-                                                   AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
-                                                                                                                                 Crosshair.Enabled = True
-                                                                                                                                 EgoPlayer.Prison = (False, Nothing)
-                                                                                                                                 Status = GameStatus.GameActive
-                                                                                                                             End Sub)
+                                                   ActivateGame()
                                                Case PlayerMode.Chaser
-                                                   Core.Schedule(3, Sub() AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
-                                                                                                                                                        Crosshair.Enabled = True
-                                                                                                                                                        EgoPlayer.Prison = (False, Nothing)
-                                                                                                                                                        Status = GameStatus.GameActive
-                                                                                                                                                    End Sub))
+                                                   Core.Schedule(5, AddressOf ActivateGame)
 
                                            End Select
                                            SendBeginGaem()
@@ -207,7 +199,7 @@ Namespace Game.Barrelled
             If mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released Then
                 EgoPlayer.Focused = Not EgoPlayer.Focused
                 Core.Instance.IsMouseVisible = Not EgoPlayer.Focused
-                Crosshair.Enabled = EgoPlayer.Focused
+                Crosshair.Enabled = EgoPlayer.Focused And Status <> GameStatus.WaitingForOnlinePlayers
             End If
 
             'Check if game can be started
@@ -289,7 +281,7 @@ Namespace Game.Barrelled
                         Dim msg As String = element.Substring(2)
                         PostChat(msg, Color.White)
                     Case "p"c 'Player pressed
-                        Dim who As Integer = CInt(element(2).ToString)
+                        Dim who As Integer = element(2).ToString
                         If who = UserIndex Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
                     Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
@@ -423,10 +415,22 @@ Namespace Game.Barrelled
             If NetworkMode Then LocalClient.WriteStream(message)
         End Sub
 #End Region
+
+#Region "Hilfsfunktionen"
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
         End Sub
+
+        Private Sub ActivateGame()
+            AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
+                                                                                          Crosshair.Enabled = True
+                                                                                          EgoPlayer.Prison = (False, Nothing)
+                                                                                          Status = GameStatus.GameActive
+                                                                                          HUDSprintBar.Active = True
+                                                                                      End Sub)
+        End Sub
+#End Region
 
 #Region "Knopfgedrücke"
         Private Sub ExitButton() Handles HUDBtnA.Clicked

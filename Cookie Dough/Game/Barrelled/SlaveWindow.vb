@@ -229,13 +229,12 @@ Namespace Game.Barrelled
                 Core.StartSceneTransition(New FadeTransition(Function() New MainMenuScene))
                 NetworkMode = False
             End If
-            ReadAndProcessInputData()
 
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> CardGameState.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
-                If LocalClient.LeaveFlag And Status <> CardGameState.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If Not LocalClient.Connected And Status <> GameStatus.GameFinished Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                If LocalClient.LeaveFlag And Status <> GameStatus.GameFinished Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Host left! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -254,7 +253,6 @@ Namespace Game.Barrelled
         ''' Liest die Daten aus dem Stream des Servers
         ''' </summary>
         Private Sub ReadAndProcessInputData()
-
             'Implement move active
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
