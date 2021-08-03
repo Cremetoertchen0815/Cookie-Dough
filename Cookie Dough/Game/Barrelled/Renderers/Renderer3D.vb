@@ -221,8 +221,10 @@ Namespace Game.Barrelled.Renderers
                 Next
             Next
 
+#If DEBUG Then
             'Draw debug cube
             DrawDebug()
+#End If
 
             'Draw local player
             For i As Integer = 0 To PlayerModelHeadless.Meshes.Count - 1
@@ -230,8 +232,6 @@ Namespace Game.Barrelled.Renderers
                 ApplyFX(element, PlayerColors(BaseClass.EgoPlayer.Mode), If(i = 2, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(4.5) * Matrix.CreateTranslation(0, 16.12, 0), element.ParentBone.ModelTransform) * PlayerTransform * BaseClass.EgoPlayer.GetWorldMatrix)
                 element.Draw()
             Next
-            'Draw bounding box
-            DrawBoundingBox(PlayerModelBoundingBox, DebugEffect, Dev, Matrix.CreateScale(0.003) * BaseClass.EgoPlayer.GetWorldMatrix, View, Projection)
 
             'Draw other players
             For p As Integer = 0 To BaseClass.Spielers.Length - 1
@@ -252,7 +252,9 @@ Namespace Game.Barrelled.Renderers
                 'Reset Rasterizer state
 
                 'Draw bounding box
+#If DEBUG Then
                 DrawBoundingBox(PlayerModelBoundingBox, DebugEffect, Dev, Matrix.CreateScale(0.003) * player.GetWorldMatrix(0), View, Projection)
+#End If
             Next
 
             'Draw map

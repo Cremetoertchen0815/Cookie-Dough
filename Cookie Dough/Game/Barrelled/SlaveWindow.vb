@@ -311,7 +311,7 @@ Namespace Game.Barrelled
                         Dim source As Integer = CInt(element(2).ToString)
                         If who = UserIndex Then
                             'Some chaser touched local, chased player
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True
                         End If
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString

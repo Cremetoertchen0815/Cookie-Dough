@@ -287,7 +287,7 @@ Namespace Game.Barrelled
                         Dim who As Integer = element(2).ToString
                         If who = UserIndex Then
                             'Local player was touched by online player
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True
                         Else
                             'Online player touched online player
                             SendPlayerPressed(who, source)
