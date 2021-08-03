@@ -19,8 +19,6 @@ Namespace Game.Barrelled.Renderers
 
         'Quad rendering
         Private QuadClockwise As VertexBuffer
-        Private QuadCounterClockwise As VertexBuffer
-        Private QuadEffect As BasicEffect
         Private DebugEffect As BasicEffect
 
         'Player
@@ -31,7 +29,8 @@ Namespace Game.Barrelled.Renderers
         Friend PlayerTransform As Matrix
 
         'Room
-        Private FloorTexture As Texture2D
+        Private FloorEffect As BasicEffect
+        Private BarrierModel As Model
         Public Floorsize As Vector2
 
         'Map
@@ -115,6 +114,7 @@ Namespace Game.Barrelled.Renderers
         End Sub
 
         Public Sub DrawDebug()
+            DebugEffect.Alpha = 1.0F
             DebugEffect.World = Matrix.CreateScale(0.03) * Matrix.CreateTranslation(30, 15, 30)
             DebugEffect.View = View
             DebugEffect.Projection = Projection
@@ -162,6 +162,7 @@ Namespace Game.Barrelled.Renderers
         Public Overrides Sub OnAddedToScene(scene As Scene)
             MyBase.OnAddedToScene(scene)
 
+            'Generate Projection matrix
             Dev = Core.GraphicsDevice
             Projection = Matrix.CreatePerspectiveFieldOfView(1.15, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
 
@@ -176,13 +177,10 @@ Namespace Game.Barrelled.Renderers
             }
             QuadClockwise = New VertexBuffer(Dev, GetType(VertexPositionNormalTexture), vert.Count, BufferUsage.WriteOnly)
             QuadClockwise.SetData(vert.ToArray)
-            vert.Reverse()
-            QuadCounterClockwise = New VertexBuffer(Dev, GetType(VertexPositionNormalTexture), vert.Count, BufferUsage.WriteOnly)
-            QuadCounterClockwise.SetData(vert.ToArray)
 
-            'Load quad effect
-            QuadEffect = New BasicEffect(Dev) With {.TextureEnabled = True}
-            ApplyDefaultFX(QuadEffect)
+            'Load room stuff
+            BarrierModel = scene.Content.Load(Of Model)("mesh/Have_A_Cube")
+            FloorEffect = New BasicEffect(Dev) With {.TextureEnabled = True, .Texture = scene.Content.LoadTexture("3Droom_floor"), .View = View, .Projection = Projection, .EmissiveColor = Vector3.One * 0.8, .FogStart = 25, .FogEnd = 90, .FogColor = Vector3.Zero}
 
             'Load player
             PlayerModel = scene.Content.Load(Of Model)("mesh/piece_filled")
@@ -201,9 +199,6 @@ Namespace Game.Barrelled.Renderers
             CreateBoxBuffer()
             CubeModel = scene.Content.Load(Of Model)("mesh/Have_A_Cube")
             ApplyDefaultFX(CubeModel, Color.Red)
-
-            'Load room
-            FloorTexture = scene.Content.LoadTexture("3Droom_floor")
         End Sub
 
         Public Overrides Sub Render(scene As Scene)
@@ -213,20 +208,11 @@ Namespace Game.Barrelled.Renderers
             'Draw floor/ceiling on a quad
             For x As Integer = 0 To Floorsize.X
                 For y As Integer = 0 To Floorsize.Y
-
-                    QuadEffect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1, 1)
-                    QuadEffect.World = Matrix.CreateTranslation(New Vector3(x, y, 0)) * Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, -20)
-                    QuadEffect.View = View
-                    QuadEffect.Projection = Projection
-                    QuadEffect.EmissiveColor = Vector3.One * 0.8
-                    QuadEffect.DirectionalLight0.Enabled = False
-                    QuadEffect.DirectionalLight1.Enabled = False
-                    QuadEffect.DirectionalLight2.Enabled = False
-                    QuadEffect.FogStart = 25
-                    QuadEffect.FogEnd = 90
-                    QuadEffect.FogColor = Vector3.Zero
-                    QuadEffect.Texture = FloorTexture
-                    For Each pass As EffectPass In QuadEffect.CurrentTechnique.Passes
+                    FloorEffect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1, 1)
+                    FloorEffect.World = Matrix.CreateTranslation(New Vector3(x, y, 0)) * Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, -20)
+                    FloorEffect.View = View
+                    FloorEffect.DiffuseColor = Vector3.Zero
+                    For Each pass As EffectPass In FloorEffect.CurrentTechnique.Passes
                         Dev.SetVertexBuffer(QuadClockwise)
                         pass.Apply()
 
@@ -264,7 +250,6 @@ Namespace Game.Barrelled.Renderers
                     element.Draw()
                 Next
                 'Reset Rasterizer state
-                Dev.RasterizerState = RasterizerState.CullNone
 
                 'Draw bounding box
                 DrawBoundingBox(PlayerModelBoundingBox, DebugEffect, Dev, Matrix.CreateScale(0.003) * player.GetWorldMatrix(0), View, Projection)
@@ -286,13 +271,38 @@ Namespace Game.Barrelled.Renderers
                 mesh.Draw()
             Next
 
+
+            'Draw barrier
+            If BaseClass.EgoPlayer.PrisonEnabled Then
+                Dev.RasterizerState = RasterizerState.CullNone
+                For Each element In BarrierModel.Meshes
+                    For Each fx As BasicEffect In element.Effects
+                        Dim pos As Vector2 = Players.CommonPlayer.PrisonPosition.Size.ToVector2 / 3 * New Vector2(1, 2) + New Vector2(5, -5.5)
+                        Dim size As Vector2 = Players.CommonPlayer.PrisonPosition.Location.ToVector2 / 6 * New Vector2(1, 0.5) + New Vector2(-2.5, 1.5)
+                        fx.World = Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(size.X, 25, size.Y)) * Matrix.CreateTranslation(New Vector3(pos.X, -2, pos.Y))
+                        fx.View = View
+                        fx.Projection = Projection
+                        fx.FogEnabled = False
+                        fx.Alpha = 0.8F
+                        fx.DiffuseColor = New Vector3(0, 0, 0)
+                        fx.EmissiveColor = New Vector3(0.8, 0.1, 0)
+                    Next
+                    element.Draw()
+                Next
+
+            End If
+
+
         End Sub
 
         Private Sub ApplyFX(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)
             For Each effect As BasicEffect In mesh.Effects
+                effect.EmissiveColor = Vector3.Zero
+                effect.Alpha = 1.0F
                 effect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1 * yflip, 1)
                 effect.DiffuseColor = DiffuseColor.ToVector3
                 effect.World = world
+                effect.FogEnabled = True
                 effect.View = View
                 effect.Projection = Projection
             Next
@@ -358,6 +368,7 @@ Namespace Game.Barrelled.Renderers
         Private Sub DrawBoundingBox(ByVal buffers As VertexExtractor.BoundingBoxBuffers, ByVal effect As BasicEffect, ByVal graphicsDevice As GraphicsDevice, ByVal world As Matrix, ByVal view As Matrix, ByVal projection As Matrix)
             graphicsDevice.SetVertexBuffer(buffers.Vertices)
             graphicsDevice.Indices = buffers.Indices
+            effect.Alpha = 1.0F
             effect.World = world
             effect.View = view
             effect.Projection = projection

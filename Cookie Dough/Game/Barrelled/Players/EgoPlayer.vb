@@ -164,7 +164,7 @@ Namespace Game.Barrelled.Players
             Mover.Move(velocity2D, Collider)
 
             'Clamp 2D coords
-            If Mode <> PlayerMode.Ghost AndAlso PrisonEnabled Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, PrisonPosition.Left, PrisonPosition.Right), Mathf.Clamp(Entity.Position.Y, PrisonPosition.Top, PrisonPosition.Bottom))
+            If Mode <> PlayerMode.Ghost AndAlso PrisonEnabled Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, PrisonPosition.Left + 5, PrisonPosition.Right - 5), Mathf.Clamp(Entity.Position.Y, PrisonPosition.Top + 5, PrisonPosition.Bottom - 5))
             Location = Me.Location
 
             'Generate camera position
