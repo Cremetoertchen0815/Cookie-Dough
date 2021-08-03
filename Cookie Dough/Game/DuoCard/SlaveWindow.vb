@@ -212,7 +212,7 @@ Namespace Game.DuoCard
                                             DebugConsole.Instance.Log(card.ToString)
                                             SendPlayerCardLay(card_nr)
                                             HUDInstructions.Text = ""
-                                        Else
+                                        ElseIf Not BeSkipped And DrawForces < 1 Then
                                             HUDInstructions.Text = "Card invalid!"
                                         End If
                                         Exit For
@@ -313,6 +313,7 @@ Namespace Game.DuoCard
                         Dim who As Integer = element(1).ToString
                         SpielerIndex = who
                         HUDNameBtn.Active = True
+                        HUDInstructions.Text = ""
                         If UserIndex < 0 Then Continue For
                         If who = UserIndex Then
                             PrepareMove()
@@ -463,6 +464,7 @@ Namespace Game.DuoCard
             LocalClient.WriteStream("i")
         End Sub
         Private Sub SendCardStackPress()
+            If BeSkipped Or DrawForces > 0 Then HUDInstructions.Text = "Too bad!"
             LocalClient.WriteStream("p")
         End Sub
 
@@ -521,8 +523,8 @@ Namespace Game.DuoCard
             Return False
         End Function
         Private Function IsLayingCardValid(card As Card) As Boolean
-            If BeSkipped And card.Type <> CardType.Eight Then HUDInstructions.Text = "Select suit that you wish for!" : Return False
-            If DrawForces > 0 And card.Type <> CardType.Seven Then HUDInstructions.Text = "Select suit that you wish for!" : Return False
+            If BeSkipped And card.Type <> CardType.Eight Then Return False
+            If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
             Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
         End Function
 
@@ -536,6 +538,9 @@ Namespace Game.DuoCard
         Private Sub PrepareMove()
             Status = CardGameState.SelectAction
             SelectionState = SelectionMode.Standard
+            HUDInstructions.Text = "Select card!"
+            If BeSkipped Then HUDInstructions.Text = "Choose an eight to forward skip or press card stack if you can't!"
+            If DrawForces > 0 Then HUDInstructions.Text = "Choose a seven to forward draw or press card stack if you can't!"
         End Sub
 #End Region
 

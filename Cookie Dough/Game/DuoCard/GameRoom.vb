@@ -262,7 +262,7 @@ Namespace Game.DuoCard
                                             Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
                                             DebugConsole.Instance.Log(card.ToString)
                                             LayCard(card)
-                                        Else
+                                        ElseIf Not BeSkipped And DrawForces < 1 Then
                                             HUDInstructions.Text = "Card invalid!"
                                         End If
                                         Exit For
@@ -281,11 +281,13 @@ Namespace Game.DuoCard
                         If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(710, 420, 220, 270).Contains(mpos) AndAlso CardStack.Count > 0 Then
                             If BeSkipped Then
                                 'Skip player
+                                HUDInstructions.Text = "Too bad!"
                                 StopUpdating = True
                                 BeSkipped = False
                                 Core.Schedule(0.5, AddressOf SwitchPlayer)
                             ElseIf DrawForces > 0 Then
                                 'Draw cards that you're forced to
+                                HUDInstructions.Text = "Too bad!"
                                 StopUpdating = True
 
                                 If DrawForces > 0 Then
@@ -578,7 +580,7 @@ Namespace Game.DuoCard
             Select Case card.Type
                 Case CardType.Jack
                     If SpielerIndex = UserIndex Then Core.Schedule(0.5, Sub()
-                                                                            HUDInstructions.Text = "Select wishing suit!"
+                                                                            HUDInstructions.Text = "Select suit that you wish for!"
                                                                             SelectionState = SelectionMode.Suit
                                                                             Status = CardGameState.SelectAction
                                                                         End Sub)
@@ -614,6 +616,7 @@ Namespace Game.DuoCard
             Loop
             'Setze HUD flags
             If Spielers(SpielerIndex).Typ <> SpielerTyp.Online Then Status = CardGameState.SelectAction Else Status = CardGameState.Waitn
+            SendParamUpdate()
             SendNewPlayerActive(SpielerIndex)
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             HUD.Color = hudcolors(UserIndex)
@@ -624,10 +627,12 @@ Namespace Game.DuoCard
             SelectionState = SelectionMode.Standard
             HUDArrowUp.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
             HUDArrowDown.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
-            SendParamUpdate()
             SendGameActive()
             ResetHUD()
-            HUDInstructions.Text = "Lol"
+            HUDInstructions.Text = "Select card!"
+            If BeSkipped Then HUDInstructions.Text = "Choose an eight to forward skip or press card stack if you can't!"
+            If DrawForces > 0 Then HUDInstructions.Text = "Choose a seven to forward draw or press card stack if you can't!"
+            If UserIndex <> SpielerIndex Then HUDInstructions.Text = ""
         End Sub
 
         Private Sub ResetHUD()
