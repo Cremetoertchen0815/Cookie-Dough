@@ -1,9 +1,15 @@
-﻿BV:
+﻿-Test DC, BR and DT!
+
+BV:
 -Custom CPU sounds
+-Shoots n Ladders BV map
+
+-DT
+-Fix progress syncing(in the bottom right)
 
 DC:
--Fix slave placing jack
--Add CPU support
+-Add CPUs
+-Add highscoring
 
 BR:
 -Update minimap to actually be useful and look pretty(custom map scaling, character rendering, Minimap arrow to indicate view direction, etc.)
@@ -14,13 +20,9 @@ BR:
 -Implement rejoining(or maybe not rejoining)
 -Different terrain(high grass[vision is disturbed, louder noises, you can hide], water[constant sneaking speed], aerial faithplates[bounces you to a set location], )
 -Implement pups(lazer[notify barrels when rebel is treading], stun[shoot at ppl]
--Music(volume depends on own speed, sirens from barrels)
+-Music(stems, volume depends on own speed, sirens from barrels)
 
-
--Work on DC CPU + highscore
--Shoots n Ladders BV map
-
-
+BR Ideas:
 räuber und Schandan meets Packman meets Hide and seek meets 3D
 -All players start in the middle, rebbels can run first, after a while barrels can roam too
 -Barrels must catch all the rebbels, if all rebels are caught, the barrels win
