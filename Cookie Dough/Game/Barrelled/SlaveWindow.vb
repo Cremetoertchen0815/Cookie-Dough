@@ -152,7 +152,7 @@ Namespace Game.Barrelled
                     Case "spawn"
                         CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
                     Case "prison"
-                        EgoPlayer.Prison = (True, New Rectangle(element.X, element.Y, element.Width, element.Height))
+                        CommonPlayer.PrisonPosition = New Rectangle(element.X, element.Y, element.Width, element.Height)
                 End Select
             Next
 
@@ -266,6 +266,9 @@ Namespace Game.Barrelled
                         Spielers(source).MOTD = txt(1)
                         Spielers(source).Bereit = True
                         Spielers(source).Mode = MODE
+                        If source = UserIndex And Spielers(source).Mode = PlayerMode.Ghost Then EgoPlayer.PrisonEnabled = False
+                        HUD.Color = PlayerHUDColors(EgoPlayer.Mode)
+                        HUDNameBtn.Text = EgoPlayer.Mode.ToString
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
                         'Set local vs online players
@@ -367,17 +370,9 @@ Namespace Game.Barrelled
                     Case "x"c 'Continue with game
                         Select Case EgoPlayer.Mode
                             Case PlayerMode.Chased
-                                AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
-                                                                                                              Crosshair.Enabled = True
-                                                                                                              EgoPlayer.Prison = (False, Nothing)
-                                                                                                              Status = GameStatus.GameActive
-                                                                                                          End Sub)
+                                ActivateGame()
                             Case PlayerMode.Chaser
-                                Core.Schedule(3, Sub() AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
-                                                                                                                                     Crosshair.Enabled = True
-                                                                                                                                     EgoPlayer.Prison = (False, Nothing)
-                                                                                                                                     Status = GameStatus.GameActive
-                                                                                                                                 End Sub))
+                                Core.Schedule(3, AddressOf ActivateGame)
 
                         End Select
                     Case "y"c 'Synchronisiere Daten
@@ -394,8 +389,6 @@ Namespace Game.Barrelled
                                 If Spielers(i).Bereit AndAlso FindEntity(Spielers(i).Name) Is Nothing Then CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
                             End If
                         Next
-                        HUD.Color = PlayerHUDColors(EgoPlayer.Mode)
-                        HUDNameBtn.Text = EgoPlayer.Mode.ToString
                     Case "z"c 'Receive sound
                         Dim dataReceiver As New Threading.Thread(Sub()
                                                                      Dim source As Integer = element(1).ToString
@@ -515,6 +508,15 @@ Namespace Game.Barrelled
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
+        End Sub
+
+        Private Sub ActivateGame()
+            AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
+                                                                                          Crosshair.Enabled = True
+                                                                                          EgoPlayer.PrisonEnabled = False
+                                                                                          Status = GameStatus.GameActive
+                                                                                          HUDSprintBar.Active = True
+                                                                                      End Sub)
         End Sub
 
 #Region "Knopfgedrücke"

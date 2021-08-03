@@ -29,17 +29,13 @@ Namespace Game.Barrelled.Players
         Private Collider As BoxCollider
         Private stickPos As Vector2
         Private TrueDirection As Vector3
-        Private movDir As Vector3
 
-        Private Const MouseSensivity As Single = 232
         Private Const SprintSpeed As Single = 150
         Private Const SneakSpeed As Single = 8
         Private Const Speed As Single = 60 '40
-        Private Const JumpHeight As Single = 50
         Private Const Gravity As Single = 85
         Private Const Acc As Single = 180
         Private Const Dec As Single = 220
-        Private Const SprintMeterDrain As Single = 0.1
 
         Public Overrides Property ThreeDeeVelocity As Vector3
             Get
@@ -55,6 +51,12 @@ Namespace Game.Barrelled.Players
             Me.Typ = typ
             MinimapSprite = New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player")).SetColor(PlayerColors(Mode)).SetRenderLayer(5)
         End Sub
+
+        Public Sub New(typ As SpielerTyp, mode As PlayerMode)
+            Me.New(typ)
+            Me.Mode = mode
+        End Sub
+
 
         Public Overrides Sub OnAddedToEntity()
 

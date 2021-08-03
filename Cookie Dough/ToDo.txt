@@ -2,8 +2,9 @@
 -Custom CPU sounds
 
 BR:
+-Add visual indicator for prison
 -Implement jump meter(???)
--Implement basic game stuff(being caught, landing in prison, freeing others, etc.)
+-Implement basic game stuff(landing in prison, freeing others, etc.)
 -Update minimap to actually be useful and look pretty(custom map scaling, character rendering, Minimap arrow to indicate view direction, etc.)
 -Implement winning
 -3D sound

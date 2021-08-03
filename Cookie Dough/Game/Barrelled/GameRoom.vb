@@ -117,7 +117,7 @@ Namespace Game.Barrelled
                     Case "spawn"
                         CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
                     Case "prison"
-                        EgoPlayer.Prison = (True, New Rectangle(element.X, element.Y, element.Width, element.Height))
+                        CommonPlayer.PrisonPosition = New Rectangle(element.X, element.Y, element.Width, element.Height)
                 End Select
             Next
 
@@ -163,7 +163,7 @@ Namespace Game.Barrelled
             Dim mstate As MouseState = Mouse.GetState
 
             'Update da good stuff
-            If StopUpdating Then
+            If Not StopUpdating Then
 
                 If NetworkMode Then SendPlayerData()
 
@@ -438,7 +438,7 @@ Namespace Game.Barrelled
         Private Sub ActivateGame()
             AdditionalHUDRend.TriggerStartAnimation({"5", "4", "3", "2", "1", "Go!"}, Sub()
                                                                                           Crosshair.Enabled = True
-                                                                                          EgoPlayer.Prison = (False, Nothing)
+                                                                                          EgoPlayer.PrisonEnabled = False
                                                                                           Status = GameStatus.GameActive
                                                                                           HUDSprintBar.Active = True
                                                                                       End Sub)

@@ -10,10 +10,9 @@ Namespace Game.Barrelled.Players
 
 
         'Misc
-        Friend Prison As (Boolean, Rectangle) = (False, Nothing)
+        Friend PrisonEnabled As Boolean
         Friend CameraPosition As Vector3
         Private lastMousePos As Vector2 = Mouse.GetState.Position.ToVector2
-        Private lastSpeen As Vector2
         Private lastmstate As MouseState = Mouse.GetState
         Private movDir As Vector3
         Private MinimapSprite As SpriteRenderer
@@ -67,7 +66,14 @@ Namespace Game.Barrelled.Players
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
             Bereit = True
+            PrisonEnabled = True
             MinimapSprite = New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player")).SetRenderLayer(5)
+        End Sub
+
+        Public Sub New(typ As SpielerTyp, mode As PlayerMode)
+            Me.New(typ)
+            Me.Mode = mode
+            If mode = PlayerMode.Ghost Then PrisonEnabled = False
         End Sub
 
         Public Overrides Sub OnAddedToEntity()
@@ -158,7 +164,7 @@ Namespace Game.Barrelled.Players
             Mover.Move(velocity2D, Collider)
 
             'Clamp 2D coords
-            If Mode <> PlayerMode.Ghost AndAlso Prison.Item1 Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, Prison.Item2.Left, Prison.Item2.Right), Mathf.Clamp(Entity.Position.Y, Prison.Item2.Top, Prison.Item2.Bottom))
+            If Mode <> PlayerMode.Ghost AndAlso PrisonEnabled Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, PrisonPosition.Left, PrisonPosition.Right), Mathf.Clamp(Entity.Position.Y, PrisonPosition.Top, PrisonPosition.Bottom))
             Location = Me.Location
 
             'Generate camera position
