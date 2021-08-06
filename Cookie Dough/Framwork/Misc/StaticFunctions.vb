@@ -82,7 +82,7 @@ Namespace Framework.Misc
             If Not BoxOpen Then
                 BoxOpen = True
                 Dim t As New Threading.Thread(Sub()
-                                                  Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
+                                                  Dim txt As String = RealInputBox(message, title, defaultvalue)
                                                   If txt <> "" Then
                                                       txt = RemIllegalChars(txt, font)
                                                       finalaction.Invoke(txt)

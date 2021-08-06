@@ -10,15 +10,20 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Mono|Any CPU = Mono|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Mono|Any CPU.ActiveCfg = Mono|Any CPU
+		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Mono|Any CPU.Build.0 = Mono|Any CPU
 		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Mono|Any CPU.ActiveCfg = Mono|Any CPU
+		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Mono|Any CPU.Build.0 = Mono|Any CPU
 		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

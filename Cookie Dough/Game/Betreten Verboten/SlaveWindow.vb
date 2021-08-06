@@ -100,7 +100,7 @@ Namespace Game.BetretenVerboten
         Private Const FigurSpeed As Integer = 450
         Private Const ErrorCooldown As Integer = 1
         Private Const RollDiceCooldown As Single = 0.5
-        Private Const CPUThinkingTime As Integer = 0.6
+        Private Const CPUThinkingTime As Single = 0.6
         Private Const DopsHöhe As Integer = 150
         Private Const CamSpeed As Integer = 1300
         Private Const SacrificeWait As Integer = 5
@@ -171,7 +171,7 @@ Namespace Game.BetretenVerboten
             Chat = New List(Of (String, Color))
             MoveActive = False
             If UserIndex > -1 Then Spielers(UserIndex).CustomSound = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
-            If UserIndex > -1 Then Spielers(UserIndex).Thumbnail = If(My.Settings.Thumbnail, Texture2D.FromFile(Dev, "Cache\client\pp.png"), ReferencePixelTrans)
+            If UserIndex > -1 Then Spielers(UserIndex).Thumbnail = If(My.Settings.Thumbnail, Texture2D.FromFile(Dev, "Cache/client/pp.png"), ReferencePixelTrans)
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
@@ -181,10 +181,10 @@ Namespace Game.BetretenVerboten
         Public Sub LoadContent()
 
             'Lade Assets
-            ButtonFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font\ButtonText"))
-            ChatFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font\ChatText"))
-            Fanfare = Content.Load(Of Song)("bgm\fanfare")
-            DamDamDaaaam = Content.Load(Of Song)("sfx\DamDamDaaam")
+            ButtonFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font/ButtonText"))
+            ChatFont = New NezSpriteFont(Content.Load(Of SpriteFont)("font/ChatText"))
+            Fanfare = Content.Load(Of Song)("bgm/fanfare")
+            DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
 
             'Lade HUD
             HUD = New GuiSystem
@@ -467,8 +467,8 @@ Namespace Game.BetretenVerboten
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
-                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Host left! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : MsgBox("Host left! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -662,8 +662,8 @@ Namespace Game.BetretenVerboten
                                                                          Try
                                                                              'Receive sound
                                                                              If IdentSound = IdentType.Custom Then
-                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-                                                                                 Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\client\" & Spielers(source).Name & "_pp.png")
+                                                                                 File.WriteAllBytes("Cache/client/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/client/" & Spielers(source).Name & "_pp.png")
                                                                              End If
                                                                          Catch ex As Exception
                                                                          End Try
@@ -671,15 +671,15 @@ Namespace Game.BetretenVerboten
                                                                          Try
                                                                              'Receive sound
                                                                              If IdentSound = IdentType.Custom Then
-                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                                                                 sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                                                                                 File.WriteAllBytes("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 sound = SoundEffect.FromFile("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav")
                                                                              Else
-                                                                                 sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                                 sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
                                                                              End If
                                                                          Catch ex As Exception
                                                                              'Data damaged, send standard sound
                                                                              IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                                                                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                             sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
                                                                          End Try
 
                                                                          'Set sound for player
@@ -727,15 +727,15 @@ Namespace Game.BetretenVerboten
 
             Dim dataSender As New Threading.Thread(Sub()
                                                        Dim txt As String = ""
-                                                       If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+                                                       If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
                                                        LocalClient.WriteStream("z" & My.Settings.SoundA.ToString & "0" & "_TATA_" & txt)
 
                                                        txt = ""
-                                                       If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+                                                       If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundB.audio")))
                                                        LocalClient.WriteStream("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
 
                                                        txt = ""
-                                                       If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
+                                                       If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/pp.png")))
                                                        LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
             dataSender.Start()
@@ -932,9 +932,9 @@ Namespace Game.BetretenVerboten
         End Function
         Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
             If ident <> IdentType.Custom Then
-                Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
+                Return SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache\client\sound" & If(IsSoundB, "B", "A") & ".audio")
+                Return SoundEffect.FromFile("Cache/client/sound" & If(IsSoundB, "B", "A") & ".audio")
             End If
         End Function
 
@@ -1065,7 +1065,7 @@ Namespace Game.BetretenVerboten
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtnB.Clicked
-            If Not Renderer.BeginTriggered AndAlso Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
+            If Not Renderer.BeginTriggered AndAlso MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                 SFX(2).Play()
                 LocalClient.blastmode = False
                 SendGameClosed()
@@ -1077,13 +1077,13 @@ Namespace Game.BetretenVerboten
         Private Sub AngerButton() Handles HUDBtnC.Clicked
             If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex > -1 Then
                 StopUpdating = True
-                Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
-                If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                    Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", "You suck!")
+                MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
+                If MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
+                    Dim res As String = RealInputBox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", "You suck!")
                     Try
                         Dim aim As Integer = res
                         Do Until aim < 13 And aim > 0
-                            res = Microsoft.VisualBasic.InputBox("Screw you! I said 1 <= x <= 12 FIELDS!", "You suck!")
+                            res = RealInputBox("Screw you! I said 1 <= x <= 12 FIELDS!", "You suck!")
                             aim = CInt(res)
                         Loop
                         WürfelWerte(0) = If(aim > 6, 6, aim)
@@ -1093,7 +1093,7 @@ Namespace Game.BetretenVerboten
                         SendAngered()
                         SFX(2).Play()
                     Catch
-                        Microsoft.VisualBasic.MsgBox("Alright, then don't.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
+                        MsgBox("Alright, then don't.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                     End Try
                 End If
                 StopUpdating = False
@@ -1105,8 +1105,8 @@ Namespace Game.BetretenVerboten
         Private Sub SacrificeButton() Handles HUDBtnD.Clicked
             If Status = SpielStatus.Würfel And Not StopUpdating And Spielers(UserIndex).SacrificeCounter <= 0 And UserIndex > -1 Then
                 StopUpdating = True
-                Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
-                If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
+                MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
+                If MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                     Status = SpielStatus.WähleOpfer
                     DontKickSacrifice = Spielers(UserIndex).SacrificeCounter < 0
                     Spielers(UserIndex).SacrificeCounter = SacrificeWait
@@ -1114,7 +1114,7 @@ Namespace Game.BetretenVerboten
                     'Move camera
                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                 Else
-                    Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
+                    MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If
                 StopUpdating = False
             Else
