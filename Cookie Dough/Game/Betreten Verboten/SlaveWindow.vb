@@ -1050,10 +1050,7 @@ Namespace Game.BetretenVerboten
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
             SFX(2).Play()
-            LaunchInputBox(Sub(x)
-                               SendChatMessage(x)
-                               PostChat("[" & Spielers(UserIndex).Name & "]: " & x, hudcolors(UserIndex))
-                           End Sub, ChatFont, "Enter your message: ", "Send message")
+            LaunchInputBox(AddressOf SendChatMessage, ChatFont, "Enter your message: ", "Send message")
         End Sub
 
 
