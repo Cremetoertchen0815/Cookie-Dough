@@ -1576,8 +1576,8 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub ResetHUD()
-            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
-            HUDBtnD.Active = SpielerIndex = UserIndex
+            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+            HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
             HUD.TweenColorTo(If(UserIndex >= 0, hudcolors(UserIndex), Color.White), 0.5).SetEaseType(EaseType.CubicInOut).Start()

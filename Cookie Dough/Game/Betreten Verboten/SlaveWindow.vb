@@ -555,8 +555,8 @@ Namespace Game.BetretenVerboten
                     Case "n"c 'New player active
                         Dim who As Integer = element(1).ToString
                         SpielerIndex = who
-                        HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
-                        HUDBtnD.Active = SpielerIndex = UserIndex
+                        HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+                        HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
                         HUDNameBtn.Active = True
                         If UserIndex < 0 Then Continue For
                         If who = UserIndex Then
