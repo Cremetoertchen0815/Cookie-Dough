@@ -17,7 +17,7 @@
 '        Private ChangeNameButtonPressed As Boolean = False
 '        Private PlayerCount As Integer = 4
 '        Private PlayerSel As Integer = 0
-'        Private Map As GaemMap = GaemMap.Default4Players
+'        Private Map As GaemMap = GaemMap.Plus
 '        Private Mode As GameMode = GameMode.Competetive
 '        Friend Arrow As Texture2D
 '        Protected AllUser As New List(Of (String, String)) '(ID, Name)
@@ -41,7 +41,7 @@
 
 '            'Init values
 '            NewGamePlayers = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
-'            Map = GaemMap.Default4Players
+'            Map = GaemMap.Plus
 '            PlayerCount = 4
 '            PlayerSel = 0
 '            MenuAktiviert = True

@@ -34,8 +34,9 @@
 
 
     Public Enum GaemMap
-        Default4Players = 0
-        Default6Players = 1
-        Default8Players = 2
+        Plus = 0
+        Star = 1
+        Octagon = 2
+        Snakes = 3
     End Enum
 End Namespace

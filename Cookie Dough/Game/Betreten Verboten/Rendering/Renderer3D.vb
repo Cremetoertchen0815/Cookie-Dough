@@ -52,7 +52,7 @@ Namespace Game.BetretenVerboten.Rendering
             dev = Core.GraphicsDevice
 
             figur_model = scene.Content.Load(Of Model)("mesh\piece_std")
-            SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games\BV\playfield_connections_" & CInt(Game.Map))
+            If Game.Map <> GaemMap.Snakes Then SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games\BV\playfield_connections_" & CInt(Game.Map))
             Pfeil = scene.Content.Load(Of Texture2D)("games\BV\arrow_right")
 
             'Load table 
@@ -71,15 +71,18 @@ Namespace Game.BetretenVerboten.Rendering
             MapBuffer.SetData(vertices.ToArray)
 
             Select Case Game.Map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     SpceCount = 10
                     FigCount = 4
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     SpceCount = 8
                     FigCount = 2
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     SpceCount = 7
                     FigCount = 2
+                Case GaemMap.Snakes
+                    SpceCount = 144
+                    FigCount = 1
             End Select
             Feld = New Rectangle(500, 70, 950, 950)
             Center = Feld.Center.ToVector2
@@ -132,7 +135,7 @@ Namespace Game.BetretenVerboten.Rendering
             For j = 0 To Game.Spielers.Length - 1
                 'Draw player thumbnail
                 Dim ptA As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, PlayFieldPos.Home1, j)
-                Dim ptB As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, If(Game.Map = GaemMap.Default4Players, PlayFieldPos.Home4, PlayFieldPos.Home2), j)
+                Dim ptB As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, If(Game.Map = GaemMap.Plus, PlayFieldPos.Home4, PlayFieldPos.Home2), j)
                 batchlor.Draw(Game.Spielers(j).Thumbnail, New Rectangle((ptA + (ptB - ptA) * 0.5).ToPoint, New Point(GetPPsize(Game.Map))), Nothing, Color.White * 0.85, GetPProtation(j, Game.Map), Game.Spielers(j).Thumbnail.Bounds.Size.ToVector2 * 0.5, SpriteEffects.None, 0)
             Next
 
@@ -141,7 +144,7 @@ Namespace Game.BetretenVerboten.Rendering
             batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
 
             'Draw field connections + border
-            batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
+            If Game.Map <> GaemMap.Snakes Then batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
             batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             For j = 0 To Game.Spielers.Length - 1

@@ -132,26 +132,33 @@ Namespace Game.BetretenVerboten
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
             Select Case Map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
                     Player.DefaultArray = {-1, -1, -1, -1}
                     FigCount = 4
                     PlCount = 4
                     SpceCount = 10
                     SaucerChance = 18
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
                     Player.DefaultArray = {-1, -1} '{-1, -1}
                     FigCount = 2
                     PlCount = 6
                     SpceCount = 8
                     SaucerChance = 14
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     Timer = New TimeSpan(0, 1, 11, 11, 11)
                     Player.DefaultArray = {-1, -1}
                     FigCount = 2
                     PlCount = 8
                     SpceCount = 7
+                    SaucerChance = 10
+                Case GaemMap.Snakes
+                    Timer = New TimeSpan(0, 1, 11, 11, 11)
+                    Player.DefaultArray = {-1}
+                    FigCount = 1
+                    PlCount = 4
+                    SpceCount = 144
                     SaucerChance = 10
             End Select
             LastTimer = Timer
@@ -1576,6 +1583,7 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub ResetHUD()
+            If UserIndex < 0 Then Return
             HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
             HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")

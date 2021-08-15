@@ -115,17 +115,17 @@ Namespace Game.BetretenVerboten
                                                  GameMode = If(x(), GameMode.Casual, GameMode.Competetive)
 
                                                  Select Case Map
-                                                     Case GaemMap.Default4Players
+                                                     Case GaemMap.Plus
                                                          Player.DefaultArray = {-1, -1, -1, -1}
                                                          FigCount = 4
                                                          PlCount = 4
                                                          SpceCount = 10
-                                                     Case GaemMap.Default6Players
+                                                     Case GaemMap.Star
                                                          Player.DefaultArray = {-1, -1}
                                                          FigCount = 2
                                                          PlCount = 6
                                                          SpceCount = 8
-                                                     Case GaemMap.Default8Players
+                                                     Case GaemMap.Octagon
                                                          Player.DefaultArray = {-1, -1}
                                                          FigCount = 2
                                                          PlCount = 8
@@ -147,11 +147,11 @@ Namespace Game.BetretenVerboten
                                                  'Load camera info
                                                  If UserIndex > -1 Then
                                                      Select Case Map
-                                                         Case GaemMap.Default4Players
+                                                         Case GaemMap.Plus
                                                              CamRotation = UserIndex / 2 * Math.PI
-                                                         Case GaemMap.Default6Players
+                                                         Case GaemMap.Star
                                                              CamRotation = Math.Round(UserIndex / 1.5) / 2 * Math.PI
-                                                         Case GaemMap.Default8Players
+                                                         Case GaemMap.Octagon
                                                              CamRotation = Math.Floor(UserIndex / 2) / 2 * Math.PI
                                                      End Select
                                                      StdCam = New Keyframe3D(-30, -20, -50, Math.PI * 2 - CamRotation, 0.75, 0, False)

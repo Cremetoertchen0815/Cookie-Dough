@@ -9,12 +9,15 @@ Namespace Game.BetretenVerboten
 
         Public Function GetMapName(map As GaemMap) As String
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Return "Plus"
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Return "Star"
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     Return "Octagon"
+                Case GaemMap.Snakes
+                    Return "Le snek
+"
                 Case Else
                     Return "Invalid Map"
             End Select
@@ -22,12 +25,14 @@ Namespace Game.BetretenVerboten
 
         Public Function GetMapSize(map As GaemMap) As Integer
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Return 4
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Return 6
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     Return 8
+                Case GaemMap.Snakes
+                    Return 4
                 Case Else
                     Return 0
             End Select
@@ -36,7 +41,7 @@ Namespace Game.BetretenVerboten
 
         Friend Function GetIntroKeyframes(map As GaemMap, player As Integer, ending As Boolean) As Keyframe3D
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Select Case player
                         Case 0
                             If Not ending Then Return New Keyframe3D(-215, -250, -850, -0.37, 1, 2.3, False) Else Return New Keyframe3D(250, -235, -800, 0.65, 1, 2.3, False)
@@ -47,8 +52,7 @@ Namespace Game.BetretenVerboten
                         Case 3
                             If Not ending Then Return New Keyframe3D(-120, 75, -530, -0.2, 1.3, -4.55, False) Else Return New Keyframe3D(-390, 70, -440, -0.2, 1.3, -4.64, False)
                     End Select
-                Case GaemMap.Default6Players
-
+                Case GaemMap.Star
                     Select Case player
                         Case 0
                             If Not ending Then Return New Keyframe3D(-70, 57, -546, 5.31, 1.39, 0.17, False) Else Return New Keyframe3D(145, 57, -546, 5.31, 1.39, 0.17, False)
@@ -63,7 +67,7 @@ Namespace Game.BetretenVerboten
                         Case 5
                             If Not ending Then Return New Keyframe3D(280, 75, -680, 5.67, 1.2, 0.17, False) Else Return New Keyframe3D(420, 75, -680, 5.67, 1.2, 0.17, False)
                     End Select
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     Select Case player
                         Case 0
                             If Not ending Then Return New Keyframe3D(-325, -196, -990, 2.08, 0.77, 0, False) Else Return New Keyframe3D(245, -280, -1117, 3.55, 0.77, 0, False)
@@ -82,6 +86,8 @@ Namespace Game.BetretenVerboten
                         Case 7
                             If Not ending Then Return New Keyframe3D(424, -37, -802, 5.1, 1.54, 0.17, False) Else Return New Keyframe3D(424, -37, -802, 5.5, 1.54, 0.17, False)
                     End Select
+                Case Else
+                    Return New Keyframe3D
             End Select
         End Function
 
@@ -94,7 +100,7 @@ Namespace Game.BetretenVerboten
         Friend Function GetMapVectorPos(map As GaemMap, player As Integer, figur As Integer, pos As Integer) As Vector2
 
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Select Case pos
                         Case -1 'Zeichne Figur in Homebase
                             Return Vector2.Transform(Map0GetLocalPos(figur), transmatrices0(player))
@@ -104,7 +110,7 @@ Namespace Game.BetretenVerboten
                             Dim matrx As Matrix = transmatrices0((player + Math.Floor(pos / 10)) Mod 4)
                             Return Vector2.Transform(Map0GetLocalPos((pos Mod 10) + 4), matrx)
                     End Select
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Select Case pos
                         Case -1 'Zeichne Figur in Homebase
                             Return Vector2.Transform(Map1GetLocalPos(figur), transmatrices1(player))
@@ -114,7 +120,7 @@ Namespace Game.BetretenVerboten
                             Dim matrx As Matrix = transmatrices1((player + Math.Floor(pos / 8)) Mod 6)
                             Return Vector2.Transform(Map1GetLocalPos((pos Mod 8) + 4), matrx)
                     End Select
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     Select Case pos
                         Case -1 'Zeichne Figur in Homebase
                             Return Vector2.Transform(Map2GetLocalPos(figur), transmatrices2(player))
@@ -124,17 +130,28 @@ Namespace Game.BetretenVerboten
                             Dim matrx As Matrix = transmatrices2((player + Math.Floor(pos / 7)) Mod 8)
                             Return Vector2.Transform(Map2GetLocalPos((pos Mod 7) + 4), matrx)
                     End Select
+                Case GaemMap.Snakes
+                    Select Case pos
+                        Case -1 'Zeichne Figur in Homebase
+                            Return Map3GetLocalPos(player)
+                        Case 145 'Zeichne Figur in Haus
+                            Return Map3GetLocalPos(player)
+                        Case Else 'Zeichne Figur auf Feld
+                            Return New Vector2(10 * (pos Mod 12) - 100, 10 * Math.Floor(pos / 12) - 100)
+                    End Select
             End Select
         End Function
 
         Friend Function GetMapVectorPos(map As GaemMap, ps As PlayFieldPos, pl As Integer) As Vector2
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Return Vector2.Transform(Map0GetLocalPos(ps), transmatrices0(pl))
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Return Vector2.Transform(Map1GetLocalPos(ps), transmatrices1(pl))
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     Return Vector2.Transform(Map2GetLocalPos(ps), transmatrices2(pl))
+                Case GaemMap.Snakes
+                    Return Map3GetLocalPos(ps)
                 Case Else
                     Return Vector2.Zero
             End Select
@@ -142,13 +159,13 @@ Namespace Game.BetretenVerboten
 
         Friend Function GetMapVectorPos(map As GaemMap, pos As Integer) As Vector2
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Dim matrx As Matrix = transmatrices0(Math.Floor(pos / 10) Mod 4)
                     Return Vector2.Transform(Map0GetLocalPos((pos Mod 10) + 4), matrx)
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Dim matrx As Matrix = transmatrices1(Math.Floor(pos / 8) Mod 6)
                     Return Vector2.Transform(Map1GetLocalPos((pos Mod 8) + 4), matrx)
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
                     Dim matrx As Matrix = transmatrices2(Math.Floor(pos / 7) Mod 8)
                     Return Vector2.Transform(Map2GetLocalPos((pos Mod 7) + 4), matrx)
                 Case Else
@@ -158,11 +175,13 @@ Namespace Game.BetretenVerboten
 
         Friend Function GetFieldSizes(map As GaemMap) As (Integer, Integer, Single, Integer)
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Return (28, 20, 3.5, 35)
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Return (22, 15, 2.3, 30)
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
+                    Return (14, 12, 1.75, 18)
+                Case GaemMap.Snakes
                     Return (14, 12, 1.75, 18)
                 Case Else
                     Return (5, 5, 10, 35)
@@ -291,10 +310,32 @@ Namespace Game.BetretenVerboten
                     Return Vector2.Zero
             End Select
         End Function
+        Private Function Map3GetLocalPos(ps As PlayFieldPos) As Vector2
+            Select Case ps
+                Case PlayFieldPos.Home1
+                    Return New Vector2(-420, -420)
+                Case PlayFieldPos.Home2
+                    Return New Vector2(-350, -420)
+                Case PlayFieldPos.Home3
+                    Return New Vector2(-420, -350)
+                Case PlayFieldPos.Home4
+                    Return New Vector2(-350, -350)
+                Case PlayFieldPos.Haus1
+                    Return New Vector2(-FDist0 * 4, 0)
+                Case PlayFieldPos.Haus2
+                    Return New Vector2(-FDist0 * 3, 0)
+                Case PlayFieldPos.Haus3
+                    Return New Vector2(-FDist0 * 2, 0)
+                Case PlayFieldPos.Haus4
+                    Return New Vector2(-FDist0, 0)
+                Case Else
+                    Return Vector2.Zero
+            End Select
+        End Function
 
         Public Function GetFigureRectangle(map As GaemMap, pl As Integer, figure As Integer, Spielers As Player(), Center As Vector2) As Rectangle
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
 
                     Dim chr As Integer = Spielers(pl).Spielfiguren(figure)
                     Dim vec As Vector2 = Vector2.Zero
@@ -309,7 +350,7 @@ Namespace Game.BetretenVerboten
                     End Select
 
                     Return GetChrRect(Center + Vector2.Transform(vec, matrx))
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
 
                     Dim chr As Integer = Spielers(pl).Spielfiguren(figure)
                     Dim vec As Vector2 = Vector2.Zero
@@ -324,7 +365,7 @@ Namespace Game.BetretenVerboten
                     End Select
 
                     Return GetChrRect(Center + Vector2.Transform(vec, matrx))
-                Case GaemMap.Default8Players
+                Case GaemMap.Octagon
 
                     Dim chr As Integer = Spielers(pl).Spielfiguren(figure)
                     Dim vec As Vector2 = Vector2.Zero
@@ -348,9 +389,9 @@ Namespace Game.BetretenVerboten
 
         Friend Function GetPProtation(pl As Integer, map As GaemMap) As Single
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus, GaemMap.Snakes
                     Return rotato0(pl)
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Return rotato1(pl)
                 Case Else
                     Return rotato2(pl) + 0.38
@@ -358,9 +399,9 @@ Namespace Game.BetretenVerboten
         End Function
         Friend Function GetPPsize(map As GaemMap) As Integer
             Select Case map
-                Case GaemMap.Default4Players
+                Case GaemMap.Plus
                     Return 140
-                Case GaemMap.Default6Players
+                Case GaemMap.Star
                     Return 80
                 Case Else
                     Return 60

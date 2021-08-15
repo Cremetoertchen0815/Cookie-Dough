@@ -17,7 +17,7 @@ Namespace Game.BetretenVerboten
         Private ChangeNameButtonPressed As Boolean = False
         Private PlayerCount As Integer = 4
         Private PlayerSel As Integer = 0
-        Private Map As GaemMap = GaemMap.Default4Players
+        Private Map As GaemMap = GaemMap.Plus
         Private Mode As GameMode = GameMode.Competetive
         Friend Arrow As Texture2D
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
@@ -41,7 +41,7 @@ Namespace Game.BetretenVerboten
 
             'Init values
             NewGamePlayers = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
-            Map = GaemMap.Default4Players
+            Map = GaemMap.Plus
             PlayerCount = 4
             PlayerSel = 0
             MenuAktiviert = True
@@ -63,7 +63,7 @@ Namespace Game.BetretenVerboten
                 If Not SecondScreen Then
 
                     If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
-                        Map = (Map + 1) Mod 3
+                        Map = (Map + 1) Mod 4
                         ReDim NewGamePlayers(GetMapSize(Map) - 1)
                         ReDim Whitelist(GetMapSize(Map) - 1)
                         SFX(2).Play()
