@@ -130,6 +130,11 @@ Namespace Game.BetretenVerboten
                                                          FigCount = 2
                                                          PlCount = 8
                                                          SpceCount = 7
+                                                     Case GaemMap.Snakes
+                                                         Player.DefaultArray = {-1}
+                                                         FigCount = 1
+                                                         PlCount = 4
+                                                         SpceCount = 100
                                                  End Select
 
                                                  'Load player info

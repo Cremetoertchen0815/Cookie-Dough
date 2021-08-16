@@ -1,8 +1,9 @@
 ﻿-Test DC, BR and DT!
 
 BV:
+-Draw snek map backdrop
+-Add snakes and ladders to snek map
 -Custom CPU sounds
--Snakes n Ladders BV map
 
 -DT
 -Fix progress syncing(in the bottom right)

@@ -134,10 +134,11 @@ Namespace Game.BetretenVerboten
                     Select Case pos
                         Case -1 'Zeichne Figur in Homebase
                             Return Map3GetLocalPos(PlayFieldPos.Home1 + player, player)
-                        Case 145 'Zeichne Figur in Haus
+                        Case 100 'Zeichne Figur in Haus
                             Return Map3GetLocalPos(PlayFieldPos.Haus1 + player, player)
                         Case Else 'Zeichne Figur auf Feld
-                            Return Map3GetLocalPos(PlayFieldPos.Feld1 + (pos Mod 10), Math.Floor(pos / 10))
+                            Dim row As Integer = Math.Floor(pos / 10)
+                            Return Map3GetLocalPos(PlayFieldPos.Feld1 + If(Mathf.IsEven(row) Or pos = 0, (pos Mod 10), 9 - (pos Mod 10)), row)
                     End Select
             End Select
         End Function
@@ -321,13 +322,13 @@ Namespace Game.BetretenVerboten
                 Case PlayFieldPos.Home4
                     Return New Vector2(100, 100)
                 Case PlayFieldPos.Haus1
-                    Return New Vector2(850, 850)
+                    Return New Vector2(50, 850)
                 Case PlayFieldPos.Haus2
-                    Return New Vector2(900, 850)
+                    Return New Vector2(100, 850)
                 Case PlayFieldPos.Haus3
-                    Return New Vector2(850, 900)
+                    Return New Vector2(50, 900)
                 Case PlayFieldPos.Haus4
-                    Return New Vector2(900, 900)
+                    Return New Vector2(100, 900)
                 Case Else
                     Return New Vector2(150 + (ps - 4) * 70, 150 + field_multiplier * 70)
                     'Return New Vector2(800 - (ps - 4) * 30, 150 + field_multiplier * 30)
