@@ -16,7 +16,7 @@ Namespace Game.BetretenVerboten.Rendering
         Private MapBuffer As VertexBuffer
         Private TableModel As Model
         Private TableMatrix As Matrix
-        Private ResolutionMultiplier As Single = 3
+        Private ResolutionMultiplier As Single = 1
 
         Private SaucerModel As Model
         Private SaucerLift As Transition(Of Single)
@@ -51,7 +51,7 @@ Namespace Game.BetretenVerboten.Rendering
             dev = Core.GraphicsDevice
 
             figur_model = scene.Content.Load(Of Model)("mesh\piece_std")
-            If Game.Map <> GaemMap.Snakes Then SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games\BV\playfield_connections_" & CInt(Game.Map))
+            SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games\BV\playfield_connections_" & CInt(Game.Map))
             Pfeil = scene.Content.Load(Of Texture2D)("games\BV\arrow_right")
 
             'Load table 
@@ -146,7 +146,7 @@ Namespace Game.BetretenVerboten.Rendering
             batchlor.Begin(Material, Matrix.CreateScale(ResolutionMultiplier))
 
             'Draw field connections + border
-            If Game.Map <> GaemMap.Snakes Then batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
+            batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
             batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
             'Draw playfield

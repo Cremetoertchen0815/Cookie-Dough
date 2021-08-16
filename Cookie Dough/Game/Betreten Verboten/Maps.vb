@@ -152,6 +152,7 @@ Namespace Game.BetretenVerboten
                 Case GaemMap.Octagon
                     Return Vector2.Transform(Map2GetLocalPos(ps), transmatrices2(pl))
                 Case GaemMap.Snakes
+                    If ps > PlayFieldPos.Home4 And ps < PlayFieldPos.Haus1 And Mathf.IsOdd(pl) Then Return Map3GetLocalPos(4 + (9 - ((ps - 4) Mod 10)), pl)
                     Return Map3GetLocalPos(ps, pl)
                 Case Else
                     Return Vector2.Zero
