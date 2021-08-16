@@ -1,7 +1,6 @@
 ﻿-Test DC, BR and DT!
 
 BV:
--If first palyer online, second player is being skipped on first round
 -Custom CPU sounds
 -Snakes n Ladders BV map
 

@@ -355,7 +355,7 @@ Namespace Game.BetretenVerboten
                         Dim defaultmov As Integer
                         For i As Integer = 0 To FigCount - 1
                             defaultmov = pl.Spielfiguren(i)
-                            If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
+                            If defaultmov > -1 And defaultmov + Fahrzahl <= If(Map > 2, SpceCount, PlCount * SpceCount) + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
                         Next
 
                         If ichmagzüge.Count = 1 Then
@@ -408,7 +408,7 @@ Namespace Game.BetretenVerboten
                         Dim defaultmov As Integer
                         For i As Integer = 0 To FigCount - 1
                             defaultmov = pl.Spielfiguren(i)
-                            If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount Then ichmagzüge.Add(i)
+                            If defaultmov > -1 And defaultmov + Fahrzahl <= If(Map > 2, SpceCount, PlCount * SpceCount) Then ichmagzüge.Add(i)
                         Next
 
                         If ichmagzüge.Count = 1 Then
@@ -832,7 +832,7 @@ Namespace Game.BetretenVerboten
                     Dim fieldB As Integer = Spielers(playerB).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB >= 0 And fieldB < PlCount * SpceCount And fb = fa Then
+                    If fieldB >= 0 And fieldB < If(Map > 2, SpceCount, PlCount * SpceCount) And fb = fa Then
 
                         'Implement BV bonus
                         If fieldA = 0 Then
@@ -884,7 +884,7 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To FigCount - 1
                 defaultmov = pl.Spielfiguren(i)
                 'Prüfe ob Zug mit dieser Figur möglich ist(Nicht in homebase, nicht über Ziel hinaus und Zielfeld nicht mit eigener Figur belegt
-                If defaultmov > -1 And defaultmov + Fahrzahl <= PlCount * SpceCount + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
+                If defaultmov > -1 And defaultmov + Fahrzahl <= If(Map > 2, SpceCount, PlCount * SpceCount) + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
             Next
 
             'Prüfe ob Zug möglich
@@ -892,10 +892,10 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function IsÜberholingInSeHaus(defaultmov As Integer) As Boolean
-            If defaultmov + Fahrzahl < PlCount * SpceCount Then Return False
+            If defaultmov + Fahrzahl < If(Map > 2, SpceCount, PlCount * SpceCount) Then Return False
 
             For i As Integer = defaultmov + 1 To defaultmov + Fahrzahl
-                If IsFieldCovered(SpielerIndex, -1, i) And i >= PlCount * SpceCount Then Return True
+                If IsFieldCovered(SpielerIndex, -1, i) And i >= If(Map > 2, SpceCount, PlCount * SpceCount) Then Return True
             Next
 
             Return False
@@ -913,7 +913,7 @@ Namespace Game.BetretenVerboten
                     Dim fieldB As Integer = Spielers(i).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, i)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB > -1 And ((fieldA < PlCount * SpceCount AndAlso (player <> i Or figur <> j) And fb = fa) OrElse (fieldB < PlCount * SpceCount + 5 And player = i And figur <> j And fieldA = fieldB)) Then Return True
+                    If fieldB > -1 And ((fieldA < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso (player <> i Or figur <> j) And fb = fa) OrElse (fieldB < If(Map > 2, SpceCount, PlCount * SpceCount) + 5 And player = i And figur <> j And fieldA = fieldB)) Then Return True
                 Next
             Next
 
@@ -925,7 +925,7 @@ Namespace Game.BetretenVerboten
             For j As Integer = 0 To PlCount - 1
                 For i As Integer = 0 To FigCount - 1
                     Dim fieldB As Integer = Spielers(j).Spielfiguren(i)
-                    If fieldB >= 0 And fieldB < PlCount * SpceCount And fa = PlayerFieldToGlobalField(fieldB, j) Then Return (j, i)
+                    If fieldB >= 0 And fieldB < If(Map > 2, SpceCount, PlCount * SpceCount) And fa = PlayerFieldToGlobalField(fieldB, j) Then Return (j, i)
                 Next
             Next
             Return (-1, -1)
@@ -943,12 +943,12 @@ Namespace Game.BetretenVerboten
             Dim fieldlst As New List(Of Integer)
             For i As Integer = 0 To FigCount - 1
                 Dim tm As Integer = Spielers(player).Spielfiguren(i)
-                If tm >= 0 And tm < PlCount * SpceCount Then Return False 'Falls sich Spieler auf dem Spielfeld befindet, ist dreimal würfeln unmöglich
-                If tm >= PlCount * SpceCount Then fieldlst.Add(tm) 'Merke Figuren, die sich im Haus befinden
+                If tm >= 0 And tm < If(Map > 2, SpceCount, PlCount * SpceCount) Then Return False 'Falls sich Spieler auf dem Spielfeld befindet, ist dreimal würfeln unmöglich
+                If tm >= If(Map > 2, SpceCount, PlCount * SpceCount) Then fieldlst.Add(tm) 'Merke Figuren, die sich im Haus befinden
             Next
 
             'Wenn nicht alle FIguren bis an den Anschlag gefahren wurden, darf man nicht dreifach würfeln
-            For i As Integer = PlCount * SpceCount + FigCount - 1 To (PlCount * SpceCount + FigCount - fieldlst.Count) Step -1
+            For i As Integer = If(Map > 2, SpceCount, PlCount * SpceCount) + FigCount - 1 To (If(Map > 2, SpceCount, PlCount * SpceCount) + FigCount - fieldlst.Count) Step -1
                 If Not fieldlst.Contains(i) Then Return False
             Next
 

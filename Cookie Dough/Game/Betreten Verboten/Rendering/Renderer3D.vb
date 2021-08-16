@@ -37,8 +37,7 @@ Namespace Game.BetretenVerboten.Rendering
         Private FigCount As Integer
         Private SpceCount As Integer
         Private Feld As Rectangle
-        Private Center As Vector2
-        Private transmatrices As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)}
+        Private FieldOffset As Vector2
         Friend AdditionalZPos As New Transition(Of Single)
 
         Public Sub New(game As IGameWindow, Optional order As Integer = 0)
@@ -74,18 +73,21 @@ Namespace Game.BetretenVerboten.Rendering
                 Case GaemMap.Plus
                     SpceCount = 10
                     FigCount = 4
+                    FieldOffset = New Vector2(475)
                 Case GaemMap.Star
                     SpceCount = 8
                     FigCount = 2
+                    FieldOffset = New Vector2(475)
                 Case GaemMap.Octagon
                     SpceCount = 7
                     FigCount = 2
+                    FieldOffset = New Vector2(475)
                 Case GaemMap.Snakes
-                    SpceCount = 144
+                    SpceCount = 100
                     FigCount = 1
+                    FieldOffset = New Vector2(0)
             End Select
             Feld = New Rectangle(500, 70, 950, 950)
-            Center = Feld.Center.ToVector2
 
             SpielfeldTextur = New RenderTarget2D(
             dev,
@@ -134,8 +136,8 @@ Namespace Game.BetretenVerboten.Rendering
             'Draw fields
             For j = 0 To Game.Spielers.Length - 1
                 'Draw player thumbnail
-                Dim ptA As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, PlayFieldPos.Home1, j)
-                Dim ptB As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, If(Game.Map = GaemMap.Plus, PlayFieldPos.Home4, PlayFieldPos.Home2), j)
+                Dim ptA As Vector2 = FieldOffset + GetMapVectorPos(Game.Map, PlayFieldPos.Home1, j)
+                Dim ptB As Vector2 = FieldOffset + GetMapVectorPos(Game.Map, If(Game.Map = GaemMap.Plus, PlayFieldPos.Home4, PlayFieldPos.Home2), j)
                 batchlor.Draw(Game.Spielers(j).Thumbnail, New Rectangle((ptA + (ptB - ptA) * 0.5).ToPoint, New Point(GetPPsize(Game.Map))), Nothing, Color.White * 0.85, GetPProtation(j, Game.Map), Game.Spielers(j).Thumbnail.Bounds.Size.ToVector2 * 0.5, SpriteEffects.None, 0)
             Next
 
@@ -147,32 +149,45 @@ Namespace Game.BetretenVerboten.Rendering
             If Game.Map <> GaemMap.Snakes Then batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
             batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
-            For j = 0 To Game.Spielers.Length - 1
-                'Zeichne Spielfeld
-                For i = 0 To 17
-                    Dim loc As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, i, j)
-                    Select Case i
-                        Case PlayFieldPos.Haus1, PlayFieldPos.Haus2, PlayFieldPos.Haus3, PlayFieldPos.Haus4, PlayFieldPos.Home1, PlayFieldPos.Home2, PlayFieldPos.Home3, PlayFieldPos.Home4
-                            If FigCount = 2 AndAlso (i = PlayFieldPos.Haus4 Or i = PlayFieldPos.Haus3 Or i = PlayFieldPos.Home3 Or i = PlayFieldPos.Home4) Then Continue For 'Skip houses and homes 3 + 4 is 6 player map is selected
-                            batchlor.DrawCircle(loc, sizes.Item2, playcolor(j), 2, 25)
-                        Case PlayFieldPos.Feld1
-                            batchlor.DrawCircle(loc, sizes.Item1, playcolor(j), 3, 30)
-                            DrawArrow(loc, playcolor(j), j, sizes.Item4)
-                        Case Else
-                            If i - 4 >= SpceCount Then Continue For
-                            batchlor.DrawCircle(loc, sizes.Item1, Color.White, 3, 30)
-                    End Select
+            'Draw playfield
+            If Game.Map = GaemMap.Snakes Then
+                'Draw snek field
+                For j = 0 To Game.Spielers.Length - 1
+                    batchlor.DrawCircle(GetMapVectorPos(Game.Map, PlayFieldPos.Home1 + j, j), sizes.Item2, playcolor(j), 2, 25)
+                    batchlor.DrawCircle(GetMapVectorPos(Game.Map, PlayFieldPos.Haus1 + j, j), sizes.Item2, playcolor(j), 2, 25)
                 Next
-            Next
+                For i = 0 To SpceCount - 1
+                    batchlor.DrawCircle(GetMapVectorPos(Game.Map, PlayFieldPos.Feld1 + i Mod 10, Math.Floor(i / 10)), sizes.Item1, Color.White, 3, 30)
+                Next
+            Else
+                For j = 0 To Game.Spielers.Length - 1
+                    'Draw regular playfield
+                    For i = 0 To 17
+                        Dim loc As Vector2 = FieldOffset + GetMapVectorPos(Game.Map, i, j)
+                        Select Case i
+                            Case PlayFieldPos.Haus1, PlayFieldPos.Haus2, PlayFieldPos.Haus3, PlayFieldPos.Haus4, PlayFieldPos.Home1, PlayFieldPos.Home2, PlayFieldPos.Home3, PlayFieldPos.Home4
+                                If FigCount = 2 AndAlso (i = PlayFieldPos.Haus4 Or i = PlayFieldPos.Haus3 Or i = PlayFieldPos.Home3 Or i = PlayFieldPos.Home4) Then Continue For 'Skip houses and homes 3 + 4 is 6 player map is selected
+                                batchlor.DrawCircle(loc, sizes.Item2, playcolor(j), 2, 25)
+                            Case PlayFieldPos.Feld1
+                                batchlor.DrawCircle(loc, sizes.Item1, playcolor(j), 3, 30)
+                                DrawArrow(loc, playcolor(j), j, sizes.Item4)
+                            Case Else
+                                If i - 4 >= SpceCount Then Continue For
+                                batchlor.DrawCircle(loc, sizes.Item1, Color.White, 3, 30)
+                        End Select
+                    Next
+                Next
+            End If
 
             'Draw UFO fields
             For Each element In Game.SaucerFields
-                batchlor.DrawCircle(New Vector2(475) + GetMapVectorPos(Game.Map, element), sizes.Item1, Color.SandyBrown, 5)
+                batchlor.DrawCircle(FieldOffset + GetMapVectorPos(Game.Map, element), sizes.Item1, Color.SandyBrown, 5)
             Next
 
+            'Draw suicide fields
             For i As Integer = 0 To Game.Spielers.Length - 1
                 If Game.Spielers(i).SuicideField < 0 Then Continue For
-                Dim center As Vector2 = New Vector2(475) + GetMapVectorPos(Game.Map, Game.Spielers(i).SuicideField)
+                Dim center As Vector2 = FieldOffset + GetMapVectorPos(Game.Map, Game.Spielers(i).SuicideField)
                 Dim line_coords As Vector2() = {center - Vector2.One * 20, center + Vector2.One * 20, center - New Vector2(-20, 20), center - New Vector2(20, -20)}
                 batchlor.DrawLine(line_coords(0), line_coords(1), playcolor(i), 3)
                 batchlor.DrawLine(line_coords(2), line_coords(3), playcolor(i), 3)
@@ -261,7 +276,7 @@ Namespace Game.BetretenVerboten.Rendering
                     element.DirectionalLight0.Direction = New Vector3(0, 0.8, 1.5)
                     element.DirectionalLight0.DiffuseColor = color.ToVector3 * 0.6 '// a gray light
                     element.DirectionalLight0.SpecularColor = New Vector3(1, 1, 1) '// with white highlights
-                    element.World = Matrix.CreateScale(basescale * scale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(-pos.X, -pos.Y, -zpos - AdditionalZPos.Value)
+                    element.World = Matrix.CreateScale(basescale * scale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(-pos.X + 475, -pos.Y + 475, -zpos - AdditionalZPos.Value)
                     element.View = View
                     element.Projection = Projection
                 Next
@@ -270,7 +285,7 @@ Namespace Game.BetretenVerboten.Rendering
         End Sub
 
         Private Sub DrawArrow(vc As Vector2, color As Color, iteration As Integer, size As Integer)
-            batchlor.Draw(Pfeil, New Rectangle(vc.X, vc.Y, size, size), Nothing, color, MathHelper.PiOver2 * ((iteration / Game.Spielers.Length) * 4 + 3), New Vector2(35) / 2, SpriteEffects.None, 0)
+            batchlor.Draw(Pfeil, New Rectangle(vc.X, vc.Y, size, size), Nothing, color, MathHelper.PiOver2 * (iteration / Game.Spielers.Length * 4 + 3), New Vector2(35) / 2, SpriteEffects.None, 0)
         End Sub
         Private Sub ApplyFX(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)
             For Each effect As BasicEffect In mesh.Effects
