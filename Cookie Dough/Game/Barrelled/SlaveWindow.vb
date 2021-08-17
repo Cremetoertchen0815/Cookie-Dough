@@ -143,6 +143,7 @@ Namespace Game.Barrelled
             'AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.55F).SetThreshold(0.45F)
 
             'Load Map
+            Dim minimapRect As RectangleF = RectangleF.Empty
             TileMap = Content.LoadTiledMap("Maps\Barrelled\" & Map.ToString & ".tmx")
             CommonPlayer.CollisionLayers = {TileMap.GetLayer(Of TmxLayer)("Collision"), TileMap.GetLayer(Of TmxLayer)("High")}
             Renderer.GenerateMapMatrices(TileMap)
@@ -153,12 +154,14 @@ Namespace Game.Barrelled
                         CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
                     Case "prison"
                         CommonPlayer.PrisonPosition = New Rectangle(element.X, element.Y, element.Width, element.Height)
+                    Case "minimap"
+                        minimapRect = New RectangleF(New Vector2(element.X, element.Y), New Vector2(CSng(element.Properties("scale").Replace("."c, ","c))))
                 End Select
             Next
 
             'Load minimap renderer
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
-            AdditionalHUDRend = CreateEntity("minimap").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New AdditionalHUDRendererable(MinimapRenderer))
+            AdditionalHUDRend = CreateEntity("addition_render").SetPosition(minimapRect.Location).SetScale(minimapRect.Size).AddComponent(New AdditionalHUDRendererable(MinimapRenderer))
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
             'Create entities and components

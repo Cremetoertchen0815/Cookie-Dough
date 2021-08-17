@@ -22,8 +22,6 @@ Namespace Game.Barrelled
         Friend EgoPlayer As EgoPlayer
         Friend UserIndex As Integer = 0
         Friend PlCount As Integer = 2
-        Friend PlayerIndexIndex As Integer
-        Friend PlayerIndexList As Integer() = {0}
         Friend StopUpdating As Boolean = False
         Friend NetworkMode As Boolean = False
         Friend Map As Map = Map.Mainland
@@ -33,6 +31,7 @@ Namespace Game.Barrelled
         Friend CanStart As Boolean = False
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
+        Private PrisonPeople As New List(Of CommonPlayer)
 
         'Networking
         Private SyncPosCounter As Single = 0
@@ -78,7 +77,6 @@ Namespace Game.Barrelled
 
         Public Sub New(map As Map)
             Chat = New List(Of (String, Color))
-            PlayerIndexIndex = -1
             Me.Map = map
             PlCount = GetMapSize(map)
             Status = GameStatus.WaitingForOnlinePlayers
@@ -290,10 +288,11 @@ Namespace Game.Barrelled
                         Dim who As Integer = element(2).ToString
                         If who = UserIndex Then
                             'Local player was touched by online player
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(EgoPlayer) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(EgoPl)
                         Else
                             'Online player touched online player
                             SendPlayerPressed(who, source)
+                            'If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(EgoPlayer) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(EgoPlayer)
                         End If
                     Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
