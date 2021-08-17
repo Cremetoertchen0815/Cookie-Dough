@@ -14,7 +14,6 @@ DC:
 -Add highscoring
 
 BR:
--Update minimap to actually be useful and look pretty(custom map scaling, character rendering, Minimap arrow to indicate view direction, etc.)
 -Implement basic game stuff(freeing others, etc.)
 -Implement winning
 -3D sound

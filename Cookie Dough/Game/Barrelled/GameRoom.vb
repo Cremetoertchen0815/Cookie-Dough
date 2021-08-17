@@ -109,6 +109,7 @@ Namespace Game.Barrelled
             EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(0))
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
 
+            Dim minimapRect As RectangleF = RectangleF.Empty
             CommonPlayer.CollisionLayers = {TileMap.GetLayer(Of TmxLayer)("Collision"), TileMap.GetLayer(Of TmxLayer)("High")}
             Renderer.GenerateMapMatrices(TileMap)
             Renderer.Floorsize = New Vector2(TileMap.Properties("floor_size_X"), TileMap.Properties("floor_size_Y"))
@@ -118,12 +119,14 @@ Namespace Game.Barrelled
                         CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
                     Case "prison"
                         CommonPlayer.PrisonPosition = New Rectangle(element.X, element.Y, element.Width, element.Height)
+                    Case "minimap"
+                        minimapRect = New RectangleF(New Vector2(element.X, element.Y), New Vector2(CSng(element.Properties("scale").Replace("."c, ","c))))
                 End Select
             Next
 
             'Load minimap renderer
             MinimapRenderer = AddRenderer(New RenderLayerRenderer(0, 5) With {.RenderTexture = New Textures.RenderTexture, .RenderTargetClearColor = Color.Transparent})
-            AdditionalHUDRend = CreateEntity("addition_render").SetScale(0.4).SetPosition(New Vector2(1500, 700)).AddComponent(New AdditionalHUDRendererable(MinimapRenderer))
+            AdditionalHUDRend = CreateEntity("addition_render").SetPosition(minimapRect.Location).SetScale(minimapRect.Size).AddComponent(New AdditionalHUDRendererable(MinimapRenderer))
 
             'Create entities and components
             'AddSceneComponent(New Object3DHandler(Spielers(UserIndex), Me))
