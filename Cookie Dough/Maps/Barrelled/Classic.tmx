@@ -548,9 +548,9 @@
    <point/>
   </object>
   <object id="2" name="prison" type="prison" x="288" y="272" width="272" height="144"/>
-  <object id="3" name="minimap" type="minimap" x="1700" y="500" width="318" height="317">
+  <object id="3" name="minimap" type="minimap" x="1554" y="759" width="318" height="317">
    <properties>
-    <property name="scale" type="float" value="0.4"/>
+    <property name="scale" type="float" value="0.35"/>
    </properties>
   </object>
  </objectgroup>
