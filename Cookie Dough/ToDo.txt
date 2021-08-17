@@ -1,15 +1,16 @@
 ﻿-Test DC, BR and DT!
+-Make shit run under MacOS
 
 BV:
--Draw snek map backdrop
 -Add snakes and ladders to snek map
+-Extend snek map vertically(???)
 -Custom CPU sounds
 
 -DT
 -Fix progress syncing(in the bottom right)
 
 DC:
--Add CPUs
+-Add CPUs 
 -Add highscoring
 
 BR:

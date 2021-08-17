@@ -40,7 +40,7 @@ Public Module Program
                 game.Run()
             End Using
         Catch ex As Exception
-            NoteError(ex, True)
+            'NoteError(ex, True)
             System.Windows.Forms.MessageBox.Show("There was an cwwitical ewwor while pwwaying the game! P... Pweease tell the deweloper!" & Environment.NewLine & Environment.NewLine & "Message: " & ex.Message & Environment.NewLine & "Stack Trace: " & ex.StackTrace, "OwO, what's this? *notices error*", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error, System.Windows.Forms.MessageBoxDefaultButton.Button1, System.Windows.Forms.MessageBoxOptions.DefaultDesktopOnly)
             System.Windows.Forms.MessageBox.Show("No, seriously! It would be a huge help if you sent a message to the Luminous Friends. They'll give you further assistance in fixing the issue ^w^.", "*notices another message box*", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information, System.Windows.Forms.MessageBoxDefaultButton.Button1, System.Windows.Forms.MessageBoxOptions.DefaultDesktopOnly)
             System.Windows.Forms.MessageBox.Show("If that sounds like too much work to you, it would already be really helpful if you sent us a photo of the error message box via our social media. ", "*notices another message box*", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information, System.Windows.Forms.MessageBoxDefaultButton.Button1, System.Windows.Forms.MessageBoxOptions.DefaultDesktopOnly)
@@ -49,9 +49,13 @@ Public Module Program
             System.Windows.Forms.MessageBox.Show("Here we go! Have a good day!" & Environment.NewLine & Environment.NewLine & "Yours truly, " & Environment.NewLine & "Creme, your next door programmer", "I seriously don't know what to put here...", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information, System.Windows.Forms.MessageBoxDefaultButton.Button1, System.Windows.Forms.MessageBoxOptions.DefaultDesktopOnly)
         End Try
 #End If
-        If Server.streamw IsNot Nothing Then streamw.Close()
-        StopServer()
-        Process.GetCurrentProcess.Kill()
+        Try
+            If Server.streamw IsNot Nothing Then streamw.Close()
+            StopServer()
+            Process.GetCurrentProcess.Kill()
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Function MsgBox(Prompt As String, Optional buttons As Microsoft.VisualBasic.MsgBoxStyle = Microsoft.VisualBasic.MsgBoxStyle.OkOnly, Optional title As String = "") As Microsoft.VisualBasic.MsgBoxResult
