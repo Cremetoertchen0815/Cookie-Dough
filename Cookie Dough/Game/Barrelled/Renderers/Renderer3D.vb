@@ -180,7 +180,7 @@ Namespace Game.Barrelled.Renderers
 
             'Load room stuff
             BarrierModel = scene.Content.Load(Of Model)("mesh/Have_A_Cube")
-            FloorEffect = New BasicEffect(Dev) With {.TextureEnabled = True, .Texture = scene.Content.LoadTexture("3Droom_floor"), .View = View, .Projection = Projection, .EmissiveColor = Vector3.One * 0.8, .FogStart = 25, .FogEnd = 90, .FogColor = Vector3.Zero}
+            FloorEffect = New BasicEffect(Dev) With {.TextureEnabled = True, .Texture = scene.Content.LoadTexture("3Droom_floor"), .View = View, .Projection = Projection, .EmissiveColor = Vector3.One * 0.8, .FogStart = 25, .FogEnd = 90, .FogColor = Vector3.Zero, .FogEnabled = True}
 
             'Load player
             PlayerModel = scene.Content.Load(Of Model)("mesh/piece_filled")
