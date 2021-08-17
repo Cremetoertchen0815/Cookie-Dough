@@ -136,10 +136,13 @@ Namespace Game.Barrelled
             'Prepare Nez scene
             Core.Instance.IsMouseVisible = False
             ClearColor = Color.Transparent
+            'Rendereres
             AddRenderer(New PsygroundRenderer(1, 0.85F))
             Renderer = AddRenderer(New Renderer3D(Me, 2))
-            AddRenderer(New RenderLayerExcludeRenderer(3, 5))
-            'AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.55F).SetThreshold(0.45F)
+            AddRenderer(New RenderLayerExcludeRenderer(3, 5) With {.WantsToRenderAfterPostProcessors = True})
+            'Postprocessing
+            AddPostProcessor(New QualityBloomPostProcessor(2)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6F).SetThreshold(0.3F)
+            AddPostProcessor(New VignettePostProcessor(1) With {.Power = 2.0F, .Radius = 1.0F})
 
             'Load Map
             Dim minimapRect As RectangleF = RectangleF.Empty
