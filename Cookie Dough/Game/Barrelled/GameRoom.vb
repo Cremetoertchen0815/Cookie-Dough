@@ -288,11 +288,11 @@ Namespace Game.Barrelled
                         Dim who As Integer = element(2).ToString
                         If who = UserIndex Then
                             'Local player was touched by online player
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(EgoPlayer) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(EgoPl)
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(EgoPlayer) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(EgoPlayer)
                         Else
                             'Online player touched online player
                             SendPlayerPressed(who, source)
-                            'If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(EgoPlayer) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(EgoPlayer)
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(Spielers(who)) Then PrisonPeople.Add(Spielers(who))
                         End If
                     Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
