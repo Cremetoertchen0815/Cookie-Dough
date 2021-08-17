@@ -219,6 +219,8 @@
     <Compile Include="Game\Megäa\Renderers\Renderer3D.vb" />
     <Compile Include="Game\Megäa\Table.vb" />
     <Compile Include="Game\Megäa\Totem.vb" />
+    <Compile Include="Intros\LF.vb" />
+    <Compile Include="Intros\MonoNez.vb" />
     <Compile Include="Menu\Intro\IntroScene.vb" />
     <Compile Include="Menu\MainMenu\MainMenuScene.vb" />
     <Compile Include="Menu\MainMenu\Splashscreen.vb" />

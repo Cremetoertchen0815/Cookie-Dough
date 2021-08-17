@@ -83,7 +83,16 @@ Public Class Game1
         Emitter.AddObserver(CoreEvents.GraphicsDeviceReset, Sub() ScaleMatrix = Scene.ScreenTransformMatrix)
 
         'Load intro screen
-        Scene = New Menu.MainMenu.SplashScreen
+#If DEBUG Then
+        Scene = New Menu.MainMenu.MainMenuScene
+#Else
+        If My.Settings.PlayedIntro Then
+            Scene = New Menu.MainMenu.SplashScreen
+        Else
+            My.Settings.PlayedIntro = True
+            Scene = New Intros.LFIntro
+        End If
+#End If
     End Sub
 
     Private keysa As New List(Of Keys)
