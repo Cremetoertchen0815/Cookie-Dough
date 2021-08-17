@@ -34,7 +34,6 @@ Namespace Game.Barrelled
         Friend Status As GameStatus
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Friend Difficulty As Difficulty 'Declares the difficulty of the CPU
-        Friend CanStart As Boolean = False
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
 
@@ -216,14 +215,11 @@ Namespace Game.Barrelled
             End If
 
             'Check if game can be started
-            If Status = GameStatus.WaitingForOnlinePlayers Then
-                CanStart = True
-                For i As Integer = 1 To Spielers.Length - 1
-                    If Not Spielers(i).Bereit Then CanStart = False : Exit For
-                Next
-            Else
-                CanStart = False
-            End If
+            Select Case Status
+                Case GameStatus.GameActive
+                    'Free prisoners
+                    If False Then SendRequestFreeing()
+            End Select
 
             'Network stuff
             If NetworkMode And (Not LocalClient.Connected Or LocalClient.LeaveFlag) Then
@@ -292,6 +288,9 @@ Namespace Game.Barrelled
                         Else
                             PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
                         End If
+                    Case "f"c
+                        Dim pl As Integer = element.Substring(1)
+                        If pl = UserIndex And EgoPlayer.Mode = PlayerMode.Chased Then EgoPlayer.PrisonEnabled = False
                     Case "e"c 'Suspend gaem
                         Dim who As Integer = element(1).ToString
                         StopUpdating = True
@@ -454,6 +453,9 @@ Namespace Game.Barrelled
         End Sub
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
+        End Sub
+        Private Sub SendRequestFreeing()
+            LocalClient.WriteStream("f")
         End Sub
         Private Sub SendPlayerData()
             Dim element = Spielers(UserIndex)

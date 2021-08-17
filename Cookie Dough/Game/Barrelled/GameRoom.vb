@@ -31,7 +31,7 @@ Namespace Game.Barrelled
         Friend CanStart As Boolean = False
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
-        Private PrisonPeople As New List(Of CommonPlayer)
+        Private PrisonPeople As New List(Of Integer)
 
         'Networking
         Private SyncPosCounter As Single = 0
@@ -207,14 +207,19 @@ Namespace Game.Barrelled
             End If
 
             'Check if game can be started
-            If Status = GameStatus.WaitingForOnlinePlayers Then
-                CanStart = True
-                For i As Integer = 1 To Spielers.Length - 1
-                    If Not Spielers(i).Bereit Then CanStart = False : Exit For
-                Next
-            Else
-                CanStart = False
-            End If
+            Select Case Status
+                Case GameStatus.WaitingForOnlinePlayers
+                    CanStart = True
+                    For i As Integer = 1 To Spielers.Length - 1
+                        If Not Spielers(i).Bereit Then CanStart = False : Exit For
+                    Next
+                Case GameStatus.GameActive
+                    'Free prisoners
+                    If False Then FreePerson(UserIndex)
+                    CanStart = False
+                Case Else
+                    CanStart = False
+            End Select
 
             'Network stuff
             If NetworkMode And (Not LocalClient.Connected Or LocalClient.LeaveFlag) Then
@@ -273,6 +278,8 @@ Namespace Game.Barrelled
                         'If Renderer.BeginTriggered Then StopWhenRealStart = True
 
                         SendPlayerLeft(source)
+                    Case "f"c
+                        FreePerson(source)
                     Case "g"c
                         Dim tx As String = element.Substring(2)
                         Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(tx)
@@ -288,11 +295,11 @@ Namespace Game.Barrelled
                         Dim who As Integer = element(2).ToString
                         If who = UserIndex Then
                             'Local player was touched by online player
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(EgoPlayer) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(EgoPlayer)
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(who)
                         Else
                             'Online player touched online player
                             SendPlayerPressed(who, source)
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(Spielers(who)) Then PrisonPeople.Add(Spielers(who))
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then PrisonPeople.Add(who)
                         End If
                     Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
@@ -336,8 +343,8 @@ Namespace Game.Barrelled
             LocalClient.WriteStream("e" & index)
         End Sub
 
-        Private Sub SendLayCard(card As Card)
-            LocalClient.WriteStream("f" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
+        Private Sub SendFreed(indx As Integer)
+            LocalClient.WriteStream("f" & indx.ToString)
         End Sub
         Private Sub SendHighscore()
             'Dim pls As New List(Of (String, Integer))
@@ -435,6 +442,17 @@ Namespace Game.Barrelled
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
+        End Sub
+
+        Private Sub FreePerson(by As Integer)
+            If Spielers(by).Mode = PlayerMode.Chased And Not PrisonPeople.Contains(by) And PrisonPeople.Count > 0 And False Then
+                Dim freed As Integer = PrisonPeople(0) : PrisonPeople.RemoveAt(0)
+                If freed = UserIndex Then
+                    EgoPlayer.PrisonEnabled = False
+                Else
+                    SendFreed(freed)
+                End If
+            End If
         End Sub
 
         Private Sub ActivateGame()
