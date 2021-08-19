@@ -1598,6 +1598,7 @@ Namespace Game.BetretenVerboten
         Private chatbtnpressed As Boolean = False
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
+#If Not MONO Then
             SFX(2).Play()
             LaunchInputBox(Sub(x)
                                If UserIndex >= 0 Then
@@ -1608,6 +1609,7 @@ Namespace Game.BetretenVerboten
                                    PostChat("[ADMIN]: " & x, Color.White)
                                End If
                            End Sub, ChatFont, "Enter your message: ", "Send message")
+#End If
         End Sub
         Private Sub VolumeButton() Handles HUDMusicBtn.Clicked
             MediaPlayer.Volume = If(MediaPlayer.Volume > 0F, 0F, 0.1F)
@@ -1617,20 +1619,56 @@ Namespace Game.BetretenVerboten
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtnB.Clicked
+#If Not MONO Then
             If Not Renderer.BeginTriggered AndAlso Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SFX(2).Play()
-                SendGameClosed()
-                NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+#End If
+            SFX(2).Play()
+            SendGameClosed()
+            NetworkMode = False
+            Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+#If Not MONO Then
             End If
+#End If
         End Sub
         Private Sub AngerButton() Handles HUDBtnC.Clicked
             If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex >= 0 Then
                 StopUpdating = True
+#If Not MONO Then
                 Microsoft.VisualBasic.MsgBox("You get angry, because you suck at this game.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 If Microsoft.VisualBasic.MsgBox("You are granted a single Joker. Do you want to utilize it now?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "You suck!") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                     Dim res As String = Microsoft.VisualBasic.InputBox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", "You suck!")
-                    Try
+#Else
+                Dim res As String = ""
+                Dim set_ten As Boolean = False
+                Dim kstate As KeyboardState = Keyboard.GetState
+                If kstate.IsKeyDown(Keys.D0) Or kstate.IsKeyDown(Keys.NumPad0) Then
+                    res = "1"
+                    set_ten = True
+                End If
+
+                If kstate.IsKeyDown(Keys.D1) Or kstate.IsKeyDown(Keys.NumPad1) Then
+                    res &= "1"
+                ElseIf kstate.IsKeyDown(Keys.D2) Or kstate.IsKeyDown(Keys.NumPad2) Then
+                    res &= "2"
+                ElseIf kstate.IsKeyDown(Keys.D3) Or kstate.IsKeyDown(Keys.NumPad3) Then
+                    res &= "3"
+                ElseIf kstate.IsKeyDown(Keys.D4) Or kstate.IsKeyDown(Keys.NumPad4) Then
+                    res &= "4"
+                ElseIf kstate.IsKeyDown(Keys.D5) Or kstate.IsKeyDown(Keys.NumPad5) Then
+                    res &= "5"
+                ElseIf kstate.IsKeyDown(Keys.D6) Or kstate.IsKeyDown(Keys.NumPad6) Then
+                    res &= "6"
+                ElseIf kstate.IsKeyDown(Keys.D7) Or kstate.IsKeyDown(Keys.NumPad7) Then
+                    res &= "7"
+                ElseIf kstate.IsKeyDown(Keys.D8) Or kstate.IsKeyDown(Keys.NumPad8) Then
+                    res &= "8"
+                ElseIf kstate.IsKeyDown(Keys.D9) Or kstate.IsKeyDown(Keys.NumPad9) Then
+                    res &= "9"
+                ElseIf set_ten Then
+                    res &= "0"
+                End If
+#End If
+                Try
                         Dim aim As Integer = res
                         Do Until aim < 13 And aim > 0
                             res = Microsoft.VisualBasic.InputBox("Screw you! I said 1 <= x <= 12 FIELDS!", "You suck!")
@@ -1647,26 +1685,35 @@ Namespace Game.BetretenVerboten
                     End Try
                 End If
                 StopUpdating = False
+
+#If Not MONO Then
             Else
                 SFX(0).Play()
             End If
+#End If
         End Sub
 
         Private Sub SacrificeButton() Handles HUDBtnD.Clicked
             If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex >= 0 AndAlso Spielers(UserIndex).SacrificeCounter <= 0 Then
                 StopUpdating = True
+
+#If Not MONO Then
                 Microsoft.VisualBasic.MsgBox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "YEET")
                 If Microsoft.VisualBasic.MsgBox("You really want to sacrifice one of your precious players?", Microsoft.VisualBasic.MsgBoxStyle.YesNo, "YEET") = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                    Status = SpielStatus.WähleOpfer
+#End If
+                Status = SpielStatus.WähleOpfer
                     DontKickSacrifice = Spielers(UserIndex).SacrificeCounter < 0
                     Spielers(UserIndex).SacrificeCounter = SacrificeWait
                     HUDBtnD.Text = "(" & SacrificeWait & ")"
                     'Move camera
                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+
+#If Not MONO Then
                 Else
                     Microsoft.VisualBasic.MsgBox("Dann halt nicht.", Microsoft.VisualBasic.MsgBoxStyle.OkOnly, "You suck!")
                 End If
-                StopUpdating = False
+#End If
+                    StopUpdating = False
             Else
                 SFX(0).Play()
             End If
