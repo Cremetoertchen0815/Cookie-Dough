@@ -276,7 +276,7 @@ Namespace Game.BetretenVerboten.Rendering
                     element.DirectionalLight0.Direction = New Vector3(0, 0.8, 1.5)
                     element.DirectionalLight0.DiffuseColor = color.ToVector3 * 0.6 '// a gray light
                     element.DirectionalLight0.SpecularColor = New Vector3(1, 1, 1) '// with white highlights
-                    element.World = Matrix.CreateScale(basescale * scale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(-pos.X + 475, -pos.Y + 475, -zpos - AdditionalZPos.Value)
+                    element.World = Matrix.CreateScale(basescale * scale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(New Vector3(-pos.X, -pos.Y, -zpos - AdditionalZPos.Value) + If(Game.Map > 2, New Vector3(475, 475, 0), Vector3.Zero))
                     element.View = View
                     element.Projection = Projection
                 Next

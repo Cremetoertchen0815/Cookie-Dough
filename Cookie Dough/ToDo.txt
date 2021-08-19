@@ -1,6 +1,5 @@
 ﻿-Test DC, BR and DT!
 -Make shit run under MacOS
--Add LF Intro
 
 BV:
 -Add snakes and ladders to snek map
