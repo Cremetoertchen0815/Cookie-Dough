@@ -14,7 +14,8 @@ DC:
 -Add highscoring
 
 BR:
--Implement basic game stuff(freeing others, etc.)
+-Implement freeing others
+-Implement freeing cooldown timer
 -Implement winning
 -3D sound
 -Implement jump meter(???)

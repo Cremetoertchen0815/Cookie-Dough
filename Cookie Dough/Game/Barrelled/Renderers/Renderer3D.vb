@@ -273,15 +273,12 @@ Namespace Game.Barrelled.Renderers
                 mesh.Draw()
             Next
 
-
             'Draw barrier
             If BaseClass.EgoPlayer.PrisonEnabled Then
                 Dev.RasterizerState = RasterizerState.CullNone
                 For Each element In BarrierModel.Meshes
                     For Each fx As BasicEffect In element.Effects
-                        Dim pos As Vector2 = Players.CommonPlayer.PrisonPosition.Size.ToVector2 / 3 * New Vector2(1, 2) + New Vector2(5, -5.5)
-                        Dim size As Vector2 = Players.CommonPlayer.PrisonPosition.Location.ToVector2 / 6 * New Vector2(1, 0.5) + New Vector2(-2.5, 1.5)
-                        fx.World = Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(size.X, 25, size.Y)) * Matrix.CreateTranslation(New Vector3(pos.X, -2, pos.Y))
+                        fx.World = Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(BaseClass.BarrierRectangle.Width, 25, BaseClass.BarrierRectangle.Height)) * Matrix.CreateTranslation(New Vector3(BaseClass.BarrierRectangle.X, -2, BaseClass.BarrierRectangle.Y))
                         fx.View = View
                         fx.Projection = Projection
                         fx.FogEnabled = False

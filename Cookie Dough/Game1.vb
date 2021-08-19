@@ -56,6 +56,7 @@ Public Class Game1
             LocalClient.Connect("127.0.0.1", My.Settings.Username & "a")
         End If
 #End If
+        IO.Directory.CreateDirectory("A\")
 
         'Load common assets
         ReferencePixelTrans = New Texture2D(GraphicsDevice, 1, 1)
@@ -74,6 +75,7 @@ Public Class Game1
         triumph = Content.Load(Of Song)("sfx\triumph")
         DebugTexture = Content.LoadTexture("dbg1")
         Dev = GraphicsDevice
+        IO.Directory.CreateDirectory("B\")
 
         'Create Emmond Tween-Manager(for BV backwards compat.)
         Automator = New TweenManager
@@ -93,6 +95,8 @@ Public Class Game1
             Scene = New Intros.LFIntro
         End If
 #End If
+
+        IO.Directory.CreateDirectory("C\")
     End Sub
 
     Private keysa As New List(Of Keys)

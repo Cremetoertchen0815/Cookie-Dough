@@ -102,7 +102,7 @@
     <Compile Include="Game\Barrelled\IGameWindow.vb" />
     <Compile Include="Game\Barrelled\Networking\SyncMessage.vb" />
     <Compile Include="Game\Barrelled\SlaveWindow.vb" />
-    <Compile Include="Game\Barrelled\MapHelper.vb" />
+    <Compile Include="Game\Barrelled\Map.vb" />
     <Compile Include="Game\Barrelled\Players\BaitNSwitchPlayer.vb" />
     <Compile Include="Game\Barrelled\Players\EgoPlayer.vb" />
     <Compile Include="Game\Barrelled\Players\CommonPlayer.vb" />

@@ -9,13 +9,15 @@ Namespace Game.Barrelled
         Public Sub New(user As EgoPlayer, owner As IGameWindow)
             Me.user = user
             Me.owner = owner
-            InteractBtn = New VirtualButton(New VirtualButton.MouseLeftButton)
+            InteractABtn = New VirtualButton(New VirtualButton.MouseLeftButton)
+            InteractBBtn = New VirtualButton(New VirtualButton.KeyboardKey(Input.Keys.E))
         End Sub
 
         Friend Property Objects As New List(Of IObject3D)
         Friend Property ViewRay As Ray
 
-        Private InteractBtn As VirtualButton
+        Private InteractABtn As VirtualButton
+        Private InteractBBtn As VirtualButton
         Private user As EgoPlayer
         Private owner As IGameWindow
         Private Const ClickRange As Single = 10
@@ -35,7 +37,8 @@ Namespace Game.Barrelled
             Next
 
             'Interact with object
-            If topmost IsNot Nothing AndAlso InteractBtn.IsPressed Then topmost.ClickedFunction(owner)
+            If topmost IsNot Nothing AndAlso InteractABtn.IsPressed AndAlso Not topmost.UserAlternateTrigger Then topmost.ClickedFunction(owner)
+            If topmost IsNot Nothing AndAlso InteractBBtn.IsPressed AndAlso topmost.UserAlternateTrigger Then topmost.ClickedFunction(owner)
         End Sub
     End Class
 End Namespace

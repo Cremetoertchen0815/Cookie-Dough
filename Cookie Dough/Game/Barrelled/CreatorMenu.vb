@@ -41,7 +41,7 @@ Namespace Game.Barrelled
             ClearColor = Color.Black
 
             'Init values
-            NewGamePlayers = {PlayerMode.Chaser, PlayerMode.Chased}
+            NewGamePlayers = {PlayerMode.Chaser, PlayerMode.Chased, PlayerMode.Chased}
             Map = Map.Classic
             PlayerCount = 2
             PlayerSel = 0

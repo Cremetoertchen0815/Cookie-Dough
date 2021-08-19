@@ -37,7 +37,6 @@ Namespace Game.Barrelled
         Private SyncPosCounter As Single = 0
 
         '3D movement & interaction
-        Friend Colliders As BoundingBox()
         Friend ObjectHandler As Object3DHandler
         Friend Crosshair As CrosshairRenderable
 
@@ -120,6 +119,7 @@ Namespace Game.Barrelled
                         CommonPlayer.PlayerSpawn = New Vector2(element.X, element.Y)
                     Case "prison"
                         CommonPlayer.PrisonPosition = New Rectangle(element.X, element.Y, element.Width, element.Height)
+                        BarrierRectangle = New RectangleF(element.Properties("barr_X").Replace("."c, ","c), element.Properties("barr_Y").Replace("."c, ","c), element.Properties("barr_Width").Replace("."c, ","c), element.Properties("barr_Height").Replace("."c, ","c))
                     Case "minimap"
                         minimapRect = New RectangleF(New Vector2(element.X, element.Y), New Vector2(CSng(element.Properties("scale").Replace("."c, ","c))))
                 End Select
@@ -147,13 +147,16 @@ Namespace Game.Barrelled
             HUDMusicBtn = New Controls.Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
             CreateEntity("HUD").AddComponent(HUD)
 
-            'Set colliders
+            'Set player colliders
             ObjectHandler = AddSceneComponent(New Object3DHandler(EgoPlayer, Me))
             For i As Integer = 0 To Spielers.Length - 1
                 If i = UserIndex Then Continue For
                 ObjectHandler.Objects.Add(Spielers(i))
             Next
-            Colliders = {}
+            'Add prison collider
+            Dim loc = New Vector3(BarrierRectangle.X, -2, BarrierRectangle.Y)
+            Dim siz = New Vector3(BarrierRectangle.Width * 2, 25, BarrierRectangle.Height * 2)
+            ObjectHandler.Objects.Add(New RoomTriggerBox(New BoundingBox(loc, loc + siz), Sub() FreePerson(UserIndex)))
         End Sub
 
         Public Overrides Sub OnStart()
@@ -521,6 +524,8 @@ Namespace Game.Barrelled
                 Return UserIndex
             End Get
         End Property
+
+        Public Property BarrierRectangle As RectangleF Implements IGameWindow.BarrierRectangle
 #End Region
 
 

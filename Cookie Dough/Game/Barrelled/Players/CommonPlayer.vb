@@ -77,11 +77,14 @@ Namespace Game.Barrelled.Players
                 Return BoundingBox.CreateFromPoints(pts)
             End Get
         End Property
+        Public Property UserAlternateTrigger As Boolean = False Implements IObject3D.UserAlternateTrigger
 
         'MustOverride Properties
         Public MustOverride Property Location As Vector3
         Public MustOverride Property Direction As Vector3
         Public Overridable Property ThreeDeeVelocity As Vector3
+
+
         Public Overridable Sub ClickedFunction(sender As IGameWindow) Implements IObject3D.ClickedFunction
             Throw New NotImplementedException
         End Sub
