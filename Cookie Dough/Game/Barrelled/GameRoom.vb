@@ -288,13 +288,13 @@ Namespace Game.Barrelled
                         Case "f"c
                             FreePerson(source)
                         Case "g"c
-                            Dim tx As String = element.Substring(2)
+                            Dim tx As String = element.Substring(8)
                             Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(tx)
                             Spielers(source).Location = dat.Item1
                             Spielers(source).Direction = dat.Item2
                             Spielers(source).ThreeDeeVelocity = dat.Item3
                             Spielers(source).RunningMode = dat.Item4
-                            LocalClient.WriteStream("g" & source.ToString & tx)
+                            SendNetworkMessageToAll("g" & source.ToString & "_TATA_" & tx)
                         Case "m"c 'Sent chat message
                             Dim msg As String = element.Substring(2)
                             PostChat(msg, Color.White)
@@ -404,7 +404,7 @@ Namespace Game.Barrelled
             SyncPosCounter += Time.DeltaTime
             If SyncPosCounter > SyncLoc Then
                 SyncPosCounter = 0
-                SendNetworkMessageToAll("g" & UserIndex.ToString & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
+                SendNetworkMessageToAll("g" & UserIndex.ToString & "_TATA_" & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
             End If
         End Sub
         Private Sub SendKick(player As Integer, figur As Integer)

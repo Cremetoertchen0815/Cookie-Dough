@@ -95,7 +95,7 @@ Namespace Game.Barrelled
                                                  ReDim Spielers(PlCount - 1)
                                                  UserIndex = CInt(x())
                                                  For i As Integer = 0 To PlCount - 1
-                                                     Dim readde As Boolean = x() = 1 Or i = 0
+                                                     Dim readde As Boolean = x() = 1 Or i = 0 'Is player already joined to the game
                                                      Dim type As SpielerTyp = CInt(x())
                                                      Dim name As String = x()
                                                      If i <> UserIndex Then
@@ -273,6 +273,7 @@ Namespace Game.Barrelled
                         Spielers(source).Bereit = True
                         Spielers(source).Mode = MODE
                         If source = UserIndex And Spielers(source).Mode = PlayerMode.Ghost Then EgoPlayer.PrisonEnabled = False
+                        If source <> UserIndex Then CreateEntity(Spielers(source).Name).AddComponent(Spielers(source))
                         HUD.Color = PlayerHUDColors(EgoPlayer.Mode)
                         HUDNameBtn.Text = EgoPlayer.Mode.ToString
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
@@ -307,7 +308,7 @@ Namespace Game.Barrelled
                     Case "g"c
                         Dim pl As Integer = element(1).ToString
                         If pl = UserIndex Then Exit Select
-                        Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(element.Substring(2))
+                        Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(element.Substring(8))
                         Spielers(pl).Location = dat.Item1
                         Spielers(pl).Direction = dat.Item2
                         Spielers(pl).ThreeDeeVelocity = dat.Item3
@@ -470,7 +471,7 @@ Namespace Game.Barrelled
             SyncPosCounter += Time.DeltaTime
             If SyncPosCounter > SyncLoc Then
                 SyncPosCounter = 0
-                SendNetworkMessageToAll("g" & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
+                SendNetworkMessageToAll("g" & "_TATA_" & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
             End If
         End Sub
         Private Sub SendGameClosed()
