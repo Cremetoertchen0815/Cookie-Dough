@@ -14,11 +14,12 @@ DC:
 -Add highscoring
 
 BR:
--Implement freeing cooldown timer
+-Implement freeing/killing cooldown timer
 -Implement winning
+-Implement sfx
 -3D sound
 -Implement jump meter(???)
--Implement rejoining(or maybe not rejoining)
+-Implement rejoining(or maybe not)
 -Different terrain(high grass[vision is disturbed, louder noises, you can hide], water[constant sneaking speed], aerial faithplates[bounces you to a set location], )
 -Implement pups(lazer[notify barrels when rebel is treading], stun[shoot at ppl]
 -Music(stems, volume depends on own speed, sirens from barrels)
