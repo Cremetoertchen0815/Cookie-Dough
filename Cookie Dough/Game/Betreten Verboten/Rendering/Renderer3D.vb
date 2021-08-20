@@ -50,9 +50,9 @@ Namespace Game.BetretenVerboten.Rendering
 
             dev = Core.GraphicsDevice
 
-            figur_model = scene.Content.Load(Of Model)("mesh\piece_std")
-            SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games\BV\playfield_connections_" & CInt(Game.Map))
-            Pfeil = scene.Content.Load(Of Texture2D)("games\BV\arrow_right")
+            figur_model = scene.Content.Load(Of Model)("mesh/piece_std")
+            SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games/BV/playfield_connections_" & CInt(Game.Map))
+            Pfeil = scene.Content.Load(Of Texture2D)("games/BV/arrow_right")
 
             'Load table 
             TableModel = scene.Content.Load(Of Model)("mesh/table")

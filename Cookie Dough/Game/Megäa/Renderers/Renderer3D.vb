@@ -75,7 +75,7 @@ Namespace Game.Megäa.Renderers
             ApplyDefaultFX(TableModel, Projection)
 
             'Load totem
-            TotemModel = scene.Content.Load(Of Model)("mesh\totem")
+            TotemModel = scene.Content.Load(Of Model)("mesh/totem")
             ApplyDefaultFX(TotemModel, Projection, -1)
 
             'Load cards
@@ -109,7 +109,7 @@ Namespace Game.Megäa.Renderers
                               Matrix.CreateScale(40) * Matrix.CreateRotationX(-0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, 20),
                               Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 12, -20)}
             RoomTextures = {scene.Content.LoadTexture("3Droom_floor"), DebugTexture}
-            WallModel = scene.Content.Load(Of Model)("mesh\wall")
+            WallModel = scene.Content.Load(Of Model)("mesh/wall")
             ApplyDefaultFX(WallModel, Projection)
         End Sub
 

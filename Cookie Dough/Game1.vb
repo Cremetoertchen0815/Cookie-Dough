@@ -20,9 +20,9 @@ Public Class Game1
         MyBase.Initialize()
 
         'Prepare program
-        IO.Directory.CreateDirectory("Cache\server\")
-        IO.Directory.CreateDirectory("Log\")
-        IO.Directory.CreateDirectory("Save\")
+        IO.Directory.CreateDirectory("Cache/server/")
+        IO.Directory.CreateDirectory("Log/")
+        IO.Directory.CreateDirectory("Save/")
         PauseOnFocusLost = False
         Screen.SetSize(1280, 720)
         Scene.SetDefaultDesignResolution(1920, 1080, Scene.SceneResolutionPolicy.BestFit)
@@ -40,8 +40,8 @@ Public Class Game1
         'Load settings
         If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection From {"weihnachtsaktion.ddns.net"}
         If My.Settings.Username = "" Then My.Settings.Username = Environment.UserName
-        If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundA.audio") Then My.Settings.SoundA = 0
-        If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundB.audio") Then My.Settings.SoundB = 0
+        If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundA.audio") Then My.Settings.SoundA = 0
+        If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundB.audio") Then My.Settings.SoundB = 0
         My.Settings.Save()
 
         'Create client(for debug: create and/or connect to server)
@@ -70,8 +70,8 @@ Public Class Game1
               Content.Load(Of SoundEffect)("sfx/text_skip"),
               Content.Load(Of SoundEffect)("sfx/saucer"),
               Content.Load(Of SoundEffect)("sfx/tuba")}
-        Lalala = Content.Load(Of Song)("games\BV\lalalala")
-        triumph = Content.Load(Of Song)("sfx\triumph")
+        Lalala = Content.Load(Of Song)("games/BV/lalalala")
+        triumph = Content.Load(Of Song)("sfx/triumph")
         DebugTexture = Content.LoadTexture("dbg1")
         Dev = GraphicsDevice
 
@@ -158,11 +158,11 @@ Public Class Game1
 
         If MediaPlayer.State = MediaState.Stopped And Not MediaPlayer.IsRepeating Then
             MediaPlayer.Play(Content.Load(Of Song)("bgm/acc_" & (MusicCounter + 1).ToString))
-#If DEBUG Then
-            MediaPlayer.Volume = 0
-#Else
+            '#If DEBUG Then
+            '            MediaPlayer.Volume = 0
+            '#Else
             If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.1
-#End If
+            '#End If
             MediaPlayer.IsRepeating = False
             MusicCounter = (MusicCounter + 1) Mod 4
         End If

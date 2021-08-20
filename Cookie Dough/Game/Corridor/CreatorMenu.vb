@@ -228,8 +228,8 @@
 '            Public Overrides Sub OnAddedToEntity()
 '                MyBase.OnAddedToEntity()
 
-'                TitleFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\MenuTitle"))
-'                MediumFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\MenuMain"))
+'                TitleFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MenuTitle"))
+'                MediumFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MenuMain"))
 '                Material = New Material With {.SamplerState = SamplerState.LinearClamp, .BlendState = BlendState.AlphaBlend}
 '            End Sub
 

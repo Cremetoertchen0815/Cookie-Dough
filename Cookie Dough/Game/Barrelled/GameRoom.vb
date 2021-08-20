@@ -6,6 +6,7 @@ Imports Cookie_Dough.Game.Barrelled.Renderers
 Imports Cookie_Dough.Game.Common
 Imports Cookie_Dough.Menu.MainMenu
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
@@ -89,8 +90,8 @@ Namespace Game.Barrelled
         Public Sub LoadContent()
 
             'Lade Assets
-            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
-            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
+            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
 
             'Prepare Nez scene
             Core.Instance.IsMouseVisible = False
@@ -104,7 +105,7 @@ Namespace Game.Barrelled
             AddPostProcessor(New VignettePostProcessor(1) With {.Power = 2.0F, .Radius = 1.0F})
 
             'Load Map
-            TileMap = Content.LoadTiledMap("Maps\Barrelled\" & Map.ToString & ".tmx")
+            TileMap = Content.LoadTiledMap("Maps/Barrelled/" & Map.ToString & ".tmx")
 
             EgoPlayer = CreateEntity("EgoPlayer").AddComponent(Spielers(0))
             CreateEntity("Map").AddComponent(New TiledMapRenderer(TileMap, "Collision")).SetRenderLayer(5)
@@ -130,7 +131,6 @@ Namespace Game.Barrelled
             AdditionalHUDRend = CreateEntity("addition_render").SetPosition(minimapRect.Location).SetScale(minimapRect.Size).AddComponent(New AdditionalHUDRendererable(MinimapRenderer))
 
             'Create entities and components
-            'AddSceneComponent(New Object3DHandler(Spielers(UserIndex), Me))
             Crosshair = CreateEntity("crosshair").AddComponent(Of CrosshairRenderable)().SetRenderLayer(6).SetEnabled(False)
 
             'Load HUD
@@ -252,78 +252,114 @@ Namespace Game.Barrelled
 
             Dim data As String() = LocalClient.ReadStream()
             For Each element In data
-                Dim source As Integer = element(0).ToString
-                Dim command As Char = element(1)
-                Select Case command
-                    Case "a"c 'Player arrived
-                        Dim txt As String() = element.Substring(2).Split("|")
-                        Spielers(source).Name = txt(0)
-                        Spielers(source).MOTD = txt(1)
-                        Spielers(source).ID = txt(2)
-                        'TRANSMIT MODE
-                        Spielers(source).Bereit = True
-                        Spielers(source).SetColor(PlayerColors(Spielers(source).Mode))
-                        CreateEntity(txt(0)).AddComponent(Spielers(source))
-                        PostChat(Spielers(source).Name & " arrived!", Color.White)
-                        SendPlayerArrived(source)
-                    Case "c"c 'Sent chat message
-                        Dim text As String = element.Substring(2)
-                        If source = 9 Then
-                            PostChat("[Guest]: " & text, Color.Gray)
-                            SendChatMessage(source, text)
-                        Else
-                            PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
-                            SendChatMessage(source, text)
-                        End If
-                    Case "e"c 'Suspend gaem
-                        If Spielers(source).Typ = SpielerTyp.None Then Continue For
-                        Spielers(source).Bereit = False
-                        PostChat(Spielers(source).Name & " left!", Color.White)
-                        If Not StopUpdating And Status <> CardGameState.SpielZuEnde And Status <> CardGameState.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
-                        If Status <> CardGameState.WarteAufOnlineSpieler Then StopUpdating = True
-                        'If Renderer.BeginTriggered Then StopWhenRealStart = True
+                Try
+                    Dim source As Integer = element(0).ToString
+                    Dim command As Char = element(1)
+                    Select Case command
+                        Case "a"c 'Player arrived
+                            Dim txt As String() = element.Substring(2).Split("|")
+                            Spielers(source).Name = txt(0)
+                            Spielers(source).MOTD = txt(1)
+                            Spielers(source).ID = txt(2)
+                            'TRANSMIT MODE
+                            Spielers(source).Bereit = True
+                            Spielers(source).SetColor(PlayerColors(Spielers(source).Mode))
+                            CreateEntity(txt(0)).AddComponent(Spielers(source))
+                            PostChat(Spielers(source).Name & " arrived!", Color.White)
+                            SendPlayerArrived(source)
+                        Case "c"c 'Sent chat message
+                            Dim text As String = element.Substring(2)
+                            If source = 9 Then
+                                PostChat("[Guest]: " & text, Color.Gray)
+                                SendChatMessage(source, text)
+                            Else
+                                PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
+                                SendChatMessage(source, text)
+                            End If
+                        Case "e"c 'Suspend gaem
+                            If Spielers(source).Typ = SpielerTyp.None Then Continue For
+                            Spielers(source).Bereit = False
+                            PostChat(Spielers(source).Name & " left!", Color.White)
+                            If Not StopUpdating And Status <> CardGameState.SpielZuEnde And Status <> CardGameState.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
+                            If Status <> CardGameState.WarteAufOnlineSpieler Then StopUpdating = True
+                            'If Renderer.BeginTriggered Then StopWhenRealStart = True
 
-                        SendPlayerLeft(source)
-                    Case "f"c
-                        FreePerson(source)
-                    Case "g"c
-                        Dim tx As String = element.Substring(2)
-                        Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(tx)
-                        Spielers(source).Location = dat.Item1
-                        Spielers(source).Direction = dat.Item2
-                        Spielers(source).ThreeDeeVelocity = dat.Item3
-                        Spielers(source).RunningMode = dat.Item4
-                        LocalClient.WriteStream("g" & source.ToString & tx)
-                    Case "m"c 'Sent chat message
-                        Dim msg As String = element.Substring(2)
-                        PostChat(msg, Color.White)
-                    Case "p"c 'Player pressed
-                        Dim who As Integer = element(2).ToString
-                        If who = UserIndex Then
-                            'Local player was touched by online player
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(who)
-                        Else
-                            'Online player touched online player
-                            SendPlayerPressed(who, source)
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then PrisonPeople.Add(who)
-                        End If
-                    Case "r"c 'Player is back
-                        Dim txt As String() = element.Substring(2).Split("|")
-                        Spielers(source).Name = txt(0)
-                        Spielers(source).MOTD = txt(1)
-                        Spielers(source).ID = txt(2)
-                        Spielers(source).Bereit = True
-                        PostChat(Spielers(source).Name & " is back!", Color.White)
-                        SendPlayerBack(source)
-                        'Check if players are still missing, if not, send the signal to continue the game
-                        Dim everythere As Boolean = True
-                        For Each pl In Spielers
-                            If Not pl.Bereit Then everythere = False
-                        Next
-                        If everythere And Status <> CardGameState.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
-                    Case "y"c
-                        SendSync()
-                End Select
+                            SendPlayerLeft(source)
+                        Case "f"c
+                            FreePerson(source)
+                        Case "g"c
+                            Dim tx As String = element.Substring(2)
+                            Dim dat = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (Vector3, Vector3, Vector3, PlayerStatus))(tx)
+                            Spielers(source).Location = dat.Item1
+                            Spielers(source).Direction = dat.Item2
+                            Spielers(source).ThreeDeeVelocity = dat.Item3
+                            Spielers(source).RunningMode = dat.Item4
+                            LocalClient.WriteStream("g" & source.ToString & tx)
+                        Case "m"c 'Sent chat message
+                            Dim msg As String = element.Substring(2)
+                            PostChat(msg, Color.White)
+                        Case "p"c 'Player pressed
+                            Dim who As Integer = element(2).ToString
+                            If who = UserIndex Then
+                                'Local player was touched by online player
+                                If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(who)
+                            Else
+                                'Online player touched online player
+                                SendPlayerPressed(who, source)
+                                If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then PrisonPeople.Add(who)
+                            End If
+                        Case "r"c 'Player is back
+                            Dim txt As String() = element.Substring(2).Split("|")
+                            Spielers(source).Name = txt(0)
+                            Spielers(source).MOTD = txt(1)
+                            Spielers(source).ID = txt(2)
+                            Spielers(source).Bereit = True
+                            PostChat(Spielers(source).Name & " is back!", Color.White)
+                            SendPlayerBack(source)
+                            'Check if players are still missing, if not, send the signal to continue the game
+                            Dim everythere As Boolean = True
+                            For Each pl In Spielers
+                                If Not pl.Bereit Then everythere = False
+                            Next
+                            If everythere And Status <> CardGameState.WarteAufOnlineSpieler Then StopUpdating = False : SendGameActive()
+                        Case "y"c
+                            SendSync()
+                        Case "z"c 'Transmit user data
+                            Dim s As New Threading.Thread(Sub()
+                                                              Dim IdentSound As IdentType = CInt(element(2).ToString)
+                                                              Dim dataNr As Integer = element(3).ToString
+                                                              Dim dat As String = element.Substring(4).Replace("_TATA_", "")
+                                                              Try
+                                                                  If dataNr = 9 Then
+                                                                      'Receive pfp
+                                                                      If IdentSound = IdentType.Custom Then
+                                                                          IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                          Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/server/" & Spielers(source).Name & "_pp.png")
+                                                                      End If
+                                                                      SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
+                                                                  Else
+                                                                      'Receive sound
+                                                                      If IdentSound = IdentType.Custom Then
+                                                                          IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav")
+                                                                      Else
+                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                      End If
+                                                                      SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
+                                                                  End If
+
+                                                              Catch ex As Exception
+                                                                  'Data damaged, send standard sound
+                                                                  If dataNr = 9 Then Exit Sub
+                                                                  IdentSound = If(dataNr = 0, IdentType.TypeB, IdentType.TypeA)
+                                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                  SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_")
+                                                              End Try
+                                                          End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+                            s.Start()
+                    End Select
+                Catch
+                End Try
             Next
         End Sub
 
@@ -337,20 +373,21 @@ Namespace Game.Barrelled
                 If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.CPU Then appendix &= i.ToString
             Next
             SendNetworkMessageToAll("b" & appendix)
+            SendPlayerData()
             SendSync()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
         End Sub
         Private Sub SendDrawCard(card As Card)
-            LocalClient.WriteStream("d" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
+            SendNetworkMessageToAll("d" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
         End Sub
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
         End Sub
 
         Private Sub SendFreed(indx As Integer)
-            LocalClient.WriteStream("f" & indx.ToString)
+            SendNetworkMessageToAll("f" & indx.ToString)
         End Sub
         Private Sub SendHighscore()
             'Dim pls As New List(Of (String, Integer))
@@ -367,7 +404,7 @@ Namespace Game.Barrelled
             SyncPosCounter += Time.DeltaTime
             If SyncPosCounter > SyncLoc Then
                 SyncPosCounter = 0
-                LocalClient.WriteStream("g" & UserIndex.ToString & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
+                SendNetworkMessageToAll("g" & UserIndex.ToString & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
             End If
         End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
@@ -414,30 +451,24 @@ Namespace Game.Barrelled
             Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(lst)
             SendNetworkMessageToAll("y" & str)
         End Sub
+        Private Sub SendSoundFile()
+            If UserIndex < 0 Then Return
 
-        Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType
-            txt = ""
-            Dim ret As IdentType
-            Select Case Spielers(i).Typ
-                Case SpielerTyp.Local
-                    If IsB Then
-                        ret = My.Settings.SoundB
-                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
-                    Else
-                        ret = My.Settings.SoundA
-                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
-                    End If
-                Case SpielerTyp.CPU
-                    Select Case i
-                        Case 0
-                            ret = IdentType.Custom
-                            txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Content\prep\tele.wav")))
-                        Case Else
-                            ret = If(IsB, IdentType.TypeA, IdentType.TypeB)
-                    End Select
-            End Select
-            Return ret
-        End Function
+            Dim dataSender As New Threading.Thread(Sub()
+                                                       Dim txt As String = ""
+                                                       If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
+                                                       SendNetworkMessageToAll("z" & My.Settings.SoundA.ToString & "0" & "_TATA_" & txt)
+
+                                                       txt = ""
+                                                       If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundB.audio")))
+                                                       SendNetworkMessageToAll("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
+
+                                                       txt = ""
+                                                       If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/pp.png")))
+                                                       SendNetworkMessageToAll("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
+                                                   End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+            dataSender.Start()
+        End Sub
 
         Private Sub SendNetworkMessageToAll(message As String)
             If NetworkMode Then LocalClient.WriteStream(message)

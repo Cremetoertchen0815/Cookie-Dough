@@ -14,6 +14,7 @@ DC:
 -Add highscoring
 
 BR:
+-Fix rejoining
 -Implement freeing others
 -Implement freeing cooldown timer
 -Implement winning

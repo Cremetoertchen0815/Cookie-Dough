@@ -35,8 +35,8 @@ Namespace Game.DropTrop.Renderers
 
             dev = Core.GraphicsDevice
 
-            figur_model = scene.Content.Load(Of Model)("mesh\piece_std")
-            Pfeil = scene.Content.Load(Of Texture2D)("games\BV\arrow_right")
+            figur_model = scene.Content.Load(Of Model)("mesh/piece_std")
+            Pfeil = scene.Content.Load(Of Texture2D)("games/BV/arrow_right")
 
             Dim vertices As New List(Of VertexPositionColorTexture) From {
                 New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX),

@@ -20,7 +20,7 @@ Namespace Framework.Networking
         Private registered As Dictionary(Of String, String) '(ID, Username)
         Private games As New Dictionary(Of Integer, IGame)
         Private RNG As New System.Random
-        Private LogPath As String = "Log\" & Date.Now.ToShortDateString & ".log"
+        Private LogPath As String = "Log/" & Date.Now.ToShortDateString & ".log"
         Friend streamw As StreamWriter
 
         Public Sub StartServer()
@@ -38,7 +38,7 @@ Namespace Framework.Networking
                     streamw.Write(oldtxt)
                 End If
                 'Load register
-                If File.Exists("Save\register.dat") Then registered = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(File.ReadAllText("Save\register.dat")) Else registered = New Dictionary(Of String, String)
+                If File.Exists("Save/register.dat") Then registered = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(File.ReadAllText("Save/register.dat")) Else registered = New Dictionary(Of String, String)
             Catch x As Exception
                 Console.WriteLine("Logging file blocked!")
             End Try
@@ -321,7 +321,7 @@ Namespace Framework.Networking
                             'Receive player scores
                             Dim game As Integer = nl(1).ToString
                             Dim map As Integer = nl(2).ToString
-                            Dim path As String = "Save\highsc" & game.ToString & map.ToString & ".dat"
+                            Dim path As String = "Save/highsc" & game.ToString & map.ToString & ".dat"
                             Dim highscore As List(Of (String, Integer))
                             Dim data As List(Of (String, Integer)) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(nl.Substring(3))
                             Dim updated As Boolean() = New Boolean(2) {}
@@ -459,7 +459,7 @@ Namespace Framework.Networking
         End Sub
 
         Private Sub SaveRegister()
-            File.WriteAllText("Save\register.dat", Newtonsoft.Json.JsonConvert.SerializeObject(registered))
+            File.WriteAllText("Save/register.dat", Newtonsoft.Json.JsonConvert.SerializeObject(registered))
         End Sub
 
         <Command("network-kick", "Kicks a specific user from the server.")>

@@ -116,10 +116,10 @@ Namespace Game.DuoCard
         Public Sub LoadContent()
 
             'Lade Assets
-            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
-            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
-            Fanfare = Content.Load(Of Song)("bgm\fanfare")
-            DamDamDaaaam = Content.Load(Of Song)("sfx\DamDamDaaam")
+            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
+            Fanfare = Content.Load(Of Song)("bgm/fanfare")
+            DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
 
             'Lade HUD
             HUD = New GuiSystem
@@ -503,16 +503,16 @@ Namespace Game.DuoCard
                 Case SpielerTyp.Local
                     If IsB Then
                         ret = My.Settings.SoundB
-                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundB.audio")))
                     Else
                         ret = My.Settings.SoundA
-                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
                     End If
                 Case SpielerTyp.CPU
                     Select Case i
                         Case 0
                             ret = IdentType.Custom
-                            txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Content\prep\tele.wav")))
+                            txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Content/prep/tele.wav")))
                         Case Else
                             ret = If(IsB, IdentType.TypeA, IdentType.TypeB)
                     End Select
@@ -527,9 +527,9 @@ Namespace Game.DuoCard
 #Region "Hilfsfunktionen"
         Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
             If ident <> IdentType.Custom Then
-                Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
+                Return SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache\client\sound" & If(IsSoundB, "B", "A") & ".audio")
+                Return SoundEffect.FromFile("Cache/client/sound" & If(IsSoundB, "B", "A") & ".audio")
             End If
         End Function
 

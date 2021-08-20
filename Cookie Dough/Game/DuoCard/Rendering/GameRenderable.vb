@@ -21,7 +21,7 @@ Namespace Game.DuoCard.Rendering
         End Sub
 
         Public Overrides Sub Init(system As Framework.UI.IParent)
-            WürfelRahmen = Core.Content.Load(Of Texture2D)("games\BV\würfel_rahmen")
+            WürfelRahmen = Core.Content.Load(Of Texture2D)("games/BV/würfel_rahmen")
         End Sub
 
         Public Overrides Sub Update(cstate As Framework.UI.GuiInput, offset As Vector2)

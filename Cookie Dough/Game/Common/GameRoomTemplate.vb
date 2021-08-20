@@ -97,10 +97,10 @@
 '        Public Sub LoadContent()
 
 '            'Lade Assets
-'            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
-'            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
-'            Fanfare = Content.Load(Of Song)("bgm\fanfare")
-'            DamDamDaaaam = Content.Load(Of Song)("sfx\DamDamDaaam")
+'            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+'            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
+'            Fanfare = Content.Load(Of Song)("bgm/fanfare")
+'            DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
 
 '            'Lade HUD
 '            HUD = New GuiSystem
@@ -131,7 +131,7 @@
 
 '            'Load sounds and MOTDs
 '            Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
-'            Dim thumb = Texture2D.FromFile(Dev, "Cache\client\pp.png")
+'            Dim thumb = Texture2D.FromFile(Dev, "Cache/client/pp.png")
 '            For i As Integer = 0 To Spielers.Length - 1
 '                Dim pl = Spielers(i)
 '                Select Case pl.Typ
@@ -144,7 +144,7 @@
 '                        If i <> 0 Then
 '                            Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
 '                        Else
-'                            Dim sff = SoundEffect.FromFile("Content\prep\tele.wav")
+'                            Dim sff = SoundEffect.FromFile("Content/prep/tele.wav")
 '                            Spielers(i).CustomSound = {sff, sff}
 '                        End If
 '                End Select
@@ -305,17 +305,17 @@
 '                                                                  If dataNr = 9 Then
 '                                                                      'Receive pfp
 '                                                                      If IdentSound = IdentType.Custom Then
-'                                                                          IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-'                                                                          Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\server\" & Spielers(source).Name & "_pp.png")
+'                                                                          IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+'                                                                          Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/server/" & Spielers(source).Name & "_pp.png")
 '                                                                      End If
 '                                                                      SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
 '                                                                  Else
 '                                                                      'Receive sound
 '                                                                      If IdentSound = IdentType.Custom Then
-'                                                                          IO.File.WriteAllBytes("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-'                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache\server\" & Spielers(source).Name & dataNr.ToString & ".wav")
+'                                                                          IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+'                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav")
 '                                                                      Else
-'                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+'                                                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
 '                                                                      End If
 '                                                                      SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
 '                                                                  End If
@@ -324,7 +324,7 @@
 '                                                                  'Data damaged, send standard sound
 '                                                                  If dataNr = 9 Then Exit Sub
 '                                                                  IdentSound = If(dataNr = 0, IdentType.TypeB, IdentType.TypeA)
-'                                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+'                                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
 '                                                                  SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_")
 '                                                              End Try
 '                                                          End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
@@ -403,7 +403,7 @@
 
 '                                                               'Send Thumbnail
 '                                                               txt = ""
-'                                                               If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
+'                                                               If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/pp.png")))
 '                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
 '                                                           End If
 '                                                       Next
@@ -418,16 +418,16 @@
 '                Case SpielerTyp.Local
 '                    If IsB Then
 '                        ret = My.Settings.SoundB
-'                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
+'                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundB.audio")))
 '                    Else
 '                        ret = My.Settings.SoundA
-'                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
+'                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
 '                    End If
 '                Case SpielerTyp.CPU
 '                    Select Case i
 '                        Case 0
 '                            ret = IdentType.Custom
-'                            txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Content\prep\tele.wav")))
+'                            txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Content/prep/tele.wav")))
 '                        Case Else
 '                            ret = If(IsB, IdentType.TypeA, IdentType.TypeB)
 '                    End Select
@@ -445,9 +445,9 @@
 
 '        Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
 '            If ident <> IdentType.Custom Then
-'                Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
+'                Return SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav")
 '            Else
-'                Return SoundEffect.FromFile("Cache\client\sound" & If(IsSoundB, "B", "A") & ".audio")
+'                Return SoundEffect.FromFile("Cache/client/sound" & If(IsSoundB, "B", "A") & ".audio")
 '            End If
 '        End Function
 

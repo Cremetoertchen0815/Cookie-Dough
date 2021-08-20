@@ -36,8 +36,8 @@ Namespace Framework.Networking
         Private _LeaveFlag As Boolean = False
 
         Public Sub New()
-            Directory.CreateDirectory("Cache\client\")
-            If Not File.Exists("Cache\client\pp.png") Then File.Copy("Content\prep\plc.png", "Cache\client\pp.png", True)
+            Directory.CreateDirectory("Cache/client/")
+            If Not File.Exists("Cache/client/pp.png") Then File.Copy("Content/prep/plc.png", "Cache/client/pp.png", True)
         End Sub
 
         Public Sub Connect(hostname As String, nickname As String)
@@ -81,8 +81,8 @@ Namespace Framework.Networking
             End Try
         End Sub
 
-        Private IDFilePath As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\Cookie Dough\ID.dat"
-        Private IDFileFolder As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\Cookie Dough"
+        Private IDFilePath As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "/Cookie Dough/ID.dat"
+        Private IDFileFolder As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "/Cookie Dough"
         Friend Property UniqueIdentifier As String
             Get
                 If My.Settings.UniqueIdentifier = "" And File.Exists(IDFilePath) Then My.Settings.UniqueIdentifier = File.ReadAllText(IDFilePath)

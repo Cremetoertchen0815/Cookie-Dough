@@ -192,14 +192,14 @@ Namespace Menu.MainMenu
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "PNG-File|*.png", .Title = "Select profile picture"}
                         Dim res = ofd.ShowDialog
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
-                            IO.File.Copy(ofd.FileName, "Cache\client\pp.png", True)
+                            IO.File.Copy(ofd.FileName, "Cache/client/pp.png", True)
                         ElseIf res = Windows.Forms.DialogResult.OK Then
                             Microsoft.VisualBasic.MsgBox("File too big!")
                         End If
                     ElseIf New Rectangle(960, 230 + 2 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         My.Settings.Thumbnail = Not My.Settings.Thumbnail
                         My.Settings.Save()
-                        If My.Settings.Thumbnail AndAlso Not IO.File.Exists("Cache\client\pp.png") Then IO.File.Copy("Content\prep\plc.png", "Cache\client\pp.png")
+                        If My.Settings.Thumbnail AndAlso Not IO.File.Exists("Cache/client/pp.png") Then IO.File.Copy("Content/prep/plc.png", "Cache/client/pp.png")
                     End If
 
                     'Spawn Sound
@@ -207,7 +207,7 @@ Namespace Menu.MainMenu
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
                         Dim res = ofd.ShowDialog
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
-                            IO.File.Copy(ofd.FileName, "Cache\client\soundA.audio", True)
+                            IO.File.Copy(ofd.FileName, "Cache/client/soundA.audio", True)
                         ElseIf res = Windows.Forms.DialogResult.OK Then
                             Microsoft.VisualBasic.MsgBox("File too big!")
                         End If
@@ -219,7 +219,7 @@ Namespace Menu.MainMenu
                     ElseIf New Rectangle(960, 230 + 3 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         My.Settings.SoundA = (My.Settings.SoundA + 1) Mod 7
                         My.Settings.Save()
-                        If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundA.audio") Then IO.File.Copy("Content\prep\plc.wav", "Cache\client\soundA.audio")
+                        If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundA.audio") Then IO.File.Copy("Content/prep/plc.wav", "Cache/client/soundA.audio")
                         Try
                             PlayAudio(My.Settings.SoundA)
                         Catch ex As Exception
@@ -232,7 +232,7 @@ Namespace Menu.MainMenu
                         Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
                         Dim res = ofd.ShowDialog
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
-                            IO.File.Copy(ofd.FileName, "Cache\client\soundB.audio", True)
+                            IO.File.Copy(ofd.FileName, "Cache/client/soundB.audio", True)
                         ElseIf res = Windows.Forms.DialogResult.OK Then
                             Microsoft.VisualBasic.MsgBox("File too big!")
                         End If
@@ -244,7 +244,7 @@ Namespace Menu.MainMenu
                     ElseIf New Rectangle(960, 230 + 4 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         My.Settings.SoundB = (My.Settings.SoundB + 1) Mod 7
                         My.Settings.Save()
-                        If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache\client\soundB.audio") Then IO.File.Copy("Content\prep\plc.wav", "Cache\client\soundB.audio")
+                        If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundB.audio") Then IO.File.Copy("Content/prep/plc.wav", "Cache/client/soundB.audio")
                         Try
                             PlayAudio(My.Settings.SoundB, True)
                         Catch ex As Exception
@@ -309,9 +309,9 @@ Namespace Menu.MainMenu
 
         Private Sub PlayAudio(ident As IdentType, Optional SoundB As Boolean = False)
             If ident <> IdentType.Custom Then
-                SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav").Play()
+                SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav").Play()
             Else
-                SoundEffect.FromFile("Cache\client\sound" & If(SoundB, "B", "A") & ".audio").Play()
+                SoundEffect.FromFile("Cache/client/sound" & If(SoundB, "B", "A") & ".audio").Play()
             End If
         End Sub
 
@@ -397,8 +397,8 @@ Namespace Menu.MainMenu
             Public Overrides Sub Initialize()
                 MyBase.Initialize()
 
-                TitleFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\MenuTitle"))
-                MediumFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\MenuMain"))
+                TitleFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MenuTitle"))
+                MediumFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MenuMain"))
                 SmolFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MenuSmol"))
                 Arrow = Core.Content.LoadTexture("arrow_left")
                 Material = New Material With {.SamplerState = SamplerState.LinearClamp}

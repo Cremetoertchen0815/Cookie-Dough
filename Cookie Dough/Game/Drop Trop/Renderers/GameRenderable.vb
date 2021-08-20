@@ -21,8 +21,8 @@ Namespace Game.DropTrop.Renderers
         End Sub
 
         Public Overrides Sub Init(system As Framework.UI.IParent)
-            WürfelAugen = Core.Content.Load(Of Texture2D)("games\BV\würfel_augen")
-            WürfelRahmen = Core.Content.Load(Of Texture2D)("games\BV\würfel_rahmen")
+            WürfelAugen = Core.Content.Load(Of Texture2D)("games/BV/würfel_augen")
+            WürfelRahmen = Core.Content.Load(Of Texture2D)("games/BV/würfel_rahmen")
         End Sub
 
         Public Overrides Sub Update(cstate As Framework.UI.GuiInput, offset As Vector2)

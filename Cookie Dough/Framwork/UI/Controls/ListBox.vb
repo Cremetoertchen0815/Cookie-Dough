@@ -38,8 +38,8 @@ Namespace Framework.UI.Controls
             par = system
 
             If Not Loaded Then
-                ArrowA = Core.Content.Load(Of Texture2D)("ui\general\arrow_left")
-                ArrowB = Core.Content.Load(Of Texture2D)("ui\general\arrow_right")
+                ArrowA = Core.Content.Load(Of Texture2D)("ui/general/arrow_left")
+                ArrowB = Core.Content.Load(Of Texture2D)("ui/general/arrow_right")
             End If
         End Sub
 

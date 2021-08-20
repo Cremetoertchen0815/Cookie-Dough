@@ -130,8 +130,8 @@ Namespace Game.Barrelled
         Public Sub LoadContent()
 
             'Lade Assets
-            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
-            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
+            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
 
             'Prepare Nez scene
             Core.Instance.IsMouseVisible = False
@@ -146,7 +146,7 @@ Namespace Game.Barrelled
 
             'Load Map
             Dim minimapRect As RectangleF = RectangleF.Empty
-            TileMap = Content.LoadTiledMap("Maps\Barrelled\" & Map.ToString & ".tmx")
+            TileMap = Content.LoadTiledMap("Maps/Barrelled/" & Map.ToString & ".tmx")
             CommonPlayer.CollisionLayers = {TileMap.GetLayer(Of TmxLayer)("Collision"), TileMap.GetLayer(Of TmxLayer)("High")}
             Renderer.GenerateMapMatrices(TileMap)
             Renderer.Floorsize = New Vector2(TileMap.Properties("floor_size_X"), TileMap.Properties("floor_size_Y"))
@@ -411,8 +411,8 @@ Namespace Game.Barrelled
                                                                          Try
                                                                              'Receive sound
                                                                              If IdentSound = IdentType.Custom Then
-                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-                                                                                 Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache\client\" & Spielers(source).Name & "_pp.png")
+                                                                                 File.WriteAllBytes("Cache/client/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/client/" & Spielers(source).Name & "_pp.png")
                                                                              End If
                                                                          Catch ex As Exception
                                                                          End Try
@@ -420,15 +420,15 @@ Namespace Game.Barrelled
                                                                          Try
                                                                              'Receive sound
                                                                              If IdentSound = IdentType.Custom Then
-                                                                                 File.WriteAllBytes("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                                                                                 sound = SoundEffect.FromFile("Cache\client\" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                                                                                 File.WriteAllBytes("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 sound = SoundEffect.FromFile("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav")
                                                                              Else
-                                                                                 sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                                 sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
                                                                              End If
                                                                          Catch ex As Exception
                                                                              'Data damaged, send standard sound
                                                                              IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                                                                             sound = SoundEffect.FromFile("Content\prep\audio_" & CInt(IdentSound).ToString & ".wav")
+                                                                             sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
                                                                          End Try
 
                                                                          'Set sound for player
@@ -445,14 +445,14 @@ Namespace Game.Barrelled
 
         Friend Sub SendArrived()
             If UserIndex < 0 Then
-                LocalClient.WriteStream("y") 'request refresh
+                SendNetworkMessageToAll("y") 'request refresh
                 Return
             End If
 
             If Rejoin Then
-                LocalClient.WriteStream("r" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Rejoin
+                SendNetworkMessageToAll("r" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Rejoin
             Else
-                LocalClient.WriteStream("a" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Nujoin
+                SendNetworkMessageToAll("a" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Nujoin
             End If
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
@@ -462,7 +462,7 @@ Namespace Game.Barrelled
             LocalClient.WriteStream("e" & index)
         End Sub
         Private Sub SendRequestFreeing()
-            LocalClient.WriteStream("f")
+            SendNetworkMessageToAll("f")
         End Sub
         Private Sub SendPlayerData()
             Dim element = Spielers(UserIndex)
@@ -470,7 +470,7 @@ Namespace Game.Barrelled
             SyncPosCounter += Time.DeltaTime
             If SyncPosCounter > SyncLoc Then
                 SyncPosCounter = 0
-                LocalClient.WriteStream("g" & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
+                SendNetworkMessageToAll("g" & Newtonsoft.Json.JsonConvert.SerializeObject((element.Location, element.Direction, element.ThreeDeeVelocity, element.RunningMode)))
             End If
         End Sub
         Private Sub SendGameClosed()
@@ -499,16 +499,16 @@ Namespace Game.Barrelled
 
             Dim dataSender As New Threading.Thread(Sub()
                                                        Dim txt As String = ""
-                                                       If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundA.audio")))
-                                                       LocalClient.WriteStream("z" & My.Settings.SoundA.ToString & "0" & "_TATA_" & txt)
+                                                       If My.Settings.SoundA = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
+                                                       SendNetworkMessageToAll("z" & My.Settings.SoundA.ToString & "0" & "_TATA_" & txt)
 
                                                        txt = ""
-                                                       If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\soundB.audio")))
-                                                       LocalClient.WriteStream("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
+                                                       If My.Settings.SoundB = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundB.audio")))
+                                                       SendNetworkMessageToAll("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
 
                                                        txt = ""
-                                                       If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache\client\pp.png")))
-                                                       LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
+                                                       If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/pp.png")))
+                                                       SendNetworkMessageToAll("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
             dataSender.Start()
         End Sub

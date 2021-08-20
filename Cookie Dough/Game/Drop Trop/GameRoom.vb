@@ -106,9 +106,9 @@ Namespace Game.DropTrop
         Public Sub LoadContent()
 
             'Lade Assets
-            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
-            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
-            Fanfare = Content.Load(Of Song)("bgm\fanfare")
+            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
+            Fanfare = Content.Load(Of Song)("bgm/fanfare")
 
             'Lade HUD
             HUD = New GuiSystem
@@ -580,9 +580,9 @@ Namespace Game.DropTrop
 
         Private Function GetLocalAudio(ident As IdentType) As SoundEffect
             If ident <> IdentType.Custom Then
-                Return SoundEffect.FromFile("Content\prep\audio_" & CInt(ident).ToString & ".wav")
+                Return SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache\client\sound.audio")
+                Return SoundEffect.FromFile("Cache/client/sound.audio")
             End If
         End Function
 

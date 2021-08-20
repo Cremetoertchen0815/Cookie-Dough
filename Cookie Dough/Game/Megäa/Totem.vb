@@ -23,7 +23,7 @@ Namespace Game.Megäa
         Public Overrides Sub Initialize()
             MyBase.Initialize()
 
-            TotemModel = Entity.Scene.Content.Load(Of Model)("mesh\totem")
+            TotemModel = Entity.Scene.Content.Load(Of Model)("mesh/totem")
             BoundingBox = VertexExtractor.CreateBoundingBox(TotemModel, Matrix.CreateScale(0.0028, 0.0028, 0.008) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(0, 3.62F, 0))
 
             Dim handler = Entity.Scene.GetSceneComponent(Of Object3DHandler)

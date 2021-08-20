@@ -3,7 +3,7 @@ Namespace Framework.Misc
 
     <TestState(TestState.NearCompletion)>
     Friend Module ErrorLogger
-        Friend ErrPath As String = "Log\errors.log"
+        Friend ErrPath As String = "Log/errors.log"
 
         Friend Sub NoteError(ex As Exception, unhandeled As Boolean)
             Try

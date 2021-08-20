@@ -15,7 +15,7 @@ Namespace Game.Megäa
         Public Overrides Sub Initialize()
             MyBase.Initialize()
 
-            TableModel = Entity.Scene.Content.Load(Of Model)("mesh\table")
+            TableModel = Entity.Scene.Content.Load(Of Model)("mesh/table")
             TransformMatrix = Matrix.CreateScale(New Vector3(3.2, 3.2, 2)) * Matrix.CreateRotationX(MathHelper.PiOver2)
             BoundingBox = VertexExtractor.CreateBoundingBox(TableModel, Matrix.CreateScale(0.01) * TransformMatrix)
 

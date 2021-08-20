@@ -103,7 +103,7 @@ Namespace Intros
 
                 dev = Core.GraphicsDevice
 
-                figur_model = scene.Content.Load(Of Model)("intro\lf\piece_std")
+                figur_model = scene.Content.Load(Of Model)("intro/lf/piece_std")
                 batchlor = New Batcher(dev)
                 View = Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
                 Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(800, 480, 1, 100000)

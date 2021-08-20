@@ -104,8 +104,8 @@ Namespace Game.Megäa
             MyBase.Initialize()
 
             'Lade Assets
-            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ButtonText"))
-            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font\ChatText"))
+            ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+            ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
 
             'Prepare Nez scene
             Core.Instance.IsMouseVisible = False
