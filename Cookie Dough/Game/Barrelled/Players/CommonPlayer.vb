@@ -43,7 +43,7 @@ Namespace Game.Barrelled.Players
         ''' <summary>
         ''' A custom defined sound that can be player under different circumstances.
         ''' </summary>
-        Public Property CustomSound As SoundEffect() Implements IPlayer.CustomSound
+        Public Property CustomSound As SoundEffect() = {SFX(3), SFX(4)} Implements IPlayer.CustomSound
         ''' <summary>
         ''' A custom defined thumbnail that can be player under different circumstances.
         ''' </summary>

@@ -21,6 +21,7 @@ Namespace Framework.Networking
         Private games As New Dictionary(Of Integer, IGame)
         Private RNG As New System.Random
         Private LogPath As String = "Log/" & Date.Now.ToShortDateString & ".log"
+        Private HostSendLockObj As New Object
         Friend streamw As StreamWriter
 
         Public Sub StartServer()
@@ -270,18 +271,25 @@ Namespace Framework.Networking
             con.StreamW.WriteLine(str)
         End Sub
 
+        Private Sub WriteStringToHost(con As Connection, str As String)
+            SyncLock HostSendLockObj
+                If Not str.Contains("_TATA_") Then Console.WriteLine("[O/" & con.Nick & "]" & str)
+                con.StreamW.WriteLine(str)
+            End SyncLock
+        End Sub
+
         Private Sub EnterJoinMode(con As Connection, gaem As IGame, index As Integer)
             Try
                 Dim break As Boolean = False
                 Do Until gaem.Ended = EndingMode.Abruptly Or break
                     Dim txt As String = ReadString(con)
-                    If gaem.HostConnection IsNot Nothing Then WriteString(gaem.HostConnection, index.ToString & txt)
+                    If gaem.HostConnection IsNot Nothing Then WriteStringToHost(gaem.HostConnection, index.ToString & txt)
                     If txt = "e" Then break = True
                 Loop
             Catch ex As Exception
                 gaem.Players(index).Bereit = False
                 gaem.Players(index).Connection = Nothing
-                If gaem.HostConnection IsNot Nothing Then WriteString(gaem.HostConnection, index.ToString & "e") 'If connection was interrupted, send to host that connection was interrupted and halt game
+                If gaem.HostConnection IsNot Nothing Then WriteStringToHost(gaem.HostConnection, index.ToString & "e") 'If connection was interrupted, send to host that connection was interrupted and halt game
             End Try
 
             If Not gaem.Active Then gaem.Players(index) = Nothing : WriteString(con, "LOL")
@@ -293,7 +301,7 @@ Namespace Framework.Networking
                 Dim break As Boolean = False
                 Do Until gaem.Ended = EndingMode.Abruptly Or break
                     Dim txt As String = ReadString(con)
-                    If gaem.HostConnection IsNot Nothing And (txt(0) = "y"c Or txt(0) = "c"c) Then WriteString(gaem.HostConnection, "9" & txt)
+                    If gaem.HostConnection IsNot Nothing And (txt(0) = "y"c Or txt(0) = "c"c) Then WriteStringToHost(gaem.HostConnection, "9" & txt)
                     If txt = "e" Then break = True
                 Loop
             Catch ex As Exception
