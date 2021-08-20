@@ -36,6 +36,7 @@ Namespace Game.Barrelled
         Friend Difficulty As Difficulty 'Declares the difficulty of the CPU
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
+        Private PrisonPeople As New List(Of Integer)
 
         'Networking
         Private SyncPosCounter As Single = 0
@@ -99,7 +100,7 @@ Namespace Game.Barrelled
                                                      Dim type As SpielerTyp = CInt(x())
                                                      Dim name As String = x()
                                                      If i <> UserIndex Then
-                                                         Spielers(i) = New OtherPlayer(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = name, .Bereit = readde}
+                                                         Spielers(i) = New OtherPlayer(If(type = SpielerTyp.None, type, SpielerTyp.Online), i) With {.Name = name, .Bereit = readde}
                                                          If readde Then CreateEntity(Spielers(i).Name).AddComponent(Spielers(i))
                                                      Else
                                                          Spielers(i) = New EgoPlayer(SpielerTyp.Online) With {.Name = My.Settings.Username}
@@ -320,8 +321,12 @@ Namespace Game.Barrelled
                         Dim who As Integer = CInt(element(1).ToString)
                         Dim source As Integer = CInt(element(2).ToString)
                         If who = UserIndex Then
-                            'Some chaser touched local, chased player
-                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True
+                            'Local player was touched by online player
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(who)
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chased And PrisonPeople.Contains(who) And Not PrisonPeople.Contains(source) Then PrisonPeople.Remove(who) : EgoPlayer.PrisonEnabled = False
+                        Else
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(who) Then PrisonPeople.Add(who)
+                            If Spielers(who).Mode = PlayerMode.Chased And Spielers(source).Mode = PlayerMode.Chased And PrisonPeople.Contains(who) And Not PrisonPeople.Contains(source) Then PrisonPeople.Remove(who)
                         End If
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString
@@ -480,13 +485,8 @@ Namespace Game.Barrelled
         Private Sub SendMessage(msg As String)
             SendNetworkMessageToAll("m" & msg)
         End Sub
-        Private Sub SendPlayerPressed(ID As String) Implements IGameWindow.PlayerPressed
-            For i As Integer = 0 To Spielers.Length - 1
-                If Spielers(i).ID = ID And i <> UserIndex Then
-                    SendNetworkMessageToAll("p" & i.ToString)
-                    Exit For
-                End If
-            Next
+        Private Sub SendPlayerPressed(i As Integer) Implements IGameWindow.PlayerPressed
+            If i <> UserIndex Then SendNetworkMessageToAll("p" & i.ToString)
         End Sub
         Private Sub SendPlayerBack(index As Integer)
             'Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))

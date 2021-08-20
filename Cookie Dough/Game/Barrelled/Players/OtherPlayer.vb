@@ -21,6 +21,7 @@ Namespace Game.Barrelled.Players
 
         'Misc
         Private MinimapSprite As SpriteRenderer
+        Private Index As Integer
 
         'Movement
         Public Velocity As Vector2
@@ -47,13 +48,14 @@ Namespace Game.Barrelled.Players
             End Set
         End Property
 
-        Public Sub New(typ As SpielerTyp)
+        Public Sub New(typ As SpielerTyp, index As Integer)
             Me.Typ = typ
+            Me.Index = index
             MinimapSprite = New SpriteRenderer(Core.Content.LoadTexture("games/BR/minimap_player")).SetColor(PlayerColors(Mode)).SetRenderLayer(5)
         End Sub
 
-        Public Sub New(typ As SpielerTyp, mode As PlayerMode)
-            Me.New(typ)
+        Public Sub New(typ As SpielerTyp, mode As PlayerMode, index As Integer)
+            Me.New(typ, index)
             Me.Mode = mode
         End Sub
 
@@ -144,7 +146,7 @@ Namespace Game.Barrelled.Players
         End Sub
 
         Public Overrides Sub ClickedFunction(sender As IGameWindow)
-            sender.PlayerPressed(ID)
+            sender.PlayerPressed(Index)
         End Sub
     End Class
 End Namespace

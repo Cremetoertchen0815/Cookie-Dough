@@ -140,7 +140,7 @@ Namespace Game.Barrelled
                 If i = 0 Then
                     AktuellesSpiel.Spielers(i) = New EgoPlayer(SpielerTyp.Local, NewGamePlayers(i)) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, "")}
                 Else
-                    AktuellesSpiel.Spielers(i) = New OtherPlayer(SpielerTyp.Online, NewGamePlayers(i)) With {.Bereit = False}
+                    AktuellesSpiel.Spielers(i) = New OtherPlayer(SpielerTyp.Online, NewGamePlayers(i), i) With {.Bereit = False}
                 End If
             Next
             AktuellesSpiel.LoadContent()

@@ -6,6 +6,6 @@ Namespace Game.Barrelled
         ReadOnly Property Spielers As CommonPlayer()
         ReadOnly Property UserIndex As Integer
         Property BarrierRectangle As RectangleF
-        Sub PlayerPressed(ID As String)
+        Sub PlayerPressed(pl As Integer)
     End Interface
 End Namespace
