@@ -2,6 +2,7 @@
 -Make shit run under MacOS
 
 BV:
+-Suicide bug(house was XOXX, one was in homebase, Suicide field was field nr 1) Diced a one, first figure in house moved one space and got wrongfully suicided
 -Add snakes and ladders to snek map
 -Extend snek map vertically(???)
 -Custom CPU sounds

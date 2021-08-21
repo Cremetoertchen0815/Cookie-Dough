@@ -144,6 +144,7 @@ Namespace Game.DuoCard
 
             Dim local_count As Integer = 1
             Dim AktuellesSpiel As New GameRoom()
+            AktuellesSpiel.PlCount = Size
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.GameMode = Mode
             AktuellesSpiel.NetworkMode = False

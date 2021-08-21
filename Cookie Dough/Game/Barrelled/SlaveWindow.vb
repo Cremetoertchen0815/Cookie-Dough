@@ -37,6 +37,7 @@ Namespace Game.Barrelled
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
         Private PrisonPeople As New List(Of Integer)
+        Private CooldownTimer As Single
 
         'Networking
         Private SyncPosCounter As Single = 0
@@ -81,6 +82,7 @@ Namespace Game.Barrelled
         'Constants
         Private Const WaitinTime As Integer = 1500
         Private Const SyncLoc As Single = 0.05F
+        Private Const PressCooldown As Single = 5.0F
 
         Public Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
@@ -486,7 +488,14 @@ Namespace Game.Barrelled
             SendNetworkMessageToAll("m" & msg)
         End Sub
         Private Sub SendPlayerPressed(i As Integer) Implements IGameWindow.PlayerPressed
-            If i <> UserIndex Then SendNetworkMessageToAll("p" & i.ToString)
+            If i <> UserIndex Then
+                'Cancel if cooldown is running
+                If CooldownTimer > 0 Then Return
+                'Check if cooldown has to be set
+                If Spielers(i).Mode = PlayerMode.Chased And EgoPlayer.Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(i) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(i) : CooldownTimer = PressCooldown
+                If Spielers(i).Mode = PlayerMode.Chased And EgoPlayer.Mode = PlayerMode.Chased And PrisonPeople.Contains(i) And Not PrisonPeople.Contains(UserIndex) Then PrisonPeople.Remove(i) : EgoPlayer.PrisonEnabled = False : CooldownTimer = PressCooldown
+                SendNetworkMessageToAll("p" & i.ToString)
+            End If
         End Sub
         Private Sub SendPlayerBack(index As Integer)
             'Dim str As String = Newtonsoft.Json.JsonConvert.SerializeObject(New Networking.SyncMessage(Spielers, SaucerFields))

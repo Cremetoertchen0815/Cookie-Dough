@@ -33,6 +33,7 @@ Namespace Game.Barrelled
         Friend WaitingTimeFlag As Boolean = False
         Private lastmstate As MouseState
         Private PrisonPeople As New List(Of Integer)
+        Private CooldownTimer As Single
 
         'Networking
         Private SyncPosCounter As Single = 0
@@ -74,6 +75,7 @@ Namespace Game.Barrelled
         'Constants
         Private Const WaitinTime As Integer = 1500
         Private Const SyncLoc As Single = 0.05F
+        Private Const PressCooldown As Single = 5.0F
 
         Public Sub New(map As Map)
             Chat = New List(Of (String, Color))
@@ -183,6 +185,7 @@ Namespace Game.Barrelled
                         Status = GameStatus.Waitn
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
+                                               HUDInstructions.Text = ""
                                                SendGameActive()
 
                                                Select Case EgoPlayer.Mode
@@ -195,7 +198,12 @@ Namespace Game.Barrelled
                                                SendBeginGaem()
                                            End Sub)
                     Case GameStatus.GameActive
-
+                        If CooldownTimer > 0 Then
+                            CooldownTimer -= Time.DeltaTime
+                            HUDInstructions.Text = Math.Ceiling(CooldownTimer).ToString & "..."
+                        Else
+                            HUDInstructions.Text = ""
+                        End If
                 End Select
 
             End If
@@ -405,7 +413,14 @@ Namespace Game.Barrelled
             SendNetworkMessageToAll("n" & who.ToString)
         End Sub
         Private Sub SendPlayerPressed(i As Integer) Implements IGameWindow.PlayerPressed
-            If i <> UserIndex Then SendNetworkMessageToAll("p" & i.ToString & UserIndex.ToString)
+            If i <> UserIndex Then
+                'Cancel if cooldown is running
+                If CooldownTimer > 0 Then Return
+                'Check if cooldown has to be set
+                If Spielers(i).Mode = PlayerMode.Chased And EgoPlayer.Mode = PlayerMode.Chaser And Not PrisonPeople.Contains(i) Then EgoPlayer.Entity.Position = CommonPlayer.PlayerSpawn : EgoPlayer.PrisonEnabled = True : PrisonPeople.Add(i) : CooldownTimer = PressCooldown
+                If Spielers(i).Mode = PlayerMode.Chased And EgoPlayer.Mode = PlayerMode.Chased And PrisonPeople.Contains(i) And Not PrisonPeople.Contains(UserIndex) Then PrisonPeople.Remove(i) : EgoPlayer.PrisonEnabled = False : CooldownTimer = PressCooldown
+                SendNetworkMessageToAll("p" & i.ToString & UserIndex.ToString)
+            End If
         End Sub
 
         Private Sub SendPlayerPressed(index As Integer, source As Integer)
