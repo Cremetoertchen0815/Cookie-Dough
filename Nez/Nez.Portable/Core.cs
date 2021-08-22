@@ -1,15 +1,14 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections;
-using Nez.Systems;
-using Nez.Console;
-using Nez.Tweens;
-using Nez.Timers;
+using Microsoft.Xna.Framework.Input;
 using Nez.BitmapFonts;
-using Nez.Analysis;
+using Nez.Console;
+using Nez.Systems;
 using Nez.Textures;
+using Nez.Timers;
+using Nez.Tweens;
+using System;
+using System.Collections;
 using System.Diagnostics;
 
 

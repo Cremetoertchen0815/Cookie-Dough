@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
+Imports Cookie_Dough.Framework.UI
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -74,6 +75,11 @@ Public Class Game1
         triumph = Content.Load(Of Song)("sfx/triumph")
         DebugTexture = Content.LoadTexture("dbg1")
         Dev = GraphicsDevice
+
+        'Create MessageBoxer
+        MsgBoxer = New MessageBoxer
+        FinalRenderable = MsgBoxer
+        RegisterGlobalManager(MsgBoxer)
 
         'Create Emmond Tween-Manager(for BV backwards compat.)
         Automator = New TweenManager

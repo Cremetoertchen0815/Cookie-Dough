@@ -1,5 +1,6 @@
 ﻿Imports System.Diagnostics
 Imports Cookie_Dough.Framework.Networking
+Imports Cookie_Dough.Framework.UI
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -10,14 +11,14 @@ Imports Microsoft.Xna.Framework.Graphics
 Public Module Program
 
     Friend Property VersionString As String = "Cookie Dough V0.30"
-    'Old Beacon-tweening system for backwards compatibility for BV
-    Friend Property Automator As TweenManager
+    Friend Property Automator As TweenManager 'Old Beacon-tweening system for backwards compatibility for BV
     Friend Property ReferencePixelTrans As Texture2D
     Friend Property Dev As GraphicsDevice
     Friend Property DebugTexture As Texture2D
     Friend Property LocalClient As Client
     Friend Property SFX As SoundEffect()
     Friend Property ScaleMatrix As Matrix
+    Friend Property MsgBoxer As MessageBoxer
     Friend Property FgColor As Color = Color.Lime
     Friend Property hudcolors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Teal, New Color(85, 120, 20)}
     Friend Property playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Yellow, Color.Maroon * 1.5F, New Color(0, 0, 200), New Color(0, 80, 80), New Color(85, 120, 20)}
@@ -51,7 +52,7 @@ Public Module Program
 #End If
         End Try
 #End If
-            Try
+        Try
             If Server.streamw IsNot Nothing Then streamw.Close()
             StopServer()
             Process.GetCurrentProcess.Kill()
