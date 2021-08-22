@@ -253,6 +253,7 @@ namespace Nez
 				    (SceneTransition != null &&
 				     (!SceneTransition._loadsNewScene || SceneTransition._isNewSceneLoaded)))
 				{
+					if (_scene.Enabled)
 					_scene.Update();
 				}
 
