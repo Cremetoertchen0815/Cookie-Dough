@@ -81,9 +81,11 @@ namespace Nez
 		public static Core Instance => _instance;
 
 		/// <summary>
-		/// facilitates easy access to the global Content instance for internal classes
+		/// facilitates easy access to the global Con tent instance for internal classes
 		/// </summary>
 		internal static Core _instance;
+
+		public IDrawable FinalRenderable = null;
 
 #if DEBUG
 		internal static long drawCalls;
@@ -316,6 +318,8 @@ namespace Nez
 				// render as usual if we dont have an active SceneTransition
 				_scene.PostRender();
 			}
+
+			if (FinalRenderable != null  && FinalRenderable.Visible) FinalRenderable.Draw(null); 
 
 			EndDebugDraw();
 		}
