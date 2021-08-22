@@ -22,7 +22,7 @@ Namespace Framework.UI
 
         'Layout & data
         Private MsgBoxArea As New Rectangle(710, 440, 500, 170)
-        Private CurrentMessage As Message = New Message With {.IsInputbox = False, .Message = "OwO, what's this? lololololololololololololololololololololololololololololololololololol", .Buttons = {"A", "Lang", "Länger"}, .FinalAction = Nothing}
+        Private CurrentMessage As Message
         Private ShowMessageBox As Boolean = False
         Private WasEnabled As Boolean
         Private MessageStack As New List(Of Message)
@@ -104,7 +104,7 @@ Namespace Framework.UI
                 For i As Integer = 0 To CurrentMessage.Buttons.Length - 1
                     Dim txt_width As Single = DispFont.MeasureString(CurrentMessage.Buttons(i)).X + padding
                     If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(MsgBoxArea.Center.X - tot_len / 2 + x_offset, MsgBoxArea.Y + MsgBoxArea.Height * 0.7, txt_width, 30).Contains(mpos) Then
-                        If CurrentMessage.FinalAction IsNot Nothing Then CurrentMessage.FinalAction(i)
+                        If CurrentMessage.FinalActionMsgBox IsNot Nothing Then CurrentMessage.FinalActionMsgBox(i)
                         CloseMsgBox()
                     End If
                     'Update offset
@@ -114,6 +114,15 @@ Namespace Framework.UI
 
             lastmstate = mstate
         End Sub
+
+        Public Sub EnqueueMsgbox(Prompt As String, finalaction As FinalMsgAction, buttons As String())
+            MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = False, .Buttons = buttons, .FinalActionMsgBox = finalaction})
+        End Sub
+
+        Public Sub EnqueueInputbox(Prompt As String, finalaction As FinalInputAction, Optional title As String = "", Optional def As String = "")
+            MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = True, .Buttons = {"OK", "Cancel"}, .FinalActionInputBox = finalaction})
+        End Sub
+
 
         Private Sub CloseMsgBox()
             If MessageStack.Count > 0 Then
@@ -125,10 +134,14 @@ Namespace Framework.UI
             End If
         End Sub
 
+        Public Delegate Sub FinalMsgAction(ByVal button As Integer)
+        Public Delegate Sub FinalInputAction(ByVal text As String, ByVal button As Integer)
+
         Private Structure Message
             Public Message As String
             Public Buttons As String()
-            Public FinalAction As Action(Of Object)
+            Public FinalActionMsgBox As FinalMsgAction
+            Public FinalActionInputBox As FinalInputAction
             Public IsInputbox As Boolean
             Public DefaultResponse As String
         End Structure

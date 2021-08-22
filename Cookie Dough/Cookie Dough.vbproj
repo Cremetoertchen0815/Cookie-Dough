@@ -255,11 +255,9 @@
     <EmbeddedResource Include="Icon.bmp">
       <LogicalName>Icon.bmp</LogicalName>
     </EmbeddedResource>
-    <Content Include="Icon.ico" />
     <Content Include="Maps\Barrelled\tiles.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="taskbar_icon.ico" />
     <Content Include="ToDo.txt" />
   </ItemGroup>
   <ItemGroup>
