@@ -97,7 +97,7 @@ Namespace Game.Common
         Public Overrides Sub Render(scene As Scene)
 
             SetViewMatrix(Game.GetCamPos)
-            Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(dev.Viewport.Width, dev.Viewport.Height, 1, 100000)
+            Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
             '---RENDERER 3D---
 

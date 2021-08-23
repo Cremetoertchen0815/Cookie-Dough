@@ -80,6 +80,7 @@ Public Class Game1
         MsgBoxer = New MessageBoxer
         FinalRenderable = MsgBoxer
         RegisterGlobalManager(MsgBoxer)
+        MsgBoxer.OpenInputbox("Lololololololololololololololololololololololololololololololololololololololololololololololololololololololololol", Nothing, "Soos")
 
         'Create Emmond Tween-Manager(for BV backwards compat.)
         Automator = New TweenManager

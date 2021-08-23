@@ -42,7 +42,7 @@ Namespace Game.Megäa.Renderers
             MyBase.OnAddedToScene(scene)
 
             Dev = Core.GraphicsDevice
-            Projection = Matrix.CreatePerspectiveFieldOfView(1, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 10000000)
+            Projection = Matrix.CreatePerspectiveFieldOfView(1, 1920 / 1080, 0.01, 10000000)
 
             'Generate quads
             Dim vert As New List(Of VertexPositionNormalTexture) From {

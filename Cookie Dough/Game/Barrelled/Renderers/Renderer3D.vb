@@ -164,7 +164,7 @@ Namespace Game.Barrelled.Renderers
 
             'Generate Projection matrix
             Dev = Core.GraphicsDevice
-            Projection = Matrix.CreatePerspectiveFieldOfView(1.15, Core.Instance.Window.ClientBounds.Width / CSng(Core.Instance.Window.ClientBounds.Height), 0.01, 500)
+            Projection = Matrix.CreatePerspectiveFieldOfView(1.15, 1920 / 1080, 0.01, 500)
 
             'Generate quads
             Dim vert As New List(Of VertexPositionNormalTexture) From {

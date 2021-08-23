@@ -319,9 +319,9 @@ namespace Nez
 				_scene.PostRender();
 			}
 
-			if (FinalRenderable != null  && FinalRenderable.Visible) FinalRenderable.Draw(null); 
-
 			EndDebugDraw();
+
+			if (FinalRenderable != null && FinalRenderable.Visible) FinalRenderable.Draw(null);
 		}
 
 		protected override void OnExiting(object sender, EventArgs args)

@@ -1631,7 +1631,11 @@ Namespace Game.BetretenVerboten
             If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex >= 0 Then
                 If Not MsgBoxer.OpenMsgbox("You get angry, because you suck at this game.", Nothing, {"OK"}) Then Return
                 MsgBoxer.EnqueueMsgbox("You are granted a single Joker. Do you want to utilize it now?", Sub(x)
-                                                                                                             If x = 1 Then MsgBoxer.EnqueueInputbox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", AddressOf AngerButtonFinal, "")
+                                                                                                             If x = 0 Then
+                                                                                                                 MsgBoxer.EnqueueInputbox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", AddressOf AngerButtonFinal, "")
+                                                                                                             Else
+                                                                                                                 MsgBoxer.EnqueueMsgbox("Alright, then don't.", Nothing, {"Bitch!"})
+                                                                                                             End If
                                                                                                          End Sub, {"Yeah", "Nope"})
 
             Else
