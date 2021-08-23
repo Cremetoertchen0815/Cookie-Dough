@@ -2450,6 +2450,30 @@
 /processorParam:Quality=Best
 /build:sfx/saucer.wav
 
+#begin sfx/step_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/step_1.wav
+
+#begin sfx/step_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/step_2.wav
+
+#begin sfx/step_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/step_3.wav
+
+#begin sfx/step_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/step_4.wav
+
 #begin sfx/sucess.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

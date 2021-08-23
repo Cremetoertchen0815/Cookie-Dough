@@ -3,10 +3,10 @@
 Namespace Game.Barrelled
     Public Module MapHelper
         Public Function GetMapSize(mp As Map) As Integer
-            Return 1
+            Return 2
         End Function
         Public Function GetTimeLeft(mp As Map) As Integer
-            Return 30
+            Return 60
         End Function
         Public Function GetMapName(mp As Map) As String
             Select Case mp

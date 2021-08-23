@@ -1,5 +1,6 @@
 ﻿Imports Cookie_Dough.Framework.Physics
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Input
 Imports Nez.Sprites
 Imports Nez.Tiled
@@ -25,11 +26,17 @@ Namespace Game.Barrelled.Players
 
         'Movement
         Public Velocity As Vector2
+        Private lastLocationY As Single = 4
         Private LocationY As Single = 4
         Private VelocityY As Single = 0
         Private Collider As BoxCollider
         Private stickPos As Vector2
         Private TrueDirection As Vector3
+
+        'Audio shit
+        Private Sounds As SoundEffectInstance()
+        Friend SoundEmitter As AudioEmitter
+        Friend SoundRunCounter As Single
 
         Private Const SprintSpeed As Single = 150
         Private Const SneakSpeed As Single = 8
@@ -61,6 +68,19 @@ Namespace Game.Barrelled.Players
 
 
         Public Overrides Sub OnAddedToEntity()
+
+            'Load sounds
+            Sounds = {Entity.Scene.Content.LoadSoundEffect("sfx/step_1").CreateInstance,
+                      Entity.Scene.Content.LoadSoundEffect("sfx/step_2").CreateInstance,
+                      Entity.Scene.Content.LoadSoundEffect("sfx/step_3").CreateInstance,
+                      Entity.Scene.Content.LoadSoundEffect("sfx/step_4").CreateInstance,
+                      Entity.Scene.Content.LoadSoundEffect("sfx/jump").CreateInstance}
+
+            'Load 3D sound
+            SoundEmitter = New AudioEmitter
+            For Each element In Sounds
+                element.Apply3D(AudioListener, SoundEmitter)
+            Next
 
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0), 16))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
@@ -128,6 +148,32 @@ Namespace Game.Barrelled.Players
             Velocity3D += Velocity.X * Vector3.Cross(Vector3.Up, movDir) * New Vector3(1, 0, 1)
             If Location.Y <= 0 Then Location = New Vector3(Location.X, 0, Location.Z)
             Velocity3D += New Vector3(0, VelocityY, 0)
+            If LocationY > 0 And lastLocationY <> 0 Then Sounds(4).Play() 'Play jump sound when left floor
+            lastLocationY = LocationY
+
+            'Update Audio Listener
+            SoundEmitter.Forward = movDir
+            SoundEmitter.Position = Location * 500
+            SoundEmitter.Up = Vector3.Up
+            SoundEmitter.Velocity = Velocity3D
+            SoundEmitter.DopplerScale = 5
+
+            For Each element In Sounds
+                element.Apply3D(AudioListener, SoundEmitter)
+                element.Pan = 1
+            Next
+
+            'Play running sounds
+            Dim speeeeeed As Single = Velocity.Length
+            If speeeeeed > 15 And Location.Y = 0 Then
+                SoundRunCounter += Time.DeltaTime
+                If SoundRunCounter > SoundRunFactor / Math.Sqrt(speeeeeed) Then
+                    Sounds(Nez.Random.Range(0, 4)).Play()
+                    SoundRunCounter = 0
+                End If
+            Else
+                SoundRunCounter = 5
+            End If
 
             'Collision
             Dim state As New TiledMapMover.CollisionState

@@ -265,6 +265,9 @@ Namespace Game.Barrelled
             'Generate View matrix for Renderer3D
             Renderer.View = Matrix.CreateLookAt(EgoPlayer.CameraPosition, EgoPlayer.CameraPosition + EgoPlayer.Direction, Vector3.Up)
 
+            'Update audio listener
+
+
             'Focus/Unfocus game
             If mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released Then
                 EgoPlayer.Focused = Not EgoPlayer.Focused

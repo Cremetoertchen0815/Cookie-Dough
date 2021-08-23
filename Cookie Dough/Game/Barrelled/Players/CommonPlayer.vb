@@ -102,5 +102,9 @@ Namespace Game.Barrelled.Players
         Private Shared PlaceholderFace As Texture2D = Core.Content.LoadTexture("games/BR/face_placeholder")
         Protected Mover As TiledMapCollisionResolver
 
+        'Audio
+        Friend Shared AudioListener As New AudioListener
+        Friend Const SoundRunFactor As Single = 2
+
     End Class
 End Namespace

@@ -1,5 +1,6 @@
 ﻿Imports Cookie_Dough.Framework.Physics
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Input
 Imports Nez.Sprites
 Imports Nez.Tiled
@@ -32,6 +33,10 @@ Namespace Game.Barrelled.Players
         Public SprintLeft As Single = 1
         Public Focused As Boolean = True
         Public CanMove As Boolean = True
+
+        'Audio shit
+        Private Sounds As SoundEffect()
+        Friend SoundRunCounter As Single
 
         'Constants
         Private Const MouseSensivity As Single = 232
@@ -83,6 +88,13 @@ Namespace Game.Barrelled.Players
             Entity.AddComponent(MinimapSprite)
             Entity.SetPosition(PlayerSpawn)
 
+            'Load audio
+            Sounds = {Entity.Scene.Content.LoadSoundEffect("sfx/step_1"),
+                      Entity.Scene.Content.LoadSoundEffect("sfx/step_2"),
+                      Entity.Scene.Content.LoadSoundEffect("sfx/step_3"),
+                      Entity.Scene.Content.LoadSoundEffect("sfx/step_4"),
+                      Entity.Scene.Content.LoadSoundEffect("sfx/jump")}
+
             'Assign virtual buttons
             MovementBtn = New VirtualJoystick(False, New VirtualJoystick.KeyboardKeys(VirtualInput.OverlapBehavior.TakeNewer, Keys.A, Keys.D, Keys.W, Keys.S))
             JumpBtn = New VirtualButton(New VirtualButton.KeyboardKey(Keys.Space))
@@ -114,7 +126,7 @@ Namespace Game.Barrelled.Players
                 If RunningMode = PlayerStatus.Sprinty Then maxSpeed = Vector2.One * SprintSpeed
 
                 'Apply jump
-                If JumpBtn.IsPressed And LocationY - VelocityY * Time.DeltaTime <= 0 Then VelocityY = -JumpHeight
+                If JumpBtn.IsPressed And LocationY - VelocityY * Time.DeltaTime <= 0 Then VelocityY = -JumpHeight : Sounds(4).Play()
             Else
                 stickPos = Vector2.Zero
             End If
@@ -172,8 +184,26 @@ Namespace Game.Barrelled.Players
             Dim camShift As Vector3 = Direction : camShift.Y = 0 : camShift.Normalize() : camShift *= 0.5
             CameraPosition = Location + camShift + New Vector3(0, If(RunningMode = PlayerStatus.Sneaky, 3, 6), 0)
 
+            'Update Audio Listener
+            AudioListener.Forward = movDir
+            AudioListener.Position = Location
+            AudioListener.Up = Vector3.Up
+            AudioListener.Velocity = Velocity3D
 
-            If Not Core.Instance.IsActive Or Not Focused Then Return
+            'Play running sounds
+            Dim speeeeeed As Single = Velocity.Length
+            If speeeeeed > 15 And Location.Y = 0 Then
+                SoundRunCounter += Time.DeltaTime
+                If SoundRunCounter > SoundRunFactor / Math.Sqrt(speeeeeed) Then
+                    Sounds(Nez.Random.Range(0, 4)).Play()
+                    SoundRunCounter = 0
+                End If
+            Else
+                SoundRunCounter = 5
+            End If
+
+
+                If Not Core.Instance.IsActive Or Not Focused Then Return
 
             'Smooth out mouse movement
             lastMousePos = Vector2.Lerp(mstate.Position.ToVector2, lastMousePos, 0.25)
