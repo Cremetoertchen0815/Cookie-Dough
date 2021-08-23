@@ -1105,7 +1105,7 @@ Namespace Game.BetretenVerboten
                                                                          Next
 
                                                                          'Check for landing on suicide field
-                                                                         If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
+                                                                         If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
                                                                              saucertrigger = False
                                                                              PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
                                                                              SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
@@ -1379,7 +1379,7 @@ Namespace Game.BetretenVerboten
                 Next
 
                 'Trigger suicide
-                If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
+                If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
                     saucertrigger = False
                     PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
                     SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
