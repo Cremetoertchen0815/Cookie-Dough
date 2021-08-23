@@ -69,6 +69,17 @@ Namespace Framework.Misc
             End If
         End Sub
 
+        Dim ChangeNameButtonPressed As Boolean = False
+        Public Sub OpenInputbox(message As String, title As String, finalaction As Action(Of String), Optional defaultvalue As String = "")
+            If Not ChangeNameButtonPressed Then
+                ChangeNameButtonPressed = True
+                Dim txt As String = MsgBoxer.OpenInputbox(message, Sub(x, y)
+                                                                       If y = 0 Then finalaction.Invoke(x)
+                                                                       ChangeNameButtonPressed = False
+                                                                   End Sub, defaultvalue)
+            End If
+        End Sub
+
         Public Function RemIllegalChars(text As String, font As NezSpriteFont) As String
             Dim result As String = text
             For Each element In text.Distinct
@@ -79,7 +90,7 @@ Namespace Framework.Misc
 
         Private BoxOpen As Boolean = False
         Friend Sub LaunchInputBox(finalaction As Action(Of String), font As NezSpriteFont, message As String, title As String, Optional defaultvalue As String = "")
-            MsgBoxer.OpenInputbox(message, Sub(x, y) If x = 0 Then finalaction.Invoke(RemIllegalChars(y, font)), defaultvalue)
+            MsgBoxer.OpenInputbox(message, Sub(x, y) If y = 0 Then finalaction.Invoke(RemIllegalChars(y, font)), defaultvalue)
         End Sub
 
         Public Function interpolate(ByVal d1 As Double, ByVal d2 As Double, ByVal dPercentage As Double) As Double

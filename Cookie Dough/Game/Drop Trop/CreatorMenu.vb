@@ -147,16 +147,6 @@ Namespace Game.DropTrop
             MenuAktiviert = False
         End Sub
 
-        Private Sub OpenInputbox(message As String, title As String, finalaction As Action(Of String), Optional defaultvalue As String = "")
-            If Not ChangeNameButtonPressed Then
-                ChangeNameButtonPressed = True
-                Dim txt As String = MsgBoxer.OpenInputbox(message, Sub(x, y)
-                                                                       If y = 0 Then finalaction.Invoke(x)
-                                                                       ChangeNameButtonPressed = False
-                                                                   End Sub, defaultvalue)
-            End If
-        End Sub
-
         Private ReadOnly Property IsConnectedToServer() As Boolean
             Get
                 Return LocalClient.Connected
