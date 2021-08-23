@@ -90,7 +90,7 @@ Namespace Framework.Misc
 
         Private BoxOpen As Boolean = False
         Friend Sub LaunchInputBox(finalaction As Action(Of String), font As NezSpriteFont, message As String, title As String, Optional defaultvalue As String = "")
-            MsgBoxer.OpenInputbox(message, Sub(x, y) If y = 0 Then finalaction.Invoke(RemIllegalChars(y, font)), defaultvalue)
+            MsgBoxer.OpenInputbox(message, Sub(x, y) If y = 0 Then finalaction.Invoke(RemIllegalChars(x, font)), defaultvalue)
         End Sub
 
         Public Function interpolate(ByVal d1 As Double, ByVal d2 As Double, ByVal dPercentage As Double) As Double
