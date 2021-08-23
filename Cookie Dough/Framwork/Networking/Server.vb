@@ -81,7 +81,7 @@ Namespace Framework.Networking
                 Loop
 
             Catch ex As Exception
-                Microsoft.VisualBasic.MsgBox("Other server already active!")
+                MsgBoxer.EnqueueMsgbox("Other server already active!")
             End Try
 
         End Sub

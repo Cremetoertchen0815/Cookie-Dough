@@ -61,22 +61,5 @@ Public Module Program
         End Try
     End Sub
 
-    Function MsgBox(Prompt As String, Optional buttons As Microsoft.VisualBasic.MsgBoxStyle = Microsoft.VisualBasic.MsgBoxStyle.OkOnly, Optional title As String = "") As Microsoft.VisualBasic.MsgBoxResult
-#If MONO Then
-        Return Microsoft.VisualBasic.MsgBoxResult.Yes
-#Else
-        Return Microsoft.VisualBasic.MsgBox(Prompt, buttons, title)
-#End If
-
-    End Function
-
-    Function RealInputBox(Prompt As String, Optional title As String = "", Optional def As String = "") As String
-#If MONO Then
-        Return ""
-#Else
-        Return Microsoft.VisualBasic.InputBox(Prompt, title, def)
-#End If
-    End Function
-
 
 End Module

@@ -54,7 +54,7 @@ Namespace Framework.Networking
                 streamw = New StreamWriter(stream) With {.AutoFlush = True}
                 streamr = New StreamReader(stream)
                 Dim vv As String = ReadString()
-                If Not vv = VersionString Then Microsoft.VisualBasic.MsgBox("Your client's version (" & VersionString & ") differs from the server's (" & vv & ")!") : Throw New NotImplementedException()
+                If Not vv = VersionString Then MsgBoxer.EnqueueMsgbox("Your client's version (" & VersionString & ") differs from the server's (" & vv & ")!") : Throw New NotImplementedException()
                 If Not ReadString() = "Hello there!" Then Throw New NotImplementedException()
                 WriteString("Wassup?")
                 If Not ReadString() = "What's your name?" Then Throw New NotImplementedException()
@@ -63,13 +63,13 @@ Namespace Framework.Networking
                 If Not SecondaryClient AndAlso UniqueIdentifier = "" Then UniqueIdentifier = ReadString()
                 Select Case ReadString()
                     Case "Sorry m8! Username already taken"
-                        Microsoft.VisualBasic.MsgBox("Username already taken on this server! Please change username!")
+                        MsgBoxer.EnqueueMsgbox("Username already taken on this server! Please change username!")
                         Exit Sub
                     Case "Sorry m8! Invalid username"
-                        Microsoft.VisualBasic.MsgBox("Username invalid! Please change username!")
+                        MsgBoxer.EnqueueMsgbox("Username invalid! Please change username!")
                         Exit Sub
                     Case "Sorry m8! ID already used"
-                        Microsoft.VisualBasic.MsgBox("Client already logged on on this PC! Please close other client before continuing!")
+                        MsgBoxer.EnqueueMsgbox("Client already logged on on this PC! Please close other client before continuing!")
                         Exit Sub
                 End Select
                 Connected = True
@@ -77,7 +77,7 @@ Namespace Framework.Networking
                 Me.Hostname = hostname
             Catch ex As Exception
                 NoteError(ex, False)
-                Microsoft.VisualBasic.MsgBox("Verbindung zum Server nicht möglich!")
+                MsgBoxer.EnqueueMsgbox("Verbindung zum Server nicht möglich!")
             End Try
         End Sub
 

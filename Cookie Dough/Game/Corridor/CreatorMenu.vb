@@ -139,7 +139,7 @@
 '            For i As Integer = 0 To GetMapSize(Map) - 1
 '                If NewGamePlayers(i) <> SpielerTyp.None Then allnone = False : Exit For
 '            Next
-'            If allnone Then Microsoft.VisualBasic.MsgBox("All players are none! Not a valid player selection!") : Return
+'            If allnone Then MsgBoxer.EnqueueMsgbox("All players are none! Not a valid player selection!") : Return
 
 '            Dim Internetz As Boolean = False
 '            For i As Integer = 0 To GetMapSize(Map) - 1
@@ -175,7 +175,7 @@
 '                                                                                                                For i As Integer = 0 To Whitelist.Length - 1
 '                                                                                                                    wtlst(i) = AllUser(Whitelist(i)).Item1
 '                                                                                                                Next
-'                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
+'                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then MsgBoxer.EnqueueMsgbox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
 '                                                                                                            End If
 '                                                                                                        End Sub
 
@@ -185,7 +185,7 @@
 '        Private Sub OpenInputbox(message As String, title As String, finalaction As Action(Of String), Optional defaultvalue As String = "")
 '            If Not ChangeNameButtonPressed Then
 '                ChangeNameButtonPressed = True
-'                Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
+'                Dim txt As String = MsgBoxer.EnqueueInputBox(message, title, defaultvalue)
 '                If txt <> "" Then
 '                    finalaction.Invoke(txt)
 '                End If

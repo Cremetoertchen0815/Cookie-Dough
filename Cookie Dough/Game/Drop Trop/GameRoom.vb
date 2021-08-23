@@ -245,8 +245,8 @@ Namespace Game.DropTrop
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
-                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : MsgBoxer.EnqueueMsgbox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : MsgBoxer.EnqueueMsgbox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -669,12 +669,13 @@ Namespace Game.DropTrop
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtn.Clicked
-            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SFX(2).Play()
-                SendGameClosed()
-                NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
-            End If
+            MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
+                                                                    If x = 1 Then Return
+                                                                    SFX(2).Play()
+                                                                    SendGameClosed()
+                                                                    NetworkMode = False
+                                                                    Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                                                                End Sub, {"Yeah", "Nope"})
         End Sub
 #End Region
 #Region "Schnittstellenimplementation"

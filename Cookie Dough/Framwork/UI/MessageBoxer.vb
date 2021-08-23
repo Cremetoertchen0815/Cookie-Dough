@@ -118,10 +118,25 @@ Namespace Framework.UI
         Public Sub EnqueueMsgbox(Prompt As String, finalaction As FinalMsgAction, buttons As String())
             MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = False, .Buttons = buttons, .FinalActionMsgBox = finalaction})
         End Sub
+        Public Sub EnqueueMsgbox(Prompt As String)
+            MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = False, .Buttons = {"OK"}, .FinalActionMsgBox = Nothing})
+        End Sub
 
-        Public Sub EnqueueInputbox(Prompt As String, finalaction As FinalInputAction, Optional title As String = "", Optional def As String = "")
+        Public Function OpenMsgbox(Prompt As String, finalaction As FinalMsgAction, buttons As String()) As Boolean
+            If ShowMessageBox Then Return False
+            MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = False, .Buttons = buttons, .FinalActionMsgBox = finalaction})
+            Return True
+        End Function
+
+        Public Sub EnqueueInputbox(Prompt As String, finalaction As FinalInputAction, Optional def As String = "")
             MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = True, .Buttons = {"OK", "Cancel"}, .FinalActionInputBox = finalaction})
         End Sub
+
+        Public Function OpenInputbox(Prompt As String, finalaction As FinalInputAction, Optional def As String = "") As Boolean
+            If ShowMessageBox Then Return False
+            MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = True, .Buttons = {"OK", "Cancel"}, .FinalActionInputBox = finalaction})
+            Return True
+        End Function
 
 
         Private Sub CloseMsgBox()

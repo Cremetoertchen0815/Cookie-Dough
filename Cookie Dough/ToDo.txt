@@ -1,5 +1,6 @@
 ﻿-Test DC, BR and DT!
 -Make shit run under MacOS
+-Implement InputBoxes to MessageBoxer
 
 BV:
 -Suicide bug(house was XOXX, one was in homebase, Suicide field was field nr 1) Diced a one, first figure in house moved one space and got wrongfully suicided

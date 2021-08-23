@@ -221,7 +221,7 @@ Namespace Game.Barrelled
             'Network stuff
             If NetworkMode And (Not LocalClient.Connected Or LocalClient.LeaveFlag) Then
                 StopUpdating = True
-                Microsoft.VisualBasic.MsgBox("Connection lost! Game was ended!")
+                MsgBoxer.EnqueueMsgbox("Connection lost! Game was ended!")
                 Core.StartSceneTransition(New FadeTransition(Function() New MainMenuScene))
                 NetworkMode = False
             End If
@@ -487,14 +487,6 @@ Namespace Game.Barrelled
 #End Region
 
 #Region "Knopfgedrücke"
-        Private Sub ExitButton() Handles HUDBtnA.Clicked
-            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SFX(2).Play()
-                SendGameClosed()
-                NetworkMode = False
-                Core.Exit()
-            End If
-        End Sub
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
 
@@ -511,12 +503,13 @@ Namespace Game.Barrelled
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtnB.Clicked
-            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SFX(2).Play()
-                SendGameClosed()
-                NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New MainMenuScene))
-            End If
+            MsgBoxer.EnqueueMsgbox("Do you really want to leave?", Sub(x)
+                                                                       If x = 1 Then Return
+                                                                       SFX(2).Play()
+                                                                       SendGameClosed()
+                                                                       NetworkMode = False
+                                                                       Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+                                                                   End Sub, {"Yeah", "Nope"})
         End Sub
 
 #End Region

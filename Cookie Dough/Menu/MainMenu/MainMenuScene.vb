@@ -138,7 +138,7 @@ Namespace Menu.MainMenu
                                             If Not ServerActive Then
                                                 'If LocalClient.Connected Then LocalClient.Disconnect()
                                                 If LocalClient.TryConnect Then
-                                                    Microsoft.VisualBasic.MsgBox("Other server already active on this port")
+                                                    MsgBoxer.EnqueueMsgbox("Other server already active on this port")
                                                 Else
                                                     StartServer()
                                                     LocalClient.Connect("127.0.0.1", My.Settings.Username)
@@ -194,7 +194,7 @@ Namespace Menu.MainMenu
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
                             IO.File.Copy(ofd.FileName, "Cache/client/pp.png", True)
                         ElseIf res = Windows.Forms.DialogResult.OK Then
-                            Microsoft.VisualBasic.MsgBox("File too big!")
+                            MsgBoxer.EnqueueMsgbox("File too big!")
                         End If
                     ElseIf New Rectangle(960, 230 + 2 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         My.Settings.Thumbnail = Not My.Settings.Thumbnail
@@ -209,12 +209,12 @@ Namespace Menu.MainMenu
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
                             IO.File.Copy(ofd.FileName, "Cache/client/soundA.audio", True)
                         ElseIf res = Windows.Forms.DialogResult.OK Then
-                            Microsoft.VisualBasic.MsgBox("File too big!")
+                            MsgBoxer.EnqueueMsgbox("File too big!")
                         End If
                         Try
                             PlayAudio(IdentType.Custom)
                         Catch ex As Exception
-                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                            MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
                     ElseIf New Rectangle(960, 230 + 3 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         My.Settings.SoundA = (My.Settings.SoundA + 1) Mod 7
@@ -223,7 +223,7 @@ Namespace Menu.MainMenu
                         Try
                             PlayAudio(My.Settings.SoundA)
                         Catch ex As Exception
-                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                            MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
                     End If
 
@@ -234,12 +234,12 @@ Namespace Menu.MainMenu
                         If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
                             IO.File.Copy(ofd.FileName, "Cache/client/soundB.audio", True)
                         ElseIf res = Windows.Forms.DialogResult.OK Then
-                            Microsoft.VisualBasic.MsgBox("File too big!")
+                            MsgBoxer.EnqueueMsgbox("File too big!")
                         End If
                         Try
                             PlayAudio(IdentType.Custom, True)
                         Catch ex As Exception
-                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                            MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
                     ElseIf New Rectangle(960, 230 + 4 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
                         My.Settings.SoundB = (My.Settings.SoundB + 1) Mod 7
@@ -248,7 +248,7 @@ Namespace Menu.MainMenu
                         Try
                             PlayAudio(My.Settings.SoundB, True)
                         Catch ex As Exception
-                            Microsoft.VisualBasic.MsgBox("Invalid sound file!")
+                            MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
                     End If
 
@@ -338,37 +338,37 @@ Namespace Menu.MainMenu
                     Try
                         BlockOnlineJoin = True
                         Dim client As New Game.Barrelled.SlaveWindow(ins)
-                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else MsgBoxer.EnqueueMsgbox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False
-                        Microsoft.VisualBasic.MsgBox("Error connecting!" & ex.ToString)
+                        MsgBoxer.EnqueueMsgbox("Error connecting!" & ex.ToString)
                     End Try
                 Case GameType.BetretenVerboten
                     Try
                         BlockOnlineJoin = True
                         Dim client As New Game.BetretenVerboten.SlaveWindow(ins)
-                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else MsgBoxer.EnqueueMsgbox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False
-                        Microsoft.VisualBasic.MsgBox("Error connecting!" & ex.ToString)
+                        MsgBoxer.EnqueueMsgbox("Error connecting!" & ex.ToString)
                     End Try
                 Case GameType.DropTrop
                     Try
                         BlockOnlineJoin = True
                         Dim client As New Game.DropTrop.SlaveWindow(ins)
-                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else MsgBoxer.EnqueueMsgbox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False
-                        Microsoft.VisualBasic.MsgBox("Error connecting!" & ex.ToString)
+                        MsgBoxer.EnqueueMsgbox("Error connecting!" & ex.ToString)
                     End Try
                 Case GameType.DuoCard
                     Try
                         BlockOnlineJoin = True
                         Dim client As New Game.DuoCard.SlaveWindow(ins)
-                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else Microsoft.VisualBasic.MsgBox("Error connecting!") : BlockOnlineJoin = False
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else MsgBoxer.EnqueueMsgbox("Error connecting!") : BlockOnlineJoin = False
                     Catch ex As Exception
                         BlockOnlineJoin = False
-                        Microsoft.VisualBasic.MsgBox("Error connecting! " & ex.ToString)
+                        MsgBoxer.EnqueueMsgbox("Error connecting! " & ex.ToString)
                     End Try
             End Select
         End Sub

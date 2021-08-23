@@ -234,7 +234,7 @@ Namespace Game.Barrelled
             'Network stuff
             If NetworkMode And (Not LocalClient.Connected Or LocalClient.LeaveFlag) Then
                 StopUpdating = True
-                Microsoft.VisualBasic.MsgBox("Connection lost! Game was ended!")
+                MsgBoxer.EnqueueMsgbox("Connection lost! Game was ended!")
                 Core.StartSceneTransition(New FadeTransition(Function() New MainMenuScene))
                 NetworkMode = False
             End If
@@ -242,8 +242,8 @@ Namespace Game.Barrelled
 
             'Network stuff
             If NetworkMode Then
-                If Not LocalClient.Connected And Status <> GameStatus.GameFinished Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
-                If LocalClient.LeaveFlag And Status <> GameStatus.GameFinished Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Host left! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                If Not LocalClient.Connected And Status <> GameStatus.GameFinished Then StopUpdating = True : NetworkMode = False : MsgBoxer.EnqueueMsgbox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                If LocalClient.LeaveFlag And Status <> GameStatus.GameFinished Then StopUpdating = True : NetworkMode = False : MsgBoxer.EnqueueMsgbox("Host left! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
             End If
 
             If NetworkMode Then ReadAndProcessInputData()
@@ -542,14 +542,6 @@ Namespace Game.Barrelled
         End Sub
 
 #Region "Knopfgedrücke"
-        Private Sub ExitButton() Handles HUDBtnA.Clicked
-            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SFX(2).Play()
-                SendGameClosed()
-                NetworkMode = False
-                Core.Exit()
-            End If
-        End Sub
 
         Private Sub ChatSendButton() Handles HUDChatBtn.Clicked
 
@@ -566,12 +558,13 @@ Namespace Game.Barrelled
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtnB.Clicked
-            If Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
-                SFX(2).Play()
-                SendGameClosed()
-                NetworkMode = False
-                Core.StartSceneTransition(New FadeTransition(Function() New MainMenuScene))
-            End If
+            MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
+                                                                    If x = 1 Then Return
+                                                                    SFX(2).Play()
+                                                                    SendGameClosed()
+                                                                    NetworkMode = False
+                                                                    Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                                                                End Sub, {"Yeah", "Nope"})
         End Sub
 #End Region
 

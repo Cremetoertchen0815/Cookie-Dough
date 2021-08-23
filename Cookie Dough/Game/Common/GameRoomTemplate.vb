@@ -222,8 +222,8 @@
 
 '            ''Network stuff
 '            'If NetworkMode Then
-'            '    If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
-'            '    If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : Microsoft.VisualBasic.MsgBox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+'            '    If Not LocalClient.Connected And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : MsgBoxer.EnqueueMsgbox("Connection lost!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
+'            '    If LocalClient.LeaveFlag And Status <> SpielStatus.SpielZuEnde Then StopUpdating = True : NetworkMode = False : MsgBoxer.EnqueueMsgbox("Disconnected! Game was ended!") : Core.StartSceneTransition(New FadeTransition(Function() New CreatorMenu))
 '            'End If
 
 '            If NetworkMode Then ReadAndProcessInputData()
@@ -481,7 +481,7 @@
 '            Screen.ApplyChanges()
 '        End Sub
 '        Private Sub MenuButton() Handles HUDBtnB.Clicked
-'            If Not Renderer.BeginTriggered AndAlso Microsoft.VisualBasic.MsgBox("Do you really want to leave?", Microsoft.VisualBasic.MsgBoxStyle.YesNo) = Microsoft.VisualBasic.MsgBoxResult.Yes Then
+'            If Not Renderer.BeginTriggered AndAlso MsgBoxer.EnqueueMsgbox("Do you really want to leave?", MsgBoxer.EnqueueMsgboxStyle.YesNo) = MsgBoxer.EnqueueMsgboxResult.Yes Then
 '                SFX(2).Play()
 '                SendGameClosed()
 '                NetworkMode = False

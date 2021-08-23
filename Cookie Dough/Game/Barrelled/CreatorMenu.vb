@@ -84,7 +84,7 @@ Namespace Game.Barrelled
                                                     SM4Scroll = 0
                                                 End Sub)
                         Else
-                            Microsoft.VisualBasic.MsgBox("Server connection required!")
+                            MsgBoxer.EnqueueMsgbox("Server connection required!")
                         End If
                     End If
                 Else
@@ -151,7 +151,7 @@ Namespace Game.Barrelled
                                                                                                             For i As Integer = 0 To Whitelist.Length - 1
                                                                                                                 wtlst(i) = AllUser(Whitelist(i)).Item1
                                                                                                             Next
-                                                                                                            If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then Microsoft.VisualBasic.MsgBox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
+                                                                                                            If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then MsgBoxer.EnqueueMsgbox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                         End Sub
 
             MenuAktiviert = False
@@ -160,11 +160,10 @@ Namespace Game.Barrelled
         Private Sub OpenInputbox(message As String, title As String, finalaction As Action(Of String), Optional defaultvalue As String = "")
             If Not ChangeNameButtonPressed Then
                 ChangeNameButtonPressed = True
-                Dim txt As String = Microsoft.VisualBasic.InputBox(message, title, defaultvalue)
-                If txt <> "" Then
-                    finalaction.Invoke(txt)
-                End If
-                ChangeNameButtonPressed = False
+                Dim txt As String = MsgBoxer.OpenInputbox(message, Sub(x, y)
+                                                                       If y = 0 Then finalaction.Invoke(x)
+                                                                       ChangeNameButtonPressed = False
+                                                                   End Sub, defaultvalue)
             End If
         End Sub
 
