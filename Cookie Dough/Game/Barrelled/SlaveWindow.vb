@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports System.IO
+Imports System.Linq
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.Barrelled.Networking
@@ -38,11 +39,10 @@ Namespace Game.Barrelled
         Private lastmstate As MouseState
         Private PrisonPeople As New List(Of Integer)
         Private CooldownTimer As Single
+        Private GameEndTimer As Single
 
         'Networking
         Private SyncPosCounter As Single = 0
-
-
 
         '3D movement & interaction
         Friend Colliders As BoundingBox()
@@ -50,6 +50,8 @@ Namespace Game.Barrelled
         Friend Crosshair As CrosshairRenderable
 
         'Assets & rendering
+        Private Fanfare As Song
+        Private DamDamDaaaam As Song
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
         Private Renderer As Renderer3D
@@ -61,7 +63,7 @@ Namespace Game.Barrelled
         'HUD
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnA As Controls.Button
-        Private WithEvents HUDBtnB As Controls.Button
+        Private WithEvents HUDBtnB As Controls.Label
         Private WithEvents HUDSprintBar As Controls.ProgressBar
         Private WithEvents HUDChat As Controls.TextscrollBox
         Private WithEvents HUDChatBtn As Controls.Button
@@ -133,6 +135,8 @@ Namespace Game.Barrelled
         Public Sub LoadContent()
 
             'Lade Assets
+            Fanfare = Content.Load(Of Song)("bgm/fanfare")
+            DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
             ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
             ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
 
@@ -176,8 +180,8 @@ Namespace Game.Barrelled
 
             'Load HUD
             HUD = New GuiSystem() With {.Color = PlayerHUDColors(PlayerMode.Ghost)}
-            HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnA)
-            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnA = New Controls.Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnA)
+            HUDBtnB = New Controls.Label(Function() "  " & Math.Ceiling(GameEndTimer).ToString & "  ", New Vector2(1500, 200)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Active = False} : HUD.Controls.Add(HUDBtnB)
             HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Progress = Function() EgoPlayer.SprintLeft} : HUD.Controls.Add(HUDSprintBar)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(330, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .LenLimit = 28} : HUD.Controls.Add(HUDChat)
             HUDChatBtn = New Controls.Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
@@ -214,7 +218,6 @@ Namespace Game.Barrelled
 
             Renderer.View = Matrix.CreateLookAt(EgoPlayer.CameraPosition, EgoPlayer.CameraPosition + EgoPlayer.Direction, Vector3.Up)
 
-
             If NetworkMode Then SendPlayerData()
 
             'Focus/Unfocus game
@@ -230,6 +233,8 @@ Namespace Game.Barrelled
                     'Free prisoners
                     If False Then SendRequestFreeing()
             End Select
+
+            If GameEndTimer > 0 Then GameEndTimer -= Time.DeltaTime Else HUDBtnB.Active = False
 
             'Network stuff
             If NetworkMode And (Not LocalClient.Connected Or LocalClient.LeaveFlag) Then
@@ -289,6 +294,8 @@ Namespace Game.Barrelled
                         'Init game
                         SendSoundFile()
                         StopUpdating = False
+                        GameEndTimer = GetTimeLeft(Map)
+                        HUDBtnB.Active = True
                         Status = CardGameState.Waitn
                         PostChat("The game has started!", Color.White)
                     Case "c"c 'Sent chat message
@@ -339,51 +346,50 @@ Namespace Game.Barrelled
                         HUDInstructions.Text = "Welcome back!"
                         SendSoundFile()
                     Case "w"c 'Spieler hat gewonnen
-                        'HUDInstructions.Text = "Game over!"
-                        'If MediaPlayer.IsRepeating Then
-                        '    MediaPlayer.Play(DamDamDaaaam)
-                        '    MediaPlayer.Volume = 0.8
-                        'Else
-                        '    MediaPlayer.Play(Fanfare)
-                        '    MediaPlayer.Volume = 0.3
-                        'End If
-                        'MediaPlayer.IsRepeating = False
+                        HUDInstructions.Text = "Game over!"
+                        If MediaPlayer.IsRepeating Then
+                            MediaPlayer.Play(DamDamDaaaam)
+                            MediaPlayer.Volume = 0.8
+                        Else
+                            MediaPlayer.Play(Fanfare)
+                            MediaPlayer.Volume = 0.3
+                        End If
+                        MediaPlayer.IsRepeating = False
 
-                        ''Berechne Rankings
-                        'Core.Schedule(1, Sub()
-                        '                     Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
-                        '                     For i As Integer = 0 To PlCount - 1
-                        '                         ranks.Add((i, GetScore(i)))
-                        '                     Next
-                        '                     ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
-                        '                     ranks.Reverse()
+                        'Berechne Rankings
+                        Core.Schedule(1, Sub()
+                                             Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
+                                             For i As Integer = 0 To PlCount - 1
+                                                 ranks.Add((i, GetScore(i)))
+                                             Next
+                                             ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
+                                             ranks.Reverse()
 
-                        '                     For i As Integer = 0 To ranks.Count - 1
-                        '                         Dim ia As Integer = i
+                                             For i As Integer = 0 To ranks.Count - 1
+                                                 Dim ia As Integer = i
 
-                        '                         Select Case i
-                        '                             Case 0
-                        '                                 Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                        '                             Case 1
-                        '                                 Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                        '                             Case 2
-                        '                                 Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                        '                             Case Else
-                        '                                 Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                        '                         End Select
-                        '                     Next
+                                                 Select Case i
+                                                     Case 0
+                                                         Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                     Case 1
+                                                         Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                     Case 2
+                                                         Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                     Case Else
+                                                         Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                 End Select
+                                             Next
 
-                        '                     'Update K/D
-                        '                     If ranks(0).Item1 = UserIndex Then
-                        '                         If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
-                        '                     Else
-                        '                         If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
-                        '                     End If
-                        '                     My.Settings.Save()
-                        '                 End Sub)
-                        ''Set flags
-                        'Status = CardGameState.SpielZuEnde
-                        'FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                                             'Update K/D
+                                             If ranks(0).Item1 = UserIndex Then
+                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
+                                             Else
+                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
+                                             End If
+                                             My.Settings.Save()
+                                         End Sub)
+                        'Set flags
+                        Status = GameStatus.GameFinished
                     Case "x"c 'Continue with game
                         Select Case EgoPlayer.Mode
                             Case PlayerMode.Chased
@@ -527,6 +533,10 @@ Namespace Game.Barrelled
             If NetworkMode Then LocalClient.WriteStream(message)
         End Sub
 #End Region
+        Private Function GetScore(i As Integer) As Integer
+            Return 666
+        End Function
+
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
@@ -557,7 +567,7 @@ Namespace Game.Barrelled
             Screen.IsFullscreen = Not Screen.IsFullscreen
             Screen.ApplyChanges()
         End Sub
-        Private Sub MenuButton() Handles HUDBtnB.Clicked
+        Private Sub MenuButton() Handles HUDBtnA.Clicked
             MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
                                                                     If x = 1 Then Return
                                                                     SFX(2).Play()

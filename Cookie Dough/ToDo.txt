@@ -18,8 +18,6 @@ DC:
 -Add highscoring
 
 BR:
--Implement freeing/killing cooldown timer
--Implement winning
 -Implement sfx
 -3D sound
 -Add new map(Lukas soll seinen Arsch bewegen[er hat gesagt, dass ich das so sagen soll])

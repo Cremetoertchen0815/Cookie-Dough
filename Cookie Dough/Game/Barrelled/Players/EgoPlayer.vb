@@ -31,6 +31,7 @@ Namespace Game.Barrelled.Players
         Public Velocity As Vector2
         Public SprintLeft As Single = 1
         Public Focused As Boolean = True
+        Public CanMove As Boolean = True
 
         'Constants
         Private Const MouseSensivity As Single = 232
@@ -155,13 +156,13 @@ Namespace Game.Barrelled.Players
             Velocity3D += New Vector3(0, VelocityY, 0)
 
             'Clamp position and move on Y-Axis
-            LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 30)
+            If CanMove Then LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 30)
 
             'Collision
             Dim state As New TiledMapMover.CollisionState
             Dim velocity2D As Vector2 = New Vector2(Velocity3D.X, Velocity3D.Z) * -Time.DeltaTime * 2
             Mover.CollisionLayer = CollisionLayers(If(LocationY > 10, 1, 0)) 'Adapt collision layer for jump
-            Mover.Move(velocity2D, Collider)
+            If CanMove Then Mover.Move(velocity2D, Collider)
 
             'Clamp 2D coords
             If Mode <> PlayerMode.Ghost AndAlso PrisonEnabled Then Entity.Position = New Vector2(Mathf.Clamp(Entity.Position.X, PrisonPosition.Left + 5, PrisonPosition.Right - 5), Mathf.Clamp(Entity.Position.Y, PrisonPosition.Top + 5, PrisonPosition.Bottom - 5))

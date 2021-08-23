@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports System.Linq
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Game.Barrelled.Networking
 Imports Cookie_Dough.Game.Barrelled.Players
@@ -34,6 +35,7 @@ Namespace Game.Barrelled
         Private lastmstate As MouseState
         Private PrisonPeople As New List(Of Integer)
         Private CooldownTimer As Single
+        Private GameEndTimer As Single = -1
 
         'Networking
         Private SyncPosCounter As Single = 0
@@ -43,6 +45,8 @@ Namespace Game.Barrelled
         Friend Crosshair As CrosshairRenderable
 
         'Assets & rendering
+        Private Fanfare As Song
+        Private DamDamDaaaam As Song
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
         Private Renderer As Renderer3D
@@ -54,7 +58,7 @@ Namespace Game.Barrelled
         'HUD
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnA As Controls.Button
-        Private WithEvents HUDBtnB As Controls.Button
+        Private WithEvents HUDBtnB As Controls.Label
         Private WithEvents HUDSprintBar As Controls.ProgressBar
         Private WithEvents HUDChat As Controls.TextscrollBox
         Private WithEvents HUDChatBtn As Controls.Button
@@ -64,10 +68,8 @@ Namespace Game.Barrelled
         Private WithEvents HUDMusicBtn As Controls.Button
         Private AdditionalHUDRend As AdditionalHUDRendererable
         Private InstructionFader As ITween(Of Color)
-        Private ShowDice As Boolean = False
         Private HUDColor As Color
         Private Chat As List(Of (String, Color))
-        Private InputBoxFlag As Boolean = False
 
         'Map
         Public TileMap As TmxMap
@@ -94,6 +96,8 @@ Namespace Game.Barrelled
             'Lade Assets
             ButtonFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
             ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
+            Fanfare = Content.Load(Of Song)("bgm/fanfare")
+            DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
 
             'Prepare Nez scene
             Core.Instance.IsMouseVisible = False
@@ -137,8 +141,8 @@ Namespace Game.Barrelled
 
             'Load HUD
             HUD = New GuiSystem() With {.Color = PlayerHUDColors(EgoPlayer.Mode)}
-            HUDBtnA = New Controls.Button("Exit Game", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnA)
-            HUDBtnB = New Controls.Button("Main Menu", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnA = New Controls.Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnA)
+            HUDBtnB = New Controls.Label(Function() "  " & Math.Ceiling(GameEndTimer).ToString & "  ", New Vector2(1500, 200)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Active = False} : HUD.Controls.Add(HUDBtnB)
             HUDSprintBar = New Controls.ProgressBar(New Vector2(500, 100), New Vector2(950, 30)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .Progress = Function() EgoPlayer.SprintLeft, .Active = False} : HUD.Controls.Add(HUDSprintBar)
             HUDChat = New Controls.TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(330, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 28} : HUD.Controls.Add(HUDChat)
             HUDNameBtn = New Controls.Button(EgoPlayer.Mode.ToString, New Vector2(500, 40), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
@@ -185,6 +189,8 @@ Namespace Game.Barrelled
                         Status = GameStatus.Waitn
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
+                                               GameEndTimer = GetTimeLeft(Map)
+                                               HUDBtnB.Active = True
                                                HUDInstructions.Text = ""
                                                SendGameActive()
 
@@ -193,7 +199,8 @@ Namespace Game.Barrelled
                                                        ActivateGame()
                                                    Case PlayerMode.Chaser
                                                        Core.Schedule(5, AddressOf ActivateGame)
-
+                                                   Case Else
+                                                       Status = GameStatus.GameActive
                                                End Select
                                                SendBeginGaem()
                                            End Sub)
@@ -204,7 +211,54 @@ Namespace Game.Barrelled
                         Else
                             HUDInstructions.Text = ""
                         End If
+
+                        'End Game
+                        If GameEndTimer <= 0 Or IsAllChasedInPrison() Then
+                            'Cue music
+                            If MediaPlayer.IsRepeating Then
+                                MediaPlayer.Play(DamDamDaaaam)
+                                MediaPlayer.Volume = 0.8
+                            Else
+                                MediaPlayer.Play(Fanfare)
+                                MediaPlayer.Volume = 0.3
+                            End If
+                            MediaPlayer.IsRepeating = False
+                            StopUpdating = True
+                            HUDInstructions.Text = "Game over!"
+                            HUDBtnB.Active = False
+                            EgoPlayer.CanMove = False
+
+                            'Berechne Rankings
+                            Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
+                            For i As Integer = 0 To PlCount - 1
+                                ranks.Add((i, GetScore(i)))
+                            Next
+                            ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
+                            ranks.Reverse()
+
+                            'Display ranks
+                            For i As Integer = 0 To ranks.Count - 1
+                                Dim ia As Integer = i
+                                Select Case i
+                                    Case 0
+                                        Core.Schedule(1 + i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                    Case 1
+                                        Core.Schedule(1 + i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                    Case 2
+                                        Core.Schedule(1 + i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                    Case Else
+                                        Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                End Select
+                            Next
+
+                            'Set flags
+                            SendWinFlag()
+                            Status = GameStatus.GameFinished
+                        End If
+
                 End Select
+
+                If GameEndTimer > 0 Then GameEndTimer -= Time.DeltaTime
 
             End If
 
@@ -471,6 +525,17 @@ Namespace Game.Barrelled
 #End Region
 
 #Region "Hilfsfunktionen"
+
+        Private Function GetScore(i As Integer) As Integer
+            Return 666
+        End Function
+
+        Private Function IsAllChasedInPrison() As Boolean
+            For i As Integer = 0 To Spielers.Length - 1
+                If Spielers(i).Mode = PlayerMode.Chased And Not PrisonPeople.Contains(i) Then Return False
+            Next
+            Return True
+        End Function
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
@@ -502,7 +567,7 @@ Namespace Game.Barrelled
             Screen.IsFullscreen = Not Screen.IsFullscreen
             Screen.ApplyChanges()
         End Sub
-        Private Sub MenuButton() Handles HUDBtnB.Clicked
+        Private Sub MenuButton() Handles HUDBtnA.Clicked
             MsgBoxer.EnqueueMsgbox("Do you really want to leave?", Sub(x)
                                                                        If x = 1 Then Return
                                                                        SFX(2).Play()
