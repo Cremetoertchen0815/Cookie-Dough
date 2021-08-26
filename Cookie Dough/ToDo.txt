@@ -3,6 +3,7 @@
 -Check host leaving and others not being kicked out of the round
 
 BV:
+-Swap in Anger MsgBox Yeah and No
 -Add snakes and ladders to snek map
 -Extend snek map vertically(???)
 -Custom CPU sounds
@@ -12,8 +13,8 @@ CR:
 
 
 DC:
+-Fixed being able to spam Mau/Mau Mau
 -Add seeing opponents cards(backside) to renderer
--Add Mau/Mau Mau
 -Add CPUs (JOHANNES)
 
 BR:
