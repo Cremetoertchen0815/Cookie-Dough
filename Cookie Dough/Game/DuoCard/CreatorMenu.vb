@@ -167,7 +167,7 @@ Namespace Game.DuoCard
                                                                                                             AktuellesSpiel.LoadContent()
                                                                                                             If Internetz Then
                                                                                                                 Dim wtlst As String() = New String(AktuellesSpiel.Spielers.Length - 1) {}
-                                                                                                                For i As Integer = 0 To Whitelist.Length - 1
+                                                                                                                For i As Integer = 0 To AktuellesSpiel.Spielers.Length - 1
                                                                                                                     wtlst(i) = AllUser(Whitelist(i)).Item1
                                                                                                                 Next
                                                                                                                 If Not ExtGame.CreateGame(LocalClient, servername, AktuellesSpiel.Spielers.Length, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then MsgBoxer.EnqueueMsgbox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True

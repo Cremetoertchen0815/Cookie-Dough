@@ -126,7 +126,6 @@ Namespace Game.DuoCard
             LocalClient.IsHost = True
             Chat = New List(Of (String, Color))
             SpielerIndex = -1
-            PlCount = 4
             MoveActive = False
             NetworkMode = True
 
