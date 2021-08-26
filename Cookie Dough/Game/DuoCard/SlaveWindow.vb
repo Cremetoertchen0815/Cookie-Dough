@@ -60,8 +60,7 @@ Namespace Game.DuoCard
         'HUD
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnB As Button
-        'Private WithEvents HUDBtnC As Button
-        'Private WithEvents HUDBtnD As Button
+        Private WithEvents HUDBtnC As Button
         Private WithEvents HUDAfkBtn As Button
         Private WithEvents HUDArrowUp As TextureButton
         Private WithEvents HUDArrowDown As TextureButton
@@ -146,6 +145,7 @@ Namespace Game.DuoCard
             HUD = New GuiSystem
             HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnC = New Button("Mau", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
             HUDArrowUp = New TextureButton(DebugTexture, New Vector2(935, 700), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowUp)
             HUDArrowDown = New TextureButton(DebugTexture, New Vector2(935, 970), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowDown)
             HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
@@ -448,13 +448,17 @@ Namespace Game.DuoCard
         Private Sub SendPlayerCardLay(card As Integer)
             LocalClient.WriteStream("f" & card.ToString)
         End Sub
-        Private Sub SendCardLay(card As Card)
-            LocalClient.WriteStream("g" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
-        End Sub
         Private Sub SendGameClosed()
             LocalClient.WriteStream("e")
         End Sub
+        Private Sub SendCardLay(card As Card)
+            LocalClient.WriteStream("g" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
+        End Sub
         Private Sub SendAfkSignal() Handles HUDAfkBtn.Clicked
+            LocalClient.WriteStream("i")
+        End Sub
+        Private Sub SendMauSignal() Handles HUDBtnC.Clicked
+            HUDBtnC.Active = False
             LocalClient.WriteStream("i")
         End Sub
         Private Sub SendCardStackPress()

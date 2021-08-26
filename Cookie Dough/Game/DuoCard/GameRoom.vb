@@ -55,7 +55,7 @@ Namespace Game.DuoCard
         'HUD
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnB As Button
-        ' Private WithEvents HUDBtnC As Button
+        Private WithEvents HUDBtnC As Button
         'Private WithEvents HUDBtnD As Button
         Private WithEvents HUDArrowUp As TextureButton
         Private WithEvents HUDArrowDown As TextureButton
@@ -124,6 +124,7 @@ Namespace Game.DuoCard
             HUD = New GuiSystem
             HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnC = New Button("Mau", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
             HUDArrowUp = New TextureButton(DebugTexture, New Vector2(935, 700), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowUp)
             HUDArrowDown = New TextureButton(DebugTexture, New Vector2(935, 970), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowDown)
             HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
@@ -357,6 +358,9 @@ Namespace Game.DuoCard
                         TableCard = card
                         StopUpdating = True
                         Core.Schedule(0.5, AddressOf SwitchPlayer)
+                    Case "k"c
+                        Spielers(source).CustomSound(0).Play()
+                        SendMauSignal(source)
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(2)
                         PostChat(msg, Color.White)
@@ -419,12 +423,11 @@ Namespace Game.DuoCard
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
         End Sub
-
         Private Sub SendLayCard(card As Card)
             LocalClient.WriteStream("f" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
         End Sub
-        Private Sub SendKick(player As Integer, figur As Integer)
-            SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
+        Private Sub SendMauSignal(source As Integer)
+            LocalClient.WriteStream("i" & source.ToString)
         End Sub
         Private Sub SendGameClosed()
             SendNetworkMessageToAll("l")
@@ -579,6 +582,9 @@ Namespace Game.DuoCard
             SelectionState = SelectionMode.Standard
             HUDArrowUp.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
             HUDArrowDown.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
+            'Check Mau button
+            If SpielerIndex = UserIndex And Spielers(UserIndex).HandDeck.Count > 1 Then HUDBtnC.Active = True
+
             SendParamUpdate()
             SendGameActive()
             ResetHUD()
@@ -611,6 +617,13 @@ Namespace Game.DuoCard
         Private Sub FullscrButton() Handles HUDFullscrBtn.Clicked
             Screen.IsFullscreen = Not Screen.IsFullscreen
             Screen.ApplyChanges()
+        End Sub
+
+        Private Sub MauButtonPressed() Handles HUDBtnC.Clicked
+            If Spielers(UserIndex).HandDeck.Count <> 2 Then Return
+            HUDBtnC.Active = False
+            Spielers(UserIndex).CustomSound(0).Play()
+            SendMauSignal(UserIndex)
         End Sub
 
         Private Sub MenuButton() Handles HUDBtnB.Clicked
