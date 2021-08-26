@@ -40,3 +40,12 @@ Baberini To-Do.Txt:
 -Barreled TST
 -Add CPUs (JOHANNES)
 -Johannes soll seinen Arsch bewegen
+
+
+
+DuoCard CPU Faktoren:
+1. Längester Streak via Brute Force(mögl. Alternative zu Brute Force)
+2. Analysiere Karten, die Gegner nicht besitzt, präferiere diese
+3. Buben sollten aufgehoben werden, bis man keine andere Wahl hat
+4. Siebener sollen aufgehoben werden, bis man ein 7er Streak hinlegen kann
+5. Neuner schnell raushauen, insofern man eine Karte zum nachlegen hat
