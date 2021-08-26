@@ -305,6 +305,7 @@ Namespace Game.DropTrop
                     Case "n"c 'Next player
                         Dim who As Integer = element(1).ToString
                         SpielerIndex = who
+                        CalcScore()
                         If who = UserIndex Then
                             PrepareMove()
                         Else

@@ -6,9 +6,6 @@ BV:
 -Extend snek map vertically(???)
 -Custom CPU sounds
 
-DT:
--Fix progress syncing(in the bottom right)
-
 CR:
 -Johannes soll seinen Arsch bewegen
 
