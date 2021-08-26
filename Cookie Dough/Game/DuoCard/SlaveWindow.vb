@@ -302,6 +302,9 @@ Namespace Game.DuoCard
                             SelectionState = SelectionMode.Suit
                             Status = CardGameState.SelectAction
                         End If
+                    Case "k"c
+                        Dim source As Integer = CInt(element(1).ToString)
+                        Spielers(source).CustomSound(0).Play()
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
@@ -314,6 +317,7 @@ Namespace Game.DuoCard
                             PrepareMove()
                         Else
                             Status = CardGameState.Waitn
+                            HUDBtnC.Active = False
                         End If
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString
@@ -445,6 +449,9 @@ Namespace Game.DuoCard
         Private Sub SendChatMessage(text As String)
             LocalClient.WriteStream("c" & text)
         End Sub
+        Private Sub SendDrawCard()
+            LocalClient.WriteStream("d")
+        End Sub
         Private Sub SendPlayerCardLay(card As Integer)
             LocalClient.WriteStream("f" & card.ToString)
         End Sub
@@ -458,6 +465,7 @@ Namespace Game.DuoCard
             LocalClient.WriteStream("i")
         End Sub
         Private Sub SendMauSignal() Handles HUDBtnC.Clicked
+            If Spielers(UserIndex).HandDeck.Count <> 2 Then Return
             HUDBtnC.Active = False
             LocalClient.WriteStream("i")
         End Sub
@@ -520,6 +528,14 @@ Namespace Game.DuoCard
             Return False
         End Function
         Private Function IsLayingCardValid(card As Card) As Boolean
+            'Check if card has to be drawn
+            If Spielers(UserIndex).HandDeck.Count < 2 And HUDBtnC.Active Then
+                If Spielers(UserIndex).HandDeck.Count = 0 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage("You forgot to Mau Mau!")
+                If Spielers(UserIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage("You forgot to Mau!")
+                SendDrawCard()
+                Return False
+            End If
+
             If BeSkipped And card.Type <> CardType.Eight Then Return False
             If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
             Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
@@ -535,6 +551,10 @@ Namespace Game.DuoCard
         Private Sub PrepareMove()
             Status = CardGameState.SelectAction
             SelectionState = SelectionMode.Standard
+            HUDInstructions.Text = "Place a card!"
+            'Check Mau button
+            HUDBtnC.Active = True
+            If Spielers(UserIndex).HandDeck.Count = 1 Then HUDBtnC.Text = "Mau Mau" Else HUDBtnC.Text = "Mau"
         End Sub
 #End Region
 

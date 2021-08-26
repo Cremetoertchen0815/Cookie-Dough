@@ -337,6 +337,15 @@ Namespace Game.DuoCard
                             PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
                             SendChatMessage(source, text)
                         End If
+                    Case "d"c 'Draw card
+                        Renderer.TriggerDeckPullAnimation(Sub()
+                                                              Dim res As Card = DrawRandomCard()
+                                                              Spielers(source).HandDeck.Add(res)
+                                                              SendDrawCard(res)
+                                                              StopUpdating = True
+
+                                                              Core.Schedule(0.5, AddressOf SwitchPlayer)
+                                                          End Sub)
                     Case "e"c 'Suspend gaem
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
                         Spielers(source).Bereit = False
@@ -503,6 +512,23 @@ Namespace Game.DuoCard
         Private Function IsLayingCardValid(card As Card) As Boolean
             If BeSkipped And card.Type <> CardType.Eight Then Return False
             If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
+
+            'Check if card has to be drawn
+            If (Spielers(SpielerIndex).HandDeck.Count = 1 Or Spielers(SpielerIndex).HandDeck.Count = 2) And HUDBtnC.Active Then
+                If Spielers(SpielerIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau Mau!")
+                If Spielers(SpielerIndex).HandDeck.Count = 2 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau!")
+                Renderer.TriggerDeckPullAnimation(Sub()
+                                                      Dim res As Card = DrawRandomCard()
+                                                      Spielers(SpielerIndex).HandDeck.Add(res)
+                                                      SendDrawCard(res)
+                                                      StopUpdating = True
+
+                                                      Core.Schedule(0.5, AddressOf SwitchPlayer)
+                                                  End Sub)
+                Return False
+            End If
+
+            'Normal card
             Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
         End Function
 
@@ -528,6 +554,7 @@ Namespace Game.DuoCard
         End Sub
 
         Private Sub LayCard(card As Card)
+
             TableCard = card
             If CardStack.Contains(card) Then CardStack.Remove(card)
             Status = CardGameState.CardAnimationActive
@@ -583,12 +610,17 @@ Namespace Game.DuoCard
             HUDArrowUp.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
             HUDArrowDown.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
             'Check Mau button
-            If SpielerIndex = UserIndex And Spielers(UserIndex).HandDeck.Count > 1 Then HUDBtnC.Active = True
+            If SpielerIndex = UserIndex Then
+                HUDBtnC.Active = True
+                If Spielers(UserIndex).HandDeck.Count = 1 Then HUDBtnC.Text = "Mau Mau" Else HUDBtnC.Text = "Mau"
+            Else
+                HUDBtnC.Active = False
+            End If
 
             SendParamUpdate()
             SendGameActive()
             ResetHUD()
-            HUDInstructions.Text = "Lol"
+            HUDInstructions.Text = "Place a card!"
         End Sub
 
         Private Sub ResetHUD()
@@ -620,7 +652,7 @@ Namespace Game.DuoCard
         End Sub
 
         Private Sub MauButtonPressed() Handles HUDBtnC.Clicked
-            If Spielers(UserIndex).HandDeck.Count <> 2 Then Return
+            If Spielers(UserIndex).HandDeck.Count > 2 Then Return
             HUDBtnC.Active = False
             Spielers(UserIndex).CustomSound(0).Play()
             SendMauSignal(UserIndex)
