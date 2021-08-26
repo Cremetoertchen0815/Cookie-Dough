@@ -34,11 +34,6 @@ Namespace Game.DuoCard
         Public Property IsAFK As Boolean = False
 
         ''' <summary>
-        ''' Gibt an, wieviele Zusatzpunkte der Spieler hat.
-        ''' </summary>
-        Public Property AdditionalPoints As Integer = 0
-
-        ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server
         ''' </summary>
         <JsonIgnore>

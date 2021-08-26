@@ -381,7 +381,6 @@ Namespace Game.DuoCard
                             Spielers(i).Name = sp.Spielers(i).Name
                             Spielers(i).OriginalType = sp.Spielers(i).OriginalType
                             Spielers(i).MOTD = sp.Spielers(i).MOTD
-                            Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
                             Spielers(i).IsAFK = sp.Spielers(i).IsAFK
                         Next
                         TableCard = sp.TableCard

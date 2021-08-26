@@ -26,7 +26,6 @@ Namespace Game.DuoCard
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
-        Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Private SelectionState As SelectionMode = SelectionMode.Standard
         Private stat As CardGameState 'Speichert den aktuellen Status des Spiels
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
@@ -207,37 +206,6 @@ Namespace Game.DuoCard
                     StopUpdating = True
                     dbgEnd = False
                     HUDInstructions.Text = "Game over!"
-
-                    'Berechne Rankings
-                    Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
-                    For i As Integer = 0 To PlCount - 1
-                        ranks.Add((i, GetScore(i)))
-                    Next
-                    ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
-                    ranks.Reverse()
-
-                    'Display ranks
-                    For i As Integer = 0 To ranks.Count - 1
-                        Dim ia As Integer = i
-                        Select Case i
-                            Case 0
-                                Core.Schedule(1 + i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                            Case 1
-                                Core.Schedule(1 + i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                            Case 2
-                                Core.Schedule(1 + i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                            Case Else
-                                Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                        End Select
-                    Next
-
-                    If GameMode = GameMode.Competetive Then
-                        'Update highscores
-                        Core.Schedule(ranks.Count + 1, AddressOf SendHighscore)
-                        'Update K/D
-                        If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
-                        My.Settings.Save()
-                    End If
 
                     'Set flags
                     SendWinFlag()
@@ -455,15 +423,6 @@ Namespace Game.DuoCard
         Private Sub SendLayCard(card As Card)
             LocalClient.WriteStream("f" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
         End Sub
-        Private Sub SendHighscore()
-            Dim pls As New List(Of (String, Integer))
-            For i As Integer = 0 To Spielers.Length - 1
-                If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.Online Then
-                    pls.Add((Spielers(i).Name, GetScore(i)))
-                End If
-            Next
-            SendNetworkMessageToAll("h" & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
-        End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
         End Sub
@@ -542,9 +501,6 @@ Namespace Game.DuoCard
             If BeSkipped And card.Type <> CardType.Eight Then Return False
             If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
             Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
-        End Function
-        Private Function GetScore(i As Integer) As Integer
-            Return 0
         End Function
 
         Private Function CheckWin() As Boolean

@@ -143,11 +143,7 @@ Namespace Game.DuoCard
             If Internetz Then LocalClient.AutomaticRefresh = False
 
             Dim local_count As Integer = 1
-            Dim AktuellesSpiel As New GameRoom()
-            AktuellesSpiel.PlCount = Size
-            ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
-            AktuellesSpiel.GameMode = Mode
-            AktuellesSpiel.NetworkMode = False
+            Dim AktuellesSpiel As New GameRoom() With {.PlCount = Size, .Spielers = New Player(AktuellesSpiel.PlCount - 1) {}, .NetworkMode = False}
             For i As Integer = 0 To AktuellesSpiel.PlCount - 1
                 Select Case NewGamePlayers(i)
                     Case SpielerTyp.Local

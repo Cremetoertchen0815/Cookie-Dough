@@ -1,5 +1,6 @@
 ﻿-Test DC, BR and DT!
 -Make shit run under MacOS
+-Check host leaving and others not being kicked out of the round
 
 BV:
 -Add snakes and ladders to snek map
@@ -14,7 +15,6 @@ DC:
 -Add seeing opponents cards(backside) to renderer
 -Add Mau/Mau Mau
 -Add CPUs (JOHANNES)
--Add highscoring
 
 BR:
 -Implement sfx
