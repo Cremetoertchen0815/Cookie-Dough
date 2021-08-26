@@ -38,6 +38,11 @@ Public Class Game1
             My.Settings.Reload()
         End If
 
+        'Create MessageBoxer
+        MsgBoxer = New MessageBoxer
+        FinalRenderable = MsgBoxer
+        RegisterGlobalManager(MsgBoxer)
+
         'Load settings
         If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection From {"weihnachtsaktion.ddns.net"}
         If My.Settings.Username = "" Then My.Settings.Username = Environment.UserName
@@ -75,11 +80,6 @@ Public Class Game1
         triumph = Content.Load(Of Song)("sfx/triumph")
         DebugTexture = Content.LoadTexture("dbg1")
         Dev = GraphicsDevice
-
-        'Create MessageBoxer
-        MsgBoxer = New MessageBoxer
-        FinalRenderable = MsgBoxer
-        RegisterGlobalManager(MsgBoxer)
 
         'Create Emmond Tween-Manager(for BV backwards compat.)
         Automator = New TweenManager
