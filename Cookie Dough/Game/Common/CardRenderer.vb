@@ -135,10 +135,9 @@ Namespace Game.Common
             SetViewMatrix(Game.GetCamPos, Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0)))
 
             'Draw other player's hand decks
+            dev.RasterizerState = RasterizerState.CullClockwise
             For i As Integer = 0 To Game.Spielers.Length - 1
-                If (i = Game.UserIndex And Game.UserIndex > -1) Or (i = 0 And Game.UserIndex < 0) Then Continue For
                 For j As Integer = 0 To Game.Spielers(i).HandDeck.Count - 1
-                    'If Game.DeckScroll <> Math.Floor(i / 7) OrElse Not Game.HandDeck(i).Visible Then Continue For
                     Dim transform As Matrix = Matrix.CreateRotationZ(MathHelper.PiOver2) * Matrix.CreateTranslation(0, 0, Math.Floor(j / 7) * 2.1) * Matrix.CreateRotationY(0.4) * Matrix.CreateScale(80) * Matrix.CreateTranslation(550, 300 - (j Mod 7) * 100, -150) * Matrix.CreateRotationZ((i - 1) * MathHelper.PiOver2)
                     card_fx.Texture = CardTextures(CardTextures.Count - 1)
                     For Each element In card_model.Meshes
@@ -149,6 +148,7 @@ Namespace Game.Common
             Next
 
             'Draw Table
+            dev.RasterizerState = RasterizerState.CullNone
             For Each element In TableModel.Meshes
                 ApplyFX(element, element.ParentBone.ModelTransform * TableMatrix)
                 element.Draw()
@@ -201,7 +201,7 @@ Namespace Game.Common
 
 #Region "Animation"
         Friend Sub TriggerDeckPullAnimation(final As Transition(Of Vector3).FinishedDelegate)
-
+            If card_deck_top_pos.State = TransitionState.InProgress AndAlso card_deck_top_pos.FinishAction IsNot Nothing Then card_deck_top_pos.FinishAction.Invoke(card_deck_top_pos)
             card_deck_top_pos = New Transition(Of Vector3)(New TransitionTypes.TransitionType_Acceleration(500), New Vector3(0, 0, -0.1), New Vector3(0, -700, -0.1), final)
             Automator.Add(card_deck_top_pos)
         End Sub

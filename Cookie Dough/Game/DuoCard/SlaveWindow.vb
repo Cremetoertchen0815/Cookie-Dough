@@ -286,7 +286,6 @@ Namespace Game.DuoCard
                         End If
                     Case "d"c 'Draw card
                         Dim card As New Card(CInt(element.Substring(2)), CInt(element(1).ToString))
-                        If SpielerIndex <> UserIndex Then Continue For
                         StopUpdating = True
                         Renderer.TriggerDeckPullAnimation(Sub() Spielers(UserIndex).HandDeck.Add(card))
                     Case "e"c 'Suspend gaem
