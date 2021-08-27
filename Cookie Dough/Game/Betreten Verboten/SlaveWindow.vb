@@ -1078,11 +1078,16 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub AngerButton() Handles HUDBtnC.Clicked
-            If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex > -1 Then
-                MsgBoxer.EnqueueMsgbox("You get angry, because you suck at this game.", Nothing, {"OK"})
+            If Status = SpielStatus.Würfel And Not StopUpdating And UserIndex >= 0 Then
+                If Not MsgBoxer.OpenMsgbox("You get angry, because you suck at this game.", Nothing, {"OK"}) Then Return
                 MsgBoxer.EnqueueMsgbox("You are granted a single Joker. Do you want to utilize it now?", Sub(x)
-                                                                                                             If x = 1 Then MsgBoxer.EnqueueInputbox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", AddressOf AngerButtonFinal, "")
+                                                                                                             If x = 0 Then
+                                                                                                                 MsgBoxer.EnqueueInputbox("How far do you want to move? (12 fields are the maximum and 1 field the minimum)", AddressOf AngerButtonFinal, "")
+                                                                                                             Else
+                                                                                                                 MsgBoxer.EnqueueMsgbox("Alright, then don't.", Nothing, {"Bitch!"})
+                                                                                                             End If
                                                                                                          End Sub, {"Yeah", "Nope"})
+
             Else
                 SFX(0).Play()
             End If
@@ -1090,6 +1095,7 @@ Namespace Game.BetretenVerboten
 
         Private Sub AngerButtonFinal(text As String, button As Integer)
             Try
+                If button <> 0 Then Throw New Exception
                 Dim aim As Integer = CInt(text)
                 If Not (aim < 13 And aim > 0) Then MsgBoxer.EnqueueInputbox("Screw you! I said 1 <= x <= 12 FIELDS!", AddressOf AngerButtonFinal, "") : Return
                 WürfelWerte(0) = If(aim > 6, 6, aim)
