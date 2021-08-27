@@ -447,6 +447,7 @@ Namespace Game.DuoCard
         End Sub
         Private Sub SendNewPlayerActive(who As Integer)
             SendNetworkMessageToAll("n" & who.ToString)
+            SendSync()
         End Sub
         Private Sub SendParamUpdate()
             SendNetworkMessageToAll("s" & If(BeSkipped, 1, 0).ToString & DrawForces.ToString)
