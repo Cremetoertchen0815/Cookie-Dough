@@ -10,10 +10,8 @@ BV:
 CR:
 -Johannes soll seinen Arsch bewegen
 
-
 DC:
--Fixed being able to spam Mau/Mau Mau
--Add seeing opponents cards(backside) to renderer
+-Fix remote drawing card animation for slaves
 -Add CPUs (JOHANNES)
 
 BR:

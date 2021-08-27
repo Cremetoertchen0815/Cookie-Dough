@@ -1,15 +1,11 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
-Imports Cookie_Dough.Game.Common
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Newtonsoft.Json
 
-Namespace Game.DuoCard
-    ''' <summary>
-    ''' Kapselt alle wichtigen Eigenschaften und Methoden eine Spielers
-    ''' </summary>
-    Public Class Player
+Namespace Game.Common
+    Public Class BaseCardPlayer
         Implements IPlayer
 
         ''' <summary>
@@ -64,6 +60,5 @@ Namespace Game.DuoCard
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub
-
     End Class
 End Namespace

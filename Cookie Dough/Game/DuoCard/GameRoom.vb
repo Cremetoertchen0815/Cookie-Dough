@@ -21,7 +21,7 @@ Namespace Game.DuoCard
         Implements ICardRendererWindow
 
         'Instance flags
-        Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As BaseCardPlayer() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
@@ -513,9 +513,11 @@ Namespace Game.DuoCard
         Private Function IsLayingCardValid(card As Card) As Boolean
             If BeSkipped And card.Type <> CardType.Eight Then Return False
             If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
+            Dim ret As Boolean = card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
 
             'Check if card has to be drawn
-            If (Spielers(SpielerIndex).HandDeck.Count = 1 Or Spielers(SpielerIndex).HandDeck.Count = 2) And HUDBtnC.Active Then
+            If (Spielers(SpielerIndex).HandDeck.Count = 1 Or Spielers(SpielerIndex).HandDeck.Count = 2) And HUDBtnC.Active And ret Then
+                StopUpdating = True
                 If Spielers(SpielerIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau Mau!")
                 If Spielers(SpielerIndex).HandDeck.Count = 2 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau!")
                 Renderer.TriggerDeckPullAnimation(Sub()
@@ -740,6 +742,12 @@ Namespace Game.DuoCard
                 HUDArrowUp.Active = value = CardGameState.SelectAction
                 HUDArrowDown.Active = value = CardGameState.SelectAction
             End Set
+        End Property
+
+        Private ReadOnly Property ICardRendererWindow_Spielers As BaseCardPlayer() Implements ICardRendererWindow.Spielers
+            Get
+                Return Spielers
+            End Get
         End Property
 #End Region
     End Class

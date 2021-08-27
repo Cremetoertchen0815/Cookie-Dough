@@ -109,6 +109,7 @@
     <Compile Include="Game\Barrelled\Players\CommonPlayer.vb" />
     <Compile Include="Game\Barrelled\Renderers\AdditionalHUDRendererable.vb" />
     <Compile Include="Game\Common\GameRoomTemplate.vb" />
+    <Compile Include="Game\Common\BaseCardPlayer.vb" />
     <Compile Include="Game\Corridor\CreatorMenu.vb" />
     <Compile Include="Game\Corridor\Enums.vb" />
     <Compile Include="Game\Corridor\GameRoom.vb" />
@@ -199,7 +200,6 @@
     <Compile Include="Game\DuoCard\IGameWindow.vb" />
     <Compile Include="Game\DuoCard\Networking\ExtGame.vb" />
     <Compile Include="Game\DuoCard\Networking\SyncMessage.vb" />
-    <Compile Include="Game\DuoCard\Player.vb" />
     <Compile Include="Game\DuoCard\Rendering\GameRenderable.vb" />
     <Compile Include="Game\DuoCard\SelectionMode.vb" />
     <Compile Include="Game\DuoCard\SlaveWindow.vb" />

@@ -24,7 +24,7 @@ Namespace Game.DuoCard
         Implements ICardRendererWindow
 
         'Instance flags
-        Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As BaseCardPlayer() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend Rejoin As Boolean = False
         Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
@@ -108,7 +108,7 @@ Namespace Game.DuoCard
                                                  For i As Integer = 0 To PlCount - 1
                                                      Dim type As SpielerTyp = CInt(x())
                                                      Dim name As String = x()
-                                                     Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
+                                                     Spielers(i) = New BaseCardPlayer(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
                                                  Next
 
                                                  'Set rejoin flag
@@ -530,6 +530,7 @@ Namespace Game.DuoCard
         Private Function IsLayingCardValid(card As Card) As Boolean
             'Check if card has to be drawn
             If Spielers(UserIndex).HandDeck.Count < 2 And HUDBtnC.Active Then
+                StopUpdating = True
                 If Spielers(UserIndex).HandDeck.Count = 0 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage("You forgot to Mau Mau!")
                 If Spielers(UserIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage("You forgot to Mau!")
                 SendDrawCard()
@@ -650,6 +651,12 @@ Namespace Game.DuoCard
                 HUDArrowUp.Active = value = CardGameState.SelectAction
                 HUDArrowDown.Active = value = CardGameState.SelectAction
             End Set
+        End Property
+
+        Private ReadOnly Property ICardRendererWindow_Spielers As BaseCardPlayer() Implements ICardRendererWindow.Spielers
+            Get
+                Return Spielers
+            End Get
         End Property
 #End Region
     End Class

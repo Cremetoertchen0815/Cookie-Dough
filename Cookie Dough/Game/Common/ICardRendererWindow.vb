@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.Networking
 Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Game.Common
@@ -11,6 +12,7 @@ Namespace Game.Common
         ReadOnly Property BGTexture As Texture2D
         ReadOnly Property DeckScroll As Integer
         ReadOnly Property State As CardGameState
+        ReadOnly Property Spielers As BaseCardPlayer()
         Function GetCamPos() As Keyframe3D
     End Interface
 End Namespace
