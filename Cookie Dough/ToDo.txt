@@ -11,7 +11,6 @@ CR:
 -Johannes soll seinen Arsch bewegen
 
 DC:
--Fix remote drawing card animation for slaves
 -Add CPUs (JOHANNES)
 
 BR:
