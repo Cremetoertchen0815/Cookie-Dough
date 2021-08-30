@@ -4,6 +4,7 @@
 
 BV:
 -Add snakes and ladders to snek map
+-Add sliding up and down
 -Extend snek map vertically(???)
 -Custom CPU sounds
 

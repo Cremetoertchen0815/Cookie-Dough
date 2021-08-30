@@ -75,7 +75,11 @@ Public Class Game1
               Content.Load(Of SoundEffect)("sfx/switch"),
               Content.Load(Of SoundEffect)("sfx/text_skip"),
               Content.Load(Of SoundEffect)("sfx/saucer"),
-              Content.Load(Of SoundEffect)("sfx/tuba")}
+              Content.Load(Of SoundEffect)("sfx/tuba"),
+              Content.Load(Of SoundEffect)("sfx/slide_down_A"),
+              Content.Load(Of SoundEffect)("sfx/slide_down_B"),
+              Content.Load(Of SoundEffect)("sfx/slide_up_A"),
+              Content.Load(Of SoundEffect)("sfx/slide_up_B")}
         Lalala = Content.Load(Of Song)("games/BV/lalalala")
         triumph = Content.Load(Of Song)("sfx/triumph")
         DebugTexture = Content.LoadTexture("dbg1")
