@@ -78,9 +78,6 @@ Namespace Game.Barrelled.Players
 
             'Load 3D sound
             SoundEmitter = New AudioEmitter
-            For Each element In Sounds
-                element.Apply3D(AudioListener, SoundEmitter)
-            Next
 
             Mover = Entity.AddComponent(New TiledMapCollisionResolver(CollisionLayers(0), 16))
             Collider = Entity.AddComponent(New BoxCollider(12, 12))
@@ -148,27 +145,24 @@ Namespace Game.Barrelled.Players
             Velocity3D += Velocity.X * Vector3.Cross(Vector3.Up, movDir) * New Vector3(1, 0, 1)
             If Location.Y <= 0 Then Location = New Vector3(Location.X, 0, Location.Z)
             Velocity3D += New Vector3(0, VelocityY, 0)
-            If LocationY > 0 And lastLocationY <> 0 Then Sounds(4).Play() 'Play jump sound when left floor
+            If LocationY > 0 And lastLocationY <> 0 Then Sounds(4).Play() : Sounds(4).Apply3D(AudioListener, SoundEmitter) 'Play jump sound when left floor
             lastLocationY = LocationY
 
             'Update Audio Listener
-            SoundEmitter.Forward = movDir
-            SoundEmitter.Position = Location * 500
+            SoundEmitter.Forward = movDir * New Vector3(-1, 1, 1)
+            SoundEmitter.Position = Location / 10
             SoundEmitter.Up = Vector3.Up
-            SoundEmitter.Velocity = Velocity3D
-            SoundEmitter.DopplerScale = 5
-
-            For Each element In Sounds
-                element.Apply3D(AudioListener, SoundEmitter)
-                element.Pan = 1
-            Next
+            SoundEmitter.Velocity = Velocity3D * New Vector3(-1, 1, -1)
+            SoundEmitter.DopplerScale = 0.1F
 
             'Play running sounds
             Dim speeeeeed As Single = Velocity.Length
             If speeeeeed > 15 And Location.Y = 0 Then
                 SoundRunCounter += Time.DeltaTime
                 If SoundRunCounter > SoundRunFactor / Math.Sqrt(speeeeeed) Then
-                    Sounds(Nez.Random.Range(0, 4)).Play()
+                    Dim nr = Nez.Random.Range(0, 4)
+                    Sounds(nr).Play()
+                    Sounds(nr).Apply3D(AudioListener, SoundEmitter)
                     SoundRunCounter = 0
                 End If
             Else
