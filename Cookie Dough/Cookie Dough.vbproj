@@ -186,7 +186,7 @@
     <Compile Include="Framwork\UI\GuiInput.vb" />
     <Compile Include="Framwork\UI\GuiSystem.vb" />
     <Compile Include="Framwork\UI\IParent.vb" />
-    <Compile Include="Game1.vb" />
+    <Compile Include="GameCore.vb" />
     <Compile Include="Game\Betreten Verboten\Enums.vb" />
     <Compile Include="Game\Betreten Verboten\CreatorMenu.vb" />
     <Compile Include="Game\Betreten Verboten\GameRoom.vb" />
@@ -231,7 +231,7 @@
     <Compile Include="Framwork\Networking\OnlineGameInstance.vb" />
     <Compile Include="Framwork\Networking\Server.vb" />
     <Compile Include="Game\Betreten Verboten\Networking\SyncMessage.vb" />
-    <Compile Include="Program.vb" />
+    <Compile Include="Launcher.vb" />
     <Compile Include="Properties\AssemblyInfo.vb" />
     <Compile Include="Properties\Settings.Designer.vb">
       <AutoGen>True</AutoGen>

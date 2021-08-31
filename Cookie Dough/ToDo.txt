@@ -1,6 +1,7 @@
 ﻿-Test DC, BR and DT!
 -Make shit run under MacOS
 -Check host leaving and others not being kicked out of the round
+-Work on code documentation
 
 BV:
 -Add snakes and ladders to snek map

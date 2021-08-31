@@ -38,6 +38,8 @@ Namespace Game.Barrelled.Renderers
         Private LoMapMatrices As Matrix()
         Private CeilingMapMatrices As Matrix()
         Private CubeModel As Model
+        Private GrassMatrices As Matrix()
+        Private GrassModel As Model
 
         'Debug Box Buffer
         Private BoxVertexBuffer As VertexBuffer
@@ -157,6 +159,15 @@ Namespace Game.Barrelled.Renderers
             Next
             CeilingMapMatrices = lst.ToArray
             lst.Clear()
+
+            'Grass
+            For Each element In map.GetLayer(Of TmxLayer)("Grass").Tiles
+                If element Is Nothing Then Continue For
+                Dim pos As Vector2 = New Vector2(element.X, element.Y) * 16 / 3
+                lst.Add(Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(2.67, 3.5, 2.67)) * Matrix.CreateTranslation(New Vector3(pos.X, 0, pos.Y)))
+            Next
+            GrassMatrices = lst.ToArray
+            lst.Clear()
         End Sub
 
         Public Overrides Sub OnAddedToScene(scene As Scene)
@@ -180,6 +191,8 @@ Namespace Game.Barrelled.Renderers
 
             'Load room stuff
             BarrierModel = scene.Content.Load(Of Model)("mesh/Have_A_Cube")
+            GrassModel = scene.Content.Load(Of Model)("mesh/grass")
+            ApplyDefaultAlpha(GrassModel, Color.White)
             FloorEffect = New BasicEffect(Dev) With {.TextureEnabled = True, .Texture = scene.Content.LoadTexture("3Droom_floor"), .View = View, .Projection = Projection, .EmissiveColor = Vector3.One * 0.8, .FogStart = 25, .FogEnd = 90, .FogColor = Vector3.Zero, .FogEnabled = True}
 
             'Load player
@@ -272,10 +285,16 @@ Namespace Game.Barrelled.Renderers
                 ApplyFX(mesh, Color.Cyan, element)
                 mesh.Draw()
             Next
+            Dev.RasterizerState = RasterizerState.CullNone
+            For Each element In GrassMatrices
+                For Each mess As ModelMesh In GrassModel.Meshes
+                    ApplyFXAlpha(mess, Color.Cyan, mess.ParentBone.ModelTransform * element)
+                    mess.Draw()
+                Next
+            Next
 
             'Draw barrier
             If BaseClass.EgoPlayer.PrisonEnabled Then
-                Dev.RasterizerState = RasterizerState.CullNone
                 For Each element In BarrierModel.Meshes
                     For Each fx As BasicEffect In element.Effects
                         fx.World = Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(BaseClass.BarrierRectangle.Width, 25, BaseClass.BarrierRectangle.Height)) * Matrix.CreateTranslation(New Vector3(BaseClass.BarrierRectangle.X, -2, BaseClass.BarrierRectangle.Y))
@@ -299,6 +318,16 @@ Namespace Game.Barrelled.Renderers
                 effect.EmissiveColor = Vector3.Zero
                 effect.Alpha = 1.0F
                 effect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1 * yflip, 1)
+                effect.DiffuseColor = DiffuseColor.ToVector3
+                effect.World = world
+                effect.FogEnabled = True
+                effect.View = View
+                effect.Projection = Projection
+            Next
+        End Sub
+        Private Sub ApplyFXAlpha(mesh As ModelMesh, DiffuseColor As Color, world As Matrix, Optional yflip As Integer = 1)
+            For Each effect As AlphaTestEffect In mesh.Effects
+                effect.Alpha = 1.0F
                 effect.DiffuseColor = DiffuseColor.ToVector3
                 effect.World = world
                 effect.FogEnabled = True
@@ -353,6 +382,17 @@ Namespace Game.Barrelled.Renderers
             For Each element In model.Meshes
                 For Each fx As BasicEffect In element.Effects
                     ApplyDefaultFX(fx, color)
+                Next
+            Next
+        End Sub
+        Friend Sub ApplyDefaultAlpha(model As Model, color As Color)
+            For Each element In model.Meshes
+                For Each effect As AlphaTestEffect In element.Effects
+                    effect.FogEnabled = True
+                    effect.FogStart = 25
+                    effect.FogEnd = 90
+                    effect.FogColor = Vector3.Zero
+                    effect.Alpha = 1
                 Next
             Next
         End Sub
