@@ -215,7 +215,7 @@ Namespace Game.Corridor
 
                 'Set HUD color
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name, "")
-                If Not Renderer.BeginTriggered Then HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
+                HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex > -1 AndAlso Spielers(SpielerIndex).Typ = SpielerTyp.Local)
             End If
 
@@ -270,7 +270,6 @@ Namespace Game.Corridor
                             PostChat(Spielers(source).Name & " left!", Color.White)
                             If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
                             If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
-                            If Renderer.BeginTriggered Then StopWhenRealStart = True
 
                             SendPlayerLeft(source)
                         Case "m"c 'Sent chat message
@@ -480,13 +479,13 @@ Namespace Game.Corridor
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtnB.Clicked
-            If Not Renderer.BeginTriggered Then MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
-                                                                                                        If x = 1 Then Return
-                                                                                                        SFX(2).Play()
-                                                                                                        SendGameClosed()
-                                                                                                        NetworkMode = False
-                                                                                                        Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
-                                                                                                    End Sub, {"Yeah", "Nope"})
+            MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
+                                                                    If x = 1 Then Return
+                                                                    SFX(2).Play()
+                                                                    SendGameClosed()
+                                                                    NetworkMode = False
+                                                                    Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                                                                End Sub, {"Yeah", "Nope"})
         End Sub
 #End Region
 #Region "Debug Commands"

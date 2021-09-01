@@ -11,8 +11,6 @@ Namespace Game.Corridor.Rendering
         Private dev As GraphicsDevice
         Private EffectA As BasicEffect
         Private SpielfeldTextur As RenderTarget2D
-        Private SpielfeldVerbindungen As Texture2D
-        Private Pfeil As Texture2D
         Private MapBuffer As VertexBuffer
         Private TableModel As Model
         Private TableMatrix As Matrix
@@ -20,28 +18,13 @@ Namespace Game.Corridor.Rendering
         Private rects As Dictionary(Of Vector2, Rectangle)
         Private Spielfeldsize As Vector2
 
-        Private SaucerModel As Model
-        Private SaucerLift As Transition(Of Single)
-        Private SaucerTarget As (Integer, Integer) = (-1, -1)
-        Private SaucerMover As Transition(Of Vector2)
-        Private SaucerPickedUp As Boolean = False
-        Private SaucerDefaultPosition As New Vector3(0, 0, 1000)
-
-        Private BeginCurrentPlayer As Integer
-        Friend BeginTriggered As Boolean
-        Private BeginCam As Transition(Of Keyframe3D)
-
         Private View As Matrix
         Private Projection As Matrix
         Private CamMatrix As Matrix
 
         Private Game As IGameWindow
-        Private FigCount As Integer
-        Private SpceCount As Integer
         Private Feld As Rectangle
         Private Center As Vector2
-        Private transmatrices As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)}
-        Friend AdditionalZPos As New Transition(Of Single)
 
         Public Sub New(game As IGameWindow, Optional order As Integer = 0)
             MyBase.New(order)
