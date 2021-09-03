@@ -107,7 +107,7 @@ Namespace Game.Corridor.Rendering
             Next
 
             'Zeichne Verbindungen
-            batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
+            batchlor.DrawHollowRect(New Rectangle(0, 0, 950 * ResolutionMultiplier, 950 * ResolutionMultiplier), Color.White, 5)
 
             batchlor.End()
 
@@ -119,6 +119,12 @@ Namespace Game.Corridor.Rendering
             'Zeichne figuren
             dev.RasterizerState = RasterizerState.CullNone
             dev.DepthStencilState = DepthStencilState.Default
+
+            For i As Integer = 0 To Game.Spielers.Length - 1
+                For Each element In Game.Spielers(i).Figuren
+                    element.Draw(i, View, Projection)
+                Next
+            Next
 
 
 

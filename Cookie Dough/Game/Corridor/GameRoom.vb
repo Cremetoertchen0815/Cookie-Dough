@@ -188,7 +188,7 @@ Namespace Game.Corridor
                         StopUpdating = True
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
-                                               FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = New Keyframe3D}
+                                               FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2000), FigurFaderCamera.Value, New Keyframe3D, Nothing) : Automator.Add(FigurFaderCamera)
                                                HUDInstructions.Text = " "
                                                'Launch start animation
                                                StopUpdating = True
