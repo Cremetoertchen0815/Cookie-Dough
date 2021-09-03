@@ -4,15 +4,16 @@ Imports Microsoft.Xna.Framework.Graphics
 Namespace Game.Corridor
     Public MustInherit Class Spielfigur
         'Properties
-        Public MustOverride Property Model3D As Model
+        Public MustOverride ReadOnly Property Model3D As Model
         Public MustOverride ReadOnly Property Type As SpielfigurType
+        Public Overridable Property TransformMatrix As Matrix = Matrix.CreateScale(New Vector3(1, 1, 1) * 5) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(New Vector3(475, 475, 0) - New Vector3(55, 55, 0))
         Public Property Position As Vector2 = Vector2.Zero
 
         Public Sub Draw(drawindex As Integer, view As Matrix, projection As Matrix)
             Dim clor As Color = If(drawindex < 1, Color.Black, Color.White)
             For Each mesh In Model3D.Meshes
                 Dim fx = CType(mesh.Effects(0), BasicEffect)
-                fx.World = Matrix.Identity
+                fx.World = TransformMatrix * Matrix.CreateTranslation(New Vector3(-Position.X, -Position.Y, 0))
                 fx.View = view
                 fx.Projection = projection
                 fx.DiffuseColor = Color.White.ToVector3

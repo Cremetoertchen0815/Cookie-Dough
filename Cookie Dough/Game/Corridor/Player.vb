@@ -32,7 +32,7 @@ Namespace Game.Corridor
 
         Public Property IsAFK As Boolean = False
 
-        Public Property Figuren As New List(Of Spielfigur)
+        Public Property Figuren As New List(Of Spielfigur) From {New Figures.Bauer}
 
         ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server
