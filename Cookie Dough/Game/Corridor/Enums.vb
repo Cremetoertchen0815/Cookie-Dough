@@ -1,4 +1,12 @@
 ﻿Namespace Game.Corridor
+    Public Enum SpielfigurType
+        König
+        Dame
+        Turm
+        Läufer
+        Springer
+        Bauer
+    End Enum
 
     Public Enum SpielStatus
         SpielZuEnde = 3

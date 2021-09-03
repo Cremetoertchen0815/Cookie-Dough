@@ -111,6 +111,9 @@
     <Compile Include="Game\Common\GameRoomTemplate.vb" />
     <Compile Include="Game\Corridor\CreatorMenu.vb" />
     <Compile Include="Game\Corridor\Enums.vb" />
+    <Compile Include="Game\Corridor\Figures\Bauer.vb" />
+    <Compile Include="Game\Corridor\Move.vb" />
+    <Compile Include="Game\Corridor\Spielfigur.vb" />
     <Compile Include="Game\Corridor\GameRoom.vb" />
     <Compile Include="Game\Corridor\IGameWindow.vb" />
     <Compile Include="Game\Corridor\Networking\ExtGame.vb" />
@@ -305,6 +308,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <Import Project="..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets" Condition="Exists('..\packages\MonoGame.Framework.DesktopGL.3.8.0.1641\build\MonoGame.Framework.DesktopGL.targets')" />
