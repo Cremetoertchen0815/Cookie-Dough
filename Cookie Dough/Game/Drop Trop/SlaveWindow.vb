@@ -37,7 +37,7 @@ Namespace Game.DropTrop
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
         Private CurrentCursor As Vector2
         Private NonViableCoord As Vector2
-        Private CoreInstance As Cookie_Dough.Game1
+        Private CoreInstance As GameCore
         Private MovesPossible As New List(Of (Vector2, Integer))
         Private NetworkLocation As Vector2 = Vector2.One * -1
 
@@ -125,7 +125,7 @@ Namespace Game.DropTrop
             Status = SpielStatus.WarteAufOnlineSpieler
             MoveActive = False
             Map = Map
-            CoreInstance = CType(Core.Instance, Cookie_Dough.Game1)
+            CoreInstance = CType(Core.Instance, GameCore)
             Timer = New TimeSpan(0, 0, 22, 22, 22)
             LastTimer = Timer
 

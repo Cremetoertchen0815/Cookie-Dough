@@ -2067,6 +2067,25 @@
 /processorParam:TextureFormat=Color
 /build:mesh/face_placeholder.png
 
+#begin mesh/grass.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=AlphaTestEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:mesh/grass.fbx
+
 #begin mesh/Have_A_Cube.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -2449,6 +2468,30 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sfx/saucer.wav
+
+#begin sfx/slide_down_A.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/slide_down_A.wav
+
+#begin sfx/slide_down_B.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/slide_down_B.wav
+
+#begin sfx/slide_up_A.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/slide_up_A.wav
+
+#begin sfx/slide_up_B.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/slide_up_B.wav
 
 #begin sfx/step_1.wav
 /importer:WavImporter

@@ -7,16 +7,22 @@ Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
 
-' <summary>
-' This is the main type for your game.
-' </summary>
-Public Class Game1
+''' <summary>
+''' The main game class that sets up the experience and manages misc. global things
+''' </summary>
+Public Class GameCore
     Inherits Core
 
+    ''' <summary>
+    ''' It's the constructor. Wow.
+    ''' </summary>
     Public Sub New()
         MyBase.New(1920, 1080, False, "Cookie Dough - Just another games collection", "Content")
-        Window.Title = " "
     End Sub
+
+    ''' <summary>
+    ''' Initialize the game and load content.
+    ''' </summary>
     Protected Overrides Sub Initialize()
         MyBase.Initialize()
 
@@ -75,7 +81,11 @@ Public Class Game1
               Content.Load(Of SoundEffect)("sfx/switch"),
               Content.Load(Of SoundEffect)("sfx/text_skip"),
               Content.Load(Of SoundEffect)("sfx/saucer"),
-              Content.Load(Of SoundEffect)("sfx/tuba")}
+              Content.Load(Of SoundEffect)("sfx/tuba"),
+              Content.Load(Of SoundEffect)("sfx/slide_down_A"),
+              Content.Load(Of SoundEffect)("sfx/slide_down_B"),
+              Content.Load(Of SoundEffect)("sfx/slide_up_A"),
+              Content.Load(Of SoundEffect)("sfx/slide_up_B")}
         Lalala = Content.Load(Of Song)("games/BV/lalalala")
         triumph = Content.Load(Of Song)("sfx/triumph")
         DebugTexture = Content.LoadTexture("dbg1")
@@ -110,33 +120,37 @@ Public Class Game1
     Protected triumph As Song
     Private MusicCounter As Integer = 0
 
+    ''' <summary>
+    ''' Update the key stack and the music manager
+    ''' </summary>
     Protected Overrides Sub Update(gameTime As GameTime)
 
 
         'Record key-strokes(ignore keystrokes if window is not focused, in order to protect privacy[in case game window is minimized and user types in sth confidential]
         keysa.Clear()
-        If IsActive Then
-            For Each A In Keyboard.GetState.GetPressedKeys
-                keysa.Add(A)
-            Next
-        End If
+        If IsActive Then keysa.AddRange(Keyboard.GetState.GetPressedKeys)
 
+        'Add keypresses that weren't actuated last frame to ButtonStack
         For Each element In keysa
             If Not oldpress.Contains(element) Then ButtonStack.Add(element)
         Next
 
+        'Record last frame's key presses
         oldpress.Clear()
-        For Each A In keysa
-            oldpress.Add(A)
-        Next
+        oldpress.AddRange(keysa)
 
+        'Remove access keypresses
         If ButtonStack.Count > 20 Then ButtonStack.RemoveAt(0)
 
+        'Update music
         UpdateMusic()
 
         MyBase.Update(gameTime)
     End Sub
 
+    ''' <summary>
+    ''' Check if a sequence of keys was pressed.
+    ''' </summary>
     Public Function GetStackKeystroke(keysa As Keys()) As Boolean
         If keysa.Length > ButtonStack.Count Then Return False
         For i As Integer = 0 To keysa.Length - 1
@@ -146,6 +160,9 @@ Public Class Game1
         Return True
     End Function
 
+    ''' <summary>
+    ''' Manages the global music queue
+    ''' </summary>
     Private Sub UpdateMusic()
         If GetStackKeystroke({Keys.L, Keys.A, Keys.L, Keys.A, Keys.L, Keys.A, Keys.L, Keys.A}) Then
             MediaPlayer.Play(Lalala)
@@ -164,11 +181,7 @@ Public Class Game1
 
         If MediaPlayer.State = MediaState.Stopped And Not MediaPlayer.IsRepeating Then
             MediaPlayer.Play(Content.Load(Of Song)("bgm/acc_" & (MusicCounter + 1).ToString))
-            '#If DEBUG Then
-            '            MediaPlayer.Volume = 0
-            '#Else
             If MediaPlayer.Volume > 0 Then MediaPlayer.Volume = 0.1
-            '#End If
             MediaPlayer.IsRepeating = False
             MusicCounter = (MusicCounter + 1) Mod 4
         End If

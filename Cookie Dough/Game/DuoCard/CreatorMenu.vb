@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Game.Common
 Imports Cookie_Dough.Game.DuoCard.Networking
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
@@ -143,22 +144,18 @@ Namespace Game.DuoCard
             If Internetz Then LocalClient.AutomaticRefresh = False
 
             Dim local_count As Integer = 1
-            Dim AktuellesSpiel As New GameRoom()
-            AktuellesSpiel.PlCount = Size
-            ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
-            AktuellesSpiel.GameMode = Mode
-            AktuellesSpiel.NetworkMode = False
+            Dim AktuellesSpiel As New GameRoom() With {.PlCount = Size, .Spielers = New BaseCardPlayer(Size - 1) {}, .NetworkMode = False}
             For i As Integer = 0 To AktuellesSpiel.PlCount - 1
                 Select Case NewGamePlayers(i)
                     Case SpielerTyp.Local
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Local) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, "")}
+                        AktuellesSpiel.Spielers(i) = New BaseCardPlayer(SpielerTyp.Local) With {.Name = My.Settings.Username & If(local_count > 1, "-" & local_count.ToString, "")}
                         local_count += 1
                     Case SpielerTyp.CPU
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.CPU) With {.Name = Farben(i)}
+                        AktuellesSpiel.Spielers(i) = New BaseCardPlayer(SpielerTyp.CPU) With {.Name = Farben(i)}
                     Case SpielerTyp.Online
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.Online) With {.Bereit = False}
+                        AktuellesSpiel.Spielers(i) = New BaseCardPlayer(SpielerTyp.Online) With {.Bereit = False}
                     Case SpielerTyp.None
-                        AktuellesSpiel.Spielers(i) = New Player(SpielerTyp.None) With {.Bereit = True}
+                        AktuellesSpiel.Spielers(i) = New BaseCardPlayer(SpielerTyp.None) With {.Bereit = True}
                 End Select
             Next
 
@@ -167,7 +164,7 @@ Namespace Game.DuoCard
                                                                                                             AktuellesSpiel.LoadContent()
                                                                                                             If Internetz Then
                                                                                                                 Dim wtlst As String() = New String(AktuellesSpiel.Spielers.Length - 1) {}
-                                                                                                                For i As Integer = 0 To Whitelist.Length - 1
+                                                                                                                For i As Integer = 0 To AktuellesSpiel.Spielers.Length - 1
                                                                                                                     wtlst(i) = AllUser(Whitelist(i)).Item1
                                                                                                                 Next
                                                                                                                 If Not ExtGame.CreateGame(LocalClient, servername, AktuellesSpiel.Spielers.Length, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then MsgBoxer.EnqueueMsgbox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True

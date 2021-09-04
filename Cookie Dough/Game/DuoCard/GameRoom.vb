@@ -21,12 +21,11 @@ Namespace Game.DuoCard
         Implements ICardRendererWindow
 
         'Instance flags
-        Friend Spielers As Player() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As BaseCardPlayer() 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend PlCount As Integer 'Gibt an wieviele Spieler das Spiel enthält
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
-        Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Private SelectionState As SelectionMode = SelectionMode.Standard
         Private stat As CardGameState 'Speichert den aktuellen Status des Spiels
         Private StopUpdating As Boolean 'Deaktiviert die Spielelogik
@@ -56,7 +55,7 @@ Namespace Game.DuoCard
         'HUD
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnB As Button
-        ' Private WithEvents HUDBtnC As Button
+        Private WithEvents HUDBtnC As Button
         'Private WithEvents HUDBtnD As Button
         Private WithEvents HUDArrowUp As TextureButton
         Private WithEvents HUDArrowDown As TextureButton
@@ -125,6 +124,7 @@ Namespace Game.DuoCard
             HUD = New GuiSystem
             HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnC = New Button("Mau", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
             HUDArrowUp = New TextureButton(DebugTexture, New Vector2(935, 700), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowUp)
             HUDArrowDown = New TextureButton(DebugTexture, New Vector2(935, 970), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowDown)
             HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
@@ -207,37 +207,6 @@ Namespace Game.DuoCard
                     StopUpdating = True
                     dbgEnd = False
                     HUDInstructions.Text = "Game over!"
-
-                    'Berechne Rankings
-                    Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
-                    For i As Integer = 0 To PlCount - 1
-                        ranks.Add((i, GetScore(i)))
-                    Next
-                    ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
-                    ranks.Reverse()
-
-                    'Display ranks
-                    For i As Integer = 0 To ranks.Count - 1
-                        Dim ia As Integer = i
-                        Select Case i
-                            Case 0
-                                Core.Schedule(1 + i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                            Case 1
-                                Core.Schedule(1 + i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                            Case 2
-                                Core.Schedule(1 + i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                            Case Else
-                                Core.Schedule(1 + i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                        End Select
-                    Next
-
-                    If GameMode = GameMode.Competetive Then
-                        'Update highscores
-                        Core.Schedule(ranks.Count + 1, AddressOf SendHighscore)
-                        'Update K/D
-                        If Spielers(ranks(0).Item1).Typ = SpielerTyp.Local Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
-                        My.Settings.Save()
-                    End If
 
                     'Set flags
                     SendWinFlag()
@@ -368,6 +337,15 @@ Namespace Game.DuoCard
                             PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
                             SendChatMessage(source, text)
                         End If
+                    Case "d"c 'Draw card
+                        Renderer.TriggerDeckPullAnimation(Sub()
+                                                              Dim res As Card = DrawRandomCard()
+                                                              Spielers(source).HandDeck.Add(res)
+                                                              SendDrawCard(res)
+                                                              StopUpdating = True
+
+                                                              Core.Schedule(0.5, AddressOf SwitchPlayer)
+                                                          End Sub)
                     Case "e"c 'Suspend gaem
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
                         Spielers(source).Bereit = False
@@ -387,8 +365,12 @@ Namespace Game.DuoCard
                     Case "g"c
                         Dim card As New Card(CInt(element.Substring(3)), CInt(element(2).ToString))
                         TableCard = card
+                        If card.Type = CardType.Clear Then SendLayCard(card)
                         StopUpdating = True
                         Core.Schedule(0.5, AddressOf SwitchPlayer)
+                    Case "k"c
+                        Spielers(source).CustomSound(0).Play()
+                        SendMauSignal(source)
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(2)
                         PostChat(msg, Color.White)
@@ -451,21 +433,11 @@ Namespace Game.DuoCard
         Private Sub SendPlayerLeft(index As Integer)
             LocalClient.WriteStream("e" & index)
         End Sub
-
         Private Sub SendLayCard(card As Card)
             LocalClient.WriteStream("f" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
         End Sub
-        Private Sub SendHighscore()
-            Dim pls As New List(Of (String, Integer))
-            For i As Integer = 0 To Spielers.Length - 1
-                If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.Online Then
-                    pls.Add((Spielers(i).Name, GetScore(i)))
-                End If
-            Next
-            SendNetworkMessageToAll("h" & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
-        End Sub
-        Private Sub SendKick(player As Integer, figur As Integer)
-            SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
+        Private Sub SendMauSignal(source As Integer)
+            LocalClient.WriteStream("i" & source.ToString)
         End Sub
         Private Sub SendGameClosed()
             SendNetworkMessageToAll("l")
@@ -475,6 +447,7 @@ Namespace Game.DuoCard
         End Sub
         Private Sub SendNewPlayerActive(who As Integer)
             SendNetworkMessageToAll("n" & who.ToString)
+            SendSync()
         End Sub
         Private Sub SendParamUpdate()
             SendNetworkMessageToAll("s" & If(BeSkipped, 1, 0).ToString & DrawForces.ToString)
@@ -541,10 +514,26 @@ Namespace Game.DuoCard
         Private Function IsLayingCardValid(card As Card) As Boolean
             If BeSkipped And card.Type <> CardType.Eight Then Return False
             If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
+            Dim ret As Boolean = card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
+
+            'Check if card has to be drawn
+            If (Spielers(SpielerIndex).HandDeck.Count = 1 Or Spielers(SpielerIndex).HandDeck.Count = 2) And HUDBtnC.Active And ret Then
+                StopUpdating = True
+                If Spielers(SpielerIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau Mau!")
+                If Spielers(SpielerIndex).HandDeck.Count = 2 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau!")
+                Renderer.TriggerDeckPullAnimation(Sub()
+                                                      Dim res As Card = DrawRandomCard()
+                                                      Spielers(SpielerIndex).HandDeck.Add(res)
+                                                      SendDrawCard(res)
+                                                      StopUpdating = True
+
+                                                      Core.Schedule(0.5, AddressOf SwitchPlayer)
+                                                  End Sub)
+                Return False
+            End If
+
+            'Normal card
             Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
-        End Function
-        Private Function GetScore(i As Integer) As Integer
-            Return 0
         End Function
 
         Private Function CheckWin() As Boolean
@@ -569,6 +558,7 @@ Namespace Game.DuoCard
         End Sub
 
         Private Sub LayCard(card As Card)
+
             TableCard = card
             If CardStack.Contains(card) Then CardStack.Remove(card)
             Status = CardGameState.CardAnimationActive
@@ -623,10 +613,18 @@ Namespace Game.DuoCard
             SelectionState = SelectionMode.Standard
             HUDArrowUp.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
             HUDArrowDown.Active = Spielers(UserIndex).Typ = SpielerTyp.Local
+            'Check Mau button
+            If SpielerIndex = UserIndex Then
+                HUDBtnC.Active = True
+                If Spielers(UserIndex).HandDeck.Count = 1 Then HUDBtnC.Text = "Mau Mau" Else HUDBtnC.Text = "Mau"
+            Else
+                HUDBtnC.Active = False
+            End If
+
             SendParamUpdate()
             SendGameActive()
             ResetHUD()
-            HUDInstructions.Text = "Lol"
+            HUDInstructions.Text = "Place a card!"
         End Sub
 
         Private Sub ResetHUD()
@@ -655,6 +653,13 @@ Namespace Game.DuoCard
         Private Sub FullscrButton() Handles HUDFullscrBtn.Clicked
             Screen.IsFullscreen = Not Screen.IsFullscreen
             Screen.ApplyChanges()
+        End Sub
+
+        Private Sub MauButtonPressed() Handles HUDBtnC.Clicked
+            If Spielers(UserIndex).HandDeck.Count > 2 Then Return
+            HUDBtnC.Active = False
+            Spielers(UserIndex).CustomSound(0).Play()
+            SendMauSignal(UserIndex)
         End Sub
 
         Private Sub MenuButton() Handles HUDBtnB.Clicked
@@ -738,6 +743,12 @@ Namespace Game.DuoCard
                 HUDArrowUp.Active = value = CardGameState.SelectAction
                 HUDArrowDown.Active = value = CardGameState.SelectAction
             End Set
+        End Property
+
+        Private ReadOnly Property ICardRendererWindow_Spielers As BaseCardPlayer() Implements ICardRendererWindow.Spielers
+            Get
+                Return Spielers
+            End Get
         End Property
 #End Region
     End Class

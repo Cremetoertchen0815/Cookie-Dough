@@ -167,6 +167,8 @@ Namespace Game.Barrelled.Players
             If Location.Y <= 0 And Not JumpBtn.IsPressed Then Location = New Vector3(Location.X, 0, Location.Z) : VelocityY = 0
             Velocity3D += New Vector3(0, VelocityY, 0)
 
+            Dim soos As New AudioListener
+
             'Clamp position and move on Y-Axis
             If CanMove Then LocationY = Mathf.Clamp(Location.Y - Velocity3D.Y * Time.DeltaTime, 0, 30)
 
@@ -185,8 +187,8 @@ Namespace Game.Barrelled.Players
             CameraPosition = Location + camShift + New Vector3(0, If(RunningMode = PlayerStatus.Sneaky, 3, 6), 0)
 
             'Update Audio Listener
-            AudioListener.Forward = movDir
-            AudioListener.Position = Location
+            AudioListener.Forward = movDir * New Vector3(-1, 1, 1)
+            AudioListener.Position = Location / 10
             AudioListener.Up = Vector3.Up
             AudioListener.Velocity = Velocity3D
 

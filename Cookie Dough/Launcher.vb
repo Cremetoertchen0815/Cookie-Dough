@@ -5,39 +5,81 @@ Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 
-' <summary>
-' The main class.
-' </summary>
-Public Module Program
+''' <summary>
+''' The launch module
+''' </summary>
+Public Module Launcher
 
+    ''' <summary>
+    ''' Determines the version of the server/client(to check for compatibility)
+    ''' </summary>
     Friend Property VersionString As String = "Cookie Dough V0.30"
-    Friend Property Automator As TweenManager 'Old Beacon-tweening system for backwards compatibility for BV
+    ''' <summary>
+    ''' Old Beacon Tweening system for backwards compatibility with BV
+    ''' </summary>
+    Friend Property Automator As TweenManager
+    ''' <summary>
+    ''' Provides a 1x1px texture that is completely transparent
+    ''' </summary>
     Friend Property ReferencePixelTrans As Texture2D
+    ''' <summary>
+    ''' The current graphics device
+    ''' </summary>
     Friend Property Dev As GraphicsDevice
+    ''' <summary>
+    ''' A texture that can be used for prototyping
+    ''' </summary>
     Friend Property DebugTexture As Texture2D
+    ''' <summary>
+    ''' The client currently used for network communication
+    ''' </summary>
     Friend Property LocalClient As Client
+    ''' <summary>
+    ''' An array containing commonly used sound effects
+    ''' </summary>
     Friend Property SFX As SoundEffect()
+    ''' <summary>
+    ''' The matrix used for scaling the screen contents to the used window size
+    ''' </summary>
     Friend Property ScaleMatrix As Matrix
+    ''' <summary>
+    ''' Global system being used for displaying message boxes and input boxes(carbonUI independent for 64-Bit MacOS applications)
+    ''' </summary>
     Friend Property MsgBoxer As MessageBoxer
+    ''' <summary>
+    ''' The menu color
+    ''' </summary>
     Friend Property FgColor As Color = Color.Lime
+    ''' <summary>
+    ''' The colors used for the HUD by users
+    ''' </summary>
     Friend Property hudcolors As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Teal, New Color(85, 120, 20)}
+    ''' <summary>
+    ''' The colors used for the player characters by users
+    ''' </summary>
     Friend Property playcolor As Color() = {Color.Magenta, Color.Lime, Color.Cyan, Color.Yellow, Color.Maroon * 1.5F, New Color(0, 0, 200), New Color(0, 80, 80), New Color(85, 120, 20)}
+    ''' <summary>
+    ''' The name of the colors by users
+    ''' </summary>
     Friend Property Farben As String() = {"Telekom", "Lime", "Cyan", "Yellow", "Red", "Olive", "Teal", "Blue"}
+    ''' <summary>
+    ''' The "message of the days" of the colors by users
+    ''' </summary>
     Friend Property CPU_MOTDs As String() = {"Erleben, was verbindet.", "I'm simply the best!", "Humans suck!", "Ching chang chong, I bims 1 Asiate!", "I'm a star!", "I SUCK!", "Alle Wege führen nach oben.", "I'm blue dabadee dabadei"}
 
-    ' <summary>
-    ' The main entry point for the application.
-    ' </summary>
+    ''' <summary>
+    ''' The main entry point for the application.
+    ''' </summary>
     <STAThread>
     Friend Sub Main()
         'Using-Block gibt nach Beendigung des Spiels Resourcen frei und ruft game.Dispose() auf.
 #If DEBUG Then
-        Using game As New Game1
+        Using game As New GameCore
             game.Run()
         End Using
 #Else
         Try
-            Using game As New Game1
+            Using game As New GameCore
                 game.Run()
             End Using
         Catch ex As Exception

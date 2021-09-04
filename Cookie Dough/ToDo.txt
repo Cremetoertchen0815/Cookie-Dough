@@ -1,22 +1,21 @@
 ﻿-Test DC, BR and DT!
 -Make shit run under MacOS
+-Check host leaving and others not being kicked out of the round
+-Work on code documentation
 
 BV:
 -Add snakes and ladders to snek map
+-Add sliding up and down
 -Extend snek map vertically(???)
 -Custom CPU sounds
 
 CR:
 -Johannes soll seinen Arsch bewegen
 
-
 DC:
 -Add CPUs (JOHANNES)
--Add highscoring
 
 BR:
--Implement sfx
--3D sound
 -Add new map(Lukas soll seinen Arsch bewegen[er hat gesagt, dass ich das so sagen soll])
 -Implement jump meter(???)
 -Implement rejoining(or maybe not)
@@ -39,7 +38,6 @@ Baberini To-Do.Txt:
 -CPU UNO
 -Barreled TST
 -Add CPUs (JOHANNES)
--Johannes soll seinen Arsch bewegen
 
 
 
@@ -50,4 +48,3 @@ DuoCard CPU Faktoren:
 4. Siebener sollen aufgehoben werden, bis man ein 7er Streak hinlegen kann
 5. Neuner schnell raushauen, insofern man eine Karte zum nachlegen hat
 
-kaka

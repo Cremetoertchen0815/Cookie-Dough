@@ -95,8 +95,9 @@ Namespace Game.Common
 #Region "Rendering"
 
         Public Overrides Sub Render(scene As Scene)
-
-            SetViewMatrix(Game.GetCamPos)
+            Dim rotatoA As Matrix = Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0))
+            Dim rotatoB As Matrix = Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.SpielerIndex * MathHelper.PiOver2, 0))
+            SetViewMatrix(Game.GetCamPos, rotatoA * rotatoB)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
             '---RENDERER 3D---
@@ -123,13 +124,31 @@ Namespace Game.Common
             Next
 
             'Draw deck top card
-            card_fx.Texture = CardTextures(CardTextures.Count - 1)
-            For Each element In card_model.Meshes
-                ApplyFX(element, element.ParentBone.ModelTransform * card_deck_Matrix * Matrix.CreateTranslation(card_deck_top_pos.Value))
-                element.Draw()
+            If card_deck_top_pos.State = TransitionState.InProgress Then
+                card_fx.Texture = CardTextures(CardTextures.Count - 1)
+                For Each element In card_model.Meshes
+                    ApplyFX(element, element.ParentBone.ModelTransform * card_deck_Matrix * Matrix.CreateTranslation(card_deck_top_pos.Value))
+                    element.Draw()
+                Next
+            End If
+
+            SetViewMatrix(Game.GetCamPos, Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0)))
+
+            'Draw other player's hand decks
+            dev.RasterizerState = RasterizerState.CullClockwise
+            For i As Integer = 0 To Game.Spielers.Length - 1
+                For j As Integer = 0 To Game.Spielers(i).HandDeck.Count - 1
+                    Dim transform As Matrix = Matrix.CreateRotationZ(MathHelper.PiOver2) * Matrix.CreateTranslation(0, 0, Math.Floor(j / 7) * 2.1) * Matrix.CreateRotationY(0.4) * Matrix.CreateScale(80) * Matrix.CreateTranslation(550, 300 - (j Mod 7) * 100, -150) * Matrix.CreateRotationZ((i - 1) * MathHelper.PiOver2)
+                    card_fx.Texture = CardTextures(CardTextures.Count - 1)
+                    For Each element In card_model.Meshes
+                        ApplyFX(element, element.ParentBone.ModelTransform * transform)
+                        element.Draw()
+                    Next
+                Next
             Next
 
             'Draw Table
+            dev.RasterizerState = RasterizerState.CullNone
             For Each element In TableModel.Meshes
                 ApplyFX(element, element.ParentBone.ModelTransform * TableMatrix)
                 element.Draw()
@@ -138,7 +157,7 @@ Namespace Game.Common
             'Draw Hand Deck
             If Game.State <> CardGameState.SelectAction Then Return
             dev.DepthStencilState = DepthStencilState.None
-            SetViewMatrix(New Keyframe3D)
+            SetViewMatrix(New Keyframe3D, Matrix.Identity)
             For i As Integer = 0 To Game.HandDeck.Count - 1
                 If Game.DeckScroll <> Math.Floor(i / 7) OrElse Not Game.HandDeck(i).Visible Then Continue For
                 Dim transform As Matrix = GetHandCardWorldMatrix(i)
@@ -150,7 +169,7 @@ Namespace Game.Common
             Next
         End Sub
 
-        Private Function GetHandCardWorldMatrix(i As Integer)
+        Private Function GetHandCardWorldMatrix(i As Integer) As Matrix
             Return Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(4.3 - (i Mod 7) * 1.4, -3, -1069.2)
         End Function
 
@@ -166,8 +185,8 @@ Namespace Game.Common
             Next
         End Sub
 
-        Private Sub SetViewMatrix(cam As Keyframe3D)
-            View = cam.GetMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
+        Private Sub SetViewMatrix(cam As Keyframe3D, FinalMatrix As Matrix)
+            View = FinalMatrix * cam.GetMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
         End Sub
 
         Friend Sub ApplyCardFX(model As Model, Projection As Matrix)
@@ -182,7 +201,7 @@ Namespace Game.Common
 
 #Region "Animation"
         Friend Sub TriggerDeckPullAnimation(final As Transition(Of Vector3).FinishedDelegate)
-
+            If card_deck_top_pos.State = TransitionState.InProgress AndAlso card_deck_top_pos.FinishAction IsNot Nothing Then card_deck_top_pos.FinishAction.Invoke(card_deck_top_pos)
             card_deck_top_pos = New Transition(Of Vector3)(New TransitionTypes.TransitionType_Acceleration(500), New Vector3(0, 0, -0.1), New Vector3(0, -700, -0.1), final)
             Automator.Add(card_deck_top_pos)
         End Sub

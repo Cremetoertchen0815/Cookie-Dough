@@ -109,6 +109,7 @@
     <Compile Include="Game\Barrelled\Players\CommonPlayer.vb" />
     <Compile Include="Game\Barrelled\Renderers\AdditionalHUDRendererable.vb" />
     <Compile Include="Game\Common\GameRoomTemplate.vb" />
+    <Compile Include="Game\Common\BaseCardPlayer.vb" />
     <Compile Include="Game\Corridor\CreatorMenu.vb" />
     <Compile Include="Game\Corridor\Enums.vb" />
     <Compile Include="Game\Corridor\Figures\TestFigur.vb" />
@@ -188,7 +189,7 @@
     <Compile Include="Framwork\UI\GuiInput.vb" />
     <Compile Include="Framwork\UI\GuiSystem.vb" />
     <Compile Include="Framwork\UI\IParent.vb" />
-    <Compile Include="Game1.vb" />
+    <Compile Include="GameCore.vb" />
     <Compile Include="Game\Betreten Verboten\Enums.vb" />
     <Compile Include="Game\Betreten Verboten\CreatorMenu.vb" />
     <Compile Include="Game\Betreten Verboten\GameRoom.vb" />
@@ -202,7 +203,6 @@
     <Compile Include="Game\DuoCard\IGameWindow.vb" />
     <Compile Include="Game\DuoCard\Networking\ExtGame.vb" />
     <Compile Include="Game\DuoCard\Networking\SyncMessage.vb" />
-    <Compile Include="Game\DuoCard\Player.vb" />
     <Compile Include="Game\DuoCard\Rendering\GameRenderable.vb" />
     <Compile Include="Game\DuoCard\SelectionMode.vb" />
     <Compile Include="Game\DuoCard\SlaveWindow.vb" />
@@ -234,7 +234,7 @@
     <Compile Include="Framwork\Networking\OnlineGameInstance.vb" />
     <Compile Include="Framwork\Networking\Server.vb" />
     <Compile Include="Game\Betreten Verboten\Networking\SyncMessage.vb" />
-    <Compile Include="Program.vb" />
+    <Compile Include="Launcher.vb" />
     <Compile Include="Properties\AssemblyInfo.vb" />
     <Compile Include="Properties\Settings.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -292,7 +292,6 @@
     <Import Include="Cookie_Dough.Framework.Graphics" />
     <Import Include="Cookie_Dough.Framework.Misc" />
     <Import Include="Cookie_Dough.Framework.Tweening" />
-    <Import Include="Cookie_Dough.Program" />
     <Import Include="Nez" />
     <Import Include="System" />
   </ItemGroup>

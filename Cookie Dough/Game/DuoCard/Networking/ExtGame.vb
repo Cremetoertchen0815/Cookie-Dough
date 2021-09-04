@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
+Imports Cookie_Dough.Game.Common
 
 Namespace Game.DuoCard.Networking
     Public Class ExtGame
@@ -9,7 +10,7 @@ Namespace Game.DuoCard.Networking
         Public Property Name As String Implements IGame.Name
         Public Property Size As Integer
         Public Property Casual As Boolean
-        Public Property Players As Player() = {Nothing, Nothing, Nothing, Nothing}
+        Public Property Players As BaseCardPlayer() = {Nothing, Nothing, Nothing, Nothing}
         Public Property Ended As EndingMode = EndingMode.Running Implements IGame.Ended
         Public Property Active As Boolean = False Implements IGame.Active
         Public Property HostConnection As Connection Implements IGame.HostConnection
@@ -34,7 +35,7 @@ Namespace Game.DuoCard.Networking
         End Sub
 
         Public Sub ServerSendJoinNujoinData(index As Integer, con As Connection, writer As Action(Of Connection, String)) Implements IGame.ServerSendJoinNujoinData
-            If index > -1 Then Players(index) = New Player(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick, .ID = con.Identifier}
+            If index > -1 Then Players(index) = New BaseCardPlayer(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick, .ID = con.Identifier}
             For i As Integer = 0 To Players.Length - 1
                 If Players(i) IsNot Nothing Then
                     writer(con, CInt(Players(i).Typ))
@@ -65,14 +66,14 @@ Namespace Game.DuoCard.Networking
                 Select Case types(i)
                     Case SpielerTyp.Local
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .Connection = con, .ID = con.Identifier}
+                        nugaem.Players(i) = New BaseCardPlayer(types(i)) With {.Name = name, .Bereit = True, .Connection = con, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.CPU
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .ID = con.Identifier}
+                        nugaem.Players(i) = New BaseCardPlayer(types(i)) With {.Name = name, .Bereit = True, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.None
-                        nugaem.Players(i) = New Player(types(i)) With {.Bereit = True}
+                        nugaem.Players(i) = New BaseCardPlayer(types(i)) With {.Bereit = True}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.Online
                         nugaem.WhiteList(i) = ReadString(con)
@@ -81,7 +82,7 @@ Namespace Game.DuoCard.Networking
             Return nugaem
         End Function
 
-        Public Shared Function CreateGame(client As Client, name As String, size As Integer, types As Player(), whitelist As String(), casual As Boolean) As Boolean
+        Public Shared Function CreateGame(client As Client, name As String, size As Integer, types As BaseCardPlayer(), whitelist As String(), casual As Boolean) As Boolean
             'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
             If client.blastmode Or Not client.Connected Then Return False
 

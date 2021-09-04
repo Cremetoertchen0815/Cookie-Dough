@@ -1645,6 +1645,7 @@ Namespace Game.BetretenVerboten
 
         Private Sub AngerButtonFinal(text As String, button As Integer)
             Try
+                If button <> 0 Then Throw New Exception
                 Dim aim As Integer = CInt(text)
                 If Not (aim < 13 And aim > 0) Then MsgBoxer.EnqueueInputbox("Screw you! I said 1 <= x <= 12 FIELDS!", AddressOf AngerButtonFinal, "") : Return
                 WürfelWerte(0) = If(aim > 6, 6, aim)

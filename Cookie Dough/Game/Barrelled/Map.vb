@@ -6,7 +6,7 @@ Namespace Game.Barrelled
             Return 2
         End Function
         Public Function GetTimeLeft(mp As Map) As Integer
-            Return 60
+            Return 6000
         End Function
         Public Function GetMapName(mp As Map) As String
             Select Case mp
