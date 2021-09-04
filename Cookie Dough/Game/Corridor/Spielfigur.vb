@@ -9,11 +9,19 @@ Namespace Game.Corridor
         Public Overridable Property TransformMatrix As Matrix = Matrix.CreateScale(New Vector3(1, 1, 1) * 5) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(New Vector3(475, 475, 0) - New Vector3(55, 55, 0))
         Public Property Position As Vector2 = Vector2.Zero
 
-        Public Sub Draw(drawindex As Integer, view As Matrix, projection As Matrix)
-            Dim clor As Color = If(drawindex < 1, Color.Black, Color.White)
+        ''' <summary>
+        ''' Draws the figure to its designated spot on the playing field
+        ''' </summary>
+        ''' <param name="drawindex">Represents the index of the player in order to determine the color of the playing pieces(0 is black, 1 is white)</param>
+        ''' <param name="view">Requests the view matrix of the 3D renderer</param>
+        ''' <param name="projection">Requests the projection matrix of the 3D renderer</param>
+        ''' <param name="selectionblinker">Determines through a span of 0 through 1 how much the pieces shall be colored in red(for showing the selection of pieces)</param>
+        Public Sub Draw(drawindex As Integer, view As Matrix, projection As Matrix, Optional selectionblinker As Single = 1.0F)
+            Dim clor As Color = Color.Lerp(If(drawindex < 1, Color.Transparent, Color.White), Color.Red, selectionblinker)
+            Dim stepp = 950 / 8   'Distance of one filed to its neighbor
             For Each mesh In Model3D.Meshes
                 Dim fx = CType(mesh.Effects(0), BasicEffect)
-                fx.World = TransformMatrix * Matrix.CreateTranslation(New Vector3(-Position.X, -Position.Y, 0))
+                fx.World = TransformMatrix * Matrix.CreateTranslation(New Vector3(-Position.X * stepp, -Position.Y * stepp, 0))
                 fx.View = view
                 fx.Projection = projection
                 fx.DiffuseColor = Color.White.ToVector3
@@ -22,7 +30,7 @@ Namespace Game.Corridor
                 fx.AmbientLightColor = Vector3.Zero
                 fx.EmissiveColor = clor.ToVector3 * 0.12
                 fx.DirectionalLight0.Direction = New Vector3(0, 0.8, 1.5)
-                fx.DirectionalLight0.DiffuseColor = clor.ToVector3 * 0.6 '// a gray light
+                fx.DirectionalLight0.DiffuseColor = clor.ToVector3 * 0.6
                 fx.DirectionalLight0.SpecularColor = New Vector3(1, 1, 1) '// with white highlights
                 mesh.Draw()
             Next

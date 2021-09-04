@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
+Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Newtonsoft.Json
@@ -32,7 +33,7 @@ Namespace Game.Corridor
 
         Public Property IsAFK As Boolean = False
 
-        Public Property Figuren As New List(Of Spielfigur) From {New Figures.Bauer}
+        Public Property Figuren As New List(Of Spielfigur) From {New Figures.Bauer With {.Position = New Vector2(0, 0)}, New Figures.Bauer With {.Position = New Vector2(1, 2)}, New Figures.Bauer With {.Position = New Vector2(7, 7)}}
 
         ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server
