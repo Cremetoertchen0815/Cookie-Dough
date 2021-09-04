@@ -19,7 +19,7 @@ Namespace Game.Corridor
         Implements IGameWindow
 
         'Instance fields
-        Friend Spielers As Player() = {New Player(SpielerTyp.Local) With {.Figuren = New List(Of Spielfigur) From {New Figures.Bauer With {.Position = New Vector2(0, 0)}, New Figures.Bauer With {.Position = New Vector2(1, 2)}, New Figures.Bauer With {.Position = New Vector2(7, 7)}}}, New Player(SpielerTyp.Local)} 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As Player() = {New Player(SpielerTyp.Local) With {.Figuren = New List(Of Spielfigur) From {New Figures.TestFigur With {.Position = New Vector2(0, 0)}, New Figures.TestFigur With {.Position = New Vector2(1, 2)}, New Figures.TestFigur With {.Position = New Vector2(7, 7)}}}, New Player(SpielerTyp.Local) With {.Figuren = New List(Of Spielfigur) From {New Figures.TestFigur With {.Position = New Vector2(6, 0)}, New Figures.TestFigur With {.Position = New Vector2(3, 6)}}}} 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
