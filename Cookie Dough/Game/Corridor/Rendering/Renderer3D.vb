@@ -67,6 +67,7 @@ Namespace Game.Corridor.Rendering
         }
 
             batchlor = New Batcher(dev)
+            debug_batcher = New Batcher(dev)
 
 
             rects = New Dictionary(Of Vector2, Rectangle)
@@ -80,13 +81,7 @@ Namespace Game.Corridor.Rendering
             Next
         End Sub
 
-#Region "Debug Rendering"
-        Protected Overrides Sub DebugRender(scene As Scene, cam As Camera)
-            MyBase.DebugRender(scene, cam)
-
-
-        End Sub
-#End Region
+        Dim debug_batcher As Batcher
 
 #Region "Rendering"
 
