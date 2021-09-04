@@ -163,7 +163,7 @@ Namespace Game.Corridor
         Public Overrides Sub Update()
             Dim mstate As MouseState = Mouse.GetState()
             Dim kstate As KeyboardState = If(DebugConsole.Instance.IsOpen, Nothing, Keyboard.GetState())
-            Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
+            Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint 'Position of the mouse, projected onto virtual screen space
 
             If Not StopUpdating Then
 
@@ -176,7 +176,17 @@ Namespace Game.Corridor
                 'Update die Spielelogik
                 Select Case Status
                     Case SpielStatus.WähleFigur
+                        Dim hitbox_size As Single = 950 / 8 'Play field size(950px) divided into 8 boxes
+                        SelectedFigure = Nothing 'Reset selected figur to nothing
 
+                        For Each figur In Spielers(UserIndex).Figuren
+                            Dim RectangleHitbox As New Rectangle(485 + figur.Position.X * hitbox_size, 65 + figur.Position.Y * hitbox_size, hitbox_size, hitbox_size) 'Generate mouse hitbox
+                            If RectangleHitbox.Contains(mpos) Then
+                                SelectedFigure = figur 'Set Selected figure to the figure hovered over by the mouse
+
+                                ' TODO: Add code that process moves once the mouse has clicked
+                            End If
+                        Next
 
                     Case SpielStatus.WarteAufOnlineSpieler
                         HUDInstructions.Text = "Waiting for all players to connect..."
@@ -572,7 +582,7 @@ Namespace Game.Corridor
             End Get
         End Property
 
-        Public Property SelectedFigure As Integer Implements IGameWindow.GetSelectedFigure
+        Public Property SelectedFigure As Spielfigur Implements IGameWindow.GetSelectedFigure
 #End Region
     End Class
 End Namespace

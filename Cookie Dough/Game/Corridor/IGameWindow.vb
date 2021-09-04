@@ -11,7 +11,7 @@ Namespace Game.Corridor
         ReadOnly Property HUDNameBtn As Controls.Button
         ReadOnly Property HUDmotdLabel As Controls.Label
         ReadOnly Property BGTexture As Texture2D
-        Property GetSelectedFigure As Integer
+        Property GetSelectedFigure As Spielfigur
         Function GetCamPos() As Keyframe3D
     End Interface
 End Namespace
