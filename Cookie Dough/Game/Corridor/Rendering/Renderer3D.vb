@@ -125,8 +125,8 @@ Namespace Game.Corridor.Rendering
 
             'Draw playing figures
             For i As Integer = 0 To Game.Spielers.Length - 1
-                For Each element In Game.Spielers(i).Figuren
-                    element.Draw(i, View, Projection)
+                For Each figur In Game.Spielers(i).Figuren
+                    figur.Draw(i, View, Projection, If(Game.Status = SpielStatus.WähleFigur And Game.GetSelectedFigure Is figur, Game.SelectFader, 0))
                 Next
             Next
 

@@ -12,12 +12,12 @@ Namespace Game.Corridor
         ''' <summary>
         ''' Draws the figure to its designated spot on the playing field
         ''' </summary>
-        ''' <param name="drawindex">Represents the index of the player in order to determine the color of the playing pieces(0 is black, 1 is white)</param>
+        ''' <param name="drawindex">Represents the index of the player in order to determine the color of the playing pieces(0 is white, 1 is black)</param>
         ''' <param name="view">Requests the view matrix of the 3D renderer</param>
         ''' <param name="projection">Requests the projection matrix of the 3D renderer</param>
         ''' <param name="selectionblinker">Determines through a span of 0 through 1 how much the pieces shall be colored in red(for showing the selection of pieces)</param>
         Public Sub Draw(drawindex As Integer, view As Matrix, projection As Matrix, Optional selectionblinker As Single = 1.0F)
-            Dim clor As Color = Color.Lerp(If(drawindex < 1, Color.Transparent, Color.White), Color.Red, selectionblinker)
+            Dim clor As Color = Color.Lerp(If(drawindex < 1, Color.White, Color.Black), Color.Red, selectionblinker)
             Dim stepp = 950 / 8   'Distance of one filed to its neighbor
             For Each mesh In Model3D.Meshes
                 Dim fx = CType(mesh.Effects(0), BasicEffect)

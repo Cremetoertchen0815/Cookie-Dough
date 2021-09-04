@@ -33,7 +33,7 @@ Namespace Game.Corridor
 
         Public Property IsAFK As Boolean = False
 
-        Public Property Figuren As New List(Of Spielfigur) From {New Figures.Bauer With {.Position = New Vector2(0, 0)}, New Figures.Bauer With {.Position = New Vector2(1, 2)}, New Figures.Bauer With {.Position = New Vector2(7, 7)}}
+        Public Property Figuren As New List(Of Spielfigur)
 
         ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server

@@ -19,7 +19,7 @@ Namespace Game.Corridor
         Implements IGameWindow
 
         'Instance fields
-        Friend Spielers As Player() = {New Player(SpielerTyp.Local), New Player(SpielerTyp.Local)} 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As Player() = {New Player(SpielerTyp.Local) With {.Figuren = New List(Of Spielfigur) From {New Figures.Bauer With {.Position = New Vector2(0, 0)}, New Figures.Bauer With {.Position = New Vector2(1, 2)}, New Figures.Bauer With {.Position = New Vector2(7, 7)}}}, New Player(SpielerTyp.Local)} 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
@@ -121,7 +121,7 @@ Namespace Game.Corridor
             HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = Color.White
-            SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
+            SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut).Start()
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
