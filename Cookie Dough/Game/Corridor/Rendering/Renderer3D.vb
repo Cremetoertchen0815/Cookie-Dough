@@ -96,7 +96,7 @@ Namespace Game.Corridor.Rendering
 
             'Set render target to be the play field texture
             dev.SetRenderTarget(SpielfeldTextur)
-            dev.Clear(Color.Black)
+            dev.Clear(New Color(15, 15, 15))
 
             'Render playfield texture
             batchlor.Begin()
