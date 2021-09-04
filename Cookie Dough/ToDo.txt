@@ -16,6 +16,7 @@ DC:
 -Add CPUs (JOHANNES)
 
 BR:
+-Ask Johannes for grass
 -Add new map(Lukas soll seinen Arsch bewegen[er hat gesagt, dass ich das so sagen soll])
 -Implement jump meter(???)
 -Implement rejoining(or maybe not)

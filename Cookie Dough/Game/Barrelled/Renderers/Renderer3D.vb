@@ -164,7 +164,7 @@ Namespace Game.Barrelled.Renderers
             For Each element In map.GetLayer(Of TmxLayer)("Grass").Tiles
                 If element Is Nothing Then Continue For
                 Dim pos As Vector2 = New Vector2(element.X, element.Y) * 16 / 3
-                lst.Add(Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(2.67, 3.5, 2.67)) * Matrix.CreateTranslation(New Vector3(pos.X, 0, pos.Y)))
+                lst.Add(Matrix.CreateTranslation(Vector3.One) * Matrix.CreateScale(New Vector3(2.67, 4, 2.67)) * Matrix.CreateTranslation(New Vector3(pos.X, 0, pos.Y)))
             Next
             GrassMatrices = lst.ToArray
             lst.Clear()
