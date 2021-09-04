@@ -289,7 +289,6 @@
     <Import Include="Cookie_Dough.Framework.Graphics" />
     <Import Include="Cookie_Dough.Framework.Misc" />
     <Import Include="Cookie_Dough.Framework.Tweening" />
-    <Import Include="Cookie_Dough.Program" />
     <Import Include="Nez" />
     <Import Include="System" />
   </ItemGroup>

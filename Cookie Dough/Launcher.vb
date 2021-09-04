@@ -74,7 +74,7 @@ Public Module Launcher
     Friend Sub Main()
         'Using-Block gibt nach Beendigung des Spiels Resourcen frei und ruft game.Dispose() auf.
 #If DEBUG Then
-        Using game As New Game1
+        Using game As New GameCore
             game.Run()
         End Using
 #Else
