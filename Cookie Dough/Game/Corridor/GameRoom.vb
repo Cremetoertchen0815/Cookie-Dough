@@ -45,7 +45,7 @@ Namespace Game.Corridor
         Friend Psyground As PsygroundRenderer
 
         'Spielfeld
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)} 'Bewegt die Kamera 
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)} 'Bewegt die Kamera 
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
 
         'HUD
@@ -175,6 +175,8 @@ Namespace Game.Corridor
 
                 'Update die Spielelogik
                 Select Case Status
+                    Case SpielStatus.WähleFigur
+
 
                     Case SpielStatus.WarteAufOnlineSpieler
                         HUDInstructions.Text = "Waiting for all players to connect..."
@@ -188,7 +190,7 @@ Namespace Game.Corridor
                         StopUpdating = True
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
-                                               FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2000), FigurFaderCamera.Value, New Keyframe3D, Nothing) : Automator.Add(FigurFaderCamera)
+                                               FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2000), FigurFaderCamera.Value, New Keyframe3D, AddressOf SwitchPlayer) : Automator.Add(FigurFaderCamera)
                                                HUDInstructions.Text = " "
                                                'Launch start animation
                                                StopUpdating = True
@@ -454,6 +456,29 @@ Namespace Game.Corridor
             HUDChat.ScrollDown = True
         End Sub
 
+        Private Sub SwitchPlayer()
+            'Increment Player Index
+            SpielerIndex = (SpielerIndex + 1) Mod 2
+            Do While Spielers(SpielerIndex).Typ = SpielerTyp.None
+                SpielerIndex = (SpielerIndex + 1) Mod 2
+            Loop
+            'Set game flags
+            Status = If(Spielers(SpielerIndex).Typ <> SpielerTyp.Online, SpielStatus.WähleFigur, SpielStatus.Waitn)
+            SendNewPlayerActive(SpielerIndex) 'Transmit to slaves that new player is active
+            If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
+            StopUpdating = False
+            SendGameActive()
+            'Set HUD flags
+            ResetHUD()
+            HUDInstructions.Text = "Select figure!"
+        End Sub
+        Private Sub ResetHUD()
+            If UserIndex < 0 Then Return
+            HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
+            HUD.TweenColorTo(If(UserIndex >= 0, hudcolors(UserIndex), Color.White), 0.5).SetEaseType(EaseType.CubicInOut).Start()
+            HUDNameBtn.Active = True
+        End Sub
+
 #End Region
 #Region "Knopfgedrücke"
 
@@ -546,6 +571,8 @@ Namespace Game.Corridor
                 Return SelectFader
             End Get
         End Property
+
+        Public Property SelectedFigure As Integer Implements IGameWindow.GetSelectedFigure
 #End Region
     End Class
 End Namespace

@@ -80,8 +80,15 @@ Namespace Game.Corridor.Rendering
             Next
         End Sub
 
-#Region "Rendering"
+#Region "Debug Rendering"
+        Protected Overrides Sub DebugRender(scene As Scene, cam As Camera)
+            MyBase.DebugRender(scene, cam)
 
+
+        End Sub
+#End Region
+
+#Region "Rendering"
 
 
         Public Overrides Sub Render(scene As Scene)
