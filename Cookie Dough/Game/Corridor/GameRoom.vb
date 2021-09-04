@@ -19,7 +19,7 @@ Namespace Game.Corridor
         Implements IGameWindow
 
         'Instance fields
-        Friend Spielers As Player() = {New Player(SpielerTyp.Local), New Player(SpielerTyp.Local)} 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
+        Friend Spielers As Player() = {New Player(SpielerTyp.Local) With {.Figuren = New List(Of Spielfigur) From {New Figures.TestFigur With {.Position = New Vector2(0, 0)}, New Figures.TestFigur With {.Position = New Vector2(1, 2)}, New Figures.TestFigur With {.Position = New Vector2(7, 7)}}}, New Player(SpielerTyp.Local) With {.Figuren = New List(Of Spielfigur) From {New Figures.TestFigur With {.Position = New Vector2(6, 0)}, New Figures.TestFigur With {.Position = New Vector2(3, 6)}}}} 'Enthält sämtliche Spieler, die an dieser Runde teilnehmen
         Friend NetworkMode As Boolean = False 'Gibt an, ob das Spiel über das Netzwerk kommunuziert
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
@@ -45,7 +45,7 @@ Namespace Game.Corridor
         Friend Psyground As PsygroundRenderer
 
         'Spielfeld
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)} 'Bewegt die Kamera 
+        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)} 'Bewegt die Kamera 
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
 
         'HUD
@@ -121,7 +121,7 @@ Namespace Game.Corridor
             HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = Color.White
-            SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
+            SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut).Start()
 
             Renderer = AddRenderer(New Renderer3D(Me, -1))
             Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
@@ -163,7 +163,7 @@ Namespace Game.Corridor
         Public Overrides Sub Update()
             Dim mstate As MouseState = Mouse.GetState()
             Dim kstate As KeyboardState = If(DebugConsole.Instance.IsOpen, Nothing, Keyboard.GetState())
-            Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint
+            Dim mpos As Point = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix)).ToPoint 'Position of the mouse, projected onto virtual screen space
 
             If Not StopUpdating Then
 
@@ -175,6 +175,18 @@ Namespace Game.Corridor
 
                 'Update die Spielelogik
                 Select Case Status
+                    Case SpielStatus.WähleFigur
+                        Dim hitbox_size As Single = 950 / 8 'Play field size(950px) divided into 8 boxes
+                        SelectedFigure = Nothing 'Reset selected figur to nothing
+
+                        For Each figur In Spielers(UserIndex).Figuren
+                            Dim RectangleHitbox As New Rectangle(485 + figur.Position.X * hitbox_size, 65 + figur.Position.Y * hitbox_size, hitbox_size, hitbox_size) 'Generate mouse hitbox
+                            If RectangleHitbox.Contains(mpos) Then
+                                SelectedFigure = figur 'Set Selected figure to the figure hovered over by the mouse
+
+                                ' TODO: Add code that process moves once the mouse has clicked
+                            End If
+                        Next
 
                     Case SpielStatus.WarteAufOnlineSpieler
                         HUDInstructions.Text = "Waiting for all players to connect..."
@@ -188,7 +200,7 @@ Namespace Game.Corridor
                         StopUpdating = True
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
-                                               FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = New Keyframe3D}
+                                               FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(2000), FigurFaderCamera.Value, New Keyframe3D, AddressOf SwitchPlayer) : Automator.Add(FigurFaderCamera)
                                                HUDInstructions.Text = " "
                                                'Launch start animation
                                                StopUpdating = True
@@ -215,7 +227,7 @@ Namespace Game.Corridor
 
                 'Set HUD color
                 HUDNameBtn.Text = If(SpielerIndex > -1, Spielers(SpielerIndex).Name, "")
-                If Not Renderer.BeginTriggered Then HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
+                HUDNameBtn.Color = hudcolors(If(SpielerIndex > -1, SpielerIndex, 0))
                 HUDInstructions.Active = (Status = SpielStatus.WarteAufOnlineSpieler) OrElse (SpielerIndex > -1 AndAlso Spielers(SpielerIndex).Typ = SpielerTyp.Local)
             End If
 
@@ -270,7 +282,6 @@ Namespace Game.Corridor
                             PostChat(Spielers(source).Name & " left!", Color.White)
                             If Not StopUpdating And Status <> SpielStatus.SpielZuEnde And Status <> SpielStatus.WarteAufOnlineSpieler Then PostChat("The game is being suspended!", Color.White)
                             If Status <> SpielStatus.WarteAufOnlineSpieler Then StopUpdating = True
-                            If Renderer.BeginTriggered Then StopWhenRealStart = True
 
                             SendPlayerLeft(source)
                         Case "m"c 'Sent chat message
@@ -455,6 +466,29 @@ Namespace Game.Corridor
             HUDChat.ScrollDown = True
         End Sub
 
+        Private Sub SwitchPlayer()
+            'Increment Player Index
+            SpielerIndex = (SpielerIndex + 1) Mod 2
+            Do While Spielers(SpielerIndex).Typ = SpielerTyp.None
+                SpielerIndex = (SpielerIndex + 1) Mod 2
+            Loop
+            'Set game flags
+            Status = If(Spielers(SpielerIndex).Typ <> SpielerTyp.Online, SpielStatus.WähleFigur, SpielStatus.Waitn)
+            SendNewPlayerActive(SpielerIndex) 'Transmit to slaves that new player is active
+            If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
+            StopUpdating = False
+            SendGameActive()
+            'Set HUD flags
+            ResetHUD()
+            HUDInstructions.Text = "Select figure!"
+        End Sub
+        Private Sub ResetHUD()
+            If UserIndex < 0 Then Return
+            HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
+            HUD.TweenColorTo(If(UserIndex >= 0, hudcolors(UserIndex), Color.White), 0.5).SetEaseType(EaseType.CubicInOut).Start()
+            HUDNameBtn.Active = True
+        End Sub
+
 #End Region
 #Region "Knopfgedrücke"
 
@@ -480,13 +514,13 @@ Namespace Game.Corridor
             Screen.ApplyChanges()
         End Sub
         Private Sub MenuButton() Handles HUDBtnB.Clicked
-            If Not Renderer.BeginTriggered Then MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
-                                                                                                        If x = 1 Then Return
-                                                                                                        SFX(2).Play()
-                                                                                                        SendGameClosed()
-                                                                                                        NetworkMode = False
-                                                                                                        Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
-                                                                                                    End Sub, {"Yeah", "Nope"})
+            MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
+                                                                    If x = 1 Then Return
+                                                                    SFX(2).Play()
+                                                                    SendGameClosed()
+                                                                    NetworkMode = False
+                                                                    Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
+                                                                End Sub, {"Yeah", "Nope"})
         End Sub
 #End Region
 #Region "Debug Commands"
@@ -547,6 +581,8 @@ Namespace Game.Corridor
                 Return SelectFader
             End Get
         End Property
+
+        Public Property SelectedFigure As Spielfigur Implements IGameWindow.GetSelectedFigure
 #End Region
     End Class
 End Namespace

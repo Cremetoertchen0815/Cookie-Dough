@@ -11,8 +11,6 @@ Namespace Game.Corridor.Rendering
         Private dev As GraphicsDevice
         Private EffectA As BasicEffect
         Private SpielfeldTextur As RenderTarget2D
-        Private SpielfeldVerbindungen As Texture2D
-        Private Pfeil As Texture2D
         Private MapBuffer As VertexBuffer
         Private TableModel As Model
         Private TableMatrix As Matrix
@@ -20,28 +18,13 @@ Namespace Game.Corridor.Rendering
         Private rects As Dictionary(Of Vector2, Rectangle)
         Private Spielfeldsize As Vector2
 
-        Private SaucerModel As Model
-        Private SaucerLift As Transition(Of Single)
-        Private SaucerTarget As (Integer, Integer) = (-1, -1)
-        Private SaucerMover As Transition(Of Vector2)
-        Private SaucerPickedUp As Boolean = False
-        Private SaucerDefaultPosition As New Vector3(0, 0, 1000)
-
-        Private BeginCurrentPlayer As Integer
-        Friend BeginTriggered As Boolean
-        Private BeginCam As Transition(Of Keyframe3D)
-
         Private View As Matrix
         Private Projection As Matrix
         Private CamMatrix As Matrix
 
         Private Game As IGameWindow
-        Private FigCount As Integer
-        Private SpceCount As Integer
         Private Feld As Rectangle
         Private Center As Vector2
-        Private transmatrices As Matrix() = {Matrix.CreateRotationZ(MathHelper.PiOver2 * 3), Matrix.Identity, Matrix.CreateRotationZ(MathHelper.PiOver2), Matrix.CreateRotationZ(MathHelper.Pi)}
-        Friend AdditionalZPos As New Transition(Of Single)
 
         Public Sub New(game As IGameWindow, Optional order As Integer = 0)
             MyBase.New(order)
@@ -84,6 +67,7 @@ Namespace Game.Corridor.Rendering
         }
 
             batchlor = New Batcher(dev)
+            debug_batcher = New Batcher(dev)
 
 
             rects = New Dictionary(Of Vector2, Rectangle)
@@ -97,25 +81,27 @@ Namespace Game.Corridor.Rendering
             Next
         End Sub
 
-#Region "Rendering"
+        Dim debug_batcher As Batcher
 
+#Region "Rendering"
 
 
         Public Overrides Sub Render(scene As Scene)
 
+            'Update matrices
             Dim cam = Game.GetCamPos
             CamMatrix = Matrix.CreateFromYawPitchRoll(cam.Yaw, cam.Pitch, cam.Roll) * Matrix.CreateTranslation(cam.Location)
-            'If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
+            'Set render target to be the play field texture
             dev.SetRenderTarget(SpielfeldTextur)
-            dev.Clear(Color.Black)
+            dev.Clear(New Color(15, 15, 15))
 
+            'Render playfield texture
             batchlor.Begin()
 
-
-            'Zeichne Spielfeld
+            'Draw playing field squares
             For x As Integer = 0 To Spielfeldsize.X - 1
                 For y As Integer = 0 To Spielfeldsize.X - 1
                     If (x + y) Mod 2 = 0 Then Continue For
@@ -123,22 +109,29 @@ Namespace Game.Corridor.Rendering
                 Next
             Next
 
-            'Zeichne Verbindungen
-            batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
+            'Draw playing field white border
+            batchlor.DrawHollowRect(New Rectangle(0, 0, 950 * ResolutionMultiplier, 950 * ResolutionMultiplier), Color.White, 5)
 
             batchlor.End()
 
 
+            'Set render target to be the pseudo backbuffer
             dev.SetRenderTarget(RenderTexture)
             dev.Clear(Color.Transparent)
 
-
-            'Zeichne figuren
-            dev.RasterizerState = RasterizerState.CullNone
-            dev.DepthStencilState = DepthStencilState.Default
+            dev.RasterizerState = RasterizerState.CullNone 'Don't cull shit out
+            dev.DepthStencilState = DepthStencilState.Default 'Z-Buffer shall be used for sorting
 
 
+            'Draw playing figures
+            For i As Integer = 0 To Game.Spielers.Length - 1
+                For Each figur In Game.Spielers(i).Figuren
+                    figur.Draw(i, View, Projection, If(Game.Status = SpielStatus.WähleFigur And Game.GetSelectedFigure Is figur, Game.SelectFader, 0))
+                Next
+            Next
 
+
+            'Draw playing field
             EffectA.World = Matrix.Identity
             EffectA.View = View
             EffectA.Projection = Projection
