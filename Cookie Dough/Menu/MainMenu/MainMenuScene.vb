@@ -38,6 +38,7 @@ Namespace Menu.MainMenu
             AddRenderer(New DefaultRenderer)
             AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
             ClearColor = Color.Black
+            Core.Instance.IsMouseVisible = True
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
             GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
