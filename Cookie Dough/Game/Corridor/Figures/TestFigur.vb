@@ -1,8 +1,7 @@
-﻿Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Graphics
+﻿Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Game.Corridor.Figures
-    Public Class Bauer
+    Public Class TestFigur
         Inherits Spielfigur
 
         'Property Overrides
@@ -12,7 +11,7 @@ Namespace Game.Corridor.Figures
                 Return CommonModel
             End Get
         End Property
-        Public Overrides ReadOnly Property Type As SpielfigurType = SpielfigurType.Bauer
+        Public Overrides ReadOnly Property Type As SpielfigurType = SpielfigurType.Debug
 
         Public Overrides Function GetAllPossibleMoves() As Move()
             Return {}

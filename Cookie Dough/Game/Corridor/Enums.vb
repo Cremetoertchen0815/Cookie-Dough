@@ -6,6 +6,7 @@
         Läufer
         Springer
         Bauer
+        Debug
     End Enum
 
     Public Enum SpielStatus

@@ -111,7 +111,7 @@
     <Compile Include="Game\Common\GameRoomTemplate.vb" />
     <Compile Include="Game\Corridor\CreatorMenu.vb" />
     <Compile Include="Game\Corridor\Enums.vb" />
-    <Compile Include="Game\Corridor\Figures\Bauer.vb" />
+    <Compile Include="Game\Corridor\Figures\TestFigur.vb" />
     <Compile Include="Game\Corridor\Move.vb" />
     <Compile Include="Game\Corridor\Spielfigur.vb" />
     <Compile Include="Game\Corridor\GameRoom.vb" />
