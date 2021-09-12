@@ -64,6 +64,7 @@ Namespace Game.BetretenVerboten.Rendering
 
             dev = Core.GraphicsDevice
 
+            'Load models
             figur_model = scene.Content.Load(Of Model)("mesh/piece_std")
             SpielfeldVerbindungen = scene.Content.Load(Of Texture2D)("games/BV/playfield_connections_" & CInt(Game.Map))
             Pfeil = scene.Content.Load(Of Texture2D)("games/BV/arrow_right")
@@ -72,6 +73,7 @@ Namespace Game.BetretenVerboten.Rendering
             TableModel = scene.Content.Load(Of Model)("mesh/table")
             ApplyDefaultFX(TableModel, Projection)
 
+            'Generate quad for map to be projected onto
             Dim vertices As New List(Of VertexPositionColorTexture) From {
                 New VertexPositionColorTexture(New Vector3(-475, 475, 0), Color.White, Vector2.UnitX),
                 New VertexPositionColorTexture(New Vector3(475, 475, 0), Color.White, Vector2.Zero),
@@ -83,6 +85,10 @@ Namespace Game.BetretenVerboten.Rendering
             MapBuffer = New VertexBuffer(dev, GetType(VertexPositionColorTexture), vertices.Count, BufferUsage.WriteOnly)
             MapBuffer.SetData(vertices.ToArray)
 
+            'Load SFX for sliding
+            SlideSFX = {scene.Content.LoadSoundEffect("sfx/slide_up_A"), scene.Content.LoadSoundEffect("sfx/slide_down_A")}
+
+            'Load map related data
             Select Case Game.Map
                 Case GaemMap.Plus
                     SpceCount = 10
