@@ -362,8 +362,8 @@ Namespace Game.BetretenVerboten.Rendering
 
         Friend Sub TriggerSlideAnimation(target As (Integer, Integer), aim As Integer, FinalAction As Action)
             Dim src As Integer = Game.Spielers(target.Item1).Spielfiguren(target.Item2)
-            Dim aimpos As Vector2 = GetMapVectorPos(Game.Map, src)
-            Dim startpos As Vector2 = GetMapVectorPos(Game.Map, aim)
+            Dim aimpos As Vector2 = GetMapVectorPos(Game.Map, aim)
+            Dim startpos As Vector2 = GetMapVectorPos(Game.Map, src)
             SlideTarget = target
 
             Core.Schedule(0.5, Sub()
