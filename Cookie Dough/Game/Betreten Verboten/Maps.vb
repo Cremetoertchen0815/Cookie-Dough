@@ -410,5 +410,14 @@ Namespace Game.BetretenVerboten
                     Return 60
             End Select
         End Function
+
+        Friend Function GetSnakeFields(map As GaemMap) As (Integer, Integer)()
+            Select Case map
+                Case GaemMap.Snakes
+                    Return {(10, 8), (20, 23)}
+                Case Else
+                    Return {}
+            End Select
+        End Function
     End Module
 End Namespace

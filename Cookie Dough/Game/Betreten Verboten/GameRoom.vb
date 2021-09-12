@@ -38,6 +38,7 @@ Namespace Game.BetretenVerboten
         Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
         Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
+        Private SlideFields As Dictionary(Of Integer, Integer) 'Enthält alle Slide-Felder als Key und deren Ziel als Value
 
         'Game fields
         Private WürfelAktuelleZahl As Integer 'Speichert den Wert des momentanen Würfels
@@ -161,6 +162,12 @@ Namespace Game.BetretenVerboten
                     SpceCount = 100
                     SaucerChance = 10
             End Select
+            'Load slide fields
+            Dim slides = GetSnakeFields(Map)
+            SlideFields = New Dictionary(Of Integer, Integer)
+            For Each element In slides
+                SlideFields.Add(element.Item1, element.Item2)
+            Next
             LastTimer = Timer
         End Sub
 
