@@ -1,11 +1,13 @@
 ﻿Imports System.Collections.Generic
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Game.BetretenVerboten.Rendering
     Public Class Renderer3D
         Inherits Renderer
 
+        'Assets
         Private figur_model As Model
         Private batchlor As Batcher
         Private dev As GraphicsDevice
@@ -18,6 +20,15 @@ Namespace Game.BetretenVerboten.Rendering
         Private TableMatrix As Matrix
         Private ResolutionMultiplier As Single = 1
 
+        'Sliding stuff
+        Private SlideMover As Transition(Of Vector2)
+        Private SlideActive As Boolean = False
+        Private SlideTarget As (Integer, Integer)
+        Private SlideSFX As SoundEffect()
+        Private SlideFields As (Integer, Integer)()
+
+
+        'Saucer stuff
         Private SaucerModel As Model
         Private SaucerLift As Transition(Of Single)
         Private SaucerTarget As (Integer, Integer) = (-1, -1)
@@ -25,14 +36,17 @@ Namespace Game.BetretenVerboten.Rendering
         Private SaucerPickedUp As Boolean = False
         Private SaucerDefaultPosition As New Vector3(0, 0, 1000)
 
+        'Intro
         Private BeginCurrentPlayer As Integer
         Friend BeginTriggered As Boolean
         Private BeginCam As Transition(Of Keyframe3D)
 
+        'Camera and projection matrices
         Private View As Matrix
         Private Projection As Matrix
         Private CamMatrix As Matrix
 
+        'Common fields
         Private Game As IGameWindow
         Private FigCount As Integer
         Private SpceCount As Integer
@@ -87,6 +101,7 @@ Namespace Game.BetretenVerboten.Rendering
                     FigCount = 1
                     FieldOffset = New Vector2(0)
             End Select
+            SlideFields = GetSnakeFields(Game.Map)
             Feld = New Rectangle(500, 70, 950, 950)
 
             SpielfeldTextur = New RenderTarget2D(
@@ -184,6 +199,11 @@ Namespace Game.BetretenVerboten.Rendering
                 batchlor.DrawCircle(FieldOffset + GetMapVectorPos(Game.Map, element), sizes.Item1, Color.SandyBrown, 5)
             Next
 
+            'Draw slide fields
+            For Each element In SlideFields
+                batchlor.DrawCircle(FieldOffset + GetMapVectorPos(Game.Map, element.Item1), sizes.Item1, Color.Lime, 6)
+            Next
+
             'Draw suicide fields
             For i As Integer = 0 To Game.Spielers.Length - 1
                 If Game.Spielers(i).SuicideField < 0 Then Continue For
@@ -233,14 +253,15 @@ Namespace Game.BetretenVerboten.Rendering
                 Dim color As Color = playcolor(j) * If((Game.Status = SpielStatus.WähleFigur Or Game.Status = SpielStatus.WähleOpfer) And j = Game.SpielerIndex And (pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.Online), Game.SelectFader, 1.0F)
                 For k As Integer = 0 To FigCount - 1
                     Dim scale As Single = If(Game.FigurFaderScales.ContainsKey((j, k)), Game.FigurFaderScales((j, k)).Value, 1)
-
-                    If SaucerPickedUp And SaucerTarget.Item1 = j And SaucerTarget.Item2 = k Then 'UFO hat Spielfigur aufgenommen
+                    If SlideActive And SlideTarget.Item1 = j And SlideTarget.Item2 = k Then 'Figure slidet
+                        DrawChr(SlideMover.Value, color, sizes.Item3, 0)
+                    ElseIf SaucerPickedUp And SaucerTarget.Item1 = j And SaucerTarget.Item2 = k Then 'UFO hat Spielfigur aufgenommen
                         DrawChr(SaucerMover.Value, color, sizes.Item3, SaucerLift.Value)
                     ElseIf Game.Status = SpielStatus.FahreFelder And Game.FigurFaderZiel.Item1 = j And Game.FigurFaderZiel.Item2 = k Then 'Spielfigur fährt nach vorne
                         DrawChr(Game.FigurFaderXY.Value, color, sizes.Item3, Game.FigurFaderZ.Value)
                     ElseIf pl.Spielfiguren(k) = -1 Then 'Zeichne Figur in Homebase
                         DrawChr(GetSpielfeldVector(j, k), playcolor(j), sizes.Item3, 0, scale)
-                    Else 'Zeichne Figur in Haus
+                    Else 'Zeichne sonstige Figuren
                         DrawChr(GetSpielfeldVector(j, k), color, sizes.Item3, 0, scale)
                     End If
                 Next
@@ -331,6 +352,26 @@ Namespace Game.BetretenVerboten.Rendering
                                                                                                                                                              Automator.Add(SaucerLift)
                                                                                                                                                          End Sub))
             Automator.Add(SaucerLift)
+        End Sub
+
+        Friend Sub TriggerSlideAnimation(target As (Integer, Integer), aim As Integer, FinalAction As Action)
+            Dim src As Integer = Game.Spielers(target.Item1).Spielfiguren(target.Item2)
+            Dim aimpos As Vector2 = GetMapVectorPos(Game.Map, src)
+            Dim startpos As Vector2 = GetMapVectorPos(Game.Map, aim)
+            SlideTarget = target
+
+            Core.Schedule(0.5, Sub()
+                                   SlideActive = True
+                                   SlideMover = New Transition(Of Vector2)(New TransitionTypes.TransitionType_Acceleration(Math.Max(Math.Abs(aim - src), 1) * 500), startpos, aimpos, Sub()
+                                                                                                                                                                                          Game.Spielers(target.Item1).Spielfiguren(target.Item2) = aim
+                                                                                                                                                                                          SlideActive = False
+                                                                                                                                                                                          FinalAction()
+                                                                                                                                                                                      End Sub)
+                                   Automator.Add(SlideMover)
+
+                                   'Play sound
+                                   SlideSFX(If(aim > src, 0, 1)).Play()
+                               End Sub)
         End Sub
 
         Friend Sub TriggerStartAnimation(FinalAction As Action)
