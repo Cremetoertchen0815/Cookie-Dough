@@ -1377,7 +1377,7 @@ Namespace Game.BetretenVerboten
                 If Not PlayStompSound Then SFX(2).Play()
 
                 Dim globalpos As Integer = PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1)
-                If SlideFields.ContainsKey(globalpos) Then
+                If SlideFields.ContainsKey(globalpos) AndAlso Not IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, SlideFields(globalpos)) Then
                     Status = SpielStatus.SaucerFlight
                     Dim aim As Integer = SlideFields(globalpos)
 
