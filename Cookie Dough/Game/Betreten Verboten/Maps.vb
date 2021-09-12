@@ -170,6 +170,11 @@ Namespace Game.BetretenVerboten
                 Case GaemMap.Octagon
                     Dim matrx As Matrix = transmatrices2(Math.Floor(pos / 7) Mod 8)
                     Return Vector2.Transform(Map2GetLocalPos((pos Mod 7) + 4), matrx)
+                Case GaemMap.Snakes
+                    Dim row As Integer = Math.Floor(pos / 10)
+                    Dim collumn As Integer = (pos Mod 10)
+                    If Mathf.IsOdd(row) Then Return Map3GetLocalPos(PlayFieldPos.Feld1 + (9 - collumn), row)
+                    Return Map3GetLocalPos(PlayFieldPos.Feld1 + collumn, row)
                 Case Else
                     Return Vector2.Zero
             End Select
