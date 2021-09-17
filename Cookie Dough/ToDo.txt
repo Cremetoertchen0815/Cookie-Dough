@@ -14,11 +14,12 @@ DC:
 -Add CPUs (JOHANNES)
 
 BR:
--Ask Johannes for grass
+-Overwork stupid map modes(WTF???)
+-Add grass noises
 -Add new map(Lukas soll seinen Arsch bewegen[er hat gesagt, dass ich das so sagen soll])
--Implement jump meter(30 jump per minute, can stack up to 5 jumps)
+-Implement jump meter(3 jump per minute, can stack up to 5 jumps)
 -Implement rejoining(or maybe not)
--Different terrain(high grass[vision is disturbed, louder noises, you can hide], water[constant sneaking speed], aerial faithplates[bounces you to a set location], )
+-Different terrain(high grass[vision is disturbed, louder noises, you can hide], water[constant sneaking speed], aerial faithplates[bounces you to a set location] )
 -Implement pups(lazer[notify barrels when rebel is treading], stun[shoot at ppl]
 -Music(stems, volume depends on own speed, sirens from barrels)
 
