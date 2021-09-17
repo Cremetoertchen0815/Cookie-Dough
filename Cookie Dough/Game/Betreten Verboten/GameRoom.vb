@@ -38,6 +38,7 @@ Namespace Game.BetretenVerboten
         Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
         Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
+        Private SlideFields As Dictionary(Of Integer, Integer) 'Enthält alle Slide-Felder als Key und deren Ziel als Value
 
         'Game fields
         Private WürfelAktuelleZahl As Integer 'Speichert den Wert des momentanen Würfels
@@ -161,6 +162,12 @@ Namespace Game.BetretenVerboten
                     SpceCount = 100
                     SaucerChance = 10
             End Select
+            'Load slide fields
+            Dim slides = GetSnakeFields(Map)
+            SlideFields = New Dictionary(Of Integer, Integer)
+            For Each element In slides
+                SlideFields.Add(element.Item1, element.Item2)
+            Next
             LastTimer = Timer
         End Sub
 
@@ -1369,28 +1376,48 @@ Namespace Game.BetretenVerboten
             Else
                 If Not PlayStompSound Then SFX(2).Play()
 
-                Dim saucertrigger As Boolean = False
-                Dim nr As Integer
-                For Each element In SaucerFields
-                    If PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = element Then
-                        saucertrigger = True
-                        nr = element
-                    End If
-                Next
+                Dim globalpos As Integer = PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1)
+                If SlideFields.ContainsKey(globalpos) AndAlso Not IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, SlideFields(globalpos)) Then
+                    Status = SpielStatus.SaucerFlight
+                    Dim aim As Integer = SlideFields(globalpos)
 
-                'Trigger suicide
-                If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
-                    saucertrigger = False
-                    PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
-                    SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
-                    KickedByGod(FigurFaderZiel.Item1, FigurFaderZiel.Item2)
+                    'If NetworkMode Then SendFlyingSaucerActive(last, nr)
+                    Renderer.TriggerSlideAnimation(FigurFaderZiel, aim, Sub()
+                                                                            'Check for landing on suicide field
+                                                                            If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
+                                                                                PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
+                                                                                SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
+                                                                                KickedByGod(FigurFaderZiel.Item1, FigurFaderZiel.Item2)
+                                                                            End If
+
+                                                                            'Continue with other shit
+                                                                            If Status <> SpielStatus.SpielZuEnde Then SwitchPlayer()
+                                                                        End Sub)
                 End If
 
-                'Trigger UFO, falls auf Feld gelandet
-                If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then TriggerSaucer(nr) Else SwitchPlayer()
+                'Figure out the saucer data
+                Dim saucertrigger As Boolean = False
+                    Dim nr As Integer
+                    For Each element In SaucerFields
+                        If PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = element Then
+                            saucertrigger = True
+                            nr = element
+                        End If
+                    Next
 
-                MoveActive = False
-            End If
+                    'Trigger suicide
+                    If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
+                        saucertrigger = False
+                        PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
+                        SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
+                        KickedByGod(FigurFaderZiel.Item1, FigurFaderZiel.Item2)
+                    End If
+
+                    'Trigger UFO, falls auf Feld gelandet
+                    If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then TriggerSaucer(nr) Else SwitchPlayer()
+
+                    MoveActive = False
+                End If
 
         End Sub
 
