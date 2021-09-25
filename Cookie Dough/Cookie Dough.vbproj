@@ -282,12 +282,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nez\Nez.Portable\Nez.csproj">
-      <Project>{d62d916d-0c23-45e6-8abc-3769a71d49a9}</Project>
-      <Name>Nez</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Import Include="Cookie_Dough" />
     <Import Include="Cookie_Dough.Framework.Graphics" />
     <Import Include="Cookie_Dough.Framework.Misc" />

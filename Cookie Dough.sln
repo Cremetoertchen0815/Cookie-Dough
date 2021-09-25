@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Cookie Dough", "Cookie Dough\Cookie Dough.vbproj", "{1B6C48F8-991E-487D-A6EE-18F9368EE925}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nez", "Nez\Nez.Portable\Nez.csproj", "{D62D916D-0C23-45E6-8ABC-3769A71D49A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nez", "..\Nez\Nez.Portable\Nez.csproj", "{BE8412BD-6F94-4C58-ADBD-A24A3CEAD2F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,12 +20,12 @@ Global
 		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Mono|Any CPU.Build.0 = Mono|Any CPU
 		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B6C48F8-991E-487D-A6EE-18F9368EE925}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Mono|Any CPU.ActiveCfg = Debug|Any CPU
-		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Mono|Any CPU.Build.0 = Debug|Any CPU
-		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D62D916D-0C23-45E6-8ABC-3769A71D49A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE8412BD-6F94-4C58-ADBD-A24A3CEAD2F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE8412BD-6F94-4C58-ADBD-A24A3CEAD2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE8412BD-6F94-4C58-ADBD-A24A3CEAD2F6}.Mono|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE8412BD-6F94-4C58-ADBD-A24A3CEAD2F6}.Mono|Any CPU.Build.0 = Debug|Any CPU
+		{BE8412BD-6F94-4C58-ADBD-A24A3CEAD2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE8412BD-6F94-4C58-ADBD-A24A3CEAD2F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

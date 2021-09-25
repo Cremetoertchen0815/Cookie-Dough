@@ -14,7 +14,6 @@ DC:
 -Add CPUs (JOHANNES)
 
 BR:
--Overwork stupid map modes(WTF???)
 -Add grass noises
 -Add new map(Lukas soll seinen Arsch bewegen[er hat gesagt, dass ich das so sagen soll])
 -Implement jump meter(3 jump per minute, can stack up to 5 jumps)
