@@ -105,7 +105,7 @@ Namespace Game.BetretenVerboten
 
                         'Upper buttons
                         If New Rectangle(560, 200, 400, 100).Contains(mpos) And OneshotPressed Then OpenInputbox("Enter a name for the round:", "Start Round", AddressOf StartNewRound)
-                        If New Rectangle(960, 200, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.PlayerSelect) 'Go to player selection screen
+                        If New Rectangle(960, 200, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(If(TeamMode, MenuMode.TeamSelect, MenuMode.PlayerSelect)) 'Go to player selection screen
 
                         'Whitelist items
                         Dim offset As Integer = 0
