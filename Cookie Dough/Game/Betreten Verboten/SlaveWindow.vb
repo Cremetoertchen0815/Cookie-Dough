@@ -524,7 +524,7 @@ Namespace Game.BetretenVerboten
                         Status = SpielStatus.Waitn
                         PostChat("The game has started!", Color.White)
                         FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
-                        Renderer.TriggerStartAnimation(Sub() Return)
+                        Renderer.TriggerStartAnimation(TeamMode, Sub() Return)
                     Case "c"c 'Sent chat message
                         Dim source As Integer = element(1).ToString
                         If source = 9 Then

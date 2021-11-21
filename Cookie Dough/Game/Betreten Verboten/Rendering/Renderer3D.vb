@@ -35,6 +35,7 @@ Namespace Game.BetretenVerboten.Rendering
         Private SaucerMover As Transition(Of Vector2)
         Private SaucerPickedUp As Boolean = False
         Private SaucerDefaultPosition As New Vector3(0, 0, 1000)
+        Private SaucerCam As Boolean = False
 
         'Intro
         Private BeginCurrentPlayer As Integer
@@ -139,7 +140,7 @@ Namespace Game.BetretenVerboten.Rendering
         Public Overrides Sub Render(scene As Scene)
 
             CamMatrix = If(BeginTriggered, BeginCam.Value, Game.GetCamPos).GetMatrix
-            If Game.Status = SpielStatus.SaucerFlight Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
+            If Game.Status = SpielStatus.SaucerFlight Or SaucerCam Then CamMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(0), MathHelper.ToRadians(70), MathHelper.ToRadians(Nez.Time.TotalTime / 40 * 360)) * Matrix.CreateTranslation(New Vector3(0, 0, -300))
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
@@ -380,7 +381,7 @@ Namespace Game.BetretenVerboten.Rendering
                                End Sub)
         End Sub
 
-        Friend Sub TriggerStartAnimation(FinalAction As Action)
+        Friend Sub TriggerStartAnimation(TeamMode As Boolean, FinalAction As Action)
             Dim plcount As Integer = 0
             BeginCurrentPlayer = -1
             BeginTriggered = True
@@ -394,12 +395,83 @@ Namespace Game.BetretenVerboten.Rendering
                 If element.Typ <> SpielerTyp.None Then plcount += 1
             Next
 
+            'Prepare team shit
+            Dim act As Action = AddressOf PlayerAnimation
+            If TeamMode Then act = Sub()
+                                       BeginCurrentPlayer = -2
+                                       TeamPlayerAnimationCheck()
+                                   End Sub
+            CurrentlyTeamA = True
+
             'Move camera down
-            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_Acceleration(2500), New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False), New Keyframe3D(-79, -90, -169, 4.36, 1.39, 0.17, False), AddressOf PlayerAnimation)
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_Acceleration(2500), New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False), New Keyframe3D(-79, -90, -169, 4.36, 1.39, 0.17, False), Sub() act())
             Automator.Add(BeginCam)
 
             'Continue with game
-            Core.Schedule(3 * plcount + 4.8, Sub() FinalAction())
+            Core.Schedule(3 * plcount + If(TeamMode, 8.8, 4.8), Sub() FinalAction())
+        End Sub
+
+        Private CurrentlyTeamA As Boolean
+        Private Sub TeamPlayerAnimation()
+
+            'Find next player, if available
+            BeginCurrentPlayer += 2
+            For i As Integer = BeginCurrentPlayer To Game.Spielers.Length
+                'Let the counter overflow if no valid player can be found
+                If i >= Game.Spielers.Length OrElse Game.Spielers(i).OriginalType <> SpielerTyp.None Then BeginCurrentPlayer = i : Exit For
+            Next
+
+            'End loop if end reached
+            If BeginCurrentPlayer >= Game.Spielers.Length Then
+
+                If CurrentlyTeamA Then
+                    CurrentlyTeamA = False
+                    BeginCurrentPlayer = -1
+                    TeamPlayerAnimationCheck()
+                Else
+                    'Prepare HUD
+                    Game.HUDmotdLabel.Active = False
+                    Game.HUDNameBtn.Active = False
+                    Game.HUDNameBtn.Location = New Vector2(500, 20)
+                    Game.HUDNameBtn.Font = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ButtonText"))
+
+                    'Move camera down and disable camera overtake
+                    BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_CriticalDamping(1500), Game.StartCamPoses(0), Game.StartCamPoses(1), Sub() BeginTriggered = False)
+                    Automator.Add(BeginCam)
+                End If
+
+                Return 'End this looping hell
+            End If
+
+            'Play sound
+            Game.Spielers(BeginCurrentPlayer).CustomSound(0).Play()
+
+            'Set presentation stuff
+            Game.HUDNameBtn.Color = hudcolors(BeginCurrentPlayer)
+            Game.HUDNameBtn.Text = Game.Spielers(BeginCurrentPlayer).Name
+            Game.HUDmotdLabel.Text = Game.Spielers(BeginCurrentPlayer).MOTD
+            Game.HUDmotdLabel.Location = New Vector2(1920 / 2 - Game.HUDmotdLabel.Font.MeasureString(Game.HUDmotdLabel.Text).X / 2, 730)
+
+            'Move camera down
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_Linear(3000), GetIntroKeyframes(Game.Map, BeginCurrentPlayer, False), GetIntroKeyframes(Game.Map, BeginCurrentPlayer, True), AddressOf TeamPlayerAnimation)
+            Automator.Add(BeginCam)
+        End Sub
+
+        Private Sub TeamPlayerAnimationCheck()
+            If CurrentlyTeamA Then
+                Game.HUDNameBtn.Color = Color.Red
+                Game.HUDNameBtn.Text = "Team A"
+            Else
+                Game.HUDNameBtn.Color = Color.Blue
+                Game.HUDNameBtn.Text = "Team B"
+            End If
+
+            Game.HUDNameBtn.Active = True
+            SaucerCam = True
+            Core.Schedule(2, Sub()
+                                 SaucerCam = False
+                                 TeamPlayerAnimation()
+                             End Sub)
         End Sub
 
         Private Sub PlayerAnimation()

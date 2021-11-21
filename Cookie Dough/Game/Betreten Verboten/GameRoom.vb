@@ -690,10 +690,10 @@ Namespace Game.BetretenVerboten
                                                FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
                                                HUDInstructions.Text = " "
                                                'Launch start animation
-                                               Renderer.TriggerStartAnimation(Sub()
-                                                                                  SwitchPlayer()
-                                                                                  If StopWhenRealStart Then StopUpdating = True
-                                                                              End Sub)
+                                               Renderer.TriggerStartAnimation(TeamMode, Sub()
+                                                                                            SwitchPlayer()
+                                                                                            If StopWhenRealStart Then StopUpdating = True
+                                                                                        End Sub)
                                                SendBeginGaem()
                                            End Sub)
                     Case SpielStatus.SpielZuEnde
