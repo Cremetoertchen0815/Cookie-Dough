@@ -124,6 +124,34 @@ Namespace Game.BetretenVerboten
                         Next
                     Case MenuMode.TeamSelect
 
+                        'Select map
+                        If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
+                            Map = (Map + 1) Mod 4
+                            ReDim NewGamePlayers(GetMapSize(Map) - 1)
+                            ReDim Whitelist(GetMapSize(Map) - 1)
+                            SFX(2).Play()
+                        End If
+
+                        'Navigational buttons
+                        If New Rectangle(560, 900, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.ModeSelect) 'Go to player mode screen
+                        If New Rectangle(960, 900, 400, 100).Contains(mpos) And OneshotPressed Then
+                            SFX(2).Play()
+
+                            Dim Internetz As Boolean = False
+                            For i As Integer = 0 To GetMapSize(Map) - 1
+                                If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
+                            Next
+
+                            If IsConnectedToServer And Internetz Then
+                                SwitchToOtherScreen(MenuMode.UserSelect, Sub()
+                                                                             AllUser = New List(Of (String, String)) From {("", "Open")}
+                                                                             AllUser.AddRange(LocalClient.GetAllUsers)
+                                                                             SM4Scroll = 0
+                                                                         End Sub)
+                            Else
+                                StartNewRound("")
+                            End If
+                        End If
                 End Select
 
                 PlayerCount = GetMapSize(Map)
