@@ -4,16 +4,15 @@
 -Work on code documentation
 -Music stops playing
 
-BV:
--Add forced anger feature
--POSSIBLE BUG: Point calculation doesn't make any sense
--BUG: Music stops playing after team match is over
--BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) 
 -Scores shall be displayed when game is over in team mode(team-based high scores)
 -Team sharing suicide fields
 -Team B colors make better
+
+BV:
+-POSSIBLE BUG: Point calculation doesn't make any sense
+-BUG: Music stops playing after team match is over
+-BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) 
 -Make CPU respect team members
--Sharing anger buttons
 -CPU should leave start fields with high priority
 -Add snakes and ladders to snek map
 -Custom CPU sounds
