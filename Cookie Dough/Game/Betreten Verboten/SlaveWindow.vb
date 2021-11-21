@@ -574,7 +574,7 @@ Namespace Game.BetretenVerboten
                     Case "n"c 'New player active
                         Dim who As Integer = element(1).ToString
                         SpielerIndex = who
-                        HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+                        HUDBtnC.Active = Not CanAnger(SpielerIndex) And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
                         HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
                         HUDNameBtn.Active = True
                         If UserIndex < 0 Then Continue For
@@ -583,6 +583,9 @@ Namespace Game.BetretenVerboten
                         Else
                             Status = SpielStatus.Waitn
                         End If
+                    Case "p"c
+                        Dim who As Integer = element(1).ToString
+                        Spielers(who).AngerCount -= 1
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString
                         Spielers(source).Bereit = True
@@ -685,12 +688,12 @@ Namespace Game.BetretenVerboten
                             Spielers(i).OriginalType = sp.Spielers(i).OriginalType
                             Spielers(i).MOTD = sp.Spielers(i).MOTD
                             Spielers(i).AdditionalPoints = sp.Spielers(i).AdditionalPoints
-                            Spielers(i).Angered = sp.Spielers(i).Angered
+                            Spielers(i).AngerCount = sp.Spielers(i).AngerCount
                             Spielers(i).SacrificeCounter = sp.Spielers(i).SacrificeCounter
                             Spielers(i).SuicideField = sp.Spielers(i).SuicideField
                             Spielers(i).IsAFK = sp.Spielers(i).IsAFK
                         Next
-                        If UserIndex > -1 AndAlso Spielers(UserIndex).Angered Then HUDBtnC.Active = False
+                        If UserIndex > -1 AndAlso Not CanAnger(UserIndex) Then HUDBtnC.Active = False
                         If UserIndex > -1 Then HUDAfkBtn.Text = If(Spielers(UserIndex).IsAFK, "Back Again", "AFK")
                         SaucerFields = sp.SaucerFields
                     Case "z"c 'Receive sound
@@ -965,6 +968,28 @@ Namespace Game.BetretenVerboten
             Return False
         End Function
 
+        Public Function CanAnger(index As Integer) As Boolean
+
+            'Check for own anger count
+            If Spielers(index).AngerCount > 0 Then
+                Spielers(index).AngerCount -= 1
+                Return True
+            End If
+
+            'Check for anger count of team mates
+            If Not TeamMode Then Return False
+            For i As Integer = 0 To PlCount / 2 - 1
+                Dim team As Integer = index Mod 2
+                Dim pl = Spielers(i * 2 + team)
+                If pl.AngerCount > 0 Then
+                    pl.AngerCount -= 1
+                    Return True
+                End If
+            Next
+
+            Return False 'Else return regular count
+        End Function
+
         Private Function GetFieldID(player As Integer, field As Integer) As (Integer, Integer)
             Dim fa As Integer = PlayerFieldToGlobalField(field, player)
             For j As Integer = 0 To PlCount - 1
@@ -1052,7 +1077,7 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function GetScore(pl As Integer) As Integer
-            Dim ret As Single = If(Spielers(pl).Angered, 0, 5)
+            Dim ret As Single = Spielers(pl).AngerCount * 5
             For Each element In Spielers(pl).Spielfiguren
                 If element >= 0 Then ret += element
             Next
@@ -1141,7 +1166,6 @@ Namespace Game.BetretenVerboten
                 WürfelWerte(0) = If(aim > 6, 6, aim)
                 WürfelWerte(1) = If(aim > 6, aim - 6, 0)
                 CalcMoves()
-                Spielers(UserIndex).Angered = True
                 SendAngered()
                 SFX(2).Play()
             Catch

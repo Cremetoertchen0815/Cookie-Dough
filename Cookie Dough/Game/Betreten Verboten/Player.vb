@@ -62,10 +62,19 @@ Namespace Game.BetretenVerboten
         ''' </summary>
         Public Property Bereit As Boolean = True Implements IPlayer.Bereit
 
+        Private _AngerCount As Integer = 1
+
         ''' <summary>
-        ''' Gibt an, ob der Spieler seinen Angerbutton benutzt hat
+        ''' Gibt an, ob der Spieler angeren kann
         ''' </summary>
-        Public Property Angered As Boolean = False
+        Public Property AngerCount() As Boolean
+            Get
+                Return _AngerCount
+            End Get
+            Set(value As Boolean)
+                _AngerCount = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' Gibt an, wie viele Züge der Spieler warten muss, bis er seinen Sacrifice-Button wieder nuitzen darf

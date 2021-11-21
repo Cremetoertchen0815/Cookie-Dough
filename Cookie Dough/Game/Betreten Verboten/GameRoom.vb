@@ -801,7 +801,7 @@ Namespace Game.BetretenVerboten
                         Case "n"c 'Switch player
                             SwitchPlayer()
                         Case "p"c 'Player angered
-                            Spielers(source).Angered = True
+                            SetAngered(source)
                         Case "r"c 'Player is back
                             Dim txt As String() = element.Substring(2).Split("|")
                             Spielers(source).Name = txt(0)
@@ -916,6 +916,9 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendNewPlayerActive(who As Integer)
             SendNetworkMessageToAll("n" & who.ToString)
+        End Sub
+        Private Sub SendAngered(who As Integer)
+            SendNetworkMessageToAll("p" & who.ToString)
         End Sub
         Private Sub SendPlayerBack(index As Integer)
             SendNetworkMessageToAll("r" & index.ToString)
@@ -1211,7 +1214,7 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function GetScore(pl As Integer) As Integer
-            Dim ret As Single = If(Spielers(pl).Angered, 0, 5)
+            Dim ret As Single = Spielers(pl).AngerCount * 5
             For Each element In Spielers(pl).Spielfiguren
                 If element >= 0 Then ret += element
             Next
@@ -1303,6 +1306,48 @@ Namespace Game.BetretenVerboten
             Next
             Return False
         End Function
+        Public Function CanAnger(index As Integer) As Boolean
+            If CanAngerInfinitely Then Return True 'Always return that one AngerButton is present if debug option is set
+
+            'Check for own anger count
+            If Spielers(index).AngerCount > 0 Then
+                Spielers(index).AngerCount -= 1
+                Return True
+            End If
+
+            'Check for anger count of team mates
+            If Not TeamMode Then Return False
+            For i As Integer = 0 To PlCount / 2 - 1
+                Dim team As Integer = index Mod 2
+                Dim pl = Spielers(i * 2 + team)
+                If pl.AngerCount > 0 Then
+                    pl.AngerCount -= 1
+                    Return True
+                End If
+            Next
+
+            Return False 'Else return regular count
+        End Function
+
+        Public Sub SetAngered(index As Integer)
+            If Spielers(index).AngerCount > 0 Then
+                Spielers(index).AngerCount -= 1
+                If Spielers(index).Typ = SpielerTyp.Online Then SendAngered(index)
+            Else
+                If Not TeamMode Then Return
+                For i As Integer = 0 To PlCount / 2 - 1
+                    Dim team As Integer = index Mod 2
+
+                    Dim pl = i * 2 + team
+                    If Spielers(pl).AngerCount > 0 Then
+                        Spielers(pl).AngerCount -= 1
+
+                        If Spielers(pl).Typ = SpielerTyp.Online Then SendAngered(pl)
+                        Return
+                    End If
+                Next
+            End If
+        End Sub
 
         'Gibt den Index ein Spielfigur zurück, die sich noch in der Homebase befindet. Falls keine Figur mehr in der Homebase, gibt die Fnkt. -1 zurück.
         Private Function GetHomebaseIndex(player As Integer) As Integer
@@ -1545,10 +1590,15 @@ Namespace Game.BetretenVerboten
                                                  End If
                                              Case 2
                                                  'Reset anger button
-                                                 If Not Spielers(pl).Angered Then Continue Do
-                                                 PostChat("You're lucky! Your anger button got reset!", Color.White)
-                                                 SendMessage("You're lucky! Your anger button got reset!")
-                                                 Spielers(pl).Angered = False
+                                                 Dim hasAnger = Spielers(pl).AngerCount > 0
+                                                 If hasAnger Then
+                                                     PostChat("You're lucky! You got another anger button!", Color.White)
+                                                     SendMessage("You're lucky! You got another anger button!")
+                                                 Else
+                                                     PostChat("You're lucky! You got back your anger button!", Color.White)
+                                                     SendMessage("You're lucky! You got back your anger button!")
+                                                 End If
+                                                 Spielers(pl).AngerCount += 1
                                                  Exit Do
                                              Case 3
                                                  'Add points
@@ -1583,10 +1633,10 @@ Namespace Game.BetretenVerboten
                                                  End If
                                              Case 2
                                                  'Set anger button
-                                                 If Spielers(pl).Angered Then Continue Do
-                                                 PostChat("Oh ooh! Your anger button got deleteted!", Color.White)
-                                                 SendMessage("Oh ooh! Your anger button got deleteted!")
-                                                 Spielers(pl).Angered = True
+                                                 If Spielers(pl).AngerCount <= 0 Then Continue Do
+                                                 PostChat("Oh ooh! You've lost an anger button!", Color.White)
+                                                 SendMessage("Oh ooh! You've lost an anger button!")
+                                                 Spielers(pl).AngerCount -= 1
                                                  Exit Do
                                          End Select
                                      Else
@@ -1652,7 +1702,7 @@ Namespace Game.BetretenVerboten
 
         Private Sub ResetHUD()
             If UserIndex < 0 Then Return
-            HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+            HUDBtnC.Active = Not CanAnger(UserIndex) And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
             HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
@@ -1718,7 +1768,7 @@ Namespace Game.BetretenVerboten
                 WürfelWerte(0) = If(aim > 6, 6, aim)
                 WürfelWerte(1) = If(aim > 6, aim - 6, 0)
                 CalcMoves()
-                Spielers(UserIndex).Angered = True
+                SetAngered(UserIndex)
                 HUDBtnC.Active = False
                 SFX(2).Play()
             Catch
