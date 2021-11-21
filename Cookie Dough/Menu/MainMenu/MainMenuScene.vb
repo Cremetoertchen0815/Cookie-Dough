@@ -106,10 +106,18 @@ Namespace Menu.MainMenu
                     Next
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 3
+                    'Settings
                     If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then My.Settings.Schwierigkeitsgrad = (My.Settings.Schwierigkeitsgrad + 1) Mod 2 : My.Settings.Save()
                     If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(5)
                     If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
-                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
+                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        Dim r As Single = Nez.Random.NextFloat()
+                        Dim g As Single = Nez.Random.NextFloat()
+                        Dim b As Single = Nez.Random.NextFloat()
+                        Dim maxbright As Single = 1
+                        FgColor = New Color(r * maxbright, g * maxbright, b * maxbright)
+                    End If
+                    If New Rectangle(560, 875, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
                 Case 4
                     'Scroll online game list
                     Dim ln As Integer = If(IsConnectedToServer And ServerActive, ConnectedUsers, AvailableServerList).Count
@@ -434,7 +442,6 @@ Namespace Menu.MainMenu
             Public Overrides ReadOnly Property Width As Single = 1920.0F
 
             Private CounterScene As MainMenuScene
-            Friend FgColor As Color = Color.Lime
 
             'Assets
             Friend TitleFont As NezSpriteFont
@@ -483,14 +490,14 @@ Namespace Menu.MainMenu
                         For i As Integer = 0 To len - 1
                             Dim gameNameA As String = CounterScene.GameList(i).Item1
                             Dim gameNameB As String = "(" & CounterScene.GameList(i).Item2 & ")"
-                            Dim color As Color = If(CounterScene.GameList(i).Item3, Color.Lime, Color.Red)
+                            Dim color As Color = If(CounterScene.GameList(i).Item3, FgColor, Color.Red)
                             batcher.DrawHollowRect(New Rectangle(560, 275 + i * 150 - CounterScene.SM1Scroll, 800, 100), color)
                             batcher.DrawString(MediumFont, gameNameA, New Vector2(560, 300 + i * 150 - CounterScene.SM1Scroll), color)
                             batcher.DrawString(SmolFont, gameNameB, New Vector2(1360 - SmolFont.MeasureString(gameNameB).X, 310 + i * 150 - CounterScene.SM1Scroll), color)
                         Next
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.SM1Scroll), 800, 100), Color.Lime)
-                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.SM1Scroll), Color.Lime)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.SM1Scroll), 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.SM1Scroll), FgColor)
 
                         'Draw heading
                         batcher.DrawRect(New Rectangle(0, 0, 1920, 220), Color.Black)
@@ -504,14 +511,14 @@ Namespace Menu.MainMenu
                         For i As Integer = 0 To len - 1
                             Dim gameNameA As String = CounterScene.OnlineGameInstances(i).Name
                             Dim gameNameB As String = "(" & GetGameTitle(CounterScene.OnlineGameInstances(i).Type) & ")"
-                            Dim color As Color = If(CounterScene.GameList(i).Item3, Color.Lime, Color.Red)
+                            Dim color As Color = If(CounterScene.GameList(i).Item3, FgColor, Color.Red)
                             batcher.DrawHollowRect(New Rectangle(560, 275 + i * 150 - CounterScene.SM2Scroll, 800, 100), color)
                             batcher.DrawString(MediumFont, gameNameA, New Vector2(560, 300 + i * 150 - CounterScene.SM2Scroll), color)
                             batcher.DrawString(SmolFont, gameNameB, New Vector2(1360 - SmolFont.MeasureString(gameNameB).X, 310 + i * 150 - CounterScene.SM2Scroll), color)
                         Next
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.SM2Scroll), 800, 100), Color.Lime)
-                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.SM2Scroll), Color.Lime)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.SM2Scroll), 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.SM2Scroll), FgColor)
 
                         'Draw heading
                         batcher.DrawRect(New Rectangle(0, 0, 1920, 220), Color.Black)
@@ -524,22 +531,24 @@ Namespace Menu.MainMenu
                         batcher.DrawHollowRect(New Rectangle(560, 425, 800, 100), FgColor)
                         batcher.DrawHollowRect(New Rectangle(560, 575, 800, 100), FgColor)
                         batcher.DrawHollowRect(New Rectangle(560, 725, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 875, 800, 100), FgColor)
                         'Draw text
                         Dim txtA As String = "CPU Difficulty: " & CType(My.Settings.Schwierigkeitsgrad, Difficulty).ToString
                         batcher.DrawString(MediumFont, txtA, New Vector2(1920.0F / 2 - MediumFont.MeasureString(txtA).X / 2, 300), FgColor)
                         batcher.DrawString(MediumFont, "User Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("User Settings").X / 2, 450), FgColor) 'If(IsConnectedToServer, FgColor, Color.Red)
                         batcher.DrawString(MediumFont, "Server Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Server Settings").X / 2, 600), FgColor)
-                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 750), FgColor)
+                        batcher.DrawString(MediumFont, "Randomize Menu Color", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Randomize Menu Color").X / 2, 750), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 900), FgColor)
                     Case 4 'Server
                         'Draw scroll arrows
                         batcher.Draw(Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
                         batcher.Draw(Arrow, New Rectangle(1420, 930, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.FlipHorizontally, 0)
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 - CInt(CounterScene.SM4Scroll), 800, 100), Color.Lime)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 - CInt(CounterScene.SM4Scroll), 800, 100), FgColor)
                         batcher.DrawLine(New Vector2(960, 275 - CInt(CounterScene.SM4Scroll)), New Vector2(960, 375 - CInt(CounterScene.SM4Scroll)), FgColor)
-                        batcher.DrawString(MediumFont, "Add Server", New Vector2(760 - MediumFont.MeasureString("Add Server").X / 2, 300 - CounterScene.SM4Scroll), If(CounterScene.IsConnectedToServer, Color.Red, Color.Lime))
-                        batcher.DrawString(MediumFont, If(CounterScene.IsConnectedToServer, "Disconnect", "Start server"), New Vector2(1160 - MediumFont.MeasureString(If(CounterScene.IsConnectedToServer, "Disconnect", "Start server")).X / 2, 300 - CounterScene.SM4Scroll), If(Not CounterScene.IsConnectedToServer And ServerActive, Color.Red, Color.Lime))
-                        batcher.DrawString(SmolFont, If(ServerActive And CounterScene.IsConnectedToServer, "Connected players:", "Available servers:"), New Vector2(560, 300 - CounterScene.SM4Scroll + 170), Color.Lime)
+                        batcher.DrawString(MediumFont, "Add Server", New Vector2(760 - MediumFont.MeasureString("Add Server").X / 2, 300 - CounterScene.SM4Scroll), If(CounterScene.IsConnectedToServer, Color.Red, FgColor))
+                        batcher.DrawString(MediumFont, If(CounterScene.IsConnectedToServer, "Disconnect", "Start server"), New Vector2(1160 - MediumFont.MeasureString(If(CounterScene.IsConnectedToServer, "Disconnect", "Start server")).X / 2, 300 - CounterScene.SM4Scroll), If(Not CounterScene.IsConnectedToServer And ServerActive, Color.Red, FgColor))
+                        batcher.DrawString(SmolFont, If(ServerActive And CounterScene.IsConnectedToServer, "Connected players:", "Available servers:"), New Vector2(560, 300 - CounterScene.SM4Scroll + 170), FgColor)
                         Dim len As Integer
                         If ServerActive And CounterScene.IsConnectedToServer Then
                             'Draw servers
@@ -547,7 +556,7 @@ Namespace Menu.MainMenu
                             For i As Integer = 0 To len - 1
                                 Dim ireal As Integer = i + 2
                                 Dim gameNameA As String = CounterScene.ConnectedUsers(i)
-                                Dim color As Color = If(My.Settings.Username = gameNameA, Color.Cyan, Color.Lime)
+                                Dim color As Color = If(My.Settings.Username = gameNameA, Color.Cyan, FgColor)
                                 batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.SM4Scroll, 800, 100), color)
                                 If gameNameA IsNot Nothing Then batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.SM4Scroll), color)
                             Next
@@ -557,14 +566,14 @@ Namespace Menu.MainMenu
                             For i As Integer = 0 To len - 1
                                 Dim ireal As Integer = i + 2
                                 Dim gameNameA As String = CounterScene.AvailableServerList(i)
-                                Dim color As Color = If(LocalClient.Hostname = gameNameA, Color.Cyan, Color.Lime)
-                                batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.SM4Scroll, 800, 100), Color.Lime)
-                                batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.SM4Scroll), Color.Lime)
+                                Dim color As Color = If(LocalClient.Hostname = gameNameA, Color.Cyan, FgColor)
+                                batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.SM4Scroll, 800, 100), FgColor)
+                                batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.SM4Scroll), FgColor)
                             Next
                         End If
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 + (len + 2) * 150 - CInt(CounterScene.SM4Scroll), 800, 100), Color.Lime)
-                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 300 + (len + 2) * 150 - CounterScene.SM4Scroll), Color.Lime)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 + (len + 2) * 150 - CInt(CounterScene.SM4Scroll), 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 300 + (len + 2) * 150 - CounterScene.SM4Scroll), FgColor)
 
                         'Draw heading
                         batcher.DrawRect(New Rectangle(0, 0, 1920, 220), Color.Black)
@@ -617,8 +626,8 @@ Namespace Menu.MainMenu
             End Sub
 
             Private Sub DrawUserMenuTableString(txtA As String, txtB As String, i As Integer, batcher As Batcher, Optional red As Boolean = False)
-                batcher.DrawString(MediumFont, txtA, New Vector2(1920 / 2 - MediumFont.MeasureString(txtA).X - 80, 250 + i * 80), Color.Lime)
-                batcher.DrawString(MediumFont, txtB, New Vector2(1920 / 2 + 80, 250 + i * 80), If(red, Color.Red, Color.Lime))
+                batcher.DrawString(MediumFont, txtA, New Vector2(1920 / 2 - MediumFont.MeasureString(txtA).X - 80, 250 + i * 80), FgColor)
+                batcher.DrawString(MediumFont, txtB, New Vector2(1920 / 2 + 80, 250 + i * 80), If(red, Color.Red, FgColor))
                 If i = 0 Then Return
                 batcher.DrawLine(New Vector2(450, 230 + i * 80), New Vector2(1920 - 450, 230 + i * 80), Color.Yellow, 1)
             End Sub

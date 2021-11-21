@@ -2,7 +2,6 @@
 -Make shit run under MacOS
 -Check host leaving and others not being kicked out of the round
 -Work on code documentation
--Custom menu color
 -Music stops playing
 
 BV:
