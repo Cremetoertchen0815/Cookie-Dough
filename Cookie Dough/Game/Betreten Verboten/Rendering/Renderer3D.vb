@@ -447,6 +447,7 @@ Namespace Game.BetretenVerboten.Rendering
             Game.Spielers(BeginCurrentPlayer).CustomSound(0).Play()
 
             'Set presentation stuff
+            Game.HUDmotdLabel.Active = True
             Game.HUDNameBtn.Color = hudcolors(BeginCurrentPlayer)
             Game.HUDNameBtn.Text = Game.Spielers(BeginCurrentPlayer).Name
             Game.HUDmotdLabel.Text = Game.Spielers(BeginCurrentPlayer).MOTD
@@ -467,6 +468,7 @@ Namespace Game.BetretenVerboten.Rendering
             End If
 
             Game.HUDNameBtn.Active = True
+            Game.HUDmotdLabel.Active = False
             SaucerCam = True
             Core.Schedule(2, Sub()
                                  SaucerCam = False
