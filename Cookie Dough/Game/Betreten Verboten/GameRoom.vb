@@ -118,7 +118,7 @@ Namespace Game.BetretenVerboten
         Private Const SacrificeWait As Integer = 5
         Private SaucerChance As Integer = 18
 
-        Public Sub New(Map As GaemMap)
+        Public Sub New(Map As GaemMap, TeamMode As Boolean)
             'Bereite Flags und Variablen vor
             Status = SpielStatus.WarteAufOnlineSpieler
             WürfelTimer = 0
@@ -163,6 +163,17 @@ Namespace Game.BetretenVerboten
                     SpceCount = 100
                     SaucerChance = 10
             End Select
+
+            'Adapt colors to team mode
+            Me.TeamMode = TeamMode
+            If TeamMode Then
+                hudcolors = {Color.Lerp(Color.Red, Color.Yellow, 0F), Color.Lerp(Color.Cyan, Color.Navy, 0F), Color.Lerp(Color.Red, Color.Yellow, 0.33F), Color.Lerp(Color.Cyan, Color.Navy, 0.33F), Color.Lerp(Color.Red, Color.Yellow, 0.66F), Color.Lerp(Color.Cyan, Color.Navy, 0.75F), Color.Lerp(Color.Red, Color.Yellow, 1.0F), Color.Lerp(Color.Cyan, Color.Navy, 1.0F)}
+                playcolor = hudcolors
+            Else
+                hudcolors = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Teal, New Color(85, 120, 20)}
+                playcolor = {Color.Magenta, Color.Lime, Color.Cyan, Color.Yellow, Color.Maroon * 1.5F, New Color(0, 0, 200), New Color(0, 80, 80), New Color(85, 120, 20)}
+            End If
+
             'Load slide fields
             Dim slides = GetSnakeFields(Map)
             SlideFields = New Dictionary(Of Integer, Integer)

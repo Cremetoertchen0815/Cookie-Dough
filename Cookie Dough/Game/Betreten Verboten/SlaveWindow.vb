@@ -28,6 +28,7 @@ Namespace Game.BetretenVerboten
         Friend SpceCount As Integer
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
+        Friend TeamMode As Boolean
         Friend NetworkMode As Boolean = False 'Gibt an, ob das SPiel online ist
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Private SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
@@ -113,6 +114,7 @@ Namespace Game.BetretenVerboten
                                                  'Load map info
                                                  Map = CInt(x())
                                                  GameMode = If(x(), GameMode.Casual, GameMode.Competetive)
+                                                 TeamMode = CBool(x())
 
                                                  Select Case Map
                                                      Case GaemMap.Plus
@@ -177,6 +179,16 @@ Namespace Game.BetretenVerboten
             MoveActive = False
             If UserIndex > -1 Then Spielers(UserIndex).CustomSound = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
             If UserIndex > -1 Then Spielers(UserIndex).Thumbnail = If(My.Settings.Thumbnail, Texture2D.FromFile(Dev, "Cache/client/pp.png"), ReferencePixelTrans)
+
+
+            'Adapt colors to team mode
+            If TeamMode Then
+                hudcolors = {Color.Lerp(Color.Red, Color.Yellow, 0F), Color.Lerp(Color.Cyan, Color.Navy, 0F), Color.Lerp(Color.Red, Color.Yellow, 0.33F), Color.Lerp(Color.Cyan, Color.Navy, 0.33F), Color.Lerp(Color.Red, Color.Yellow, 0.66F), Color.Lerp(Color.Cyan, Color.Navy, 0.75F), Color.Lerp(Color.Red, Color.Yellow, 1.0F), Color.Lerp(Color.Cyan, Color.Navy, 1.0F)}
+                playcolor = hudcolors
+            Else
+                hudcolors = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Teal, New Color(85, 120, 20)}
+                playcolor = {Color.Magenta, Color.Lime, Color.Cyan, Color.Yellow, Color.Maroon * 1.5F, New Color(0, 0, 200), New Color(0, 80, 80), New Color(85, 120, 20)}
+            End If
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 

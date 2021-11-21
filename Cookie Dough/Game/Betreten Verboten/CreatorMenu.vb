@@ -196,10 +196,9 @@ Namespace Game.BetretenVerboten
             If Internetz Then LocalClient.AutomaticRefresh = False
 
             Dim local_count As Integer = 1
-            Dim AktuellesSpiel As New GameRoom(Map)
+            Dim AktuellesSpiel As New GameRoom(Map, TeamMode)
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.GameMode = Mode
-            AktuellesSpiel.TeamMode = TeamMode
             AktuellesSpiel.NetworkMode = False
             AktuellesSpiel.Difficulty = My.Settings.Schwierigkeitsgrad
             For i As Integer = 0 To AktuellesSpiel.PlCount - 1
