@@ -4,6 +4,7 @@
 -Work on code documentation
 
 BV:
+-Team mode
 -Add snakes and ladders to snek map
 -Custom CPU sounds
 

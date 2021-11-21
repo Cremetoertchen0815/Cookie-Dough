@@ -302,7 +302,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Nez\Nez.Portable\Nez.csproj">
+    <ProjectReference Include="..\..\Nez-LF\Nez.Portable\Nez.csproj">
       <Project>{be8412bd-6f94-4c58-adbd-a24a3cead2f6}</Project>
       <Name>Nez</Name>
     </ProjectReference>
