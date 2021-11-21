@@ -132,6 +132,18 @@ Namespace Game.BetretenVerboten
                             SFX(2).Play()
                         End If
 
+                        For i As Integer = 0 To PlayerCount / 2 - 1
+
+                            If New Rectangle(1920 / 2 - 800, 350 + 150 * i, 500, 100).Contains(mpos) And OneshotPressed Then
+                                NewGamePlayers(i * 2) = (NewGamePlayers(i * 2) + 1) Mod If(IsConnectedToServer, 4, 3) : SFX(2).Play()
+                            End If
+
+                            If New Rectangle(1920 / 2 + 800 - 500, 350 + 150 * i, 500, 100).Contains(mpos) And OneshotPressed Then
+                                NewGamePlayers(i * 2 + 1) = (NewGamePlayers(i * 2 + 1) + 1) Mod If(IsConnectedToServer, 4, 3) : SFX(2).Play()
+                            End If
+
+                        Next
+
                         'Navigational buttons
                         If New Rectangle(560, 900, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.ModeSelect) 'Go to player mode screen
                         If New Rectangle(960, 900, 400, 100).Contains(mpos) And OneshotPressed Then
@@ -341,11 +353,14 @@ Namespace Game.BetretenVerboten
                         batcher.DrawString(TitleFont, "Team vs. Team", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Team vs. Team").X / 2, 50), FgColor)
 
                         'Team headings
-                        batcher.DrawString(MediumFont, "Team A:", New Vector2(1920.0F / 2 - 650, 225), FgColor)
-                        batcher.DrawString(MediumFont, "Team B:", New Vector2(1920.0F / 2 + 450, 225), FgColor)
+                        batcher.DrawString(MediumFont, "Team A:", New Vector2(1920.0F / 2 - 650, 275), FgColor)
+                        batcher.DrawString(MediumFont, "Team B:", New Vector2(1920.0F / 2 + 450, 275), FgColor)
                         For i As Integer = 0 To instance.PlayerCount / 2 - 1
                             batcher.DrawHollowRect(New Rectangle(1920 / 2 - 800, 350 + 150 * i, 500, 100), FgColor) 'Left box
                             batcher.DrawHollowRect(New Rectangle(1920 / 2 + 800 - 500, 350 + 150 * i, 500, 100), FgColor) 'Right box
+
+                            batcher.DrawString(MediumFont, "Player " & (i * 2 + 1).ToString & ": " & instance.NewGamePlayers(i * 2).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player " & (i * 2 + 1).ToString & ": " & instance.NewGamePlayers(i * 2).ToString).X / 2 - 550, 375 + i * 150), FgColor)
+                            batcher.DrawString(MediumFont, "Player " & (i * 2 + 2).ToString & ": " & instance.NewGamePlayers(i * 2 + 1).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player " & (i * 2 + 2).ToString & ": " & instance.NewGamePlayers(i * 2 + 1).ToString).X / 2 + 550, 375 + i * 150), FgColor)
                         Next
 
                         'Map button
