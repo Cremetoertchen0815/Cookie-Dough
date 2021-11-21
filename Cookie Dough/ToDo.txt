@@ -2,9 +2,9 @@
 -Make shit run under MacOS
 -Check host leaving and others not being kicked out of the round
 -Work on code documentation
+-Custom menu color
 
 BV:
--Team mode(Animation, End sequenz)
 -Team mode high score
 -Add snakes and ladders to snek map
 -Custom CPU sounds
