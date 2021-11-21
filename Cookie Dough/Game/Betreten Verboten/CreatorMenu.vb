@@ -64,7 +64,7 @@ Namespace Game.BetretenVerboten
                 Select Case SecondScreen
                     Case MenuMode.ModeSelect
                         If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.PlayerSelect, Sub() TeamMode = False)
-                        If New Rectangle(560, 500, 800, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.PlayerSelect, Sub() TeamMode = True)
+                        If New Rectangle(560, 500, 800, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.TeamSelect, Sub() TeamMode = True)
                         If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene)) : MenuAktiviert = False
 
                     Case MenuMode.PlayerSelect
@@ -245,8 +245,12 @@ Namespace Game.BetretenVerboten
 
             Public Overrides Sub Render(batcher As Batcher, camera As Camera)
 
+                'Draw heading
+                batcher.DrawRect(New Rectangle(0, 0, 1920, 150), Color.Black)
+
                 Select Case instance.SecondScreen
                     Case MenuMode.ModeSelect
+                        batcher.DrawString(TitleFont, "Betreten Verboten", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Betreten Verboten").X / 2, 50), FgColor)
                         batcher.DrawString(MediumFont, "Select a mode:", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Select a mode:").X / 2, 225), FgColor)
 
                         batcher.DrawHollowRect(New Rectangle(560, 350, 800, 100), FgColor)
@@ -258,6 +262,8 @@ Namespace Game.BetretenVerboten
                         batcher.DrawString(MediumFont, "Team vs. Team", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Team vs. Team").X / 2, 525), FgColor)
                         batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 675), FgColor)
                     Case MenuMode.PlayerSelect
+                        batcher.DrawString(TitleFont, "Player vs. Player", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Player vs. Player").X / 2, 50), FgColor)
+
                         'Draw rects
                         batcher.DrawHollowRect(New Rectangle(560, 200, 800, 100), FgColor)
                         batcher.DrawHollowRect(New Rectangle(560, 350, 800, 100), FgColor)
@@ -282,6 +288,7 @@ Namespace Game.BetretenVerboten
                         batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Back").X / 2, 925), FgColor)
                         batcher.DrawString(MediumFont, "Start Round", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Start Round").X / 2, 925), FgColor)
                     Case MenuMode.UserSelect
+                        batcher.DrawString(TitleFont, "Select User", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Select User").X / 2, 50), FgColor)
 
                         'Draw top button
                         batcher.DrawHollowRect(New Rectangle(560, 200 - CInt(instance.SM4Scroll), 800, 100), FgColor)
@@ -303,13 +310,30 @@ Namespace Game.BetretenVerboten
                         Next
 
                     Case MenuMode.TeamSelect
+                        batcher.DrawString(TitleFont, "Team vs. Team", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Team vs. Team").X / 2, 50), FgColor)
+
+                        'Team headings
+                        batcher.DrawString(MediumFont, "Team A:", New Vector2(1920.0F / 2 - 650, 225), FgColor)
+                        batcher.DrawString(MediumFont, "Team B:", New Vector2(1920.0F / 2 + 450, 225), FgColor)
+                        For i As Integer = 0 To instance.PlayerCount / 2 - 1
+                            batcher.DrawHollowRect(New Rectangle(1920 / 2 - 800, 350 + 150 * i, 500, 100), FgColor) 'Left box
+                            batcher.DrawHollowRect(New Rectangle(1920 / 2 + 800 - 500, 350 + 150 * i, 500, 100), FgColor) 'Right box
+                        Next
+
+                        'Map button
+                        batcher.DrawHollowRect(New Rectangle(560, 200, 800, 100), FgColor)
+                        batcher.DrawLine(New Vector2(1920.0F / 2, 200), New Vector2(1920.0F / 2, 300), FgColor)
+                        batcher.DrawString(MediumFont, "Map: " & GetMapName(instance.Map), New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Map: " & GetMapName(instance.Map)).X / 2, 225), FgColor)
+                        batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 225), FgColor)
+
+                        'Navigational buttons
+                        batcher.DrawHollowRect(New Rectangle(560, 900, 800, 100), FgColor)
+                        batcher.DrawLine(New Vector2(1920.0F / 2, 900), New Vector2(1920.0F / 2, 1000), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Back").X / 2, 925), FgColor)
+                        batcher.DrawString(MediumFont, "Start Round", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Start Round").X / 2, 925), FgColor)
                 End Select
 
 
-
-                'Draw heading
-                batcher.DrawRect(New Rectangle(0, 0, 1920, 150), Color.Black)
-                batcher.DrawString(TitleFont, "Betreten Verboten", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Betreten Verboten").X / 2, 50), FgColor)
 
                 batcher.DrawRect(New Rectangle(0, 0, 1920, 1080), Color.Black * instance.Schwarzblende.Value)
             End Sub
