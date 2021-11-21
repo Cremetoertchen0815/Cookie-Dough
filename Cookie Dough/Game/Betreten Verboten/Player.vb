@@ -67,11 +67,11 @@ Namespace Game.BetretenVerboten
         ''' <summary>
         ''' Gibt an, ob der Spieler angeren kann
         ''' </summary>
-        Public Property AngerCount() As Boolean
+        Public Property AngerCount() As Integer
             Get
                 Return _AngerCount
             End Get
-            Set(value As Boolean)
+            Set(value As Integer)
                 _AngerCount = value
             End Set
         End Property

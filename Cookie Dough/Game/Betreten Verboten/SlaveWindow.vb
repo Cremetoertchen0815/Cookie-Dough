@@ -971,20 +971,13 @@ Namespace Game.BetretenVerboten
         Public Function CanAnger(index As Integer) As Boolean
 
             'Check for own anger count
-            If Spielers(index).AngerCount > 0 Then
-                Spielers(index).AngerCount -= 1
-                Return True
-            End If
+            If Spielers(index).AngerCount > 0 Then Return True
 
             'Check for anger count of team mates
             If Not TeamMode Then Return False
             For i As Integer = 0 To PlCount / 2 - 1
                 Dim team As Integer = index Mod 2
-                Dim pl = Spielers(i * 2 + team)
-                If pl.AngerCount > 0 Then
-                    pl.AngerCount -= 1
-                    Return True
-                End If
+                If Spielers(i * 2 + team).Typ <> SpielerTyp.None And Spielers(i * 2 + team).AngerCount > 0 Then Return True
             Next
 
             Return False 'Else return regular count

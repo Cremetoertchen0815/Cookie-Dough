@@ -92,6 +92,7 @@ Namespace Game.BetretenVerboten
         Private Shared dbgCamFree As Boolean = False
         Private Shared dbgCam As Keyframe3D = Nothing
         Private Shared dbgLoguser As Integer = -1
+        Private Shared dbgEndlessAnger As Boolean = False
 
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
@@ -1307,39 +1308,36 @@ Namespace Game.BetretenVerboten
             Return False
         End Function
         Public Function CanAnger(index As Integer) As Boolean
-            If CanAngerInfinitely Then Return True 'Always return that one AngerButton is present if debug option is set
+            If dbgEndlessAnger Then Return True 'Always return that one AngerButton is present if debug option is set
 
             'Check for own anger count
-            If Spielers(index).AngerCount > 0 Then
-                Spielers(index).AngerCount -= 1
-                Return True
-            End If
+            If Spielers(index).AngerCount > 0 Then Return True
 
             'Check for anger count of team mates
             If Not TeamMode Then Return False
             For i As Integer = 0 To PlCount / 2 - 1
                 Dim team As Integer = index Mod 2
-                Dim pl = Spielers(i * 2 + team)
-                If pl.AngerCount > 0 Then
-                    pl.AngerCount -= 1
-                    Return True
-                End If
+                If Spielers(i * 2 + team).Typ <> SpielerTyp.None And Spielers(i * 2 + team).AngerCount > 0 Then Return True
             Next
 
             Return False 'Else return regular count
         End Function
 
         Public Sub SetAngered(index As Integer)
+            If dbgEndlessAnger Then Return 'Don't influence shit when dealing with debug anger
+
             If Spielers(index).AngerCount > 0 Then
+                'The player has an anger button, which he uses
                 Spielers(index).AngerCount -= 1
                 If Spielers(index).Typ = SpielerTyp.Online Then SendAngered(index)
             Else
+                'The player doesn't have an anger button, so he snitches one from his team mates
                 If Not TeamMode Then Return
                 For i As Integer = 0 To PlCount / 2 - 1
                     Dim team As Integer = index Mod 2
 
                     Dim pl = i * 2 + team
-                    If Spielers(pl).AngerCount > 0 Then
+                    If Spielers(pl).Typ <> SpielerTyp.None And Spielers(pl).AngerCount > 0 Then
                         Spielers(pl).AngerCount -= 1
 
                         If Spielers(pl).Typ = SpielerTyp.Online Then SendAngered(pl)
@@ -1702,7 +1700,7 @@ Namespace Game.BetretenVerboten
 
         Private Sub ResetHUD()
             If UserIndex < 0 Then Return
-            HUDBtnC.Active = Not CanAnger(UserIndex) And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+            HUDBtnC.Active = CanAnger(UserIndex) And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
             HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
@@ -1814,6 +1812,11 @@ Namespace Game.BetretenVerboten
         <Command("bv-sync", "Removes a specific user from the game.")>
         Public Shared Sub dbgSyncData()
             dbgExecSync = True
+        End Sub
+
+        <Command("bv-anger", "Enables endless anger issues.")>
+        Public Shared Sub dbgAnger()
+            dbgEndlessAnger = True
         End Sub
 
         <Command("bv-place", "Places a player's figure on a certain position.")>
