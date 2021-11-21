@@ -28,6 +28,7 @@ Namespace Game.BetretenVerboten
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
+        Friend TeamMode As Boolean
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Friend Difficulty As Difficulty 'Declares the difficulty of the CPU

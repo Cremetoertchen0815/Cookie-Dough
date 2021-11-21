@@ -9,6 +9,7 @@ Namespace Game.BetretenVerboten.Networking
         Public Property Name As String Implements IGame.Name
         Public Property Map As GaemMap
         Public Property Casual As Boolean
+        Public Property Team As Boolean
         Public Property Players As Player() = {Nothing, Nothing, Nothing, Nothing}
         Public Property Ended As EndingMode = EndingMode.Running Implements IGame.Ended
         Public Property Active As Boolean = False Implements IGame.Active
@@ -49,13 +50,15 @@ Namespace Game.BetretenVerboten.Networking
         Public Sub ServerSendJoinGlobalData(con As Connection, writer As Action(Of Connection, String)) Implements IGame.ServerSendJoinGlobalData
             writer(con, CInt(Map))
             writer(con, Casual.ToString)
+            writer(con, Team.ToString)
         End Sub
 
         Public Shared Function ServerSendCreateData(ReadString As Func(Of Connection, String), con As Connection, gamename As String, Key As Integer) As IGame
             'Read map from stream and resize arrays accordingly
             Dim map As GaemMap = CInt(ReadString(con))
             Dim casual As Boolean = ReadString(con)
-            Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Map = map, .Casual = casual}
+            Dim team As Boolean = ReadString(con)
+            Dim nugaem As New ExtGame With {.HostConnection = con, .Name = gamename, .Key = Key, .Map = map, .Casual = casual, .Team = team}
             ReDim nugaem.Players(GetMapSize(map) - 1)
             ReDim nugaem.WhiteList(GetMapSize(map) - 1)
             Dim types As SpielerTyp() = New SpielerTyp(GetMapSize(map) - 1) {}
@@ -81,7 +84,7 @@ Namespace Game.BetretenVerboten.Networking
             Return nugaem
         End Function
 
-        Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player(), whitelist As String(), casual As Boolean) As Boolean
+        Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player(), whitelist As String(), casual As Boolean, TeamMode As Boolean) As Boolean
             'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
             If client.blastmode Or Not client.Connected Then Return False
 
@@ -90,6 +93,7 @@ Namespace Game.BetretenVerboten.Networking
             client.WriteString(GameType.BetretenVerboten.ToString)
             client.WriteString(CInt(map).ToString)
             client.WriteString(casual.ToString)
+            client.WriteString(TeamMode.ToString)
             For i As Integer = 0 To GetMapSize(map) - 1
                 client.WriteString(CInt(types(i).Typ).ToString) 'Send player type
                 If types(i).Typ = SpielerTyp.Online Then client.WriteString(whitelist(i)) 'Send whitelist slot

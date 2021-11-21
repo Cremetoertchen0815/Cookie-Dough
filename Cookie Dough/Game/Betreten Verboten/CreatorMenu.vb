@@ -199,6 +199,7 @@ Namespace Game.BetretenVerboten
             Dim AktuellesSpiel As New GameRoom(Map)
             ReDim AktuellesSpiel.Spielers(AktuellesSpiel.PlCount - 1)
             AktuellesSpiel.GameMode = Mode
+            AktuellesSpiel.TeamMode = TeamMode
             AktuellesSpiel.NetworkMode = False
             AktuellesSpiel.Difficulty = My.Settings.Schwierigkeitsgrad
             For i As Integer = 0 To AktuellesSpiel.PlCount - 1
@@ -223,7 +224,7 @@ Namespace Game.BetretenVerboten
                                                                                                                 For i As Integer = 0 To Whitelist.Length - 1
                                                                                                                     wtlst(i) = AllUser(Whitelist(i)).Item1
                                                                                                                 Next
-                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual) Then MsgBoxer.EnqueueMsgbox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
+                                                                                                                If Not ExtGame.CreateGame(LocalClient, servername, Map, AktuellesSpiel.Spielers, wtlst, Mode = GameMode.Casual, TeamMode) Then MsgBoxer.EnqueueMsgbox("Somethings wrong, mate!") Else AktuellesSpiel.NetworkMode = True
                                                                                                             End If
                                                                                                         End Sub
 
