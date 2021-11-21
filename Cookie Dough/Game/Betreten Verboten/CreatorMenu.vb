@@ -23,9 +23,10 @@ Namespace Game.BetretenVerboten
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
         Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
         Protected Whitelist As Integer() = {0, 0, 0, 0}
-        Protected SecondScreen As Boolean = False
+        Protected SecondScreen As MenuMode = MenuMode.ModeSelect
         Protected SM4Scroll As Single
         Protected Schwarzblende As New Transition(Of Single)
+        Protected TeamMode As Boolean = False
 
         'Konstanten
         Friend Const FadeOverTime As Integer = 500
@@ -60,63 +61,70 @@ Namespace Game.BetretenVerboten
 
             If MenuAktiviert And Not ChangeNameButtonPressed Then
 
-                If Not SecondScreen Then
+                Select Case SecondScreen
+                    Case MenuMode.ModeSelect
+                        If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.PlayerSelect, Sub() TeamMode = False)
+                        If New Rectangle(560, 500, 800, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.PlayerSelect, Sub() TeamMode = True)
+                        If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene)) : MenuAktiviert = False
 
-                    If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
-                        Map = (Map + 1) Mod 4
-                        ReDim NewGamePlayers(GetMapSize(Map) - 1)
-                        ReDim Whitelist(GetMapSize(Map) - 1)
-                        SFX(2).Play()
-                    End If
-                    If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then Mode = If(Mode = GameMode.Casual, GameMode.Competetive, GameMode.Casual)
-                    If New Rectangle(560, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel -= 1 : SFX(2).Play()
-                    If New Rectangle(960, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel += 1 : SFX(2).Play()
-                    If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then NewGamePlayers(PlayerSel) = (NewGamePlayers(PlayerSel) + 1) Mod If(IsConnectedToServer, 4, 3) : SFX(2).Play()
-                    If New Rectangle(560, 900, 400, 100).Contains(mpos) And OneshotPressed Then Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene)) : MenuAktiviert = False
-                    If New Rectangle(960, 900, 400, 100).Contains(mpos) And OneshotPressed Then
-                        SFX(2).Play()
-
-                        Dim Internetz As Boolean = False
-                        For i As Integer = 0 To GetMapSize(Map) - 1
-                            If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
-                        Next
-
-                        If IsConnectedToServer And Internetz Then
-                            SwitchToOtherScreen(Sub()
-                                                    AllUser = New List(Of (String, String)) From {("", "Open")}
-                                                    AllUser.AddRange(LocalClient.GetAllUsers)
-                                                    SM4Scroll = 0
-                                                End Sub)
-                        Else
-                            StartNewRound("")
+                    Case MenuMode.PlayerSelect
+                        If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
+                            Map = (Map + 1) Mod 4
+                            ReDim NewGamePlayers(GetMapSize(Map) - 1)
+                            ReDim Whitelist(GetMapSize(Map) - 1)
+                            SFX(2).Play()
                         End If
-                    End If
-                Else
-                    Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
-                    If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
-                    If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
-                    SM4Scroll = Mathf.Clamp(SM4Scroll - scrollval * 30, 0, Math.Max(375 + (Whitelist.Length - 1) * 150 - 1050, 0))
+                        If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then Mode = If(Mode = GameMode.Casual, GameMode.Competetive, GameMode.Casual)
+                        If New Rectangle(560, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel -= 1 : SFX(2).Play()
+                        If New Rectangle(960, 500, 400, 100).Contains(mpos) And OneshotPressed Then PlayerSel += 1 : SFX(2).Play()
+                        If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then NewGamePlayers(PlayerSel) = (NewGamePlayers(PlayerSel) + 1) Mod If(IsConnectedToServer, 4, 3) : SFX(2).Play()
+                        If New Rectangle(560, 900, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.ModeSelect, Sub() TeamMode = True)
+                        If New Rectangle(960, 900, 400, 100).Contains(mpos) And OneshotPressed Then
+                            SFX(2).Play()
 
-                    'Upper buttons
-                    If New Rectangle(560, 200, 400, 100).Contains(mpos) And OneshotPressed Then OpenInputbox("Enter a name for the round:", "Start Round", AddressOf StartNewRound)
-                    If New Rectangle(960, 200, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen()
+                            Dim Internetz As Boolean = False
+                            For i As Integer = 0 To GetMapSize(Map) - 1
+                                If NewGamePlayers(i) = SpielerTyp.Online And IsConnectedToServer Then Internetz = True : Exit For
+                            Next
 
-                    'Whitelist items
-                    Dim offset As Integer = 0
-                    For i As Integer = 0 To NewGamePlayers.Length - 1
-                        If NewGamePlayers(i) = SpielerTyp.Online Then
-                            If New Rectangle(560, 350 + offset * 150 - CInt(SM4Scroll), 800, 100).Contains(mpos) And OneshotPressed Then
-                                'Increment player
-                                Dim once As Boolean = True
-                                Do While once Or IsIDtaken(i)
-                                    Whitelist(i) = (Whitelist(i) + 1) Mod AllUser.Count
-                                    once = False
-                                Loop
+                            If IsConnectedToServer And Internetz Then
+                                SwitchToOtherScreen(MenuMode.UserSelect, Sub()
+                                                                             AllUser = New List(Of (String, String)) From {("", "Open")}
+                                                                             AllUser.AddRange(LocalClient.GetAllUsers)
+                                                                             SM4Scroll = 0
+                                                                         End Sub)
+                            Else
+                                StartNewRound("")
                             End If
-                            offset += 1
                         End If
-                    Next
-                End If
+                    Case MenuMode.UserSelect
+                        Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
+                        If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
+                        If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
+                        SM4Scroll = Mathf.Clamp(SM4Scroll - scrollval * 30, 0, Math.Max(375 + (Whitelist.Length - 1) * 150 - 1050, 0))
+
+                        'Upper buttons
+                        If New Rectangle(560, 200, 400, 100).Contains(mpos) And OneshotPressed Then OpenInputbox("Enter a name for the round:", "Start Round", AddressOf StartNewRound)
+                        If New Rectangle(960, 200, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.PlayerSelect) 'Go to player selection screen
+
+                        'Whitelist items
+                        Dim offset As Integer = 0
+                        For i As Integer = 0 To NewGamePlayers.Length - 1
+                            If NewGamePlayers(i) = SpielerTyp.Online Then
+                                If New Rectangle(560, 350 + offset * 150 - CInt(SM4Scroll), 800, 100).Contains(mpos) And OneshotPressed Then
+                                    'Increment player
+                                    Dim once As Boolean = True
+                                    Do While once Or IsIDtaken(i)
+                                        Whitelist(i) = (Whitelist(i) + 1) Mod AllUser.Count
+                                        once = False
+                                    Loop
+                                End If
+                                offset += 1
+                            End If
+                        Next
+                    Case MenuMode.TeamSelect
+
+                End Select
 
                 PlayerCount = GetMapSize(Map)
                 PlayerSel = Math.Min(Math.Max(PlayerSel, 0), PlayerCount - 1)
@@ -188,19 +196,26 @@ Namespace Game.BetretenVerboten
             End Get
         End Property
 
-        Private Sub SwitchToOtherScreen(Optional InBetweenOperation As Action = Nothing)
+        Private Sub SwitchToOtherScreen(screen As MenuMode, Optional InBetweenOperation As Action = Nothing)
             'Spiele Sound
             SFX(2).Play()
 
             'Blende über
             Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(500), Schwarzblende.Value, 1.0F, Sub()
                                                                                                                                      If InBetweenOperation IsNot Nothing Then InBetweenOperation()
-                                                                                                                                     SecondScreen = Not SecondScreen
+                                                                                                                                     SecondScreen = screen
                                                                                                                                      Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(1000), 1.0F, 0.0F, Nothing)
                                                                                                                                      Automator.Add(Schwarzblende)
                                                                                                                                  End Sub)
             Automator.Add(Schwarzblende)
         End Sub
+
+        Public Enum MenuMode
+            ModeSelect
+            TeamSelect
+            PlayerSelect
+            UserSelect
+        End Enum
 
         Public Class MenuRenderer
             Inherits RenderableComponent
@@ -230,51 +245,67 @@ Namespace Game.BetretenVerboten
 
             Public Overrides Sub Render(batcher As Batcher, camera As Camera)
 
+                Select Case instance.SecondScreen
+                    Case MenuMode.ModeSelect
+                        batcher.DrawString(MediumFont, "Select a mode:", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Select a mode:").X / 2, 225), FgColor)
 
-                If Not instance.SecondScreen Then
-                    'Draw rects
-                    batcher.DrawHollowRect(New Rectangle(560, 200, 800, 100), FgColor)
-                    batcher.DrawHollowRect(New Rectangle(560, 350, 800, 100), FgColor)
-                    batcher.DrawHollowRect(New Rectangle(560, 500, 800, 100), FgColor)
-                    batcher.DrawHollowRect(New Rectangle(560, 650, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 350, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 500, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 650, 800, 100), FgColor)
 
-                    'Draw contents
-                    batcher.DrawLine(New Vector2(1920.0F / 2, 200), New Vector2(1920.0F / 2, 300), FgColor)
-                    batcher.DrawString(MediumFont, "Map: " & GetMapName(instance.Map), New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Map: " & GetMapName(instance.Map)).X / 2, 225), FgColor)
-                    batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 225), FgColor)
 
-                    batcher.DrawString(MediumFont, "Mode: " & instance.Mode.ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Mode: " & instance.Mode.ToString).X / 2, 375), FgColor)
+                        batcher.DrawString(MediumFont, "Player vs. Player", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player vs. Player").X / 2, 375), FgColor)
+                        batcher.DrawString(MediumFont, "Team vs. Team", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Team vs. Team").X / 2, 525), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 675), FgColor)
+                    Case MenuMode.PlayerSelect
+                        'Draw rects
+                        batcher.DrawHollowRect(New Rectangle(560, 200, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 350, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 500, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 650, 800, 100), FgColor)
 
-                    batcher.DrawLine(New Vector2(1920.0F / 2, 500), New Vector2(1920.0F / 2, 600), FgColor)
-                    batcher.DrawString(MediumFont, "←", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("←").X / 2, 525), FgColor)
-                    batcher.DrawString(MediumFont, "→", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("→").X / 2, 525), FgColor)
+                        'Draw contents
+                        batcher.DrawLine(New Vector2(1920.0F / 2, 200), New Vector2(1920.0F / 2, 300), FgColor)
+                        batcher.DrawString(MediumFont, "Map: " & GetMapName(instance.Map), New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Map: " & GetMapName(instance.Map)).X / 2, 225), FgColor)
+                        batcher.DrawString(MediumFont, instance.PlayerCount.ToString & " Player", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString(instance.PlayerCount.ToString & " Player").X / 2, 225), FgColor)
 
-                    batcher.DrawString(MediumFont, "Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString).X / 2, 675), FgColor)
-                    batcher.DrawHollowRect(New Rectangle(560, 900, 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Mode: " & instance.Mode.ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Mode: " & instance.Mode.ToString).X / 2, 375), FgColor)
 
-                    batcher.DrawLine(New Vector2(1920.0F / 2, 900), New Vector2(1920.0F / 2, 1000), FgColor)
-                    batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Back").X / 2, 925), FgColor)
-                    batcher.DrawString(MediumFont, "Start Round", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Start Round").X / 2, 925), FgColor)
-                Else
-                    'Draw top button
-                    batcher.DrawHollowRect(New Rectangle(560, 200 - CInt(instance.SM4Scroll), 800, 100), FgColor)
-                    batcher.DrawLine(New Vector2(1920.0F / 2, 200 - CInt(instance.SM4Scroll)), New Vector2(1920.0F / 2, 300 - CInt(instance.SM4Scroll)), FgColor)
-                    batcher.DrawString(MediumFont, "Start", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Start").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
-                    batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Back").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
-                    'Draw scroll arrows
-                    batcher.Draw(instance.Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
-                    batcher.Draw(instance.Arrow, New Rectangle(1420, 930, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.FlipHorizontally, 0)
-                    'Draw online player
-                    Dim offset As Integer = 0
-                    For i As Integer = 0 To instance.NewGamePlayers.Length - 1
-                        If instance.NewGamePlayers(i) = SpielerTyp.Online Then
-                            Dim str As String = "Player " & (i + 1).ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item2
-                            batcher.DrawHollowRect(New Rectangle(560, 350 + offset * 150 - CInt(instance.SM4Scroll), 800, 100), FgColor)
-                            batcher.DrawString(MediumFont, str, New Vector2(1920.0F / 2 - MediumFont.MeasureString(str).X / 2, 375 + offset * 150 - CInt(instance.SM4Scroll)), FgColor)
-                            offset += 1
-                        End If
-                    Next
-                End If
+                        batcher.DrawLine(New Vector2(1920.0F / 2, 500), New Vector2(1920.0F / 2, 600), FgColor)
+                        batcher.DrawString(MediumFont, "←", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("←").X / 2, 525), FgColor)
+                        batcher.DrawString(MediumFont, "→", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("→").X / 2, 525), FgColor)
+
+                        batcher.DrawString(MediumFont, "Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString, New Vector2(1920.0F / 2 - MediumFont.MeasureString("Player " & (instance.PlayerSel + 1).ToString & ": " & instance.NewGamePlayers(instance.PlayerSel).ToString).X / 2, 675), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 900, 800, 100), FgColor)
+
+                        batcher.DrawLine(New Vector2(1920.0F / 2, 900), New Vector2(1920.0F / 2, 1000), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Back").X / 2, 925), FgColor)
+                        batcher.DrawString(MediumFont, "Start Round", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Start Round").X / 2, 925), FgColor)
+                    Case MenuMode.UserSelect
+
+                        'Draw top button
+                        batcher.DrawHollowRect(New Rectangle(560, 200 - CInt(instance.SM4Scroll), 800, 100), FgColor)
+                        batcher.DrawLine(New Vector2(1920.0F / 2, 200 - CInt(instance.SM4Scroll)), New Vector2(1920.0F / 2, 300 - CInt(instance.SM4Scroll)), FgColor)
+                        batcher.DrawString(MediumFont, "Start", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Start").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Back").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
+                        'Draw scroll arrows
+                        batcher.Draw(instance.Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
+                        batcher.Draw(instance.Arrow, New Rectangle(1420, 930, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.FlipHorizontally, 0)
+                        'Draw online player
+                        Dim offset As Integer = 0
+                        For i As Integer = 0 To instance.NewGamePlayers.Length - 1
+                            If instance.NewGamePlayers(i) = SpielerTyp.Online Then
+                                Dim str As String = "Player " & (i + 1).ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item2
+                                batcher.DrawHollowRect(New Rectangle(560, 350 + offset * 150 - CInt(instance.SM4Scroll), 800, 100), FgColor)
+                                batcher.DrawString(MediumFont, str, New Vector2(1920.0F / 2 - MediumFont.MeasureString(str).X / 2, 375 + offset * 150 - CInt(instance.SM4Scroll)), FgColor)
+                                offset += 1
+                            End If
+                        Next
+
+                    Case MenuMode.TeamSelect
+                End Select
+
+
 
                 'Draw heading
                 batcher.DrawRect(New Rectangle(0, 0, 1920, 150), Color.Black)
