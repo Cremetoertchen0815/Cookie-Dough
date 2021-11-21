@@ -4,7 +4,8 @@
 -Work on code documentation
 
 BV:
--Team mode(Animation, End sequenz und sepetare Highscores)
+-Team mode(Animation, End sequenz)
+-Team mode high score
 -Add snakes and ladders to snek map
 -Custom CPU sounds
 
