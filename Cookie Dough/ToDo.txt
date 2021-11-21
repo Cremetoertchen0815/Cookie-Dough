@@ -4,7 +4,7 @@
 -Work on code documentation
 -Music stops playing
 
--Scores shall be displayed when game is over in team mode(team-based high scores)
+-
 -Team sharing suicide fields
 -Team B colors make better
 
