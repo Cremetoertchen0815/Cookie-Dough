@@ -610,35 +610,60 @@ Namespace Game.BetretenVerboten
 
                         'Berechne Rankings
                         Core.Schedule(1, Sub()
-                                             Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
-                                             For i As Integer = 0 To PlCount - 1
-                                                 ranks.Add((i, GetScore(i)))
-                                             Next
-                                             ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
-                                             ranks.Reverse()
+                                             If TeamMode Then
 
-                                             For i As Integer = 0 To ranks.Count - 1
-                                                 Dim ia As Integer = i
+                                                 'Get ranks
+                                                 Dim teamA As Integer = 0
+                                                 Dim teamB As Integer = 0
+                                                 For i As Integer = 0 To PlCount / 2 - 1
+                                                     teamA += GetScore(i * 2)
+                                                     teamB += GetScore(i * 2 + 1)
+                                                 Next
 
-                                                 Select Case i
-                                                     Case 0
-                                                         Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                     Case 1
-                                                         Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                     Case 2
-                                                         Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                     Case Else
-                                                         Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                 End Select
-                                             Next
+                                                 If teamA > teamB Then
+                                                     Core.Schedule(2, Sub() PostChat("Team A won!", Color.Red))
+                                                 ElseIf teamB > teamA Then
+                                                     Core.Schedule(2, Sub() PostChat("Team B won!", Color.Blue))
+                                                 Else
+                                                     Core.Schedule(2, Sub() PostChat("Draw!", Color.Gray))
+                                                 End If
 
-                                             'Update K/D
-                                             If ranks(0).Item1 = UserIndex Then
-                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
+                                                 If GameMode = GameMode.Competetive Then
+                                                     'Update K/D
+                                                     If (teamA >= teamB And Mathf.IsEven(UserIndex)) Or (teamB >= teamA And Mathf.IsOdd(UserIndex)) Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
+                                                     My.Settings.Save()
+                                                 End If
                                              Else
-                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
+                                                 Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
+                                                 For i As Integer = 0 To PlCount - 1
+                                                     ranks.Add((i, GetScore(i)))
+                                                 Next
+                                                 ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
+                                                 ranks.Reverse()
+
+                                                 For i As Integer = 0 To ranks.Count - 1
+                                                     Dim ia As Integer = i
+
+                                                     Select Case i
+                                                         Case 0
+                                                             Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                         Case 1
+                                                             Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                         Case 2
+                                                             Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                         Case Else
+                                                             Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
+                                                     End Select
+                                                 Next
+
+                                                 'Update K/D
+                                                 If ranks(0).Item1 = UserIndex Then
+                                                     If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
+                                                 Else
+                                                     If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
+                                                 End If
+                                                 My.Settings.Save()
                                              End If
-                                             My.Settings.Save()
                                          End Sub)
                         'Set flags
                         Status = SpielStatus.SpielZuEnde
