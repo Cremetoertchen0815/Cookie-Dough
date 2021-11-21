@@ -857,11 +857,12 @@ Namespace Game.BetretenVerboten
                                                  PostChat("BETRETEN VERBOTEN!", Color.White)
                                                  PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White)
                                              End Sub)
-                            Spielers(playerA).AdditionalPoints += 50
+                            Spielers(playerA).AdditionalPoints += 50 * If(Mathf.IsEven(playerA) = Mathf.IsEven(playerB), -1, -1)
                         Else
                             Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
-                            Spielers(playerA).AdditionalPoints += 25
+                            Spielers(playerA).AdditionalPoints += 25 * If(Mathf.IsEven(playerA) = Mathf.IsEven(playerB), -1, -1)
                         End If
+                        If Mathf.IsEven(playerA) = Mathf.IsEven(playerB) Then SFX(9).Play()
                         Return j
                     End If
                 Next
