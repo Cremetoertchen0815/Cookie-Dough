@@ -1509,16 +1509,25 @@ Namespace Game.BetretenVerboten
                         End If
                     Next
 
-                    'Trigger suicide
-                    If Spielers(FigurFaderZiel.Item1).SuicideField >= 0 AndAlso Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = Spielers(FigurFaderZiel.Item1).SuicideField Then
-                        saucertrigger = False
-                        PostChat(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!", Color.White)
-                        SendMessage(Spielers(FigurFaderZiel.Item1).Name & " committed suicide!")
-                        KickedByGod(FigurFaderZiel.Item1, FigurFaderZiel.Item2)
-                    End If
+                'Trigger suicide
+                If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then 'If figure is on regular playing field
+                    If TeamMode Then 'Check also for team mates' suicide fields
+                        Dim team = FigurFaderZiel.Item1 Mod 2
+                        For i As Integer = 0 To PlCount / 2 - 1
+                            If CheckForSuicide(i * 2 + team) Then
+                                saucertrigger = False
+                                Exit For
+                            End If
+                        Next
 
-                    'Trigger UFO, falls auf Feld gelandet
-                    If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then TriggerSaucer(nr) Else SwitchPlayer()
+                    ElseIf CheckForSuicide(FigurFaderZiel.Item1) Then 'Check only for own field
+                        saucertrigger = False
+                    End If
+                End If
+
+
+                'Trigger UFO, falls auf Feld gelandet
+                If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then TriggerSaucer(nr) Else SwitchPlayer()
 
                     MoveActive = False
                 End If
