@@ -349,6 +349,8 @@ Namespace Game.BetretenVerboten
                         End If
 
                         If GameMode = GameMode.Competetive Then
+                            'Update highscores
+                            Core.Schedule(5, AddressOf SendHighscore)
                             'Update K/D
                             If (teamA >= teamB And Mathf.IsEven(UserIndex)) Or (teamB >= teamA And Mathf.IsOdd(UserIndex)) Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
                             My.Settings.Save()
@@ -913,7 +915,7 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To Spielers.Length - 1
                 If Spielers(i).OriginalType = SpielerTyp.Local Or Spielers(i).OriginalType = SpielerTyp.Online Then pls.Add((Spielers(i).ID, GetScore(i)))
             Next
-            SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
+            SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & If(TeamMode, 1, 0).ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
         End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
