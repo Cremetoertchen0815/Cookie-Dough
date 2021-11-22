@@ -28,7 +28,6 @@ Namespace Game.BetretenVerboten
         Friend SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Status As SpielStatus 'Speichert den aktuellen Status des Spiels
-        Friend TeamMode As Boolean
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Friend Difficulty As Difficulty 'Declares the difficulty of the CPU
@@ -40,6 +39,9 @@ Namespace Game.BetretenVerboten
         Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
         Private SlideFields As Dictionary(Of Integer, Integer) 'Enthält alle Slide-Felder als Key und deren Ziel als Value
+        Friend TeamMode As Boolean
+        Friend TeamNameA As String = "A"
+        Friend TeamNameB As String = "B"
 
         'Game fields
         Private WürfelAktuelleZahl As Integer 'Speichert den Wert des momentanen Würfels
@@ -339,13 +341,13 @@ Namespace Game.BetretenVerboten
                         Next
 
                         If teamA > teamB Then
-                            Core.Schedule(2, Sub() PostChat("Team A won(" & teamA & ") points)!", Color.Red))
-                            Core.Schedule(3, Sub() PostChat("Team B lost(" & teamB & ") points)", Color.Cyan))
+                            Core.Schedule(2, Sub() PostChat("Team " & TeamNameA & " won(" & teamA & ") points)!", Color.Red))
+                            Core.Schedule(3, Sub() PostChat("Team " & TeamNameB & " lost(" & teamB & ") points)", Color.Cyan))
                         ElseIf teamB > teamA Then
-                            Core.Schedule(2, Sub() PostChat("Team B won(" & teamB & ") points)!", Color.Cyan))
-                            Core.Schedule(3, Sub() PostChat("Team A lost(" & teamA & ") points)", Color.Cyan))
+                            Core.Schedule(2, Sub() PostChat("Team " & TeamNameB & " won(" & teamB & ") points)!", Color.Cyan))
+                            Core.Schedule(3, Sub() PostChat("Team " & TeamNameA & " lost(" & teamA & ") points)", Color.Cyan))
                         Else
-                            Core.Schedule(2, Sub() PostChat("Draw(" & teamA & ")!", Color.Gray))
+                            Core.Schedule(2, Sub() PostChat("Draw(" & TeamNameA & ")!", Color.Gray))
                         End If
 
                         If GameMode = GameMode.Competetive Then
@@ -891,7 +893,7 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To Spielers.Length - 1
                 If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.CPU Then appendix &= i.ToString
             Next
-            SendNetworkMessageToAll("b" & appendix)
+            SendNetworkMessageToAll("b" & appendix & "|" & TeamNameA & "|" & TeamNameB)
             SendPlayerData()
             SendSync()
         End Sub
@@ -911,11 +913,28 @@ Namespace Game.BetretenVerboten
             SendNetworkMessageToAll("g" & fields.ToString)
         End Sub
         Private Sub SendHighscore()
-            Dim pls As New List(Of (String, Integer))
-            For i As Integer = 0 To Spielers.Length - 1
-                If Spielers(i).OriginalType = SpielerTyp.Local Or Spielers(i).OriginalType = SpielerTyp.Online Then pls.Add((Spielers(i).ID, GetScore(i)))
-            Next
-            SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & If(TeamMode, 1, 0).ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
+            If TeamMode Then
+                'Get team scores
+                Dim teamA = ("Team " & TeamNameA, 0)
+                Dim teamB = ("Team " & TeamNameB, 0)
+                For i As Integer = 0 To PlCount / 2 - 1
+                    If Spielers(i * 2).OriginalType = SpielerTyp.Local Or Spielers(i * 2).OriginalType = SpielerTyp.Online Then teamA.Item2 += GetScore(i * 2)
+                    If Spielers(i * 2 + 1).OriginalType = SpielerTyp.Local Or Spielers(i * 2 + 1).OriginalType = SpielerTyp.Online Then teamB.Item2 += GetScore(i * 2 + 1)
+                Next
+
+                Dim pls As New List(Of (String, Integer))
+                If teamA.Item2 > 0 Then pls.Add(teamA)
+                If teamB.Item2 > 0 Then pls.Add(teamB)
+
+                If pls.Count < 1 Then Return
+                SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & 1.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
+            Else
+                Dim pls As New List(Of (String, Integer))
+                For i As Integer = 0 To Spielers.Length - 1
+                    If Spielers(i).OriginalType = SpielerTyp.Local Or Spielers(i).OriginalType = SpielerTyp.Online Then pls.Add((Spielers(i).ID, GetScore(i)))
+                Next
+                SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
+            End If
         End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
@@ -1998,6 +2017,12 @@ Namespace Game.BetretenVerboten
         Public ReadOnly Property StartCamPoses As Keyframe3D() Implements IGameWindow.StartCamPoses
             Get
                 Return {New Keyframe3D, New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)}
+            End Get
+        End Property
+
+        Public ReadOnly Property TeamNames As String() Implements IGameWindow.TeamNames
+            Get
+                Return {TeamNameA, TeamNameB}
             End Get
         End Property
 

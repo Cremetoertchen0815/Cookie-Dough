@@ -461,10 +461,10 @@ Namespace Game.BetretenVerboten.Rendering
         Private Sub TeamPlayerAnimationCheck()
             If CurrentlyTeamA Then
                 Game.HUDNameBtn.Color = Color.Red
-                Game.HUDNameBtn.Text = "Team A"
+                Game.HUDNameBtn.Text = "Team " & Game.TeamNames(0)
             Else
                 Game.HUDNameBtn.Color = Color.Blue
-                Game.HUDNameBtn.Text = "Team B"
+                Game.HUDNameBtn.Text = "Team " & Game.TeamNames(1)
             End If
 
             Game.HUDNameBtn.Active = True

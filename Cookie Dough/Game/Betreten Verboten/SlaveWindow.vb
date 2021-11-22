@@ -28,7 +28,6 @@ Namespace Game.BetretenVerboten
         Friend SpceCount As Integer
         Friend UserIndex As Integer 'Gibt den Index des Spielers an, welcher momentan durch diese Spielinstanz repräsentiert wird
         Friend Map As GaemMap 'Gibt die Map an, die verwendet wird
-        Friend TeamMode As Boolean
         Friend NetworkMode As Boolean = False 'Gibt an, ob das SPiel online ist
         Friend GameMode As GameMode 'Gibt an, ob der Sieg/Verlust zur K/D gezählt werden soll
         Private SpielerIndex As Integer = -1 'Gibt den Index des Spielers an, welcher momentan an den Reihe ist.
@@ -47,6 +46,9 @@ Namespace Game.BetretenVerboten
         Private MoveActive As Boolean = False
         Private StopDiceWhenFinished As Boolean = False 'Verhindert den Skip-Bug
         Private SaucerFields As New List(Of Integer)
+        Friend TeamMode As Boolean
+        Friend TeamNameA As String = "A"
+        Friend TeamNameB As String = "B"
 
         'Assets
         Private Fanfare As Song
@@ -516,10 +518,14 @@ Namespace Game.BetretenVerboten
                         PostChat(Spielers(source).Name & " arrived!", Color.White)
                     Case "b"c 'Begin gaem
                         'Set local vs online players
-                        Dim stuff As String = element.Substring(1)
+                        Dim appendix As String() = element.Substring(1).Split("|"c)
                         For i As Integer = 0 To Spielers.Length - 1
-                            If stuff.Contains(i) Then Spielers(i).Typ = SpielerTyp.Local
+                            If appendix(0).Contains(i) Then Spielers(i).Typ = SpielerTyp.Local
                         Next
+                        'Set team names
+                        TeamNameA = appendix(1)
+                        TeamNameB = appendix(2)
+
                         'Init game
                         SendSoundFile()
                         StopUpdating = False
@@ -1308,6 +1314,12 @@ Namespace Game.BetretenVerboten
         Public ReadOnly Property StartCamPoses As Keyframe3D() Implements IGameWindow.StartCamPoses
             Get
                 Return {New Keyframe3D(0, 0, 0, MathHelper.TwoPi - CamRotation, 0, 0, False), StdCam}
+            End Get
+        End Property
+
+        Public ReadOnly Property TeamNames As String() Implements IGameWindow.TeamNames
+            Get
+                Return {TeamNameA, TeamNameB}
             End Get
         End Property
 #End Region
