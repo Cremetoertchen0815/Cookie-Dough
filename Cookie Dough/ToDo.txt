@@ -4,8 +4,6 @@
 -Work on code documentation
 -Music stops playing
 
--Team B colors make better
-
 BV:
 -POSSIBLE BUG: Point calculation doesn't make any sense
 -BUG: Music stops playing after team match is over
