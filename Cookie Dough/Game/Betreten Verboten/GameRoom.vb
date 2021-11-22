@@ -525,7 +525,6 @@ Namespace Game.BetretenVerboten
                                 End If
 
                             Case SpielerTyp.CPU
-                                'TODO: FÜge CPU-Code ein(Auswahl, welcher Zug optimal ist)
                                 CPUTimer += Time.DeltaTime
                                 If CPUTimer > CPUThinkingTime Then
                                     CPUTimer = 0
@@ -591,23 +590,31 @@ Namespace Game.BetretenVerboten
                                                 ' Attackopportunity: kann der zug einen Feindlichen spieler eleminieren? 
                                                 Dim Ergebnis As (Integer, Integer) = GetKickFigur(SpielerIndex, element, Fahrzahl)
                                                 If Ergebnis.Item1 <> -1 And Ergebnis.Item2 <> -1 Then
-                                                    Scores(element) *= behaviour.AttackOpportunityMultiplier
+                                                    Dim playerTeam As Integer = SpielerIndex Mod 2
+                                                    Dim targetTeam As Integer = Ergebnis.Item1 Mod 2
+                                                    Scores(element) *= If(playerTeam = targetTeam, behaviour.AttackPartyMemberMultiplier, behaviour.AttackOpportunityMultiplier) 'Worsen score if kicking party member
                                                 End If
 
 
                                                 'Risk: nicht auf das Startfeld/den Eingangsbereich eines gegners stellen da eine neue figur erscheinen könnte.
                                                 Dim aimpl As Integer = Math.Floor(Globpos(1) / SpceCount) 'The player who's section the figure will land on
-                                                Dim ishomeregionbusy As Boolean = locpos(1) < If(Map > 2, SpceCount, PlCount * SpceCount) And aimpl <> SpielerIndex AndAlso GetHomebaseIndex(aimpl) > -1 'The home base linked to the area the piece is gonna land in, houses playing pieces.
+                                                Dim landinginhaus As Boolean = locpos(1) >= If(Map > 2, SpceCount, PlCount * SpceCount) 'Determines whether the player will land in his haus
+                                                Dim ishomeregionbusy As Boolean = aimpl <> SpielerIndex AndAlso GetHomebaseIndex(aimpl) > -1 'The home base linked to the area the piece is gonna land in, houses playing pieces.
                                                 Dim isfieldcoveredbyUFO As Boolean = SaucerFields.Contains(PlayerFieldToGlobalField(locpos(1), SpielerIndex))
-                                                If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 And ishomeregionbusy And Not isfieldcoveredbyUFO Then
+                                                If locpos(1) > 0 And (locpos(1) Mod SpceCount) = 0 And ishomeregionbusy And Not landinginhaus And Not isfieldcoveredbyUFO Then
                                                     Scores(element) *= behaviour.HomeFieldEnteringMultiplier
-                                                ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 And ishomeregionbusy Then
+                                                ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 And ishomeregionbusy And Not landinginhaus Then
                                                     Scores(element) *= behaviour.HomeDzEnteringMultiplier
                                                 End If
 
-                                                'Flee: führt der Zug die Figur aus einem Startbereich heraus
+                                                'Flee A: führt der Zug die Figur aus einem Startbereich heraus
                                                 If locpos(0) > 6 And (locpos(0) Mod SpceCount) < 7 And (locpos(1) Mod SpceCount) > 6 Then
                                                     Scores(element) *= behaviour.HomeDzLeavingMultiplier
+                                                End If
+
+                                                'Flee B: führt der Zug die Figur von einem Startfeld weg
+                                                If locpos(0) > 0 And (locpos(0) Mod SpceCount) = 0 And ishomeregionbusy Then
+                                                    Scores(element) *= behaviour.HomeFieldLeavingMultiplier
                                                 End If
                                             Next
 
@@ -1127,7 +1134,7 @@ Namespace Game.BetretenVerboten
                     Dim fieldB As Integer = Spielers(playerB).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB >= 0 And fieldB <= If(Map > 2, SpceCount, PlCount * SpceCount) And fb = fa Then Return (i, j)
+                    If fieldB >= 0 And fieldB <= If(Map > 2, SpceCount, PlCount * SpceCount) And fb = fa Then Return (playerB, j)
                 Next
             Next
             Return (-1, -1)

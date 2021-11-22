@@ -8,10 +8,12 @@
                     PieceDzLeavingMultiplier = 1.4F
                     PieceDzEnteringMultiplier = 0.66F
                     ManifestDestinyMultiplier = 10.0F
-                    AttackOpportunityMultiplier = 2.2F
-                    HomeFieldEnteringMultiplier = 0.25F
                     HomeDzEnteringMultiplier = 0.5F
                     HomeDzLeavingMultiplier = 1.3F
+                    HomeFieldEnteringMultiplier = 0.25F
+                    HomeFieldLeavingMultiplier = 1.65F
+                    AttackOpportunityMultiplier = 2.25F
+                    AttackPartyMemberMultiplier = 0.35F
             End Select
         End Sub
 
@@ -22,8 +24,10 @@
         Public HomeDzLeavingMultiplier As Single 'Gives figures an advantage if they are in the spawn danger zone and this move will bring them out of this danger zone
         Public HomeDzEnteringMultiplier As Single 'Gives figures a disadvantage if they are going to enter the danger zone of an enemy
         Public HomeFieldEnteringMultiplier As Single 'Gives figures a disadvantage if they are going to enter the spawn field of an enemy
+        Public HomeFieldLeavingMultiplier As Single 'Gives figures an advantage if they are going to leave the spawn field of an enemy
         Public ManifestDestinyMultiplier As Single 'Gives figures an advantage if they'll enter the house with this move
         Public AttackOpportunityMultiplier As Single 'Gives figures an advantage if they'll kick an enemy figure with this move
+        Public AttackPartyMemberMultiplier As Single 'Gives figures a disadvantage if they'll kick a figure from their own team with this move
         Public DeezNuts As Object ' Does absolutely nothing, but Jakob wanted me to add it, oh well...
     End Structure
 End Namespace
