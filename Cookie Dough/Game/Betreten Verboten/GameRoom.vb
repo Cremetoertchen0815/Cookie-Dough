@@ -970,16 +970,16 @@ Namespace Game.BetretenVerboten
         Private Sub SendHighscore()
             If TeamMode Then
                 'Get team scores
-                Dim teamA = ("Team " & TeamNameA, 0)
-                Dim teamB = ("Team " & TeamNameB, 0)
+                Dim teamA = 0
+                Dim teamB = 0
                 For i As Integer = 0 To PlCount / 2 - 1
-                    If Spielers(i * 2).OriginalType = SpielerTyp.Local Or Spielers(i * 2).OriginalType = SpielerTyp.Online Then teamA.Item2 += GetScore(i * 2)
-                    If Spielers(i * 2 + 1).OriginalType = SpielerTyp.Local Or Spielers(i * 2 + 1).OriginalType = SpielerTyp.Online Then teamB.Item2 += GetScore(i * 2 + 1)
+                    If Spielers(i * 2).OriginalType = SpielerTyp.Local Or Spielers(i * 2).OriginalType = SpielerTyp.Online Then teamA += GetScore(i * 2)
+                    If Spielers(i * 2 + 1).OriginalType = SpielerTyp.Local Or Spielers(i * 2 + 1).OriginalType = SpielerTyp.Online Then teamB += GetScore(i * 2 + 1)
                 Next
 
                 Dim pls As New List(Of (String, Integer))
-                If teamA.Item2 > 0 Then pls.Add(teamA)
-                If teamB.Item2 > 0 Then pls.Add(teamB)
+                If teamA > 0 Then pls.Add(("Team " & TeamNameA, teamA))
+                If teamB > 0 Then pls.Add(("Team " & TeamNameB, teamB))
 
                 If pls.Count < 1 Then Return
                 SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & 1.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
