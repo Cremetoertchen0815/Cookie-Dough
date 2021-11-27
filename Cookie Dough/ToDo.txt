@@ -6,6 +6,10 @@
 -Save menu color
 
 BV:
+-Add leaderboard
+-Fix point allocation when kicking
+-Fix anger buttons not being present for slaves(didn't copy over anger detection to slave)
+-Fix bug of names in main menu being too long
 -Implement voting ssystem for team names
 -POSSIBLE BUG: Point calculation doesn't make any sense
 -BUG: Music stops playing after team match is over
