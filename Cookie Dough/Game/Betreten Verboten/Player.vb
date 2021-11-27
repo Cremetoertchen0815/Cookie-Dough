@@ -103,6 +103,8 @@ Namespace Game.BetretenVerboten
         ''' </summary>
         Public Property MOTD As String = My.Settings.MOTD Implements IPlayer.MOTD
 
+        Friend TeamNameWish As String
+
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub

@@ -38,6 +38,7 @@ Namespace Game.BetretenVerboten
         Private Timer As TimeSpan 'Misst die Zeit seit dem Anfang des Spiels
         Private LastTimer As TimeSpan 'Gibt den Timer des vergangenen Frames an
         Private TimeOver As Boolean = False 'Gibt an, ob die registrierte Zeit abgelaufen ist
+        Private IsAskingForNameWish As Boolean = False 'Gibt an, ob das Spiel gerade einen Teamnamenswunsch von allen Spielern erwartet
         Private SlideFields As Dictionary(Of Integer, Integer) 'Enthält alle Slide-Felder als Key und deren Ziel als Value
         Friend TeamMode As Boolean
         Friend TeamNameA As String = "A"
@@ -706,26 +707,64 @@ Namespace Game.BetretenVerboten
                         End If
 
                     Case SpielStatus.WarteAufOnlineSpieler
-                        HUDInstructions.Text = "Waiting for all players to connect..."
+                        HUDInstructions.Text = If(IsAskingForNameWish, "Waiting for all players to answer their preferred team name...", "Waiting for all players to connect...")
 
-                        'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
-                        For Each sp In Spielers
-                            If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
-                        Next
+                        If IsAskingForNameWish Or Not TeamMode Then
 
-                        'Falls vollzählig, starte Spiel
-                        StopUpdating = True
-                        Core.Schedule(0.8, Sub()
-                                               PostChat("The game has started!", Color.White)
-                                               FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
-                                               HUDInstructions.Text = " "
-                                               'Launch start animation
-                                               Renderer.TriggerStartAnimation(TeamMode, Sub()
-                                                                                            SwitchPlayer()
-                                                                                            If StopWhenRealStart Then StopUpdating = True
-                                                                                        End Sub)
-                                               SendBeginGaem()
-                                           End Sub)
+                            'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
+                            For Each sp In Spielers
+                                If sp Is Nothing OrElse Not sp.Bereit OrElse (sp.TeamNameWish = String.Empty AndAlso (sp.Typ = SpielerTyp.Online Or sp.Typ = SpielerTyp.Local)) Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
+                            Next
+
+                            'Falls vollzählig, starte Spiel
+                            If TeamMode Then
+                                'Post message to chat
+                                PostChat("Thank a lot! *bless*", Color.White)
+                                PostChat("Let'sa go!", Color.White)
+                                SendMessage("Thank a lot! *bless*")
+                                SendMessage("Let'sa go!")
+                                'Pick team names
+                                Dim teamA As New List(Of String)
+                                Dim teamB As New List(Of String)
+                                For i As Integer = 0 To PlCount - 1
+                                    Dim curent_team = If(i Mod 2 = 0, teamA, teamB)
+                                    If Spielers(i).Typ = SpielerTyp.Online Or Spielers(i).Typ = SpielerTyp.Local Then curent_team.Add(Spielers(i).TeamNameWish)
+                                Next
+                                If teamA.Count > 0 Then TeamNameA = teamA(Nez.Random.Range(0, teamA.Count))
+                                If teamB.Count > 0 Then TeamNameB = teamB(Nez.Random.Range(0, teamB.Count))
+                            End If
+                            StopUpdating = True
+                            Core.Schedule(0.8, Sub()
+                                                   PostChat("The game has started!", Color.White)
+                                                   FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+                                                   HUDInstructions.Text = " "
+                                                   'Launch start animation
+                                                   Renderer.TriggerStartAnimation(TeamMode, Sub()
+                                                                                                SwitchPlayer()
+                                                                                                If StopWhenRealStart Then StopUpdating = True
+                                                                                            End Sub)
+                                                   SendBeginGaem()
+                                               End Sub)
+
+                        ElseIf Not IsAskingForNameWish Then
+
+                            'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
+                            For Each sp In Spielers
+                                If sp Is Nothing OrElse Not sp.Bereit Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
+                            Next
+
+                            IsAskingForNameWish = True
+                            Core.Schedule(0.5F, Sub()
+                                                    PostChat("Enter you wish for a team name into the chat:", Color.White)
+                                                    SendMessage("Enter you wish for a team name into the chat:")
+                                                    PostChat("(The winner will be picked at random)", Color.White)
+                                                    SendMessage("(The winner will be picked at random)")
+                                                End Sub)
+                            For i As Integer = 0 To PlCount - 1
+                                Dim j = i
+                                If Spielers(i).Typ = SpielerTyp.Local Then MsgBoxer.EnqueueInputbox("Enter your wish team, " & Spielers(i).Name & "!", Sub(x, y) Spielers(j).TeamNameWish = x, If(i Mod 2 = 0, TeamNameA, TeamNameB))
+                            Next
+                        End If
                     Case SpielStatus.SpielZuEnde
                         StopUpdating = True
                 End Select
@@ -805,6 +844,7 @@ Namespace Game.BetretenVerboten
                                 PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
                                 SendChatMessage(source, text)
                             End If
+                            If IsAskingForNameWish Then Spielers(source).TeamNameWish = text
                         Case "e"c 'Suspend gaem
                             If Spielers(source).Typ = SpielerTyp.None Then Continue For
                             Spielers(source).Bereit = False

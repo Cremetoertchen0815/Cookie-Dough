@@ -342,8 +342,9 @@ Namespace Framework.Networking
                             highscore = highscore.OrderBy(Function(x) x.Item2).ToList()
                             highscore.Reverse()
 
-                            'Remove double gangers
-                            Dim indx As Integer = 0
+                            If TeamMode Then
+                                'Remove double gangers
+                                Dim indx As Integer = 0
                                 Dim ent As Integer = highscore.Count
                                 Do Until indx >= ent
                                     If takenIDs.Contains(highscore(indx).Item1) Then
@@ -354,10 +355,13 @@ Namespace Framework.Networking
                                         indx += 1
                                     End If
                                 Loop
-                                'Delete access
-                                Do While highscore.Count > 10
-                                    highscore.RemoveAt(highscore.Count - 1)
-                                Loop
+                            End If
+
+                            'Delete access
+                            Do While highscore.Count > 10
+                                highscore.RemoveAt(highscore.Count - 1)
+                            Loop
+
                             'Update "updated" list
                             For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
                                 updated(i) = data.Contains(highscore(i))
@@ -368,7 +372,7 @@ Namespace Framework.Networking
                             If TeamMode Then
                                 'Send chat stuff
                                 SendToAllGameClients(gaem, "mHighscores:", False)
-                                For i As Integer = 0 To 2
+                                For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
                                     Dim ii As Integer = i
                                     Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & highscore(ii).Item1 & "(" & highscore(ii).Item2.ToString & If(updated(ii), ", GG!)", ")"), False))
                                 Next
