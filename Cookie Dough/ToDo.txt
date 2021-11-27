@@ -6,8 +6,6 @@
 -Save menu color
 
 BV:
--Fix lost team only being displayed for host
--Fix point allocation when kicking
 -Fix anger buttons not being present for slaves(didn't copy over anger detection to slave)
 -Fix bug of names in main menu being too long
 -Implement voting ssystem for team names

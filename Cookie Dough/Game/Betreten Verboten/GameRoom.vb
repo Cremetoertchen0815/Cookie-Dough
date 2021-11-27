@@ -1106,19 +1106,20 @@ Namespace Game.BetretenVerboten
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, playerB)
                     'Falls globale Spielfeldposition identisch und 
                     If fieldB >= 0 And fieldB < If(Map > 2, SpceCount, PlCount * SpceCount) And fb = fa Then
+                        Dim kickingAlly = Mathf.IsEven(playerA) = Mathf.IsEven(playerB) And TeamMode
                         'Implement BV bonus
                         If fieldA = 0 Then
                             Core.Schedule(1, Sub()
                                                  PostChat("BETRETEN VERBOTEN!", Color.White)
                                                  PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White)
                                              End Sub)
-                            Spielers(playerA).AdditionalPoints += 50 * If(Mathf.IsEven(playerA) = Mathf.IsEven(playerB), -1, -1)
+                            Spielers(playerA).AdditionalPoints += 50 * If(kickingAlly, -1, 1)
                         Else
                             Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
-                            Spielers(playerA).AdditionalPoints += 25 * If(Mathf.IsEven(playerA) = Mathf.IsEven(playerB), -1, -1)
+                            Spielers(playerA).AdditionalPoints += 25 * If(kickingAlly, -1, 1)
                         End If
 
-                        If Mathf.IsEven(playerA) = Mathf.IsEven(playerB) Then SFX(9).Play()
+                        If kickingAlly Then SFX(9).Play()
                         Return j
                     End If
                 Next
