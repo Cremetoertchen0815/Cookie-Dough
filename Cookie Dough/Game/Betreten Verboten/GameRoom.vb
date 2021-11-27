@@ -1002,6 +1002,7 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub SendNewPlayerActive(who As Integer)
             SendNetworkMessageToAll("n" & who.ToString)
+            SendSync()
         End Sub
         Private Sub SendAngered(who As Integer)
             SendNetworkMessageToAll("p" & who.ToString)
