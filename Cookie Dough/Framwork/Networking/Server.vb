@@ -358,12 +358,12 @@ Namespace Framework.Networking
                                 Do While highscore.Count > 10
                                     highscore.RemoveAt(highscore.Count - 1)
                                 Loop
-                                'Update "updated" list
-                                For i As Integer = 0 To 2
-                                    updated(i) = data.Contains(highscore(i))
-                                Next
-                                'Save to file
-                                File.WriteAllText(path, Newtonsoft.Json.JsonConvert.SerializeObject(highscore))
+                            'Update "updated" list
+                            For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
+                                updated(i) = data.Contains(highscore(i))
+                            Next
+                            'Save to file
+                            File.WriteAllText(path, Newtonsoft.Json.JsonConvert.SerializeObject(highscore))
 
                             If TeamMode Then
                                 'Send chat stuff

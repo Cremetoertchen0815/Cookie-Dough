@@ -8,7 +8,7 @@
 BV:
 -Implement voting system for team names
 -BUG: Music stops playing after team match is over
--BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) 
+-BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) ???
 -Make CPU avoid suicide fields
 -Custom CPU sounds(Lime -> Simply the best, Cyan -> Was ist denn mit Karsten los?, Gelb -> Asiate, Rot -> Ich bin in Gefahr, bitte helfen sie mir, Blau -> I'm blue dabadee, Teal -> Wandern, Olive ->  )
 -Add snakes and ladders to snek map
