@@ -329,10 +329,10 @@ Namespace Framework.Networking
                             'Receive player scores
                             Dim game As Integer = nl(1).ToString
                             Dim map As Integer = nl(2).ToString
-                            Dim TeamMode As Boolean = CInt(nl(2).ToString) = 1
+                            Dim TeamMode As Boolean = CInt(nl(3).ToString) = 1
                             Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
                             Dim highscore As List(Of (String, Integer))
-                            Dim data As List(Of (String, Integer)) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(nl.Substring(3))
+                            Dim data As List(Of (String, Integer)) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(nl.Substring(4))
                             Dim updated As Boolean() = New Boolean(2) {}
                             Dim takenIDs As New List(Of String)
                             'Load and update highscores

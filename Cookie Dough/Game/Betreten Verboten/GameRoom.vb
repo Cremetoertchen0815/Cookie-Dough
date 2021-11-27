@@ -343,11 +343,11 @@ Namespace Game.BetretenVerboten
                         Next
 
                         If teamA > teamB Then
-                            Core.Schedule(2, Sub() PostChat("Team " & TeamNameA & " won(" & teamA & ") points)!", Color.Red))
-                            Core.Schedule(3, Sub() PostChat("Team " & TeamNameB & " lost(" & teamB & ") points)", Color.Cyan))
+                            Core.Schedule(2, Sub() PostChat("Team " & TeamNameA & " won(" & teamA & " points)!", Color.Red))
+                            Core.Schedule(3, Sub() PostChat("Team " & TeamNameB & " lost(" & teamB & " points)", Color.Cyan))
                         ElseIf teamB > teamA Then
-                            Core.Schedule(2, Sub() PostChat("Team " & TeamNameB & " won(" & teamB & ") points)!", Color.Cyan))
-                            Core.Schedule(3, Sub() PostChat("Team " & TeamNameA & " lost(" & teamA & ") points)", Color.Cyan))
+                            Core.Schedule(2, Sub() PostChat("Team " & TeamNameB & " won(" & teamB & " points)!", Color.Cyan))
+                            Core.Schedule(3, Sub() PostChat("Team " & TeamNameA & " lost(" & teamA & " points)", Color.Cyan))
                         Else
                             Core.Schedule(2, Sub() PostChat("Draw(" & TeamNameA & ")!", Color.Gray))
                         End If
