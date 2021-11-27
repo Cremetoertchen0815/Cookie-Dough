@@ -49,7 +49,7 @@ Public Module Launcher
     ''' <summary>
     ''' The menu color
     ''' </summary>
-    Friend Property FgColor As Color = Color.Lime
+    Friend Property FgColor As Color = New Color(My.Settings.colorR, My.Settings.colorG, My.Settings.colorB)
     ''' <summary>
     ''' The colors used for the HUD by users
     ''' </summary>

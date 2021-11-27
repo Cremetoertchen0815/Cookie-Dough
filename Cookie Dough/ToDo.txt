@@ -3,7 +3,6 @@
 -Check host leaving and others not being kicked out of the round
 -Work on code documentation
 -Music stops playing
--Save menu color
 
 BV:
 -BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) ???

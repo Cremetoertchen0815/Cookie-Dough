@@ -114,8 +114,11 @@ Namespace Menu.MainMenu
                         Dim r As Single = Nez.Random.NextFloat()
                         Dim g As Single = Nez.Random.NextFloat()
                         Dim b As Single = Nez.Random.NextFloat()
-                        Dim maxbright As Single = 1
-                        FgColor = New Color(r * maxbright, g * maxbright, b * maxbright)
+                        FgColor = New Color(r, g, b)
+                        My.Settings.colorR = r * 255
+                        My.Settings.colorG = g * 255
+                        My.Settings.colorB = b * 255
+                        My.Settings.Save()
                     End If
                     If New Rectangle(560, 875, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
                 Case 4

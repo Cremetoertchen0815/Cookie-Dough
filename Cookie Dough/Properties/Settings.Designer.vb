@@ -207,6 +207,42 @@ Partial Public NotInheritable Class Settings
             Me("PlayedIntro") = value
         End Set
     End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+    Public Property colorR() As Byte
+        Get
+            Return CType(Me("colorR"),Byte)
+        End Get
+        Set
+            Me("colorR") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("255")>  _
+    Public Property colorG() As Byte
+        Get
+            Return CType(Me("colorG"),Byte)
+        End Get
+        Set
+            Me("colorG") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+    Public Property colorB() As Byte
+        Get
+            Return CType(Me("colorB"),Byte)
+        End Get
+        Set
+            Me("colorB") = value
+        End Set
+    End Property
 End Class
 
 Namespace My
