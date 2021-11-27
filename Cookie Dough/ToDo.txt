@@ -6,10 +6,8 @@
 -Save menu color
 
 BV:
--Fix anger buttons not being present for slaves(didn't copy over anger detection to slave)
 -Fix bug of names in main menu being too long
--Implement voting ssystem for team names
--POSSIBLE BUG: Point calculation doesn't make any sense
+-Implement voting system for team names
 -BUG: Music stops playing after team match is over
 -BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) 
 -Make CPU avoid suicide fields

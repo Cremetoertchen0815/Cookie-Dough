@@ -818,6 +818,7 @@ Namespace Game.BetretenVerboten
                             SwitchPlayer()
                         Case "p"c 'Player angered
                             SetAngered(source)
+                            SendSync()
                         Case "r"c 'Player is back
                             Dim txt As String() = element.Substring(2).Split("|")
                             Spielers(source).Name = txt(0)
