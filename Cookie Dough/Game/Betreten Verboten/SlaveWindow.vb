@@ -75,6 +75,7 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDAfkBtn As Button
         Private WithEvents HUDDiceBtn As GameRenderable
         Private WithEvents HUDmotdLabel As Label
+        Private WithEvents HUDScores As CustomControl
         Private InstructionFader As PropertyTransition
         Private ShowDice As Boolean = False
         Private Chat As List(Of (String, Color))
@@ -222,6 +223,7 @@ Namespace Game.BetretenVerboten
             HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
+            HUDScores = New CustomControl(AddressOf RenderScore, Sub() Return, New Vector2(1500, 700), New Vector2(370, 300)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .Active = False} : HUD.Controls.Add(HUDScores)
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = If(UserIndex > -1, hudcolors(UserIndex), Color.White)
 
@@ -582,6 +584,7 @@ Namespace Game.BetretenVerboten
                         SpielerIndex = who
                         HUDBtnC.Active = Not CanAnger(SpielerIndex) And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
                         HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+                        HUDScores.Active = UserIndex <> SpielerIndex
                         HUDNameBtn.Active = True
                         If UserIndex < 0 Then Continue For
                         If who = UserIndex Then
@@ -1088,6 +1091,16 @@ Namespace Game.BetretenVerboten
             Return GetMapVectorPos(Map, player, figur, Spielers(player).Spielfiguren(figur) + increment)
         End Function
 
+        Private Sub RenderScore(batcher As Batcher, InnerBounds As Rectangle, color As Color)
+            batcher.DrawRect(InnerBounds, HUDScores.BackgroundColor)
+            batcher.DrawHollowRect(InnerBounds, color, HUDScores.Border.Width)
+            Dim space As Integer
+            For i As Integer = 0 To PlCount - 1
+                If Spielers(i).Typ = SpielerTyp.None Then Continue For
+                space += 1
+                batcher.DrawString(HUDScores.Font, Spielers(i).Name & ": " & GetScore(i), InnerBounds.Location.ToVector2 + New Vector2(30, space * 30), hudcolors(i))
+            Next
+        End Sub
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
