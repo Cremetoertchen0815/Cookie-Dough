@@ -7,6 +7,7 @@
 -Team B colors make better
 
 BV:
+-Implement voting ssystem for team names
 -POSSIBLE BUG: Point calculation doesn't make any sense
 -BUG: Music stops playing after team match is over
 -BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) 
