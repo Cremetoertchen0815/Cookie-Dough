@@ -6,7 +6,6 @@
 -Save menu color
 
 BV:
--Fix bug of names in main menu being too long
 -Implement voting system for team names
 -BUG: Music stops playing after team match is over
 -BUG: Online player, three in haus, one close to haus, can't sacrifice(screen blinks, but nothing happens) 

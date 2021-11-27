@@ -509,7 +509,7 @@ Namespace Menu.MainMenu
                         'Draw games
                         Dim len As Integer = CounterScene.OnlineGameInstances.Length
                         For i As Integer = 0 To len - 1
-                            Dim gameNameA As String = CounterScene.OnlineGameInstances(i).Name
+                            Dim gameNameA As String = If(CounterScene.OnlineGameInstances(i).Name.Length > 16, CounterScene.OnlineGameInstances(i).Name.Substring(0, 13) & "...", CounterScene.OnlineGameInstances(i).Name)
                             Dim gameNameB As String = "(" & GetGameTitle(CounterScene.OnlineGameInstances(i).Type) & ")"
                             Dim color As Color = If(CounterScene.GameList(i).Item3, FgColor, Color.Red)
                             batcher.DrawHollowRect(New Rectangle(560, 275 + i * 150 - CounterScene.SM2Scroll, 800, 100), color)
