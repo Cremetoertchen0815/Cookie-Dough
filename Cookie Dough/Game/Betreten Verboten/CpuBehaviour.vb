@@ -14,6 +14,7 @@
                     HomeFieldLeavingMultiplier = 1.65F
                     AttackOpportunityMultiplier = 2.25F
                     AttackPartyMemberMultiplier = 0.35F
+                    SuicideMultiplier = 0.15F
             End Select
         End Sub
 
@@ -28,6 +29,7 @@
         Public ManifestDestinyMultiplier As Single 'Gives figures an advantage if they'll enter the house with this move
         Public AttackOpportunityMultiplier As Single 'Gives figures an advantage if they'll kick an enemy figure with this move
         Public AttackPartyMemberMultiplier As Single 'Gives figures a disadvantage if they'll kick a figure from their own team with this move
+        Public SuicideMultiplier As Single 'Gives figures a disadvantage if they'll land on their own or team mates' suicide field
         Public DeezNuts As Object ' Does absolutely nothing, but Jakob wanted me to add it, oh well...
     End Structure
 End Namespace

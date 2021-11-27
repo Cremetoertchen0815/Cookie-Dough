@@ -572,6 +572,7 @@ Namespace Game.BetretenVerboten
                                                 ' Safety:ist eine Figur höchstens 6 felder vor einer Feindlichen Figur entfernt, ist sie in einer Gefahrenzone die avoidet werden soll
                                                 Dim locpos As Integer() = {Spielers(SpielerIndex).Spielfiguren(element), Spielers(SpielerIndex).Spielfiguren(element) + Fahrzahl}
                                                 Dim Globpos As Integer() = {PlayerFieldToGlobalField(locpos(0), SpielerIndex), PlayerFieldToGlobalField(locpos(1), SpielerIndex)}
+                                                Dim playerTeam As Integer = SpielerIndex Mod 2
                                                 For ALVSP As Integer = 0 To FigCount - 1
                                                     If ALVSP <> SpielerIndex Then
                                                         For ALVSPF As Integer = 0 To FigCount - 1
@@ -596,7 +597,6 @@ Namespace Game.BetretenVerboten
                                                 ' Attackopportunity: kann der zug einen Feindlichen spieler eleminieren? 
                                                 Dim Ergebnis As (Integer, Integer) = GetKickFigur(SpielerIndex, element, Fahrzahl)
                                                 If Ergebnis.Item1 <> -1 And Ergebnis.Item2 <> -1 Then
-                                                    Dim playerTeam As Integer = SpielerIndex Mod 2
                                                     Dim targetTeam As Integer = Ergebnis.Item1 Mod 2
                                                     Scores(element) *= If(playerTeam = targetTeam, behaviour.AttackPartyMemberMultiplier, behaviour.AttackOpportunityMultiplier) 'Worsen score if kicking party member
                                                 End If
@@ -611,6 +611,18 @@ Namespace Game.BetretenVerboten
                                                     Scores(element) *= behaviour.HomeFieldEnteringMultiplier
                                                 ElseIf locpos(1) > 6 And (locpos(1) Mod SpceCount) < 7 And Not (locpos(0) Mod SpceCount) < 7 And ishomeregionbusy And Not landinginhaus Then
                                                     Scores(element) *= behaviour.HomeDzEnteringMultiplier
+                                                End If
+
+                                                'Anti-suicide: nicht auf das eigene(oder der eines teammates) Suicide field stellen
+                                                If Not TeamMode And Globpos(1) = Spielers(SpielerIndex).SuicideField Then
+                                                    Scores(element) *= behaviour.SuicideMultiplier
+                                                ElseIf TeamMode Then
+                                                    For i As Integer = 0 To PlCount / 2 - 1
+                                                        If (Globpos(1) = Spielers(i * 2 + playerTeam).SuicideField) Then
+                                                            Scores(element) *= behaviour.SuicideMultiplier
+                                                            Exit For
+                                                        End If
+                                                    Next
                                                 End If
 
                                                 'Flee A: führt der Zug die Figur aus einem Startbereich heraus
