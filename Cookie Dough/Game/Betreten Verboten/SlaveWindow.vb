@@ -428,10 +428,9 @@ Namespace Game.BetretenVerboten
                         Dim pl As Player = Spielers(SpielerIndex)
 
                         Dim ichmagzüge As New List(Of Integer)
-                        Dim defaultmov As Integer
                         For i As Integer = 0 To FigCount - 1
-                            defaultmov = pl.Spielfiguren(i)
-                            If defaultmov > -1 And defaultmov + Fahrzahl <= If(Map > 2, SpceCount, PlCount * SpceCount) Then ichmagzüge.Add(i)
+                            Dim defaultmov = pl.Spielfiguren(i)
+                            If defaultmov > -1 And defaultmov <= If(Map > 2, SpceCount, PlCount * SpceCount) Then ichmagzüge.Add(i)
                         Next
 
                         If ichmagzüge.Count = 1 Then
