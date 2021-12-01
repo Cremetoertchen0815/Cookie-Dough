@@ -1692,7 +1692,6 @@ Namespace Game.BetretenVerboten
                                          Select Case Nez.Random.Range(0, 5)
                                              Case 0
                                                  Try
-
                                                      'Boost random figure
                                                      Dim fig = Nez.Random.Range(0, FigCount)
                                                      Dim boost = Nez.Random.Range(1, PlCount * 5)
@@ -1721,7 +1720,7 @@ Namespace Game.BetretenVerboten
                                                      count += 1
                                                      If count > 20 Then dont = True : Exit Do
                                                  Loop
-                                                 If pla <> pl And Not dont Then
+                                                 If (Not TeamMode And pla <> pl) Or (TeamMode And (pla Mod 2) <> (pl Mod 2)) And Not dont Then
                                                      PostChat("You're lucky! A random enemy figure got kicked!", Color.White)
                                                      SendMessage("You're lucky! A random enemy figure got kicked!")
                                                      KickedByGod(pla, fig)
@@ -1757,16 +1756,18 @@ Namespace Game.BetretenVerboten
                                              Case 1
                                                  'Kick random figure
                                                  Dim fig = Nez.Random.Range(0, FigCount)
+                                                 Dim pla = Nez.Random.Range(0, PlCount)
                                                  Dim dont = False
                                                  Dim count = 0
                                                  Do While Spielers(pl).Spielfiguren(fig) < 0 And Spielers(pl).Spielfiguren(fig) >= PlCount * SpceCount
                                                      fig = Nez.Random.Range(0, FigCount)
+                                                     pla = Nez.Random.Range(0, PlCount)
                                                      count += 1
                                                      If count > 20 Then dont = True : Exit Do
                                                  Loop
-                                                 If Not dont Then
-                                                     PostChat("Oh ooh! Another one of your piece died!", Color.White)
-                                                     SendMessage("Oh ooh! Another one of your piece died!")
+                                                 If Not TeamMode Or (TeamMode And pl Mod 2 = pla Mod 2) And Not dont Then
+                                                     PostChat("Oh ooh! One of your " & If(TeamMode, "team's ", "") & "pieces died!", Color.White)
+                                                     SendMessage("Oh ooh! Of your " & If(TeamMode, "team's ", "") & "pieces died!")
                                                      KickedByGod(pl, fig)
                                                      Exit Do
                                                  End If
