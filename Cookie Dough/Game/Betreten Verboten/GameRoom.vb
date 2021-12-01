@@ -215,16 +215,16 @@ Namespace Game.BetretenVerboten
             HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Controls.Add(HUDFullscrBtn)
             HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Controls.Add(HUDMusicBtn)
             HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Controls.Add(HUDAfkBtn)
-            HUDScores = New CustomControl(AddressOf RenderScore, Sub() Return, New Vector2(1500, 700), New Vector2(370, 300)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .Active = False} : HUD.Controls.Add(HUDScores)
+            HUDScores = New CustomControl(AddressOf RenderScore, Sub() Return, New Vector2(1600, 700), New Vector2(270, 300)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .Active = False} : HUD.Controls.Add(HUDScores)
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = Color.White
 
             Renderer = AddRenderer(New Renderer3D(Me, 1))
-            Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
+            Psyground = AddRenderer(New PsygroundRenderer(0, 0.25))
             AddRenderer(New DefaultRenderer(2))
             GuiControl.BackgroundImage = Renderer.BlurredContents
 
-            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6F).SetThreshold(0)
+            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.62F).SetThreshold(0)
             ClearColor = Color.Black
             Material.DefaultMaterial.SamplerState = SamplerState.AnisotropicClamp
 

@@ -31,7 +31,7 @@ Namespace Framework.Graphics
 
         'Properties
         Public Property Size As New Vector2(1920.0F, 1080)
-        Public Property Colors As Color() = {Color.Blue, Color.DarkCyan, Color.Purple, Color.Black, Color.Green}
+        Public Property Colors As Color() = {Color.Blue, Color.DarkCyan, Color.Purple, Color.Orange, Color.Green, Color.Teal, Color.Black, Color.Maroon}
         Public Property Speed As Integer = 10000
 
         Public Sub New(Optional order As Integer = 0, Optional Alpha As Single = 0.3F)

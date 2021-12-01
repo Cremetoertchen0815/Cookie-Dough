@@ -1,11 +1,8 @@
 ﻿-Test DC, BR and DT!
--Make shit run under MacOS
--Check host leaving and others not being kicked out of the round
 -Work on code documentation
 -Music stops playing
 
 BV:
--Apply blur effect over UI transparent parts to simulate frosted glass
 -Add snakes and ladders to snek map
 
 CR:
