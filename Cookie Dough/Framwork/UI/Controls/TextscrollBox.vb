@@ -38,6 +38,7 @@ Namespace Framework.UI.Controls
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, color As Color)
+            If RedrawBackground AndAlso BackgroundImage IsNot Nothing Then batcher.Draw(BackgroundImage, rect, New Rectangle(rect.X + 15, rect.Y + 15, rect.Width - 30, rect.Height - 30), Color.White)
             batcher.DrawRect(rect, BackgroundColor)
             batcher.DrawHollowRect(rect, color, Border.Width)
 

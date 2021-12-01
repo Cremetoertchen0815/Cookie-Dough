@@ -23,6 +23,7 @@ Namespace Game.BetretenVerboten
         ReadOnly Property HUDNameBtn As Controls.Button
         ReadOnly Property HUDmotdLabel As Controls.Label
         ReadOnly Property BGTexture As Texture2D
+        ReadOnly Property GameTexture As Texture2D
         ReadOnly Property StartCamPoses As Keyframe3D()
         ReadOnly Property TeamNames As String()
         Function GetCamPos() As Keyframe3D

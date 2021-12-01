@@ -44,6 +44,8 @@ Namespace Framework.UI.Controls
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, color As Color)
+            Dim f = Border.Width
+            If RedrawBackground AndAlso BackgroundImage IsNot Nothing Then batcher.Draw(BackgroundImage, rect, New Rectangle(rect.X + f, rect.Y + f, rect.Width - f * 2, rect.Height - f * 2), Color.White)
             batcher.DrawRect(rect, BackgroundColor)
             batcher.DrawHollowRect(rect, color, Border.Width)
             For i As Integer = 0 To workingtext.Length - 1

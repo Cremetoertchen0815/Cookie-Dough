@@ -2,6 +2,7 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
+Imports Nez.Textures
 
 Namespace Game.BetretenVerboten.Rendering
     Public Class Renderer3D
@@ -48,6 +49,8 @@ Namespace Game.BetretenVerboten.Rendering
         Private CamMatrix As Matrix
 
         'Common fields
+        Public BlurredContents As RenderTexture
+        Private BlurEffect As GaussianBlurPostProcessor
         Private Game As IGameWindow
         Private FigCount As Integer
         Private SpceCount As Integer
@@ -58,6 +61,9 @@ Namespace Game.BetretenVerboten.Rendering
         Public Sub New(game As IGameWindow, Optional order As Integer = 0)
             MyBase.New(order)
             Me.Game = game
+
+            RenderTexture = New RenderTexture()
+            BlurredContents = New RenderTexture(1920, 1080)
         End Sub
 
         Public Overrides Sub OnAddedToScene(scene As Scene)
@@ -89,6 +95,9 @@ Namespace Game.BetretenVerboten.Rendering
             'Load SFX for sliding
             SlideSFX = {scene.Content.LoadSoundEffect("sfx/slide_up_A"), scene.Content.LoadSoundEffect("sfx/slide_down_A")}
 
+            BlurEffect = scene.AddPostProcessor(New GaussianBlurPostProcessor(0) With {.Enabled = False})
+            BlurEffect.Effect.BlurAmount = 4
+
             'Load map related data
             Select Case Game.Map
                 Case GaemMap.Plus
@@ -119,12 +128,15 @@ Namespace Game.BetretenVerboten.Rendering
             dev.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents) With {.Name = "TmpA"}
 
-            RenderTexture = New Textures.RenderTexture()
 
             EffectA = New BasicEffect(dev) With {.Alpha = 1.0F,
             .VertexColorEnabled = True,
             .LightingEnabled = False,
-            .TextureEnabled = True
+            .TextureEnabled = True,
+            .FogEnabled = True,
+            .FogColor = Vector3.Zero,
+            .FogStart = 0.5F,
+            .FogEnd = 2.5F
         }
 
             batchlor = New Batcher(dev)
@@ -235,8 +247,14 @@ Namespace Game.BetretenVerboten.Rendering
             dev.SetRenderTarget(RenderTexture)
             dev.Clear(Color.Transparent)
 
+            batchlor.Begin()
+            batchlor.Draw(Game.BGTexture, New Rectangle(0, 0, 1920, 1080))
+            batchlor.End()
+
+
             dev.RasterizerState = RasterizerState.CullNone
             dev.DepthStencilState = DepthStencilState.Default
+            dev.SamplerStates(0) = SamplerState.AnisotropicClamp
 
             'Render map
             EffectA.World = Matrix.Identity
@@ -292,10 +310,19 @@ Namespace Game.BetretenVerboten.Rendering
                     effect.View = View
                     effect.Projection = Projection
                     effect.Alpha = 1
+                    effect.FogEnabled = True
+                    effect.FogColor = Vector3.Zero
+                    effect.FogStart = 0.5F
+                    effect.FogEnd = 2.5F
                 Next
 
                 mesh.Draw()
             Next
+
+            '---END OF RENDERER3D---
+
+            'Apply blur to the contents
+            BlurEffect.Process(RenderTexture, BlurredContents)
         End Sub
 
         Private Sub DrawChr(pos As Vector2, color As Color, basescale As Single, Optional zpos As Integer = 0, Optional scale As Single = 1)
@@ -314,6 +341,10 @@ Namespace Game.BetretenVerboten.Rendering
                     element.World = Matrix.CreateScale(basescale * scale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(New Vector3(-pos.X, -pos.Y, -zpos - AdditionalZPos.Value) + If(Game.Map > 2, New Vector3(475, 475, 0), Vector3.Zero))
                     element.View = View
                     element.Projection = Projection
+                    element.FogEnabled = True
+                    element.FogColor = Vector3.Zero
+                    element.FogStart = 0.5F
+                    element.FogEnd = 2.5F
                 Next
                 mesh.Draw()
             Next

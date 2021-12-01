@@ -23,6 +23,10 @@ Namespace Framework.Graphics
             effect.SpecularPower = 15
             effect.Alpha = 1
             effect.Projection = Projection
+            effect.FogEnabled = True
+            effect.FogColor = Vector3.Zero
+            effect.FogStart = 0.5F
+            effect.FogEnd = 3
         End Sub
         Friend Sub ApplyDefaultFX(effect As BasicEffect, Projection As Matrix, color As Color)
             effect.LightingEnabled = True
@@ -42,6 +46,10 @@ Namespace Framework.Graphics
             effect.SpecularPower = 15
             effect.Alpha = 1
             effect.Projection = Projection
+            effect.FogEnabled = True
+            effect.FogColor = Vector3.Zero
+            effect.FogStart = 0.5F
+            effect.FogEnd = 3
         End Sub
         Friend Sub ApplyDefaultFX(model As Model, Projection As Matrix, color As Color)
             For Each element In model.Meshes

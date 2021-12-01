@@ -1332,7 +1332,7 @@ Namespace Game.BetretenVerboten
 
         Public ReadOnly Property BGTexture As Texture2D Implements IGameWindow.BGTexture
             Get
-                Return Renderer.RenderTexture
+                Return Psyground.RenderTexture
             End Get
         End Property
 
@@ -1345,6 +1345,12 @@ Namespace Game.BetretenVerboten
         Public ReadOnly Property TeamNames As String() Implements IGameWindow.TeamNames
             Get
                 Return {TeamNameA, TeamNameB}
+            End Get
+        End Property
+
+        Public ReadOnly Property GameTexture As Texture2D Implements IGameWindow.GameTexture
+            Get
+                Return Renderer.RenderTexture
             End Get
         End Property
 #End Region

@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Framework.UI
     Public MustInherit Class GuiControl
@@ -14,12 +15,15 @@ Namespace Framework.UI
         Public Property Color As Color
         Public Property Font As NezSpriteFont Implements IParent.Font
         Public Property Children As New List(Of GuiControl)
+        Public Property RedrawBackground As Boolean = False
+        Public Shared BackgroundImage As Texture2D = Nothing
         Public MustOverride ReadOnly Property InnerBounds As Rectangle Implements IParent.Bounds
         Public Overridable ReadOnly Property OuterBounds As Rectangle
             Get
                 Return InnerBounds
             End Get
         End Property
+
 
         Public MustOverride Sub Init(system As IParent) Implements IParent.Init
         Public Overridable Sub Unload()

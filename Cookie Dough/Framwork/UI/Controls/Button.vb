@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Framework.UI.Controls
     Public Class Button
@@ -23,6 +24,7 @@ Namespace Framework.UI.Controls
         Private rect As Rectangle
         Private par As IParent
 
+
         Public Sub New(text As String, location As Vector2, size As Vector2)
             Me.Text = text
             Me.Location = location
@@ -38,6 +40,7 @@ Namespace Framework.UI.Controls
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, color As Color)
+            If RedrawBackground AndAlso BackgroundImage IsNot Nothing Then batcher.Draw(BackgroundImage, rect, New Rectangle(rect.X + rect.Width / 10, rect.Y + rect.Height / 10, rect.Width - rect.Width / 5, rect.Height - rect.Height / 5), Color.White)
             batcher.DrawRect(rect, BackgroundColor)
             batcher.DrawHollowRect(rect, color, Border.Width)
             batcher.DrawString(Font, Text, rect.Center.ToVector2 - Font.MeasureString(Text) / 2, If(Me.Color = Color.Transparent, color, Me.Color))

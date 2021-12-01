@@ -60,7 +60,9 @@ Namespace Framework.Graphics
             indexbuffer = New IndexBuffer(dev, IndexElementSize.ThirtyTwoBits, indexlist.Length, BufferUsage.WriteOnly)
             indexbuffer.SetData(indexlist)
 
-            Effect = New BasicEffect(dev)
+            Effect = New BasicEffect(Dev)
+
+            RenderTexture = New Textures.RenderTexture()
 
             faderA = New Transition(Of Color) With {.EndValue = RndColor(), .Value = .EndValue}
             faderB = New Transition(Of Color) With {.EndValue = RndColor(), .Value = .EndValue}
@@ -71,6 +73,7 @@ Namespace Framework.Graphics
         End Sub
 
         Public Overrides Sub Render(scene As Scene)
+            Dev.SetRenderTarget(RenderTexture)
 
             Effect.World = World
             Effect.View = View
@@ -85,15 +88,15 @@ Namespace Framework.Graphics
 
             vertexbuffer.SetData(vertexlist)
 
-            dev.BlendState = BlendState.AlphaBlend
+            Dev.BlendState = BlendState.AlphaBlend
 
             For Each element In Effect.CurrentTechnique.Passes
-                dev.SetVertexBuffer(vertexbuffer)
-                dev.Indices = indexbuffer
+                Dev.SetVertexBuffer(vertexbuffer)
+                Dev.Indices = indexbuffer
 
                 element.Apply()
 
-                dev.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4)
+                Dev.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4)
             Next
         End Sub
 
