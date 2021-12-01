@@ -5,6 +5,7 @@
 -Music stops playing
 
 BV:
+-Apply blur effect over UI transparent parts to simulate frosted glass
 -Add snakes and ladders to snek map
 
 CR:
