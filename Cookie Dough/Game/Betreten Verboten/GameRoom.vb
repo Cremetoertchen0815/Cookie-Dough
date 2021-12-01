@@ -713,7 +713,7 @@ Namespace Game.BetretenVerboten
 
                             'Prüfe einer die vier Spieler nicht anwesend sind, kehre zurück
                             For Each sp In Spielers
-                                If sp Is Nothing OrElse Not sp.Bereit OrElse (sp.TeamNameWish = String.Empty AndAlso (sp.Typ = SpielerTyp.Online Or sp.Typ = SpielerTyp.Local)) Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
+                                If sp Is Nothing OrElse Not sp.Bereit OrElse (sp.TeamNameWish = String.Empty And TeamMode AndAlso (sp.Typ = SpielerTyp.Online Or sp.Typ = SpielerTyp.Local)) Then Exit Select 'Falls ein Spieler noch nicht belegt/bereit, breche Spielstart ab
                             Next
 
                             'Falls vollzählig, starte Spiel
@@ -1007,6 +1007,9 @@ Namespace Game.BetretenVerboten
         Private Sub SendAngered(who As Integer)
             SendNetworkMessageToAll("p" & who.ToString)
         End Sub
+        Private Sub SendSlide(pl As Integer, figur As Integer, aim As Integer)
+            SendNetworkMessageToAll("o" & pl.ToString & figur.ToString & aim.ToString)
+        End Sub
         Private Sub SendPlayerBack(index As Integer)
             SendNetworkMessageToAll("r" & index.ToString)
             SendSync()
@@ -1277,6 +1280,43 @@ Namespace Game.BetretenVerboten
             Else
                 Return False
             End If
+        End Function
+
+        Private Function CheckForSlide() As Boolean
+            Dim globalpos As Integer = PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1)
+            If SlideFields.ContainsKey(globalpos) AndAlso Not IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, SlideFields(globalpos)) Then
+                Status = SpielStatus.SaucerFlight
+                Dim aim As Integer = SlideFields(globalpos)
+
+                Renderer.TriggerSlideAnimation(FigurFaderZiel, aim, Sub()
+                                                                        'Figure out the saucer data
+                                                                        Dim saucertrigger As Boolean = False
+                                                                        Dim nr As Integer
+                                                                        For Each element In SaucerFields
+                                                                            If PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = element Then
+                                                                                saucertrigger = True
+                                                                                nr = element
+                                                                            End If
+                                                                        Next
+
+                                                                        If Not saucertrigger Then CheckForSlide()
+
+                                                                        'Trigger suicide
+                                                                        If CheckTeamSuicide() Then saucertrigger = False
+
+                                                                        'Trigger UFO, falls auf Feld gelandet
+                                                                        If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then
+                                                                            TriggerSaucer(nr)
+                                                                        ElseIf Status <> SpielStatus.SpielZuEnde Then
+                                                                            SwitchPlayer()
+                                                                        End If
+                                                                    End Sub)
+
+                SendSlide(FigurFaderZiel.Item1, FigurFaderZiel.Item2, aim)
+                Return True
+            End If
+
+            Return False
         End Function
 
         Private Function GetNormalDiceSum() As Integer
@@ -1569,30 +1609,22 @@ Namespace Game.BetretenVerboten
                 FigurFaderZ = New Transition(Of Integer)(New TransitionTypes.TransitionType_Parabole(FigurSpeed), 0, DopsHöhe, Nothing) : Automator.Add(FigurFaderZ)
             Else
                 If Not PlayStompSound Then SFX(2).Play()
-
-                Dim globalpos As Integer = PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1)
-                If SlideFields.ContainsKey(globalpos) AndAlso Not IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, SlideFields(globalpos)) Then
-                    Status = SpielStatus.SaucerFlight
-                    Dim aim As Integer = SlideFields(globalpos)
-
-                    Renderer.TriggerSlideAnimation(FigurFaderZiel, aim, Sub()
-                                                                            'Check for landing on suicide field
-                                                                            CheckTeamSuicide()
-
-                                                                            'Continue with other shit
-                                                                            If Status <> SpielStatus.SpielZuEnde Then SwitchPlayer()
-                                                                        End Sub)
-                End If
+                MoveActive = False
 
                 'Figure out the saucer data
                 Dim saucertrigger As Boolean = False
-                    Dim nr As Integer
-                    For Each element In SaucerFields
-                        If PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = element Then
-                            saucertrigger = True
-                            nr = element
-                        End If
-                    Next
+                Dim nr As Integer
+                For Each element In SaucerFields
+                    If PlayerFieldToGlobalField(Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2), FigurFaderZiel.Item1) = element Then
+                        saucertrigger = True
+                        nr = element
+                    End If
+                Next
+
+                If Not saucertrigger And CheckForSlide() Then
+                    Status = SpielStatus.Waitn
+                    Return
+                End If
 
                 'Trigger suicide
                 If CheckTeamSuicide() Then saucertrigger = False
@@ -1600,8 +1632,7 @@ Namespace Game.BetretenVerboten
                 'Trigger UFO, falls auf Feld gelandet
                 If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then TriggerSaucer(nr) Else SwitchPlayer()
 
-                    MoveActive = False
-                End If
+            End If
 
         End Sub
 

@@ -591,6 +591,11 @@ Namespace Game.BetretenVerboten
                         Else
                             Status = SpielStatus.Waitn
                         End If
+                    Case "o"c
+                        Dim pl As Integer = element(1).ToString
+                        Dim figur As Integer = element(2).ToString
+                        Dim aim As Integer = element.Substring(3)
+                        Renderer.TriggerSlideAnimation((pl, figur), aim, Sub() Return)
                     Case "p"c
                         Dim who As Integer = element(1).ToString
                         Spielers(who).AngerCount -= 1
