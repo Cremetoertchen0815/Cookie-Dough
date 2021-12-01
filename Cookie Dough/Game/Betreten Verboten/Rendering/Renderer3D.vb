@@ -18,7 +18,7 @@ Namespace Game.BetretenVerboten.Rendering
         Private MapBuffer As VertexBuffer
         Private TableModel As Model
         Private TableMatrix As Matrix
-        Private ResolutionMultiplier As Single = 1
+        Private ResolutionMultiplier As Single = 2
 
         'Sliding stuff
         Private SlideMover As Transition(Of Vector2)
