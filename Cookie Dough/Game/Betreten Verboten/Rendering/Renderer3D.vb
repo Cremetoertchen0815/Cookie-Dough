@@ -171,6 +171,18 @@ Namespace Game.BetretenVerboten.Rendering
             batchlor.Draw(SpielfeldVerbindungen, New Rectangle(0, 0, 950, 950), Color.White)
             batchlor.DrawHollowRect(New Rectangle(0, 0, 950, 950), Color.White, 5)
 
+            'Draw slide fields
+            For Each element In SlideFields
+                Dim source = FieldOffset + GetMapVectorPos(Game.Map, element.Item1)
+                Dim destination = FieldOffset + GetMapVectorPos(Game.Map, element.Item2)
+                Dim dir_vec = Vector2.Normalize(destination - source)
+                Dim clor = If(element.Item1 < element.Item2, Color.Lime, Color.Red)
+                Dim radius = sizes.Item1 + 2
+                batchlor.DrawLine(source + dir_vec * radius, destination, clor, 3)
+                batchlor.DrawCircle(destination, 3, clor, 6)
+                batchlor.DrawCircle(source, radius, clor, 6)
+            Next
+
             'Draw playfield
             If Game.Map = GaemMap.Snakes Then
                 'Draw snek field
@@ -204,11 +216,6 @@ Namespace Game.BetretenVerboten.Rendering
             'Draw UFO fields
             For Each element In Game.SaucerFields
                 batchlor.DrawCircle(FieldOffset + GetMapVectorPos(Game.Map, element), sizes.Item1, Color.SandyBrown, 5)
-            Next
-
-            'Draw slide fields
-            For Each element In SlideFields
-                batchlor.DrawCircle(FieldOffset + GetMapVectorPos(Game.Map, element.Item1), sizes.Item1, Color.Lime, 6)
             Next
 
             'Draw suicide fields
