@@ -973,8 +973,8 @@ Namespace Game.BetretenVerboten
                 Dim teamA = 0
                 Dim teamB = 0
                 For i As Integer = 0 To PlCount / 2 - 1
-                    If Spielers(i * 2).OriginalType = SpielerTyp.Local Or Spielers(i * 2).OriginalType = SpielerTyp.Online Then teamA += GetScore(i * 2)
-                    If Spielers(i * 2 + 1).OriginalType = SpielerTyp.Local Or Spielers(i * 2 + 1).OriginalType = SpielerTyp.Online Then teamB += GetScore(i * 2 + 1)
+                    If Spielers(i * 2).OriginalType <> SpielerTyp.None Then teamA += GetScore(i * 2)
+                    If Spielers(i * 2 + 1).OriginalType <> SpielerTyp.None Then teamB += GetScore(i * 2 + 1)
                 Next
 
                 Dim pls As New List(Of (String, Integer))
