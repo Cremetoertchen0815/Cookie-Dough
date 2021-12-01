@@ -2406,14 +2406,71 @@
 #begin prep/audio_5.wav
 /copy:prep/audio_5.wav
 
+#begin prep/cpu_0_0.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_0_0.wav
+
+#begin prep/cpu_0_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_0_1.wav
+
+#begin prep/cpu_1_0.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_1_0.wav
+
+#begin prep/cpu_1_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_1_1.wav
+
+#begin prep/cpu_2_0.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_2_0.wav
+
+#begin prep/cpu_2_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_2_1.wav
+
+#begin prep/cpu_3_0.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_3_0.wav
+
+#begin prep/cpu_3_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_3_1.wav
+
+#begin prep/cpu_5_0.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_5_0.wav
+
+#begin prep/cpu_5_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_5_1.wav
+
 #begin prep/plc.png
 /copy:prep/plc.png
 
 #begin prep/plc.wav
 /copy:prep/plc.wav
-
-#begin prep/tele.wav
-/copy:prep/tele.wav
 
 #begin sfx/access_denied.wav
 /importer:WavImporter

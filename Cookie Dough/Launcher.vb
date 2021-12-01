@@ -65,7 +65,7 @@ Public Module Launcher
     ''' <summary>
     ''' The "message of the days" of the colors by users
     ''' </summary>
-    Friend Property CPU_MOTDs As String() = {"Erleben, was verbindet.", "I'm simply the best!", "Humans suck!", "Ching chang chong, I bims 1 Asiate!", "I SUCK!", "I'm blue dabadee dabadei", "Alle Wege führen nach oben.", "I'm a star!"}
+    Friend Property CPU_MOTDs As String() = {"Erleben, was verbindet.", "Karsten.", "Humans suck!", "Ching chang chong, I bims 1 Asiate!", "I SUCK!", "I'm blue dabadee dabadei", "Alle Wege führen nach oben.", "I'm a star!"}
 
     ''' <summary>
     ''' The main entry point for the application.

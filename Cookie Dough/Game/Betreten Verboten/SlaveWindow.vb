@@ -149,6 +149,13 @@ Namespace Game.BetretenVerboten
                                                      Dim type As SpielerTyp = CInt(x())
                                                      Dim name As String = x()
                                                      Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
+                                                     If type = SpielerTyp.CPU Then
+                                                         If i = 4 Or i > 5 Then
+                                                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
+                                                         Else
+                                                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1")}
+                                                         End If
+                                                     End If
                                                  Next
 
                                                  'Set rejoin flag
@@ -722,7 +729,7 @@ Namespace Game.BetretenVerboten
 
                                                                      If SoundNr = 9 Then
                                                                          Try
-                                                                             'Receive sound
+                                                                             'Receive image
                                                                              If IdentSound = IdentType.Custom Then
                                                                                  File.WriteAllBytes("Cache/client/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
                                                                                  Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/client/" & Spielers(source).Name & "_pp.png")

@@ -241,11 +241,10 @@ Namespace Game.BetretenVerboten
                         If My.Settings.Thumbnail Then Spielers(i).Thumbnail = thumb
                     Case SpielerTyp.CPU
                         Spielers(i).MOTD = CPU_MOTDs(i)
-                        If i <> 0 Then
+                        If i = 4 Or i > 5 Then
                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
                         Else
-                            Dim sff = SoundEffect.FromFile("Content/prep/tele.wav")
-                            Spielers(i).CustomSound = {sff, sff}
+                            Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1")}
                         End If
                 End Select
             Next
@@ -1035,7 +1034,7 @@ Namespace Game.BetretenVerboten
             Dim dataSender As New Threading.Thread(Sub()
                                                        For i As Integer = 0 To Spielers.Length - 1
                                                            Dim pl = Spielers(i)
-                                                           If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
+                                                           If pl.Typ = SpielerTyp.Local Then
                                                                'Send Sound A
                                                                Dim txt As String = ""
                                                                Dim snd As IdentType = GetPlayerAudio(i, False, txt)
@@ -1068,14 +1067,6 @@ Namespace Game.BetretenVerboten
                         ret = My.Settings.SoundA
                         If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
                     End If
-                Case SpielerTyp.CPU
-                    Select Case i
-                        Case 0
-                            ret = IdentType.Custom
-                            txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Content/prep/tele.wav")))
-                        Case Else
-                            ret = If(IsB, IdentType.TypeA, IdentType.TypeB)
-                    End Select
             End Select
             Return ret
         End Function

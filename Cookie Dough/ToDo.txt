@@ -3,10 +3,9 @@
 -Check host leaving and others not being kicked out of the round
 -Work on code documentation
 -Music stops playing
+-Fix bloom
 
 BV:
--Custom CPU sounds(Lime -> Simply the best, Cyan -> Was ist denn mit Karsten los?, Gelb -> Asiate, Rot -> Ich bin in Gefahr, bitte helfen sie mir, Blau -> I'm blue dabadee, Teal -> Wandern, Olive ->  )
--If i'm bored, check kick points for slave
 -Add snakes and ladders to snek map
 
 CR:
