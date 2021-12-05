@@ -3,7 +3,6 @@
 -Music stops playing
 
 BV:
--Make sacrifice channces a little worse
 -Implement chat log feature
 -Add snakes and ladders to snek map
 
