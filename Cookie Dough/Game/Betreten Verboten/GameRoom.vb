@@ -243,7 +243,7 @@ Namespace Game.BetretenVerboten
                         If My.Settings.Thumbnail Then Spielers(i).Thumbnail = thumb
                     Case SpielerTyp.CPU
                         Spielers(i).MOTD = CPU_MOTDs(i)
-                        If i = 4 Or i > 5 Then
+                        If i > 5 Then
                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
                         Else
                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1")}

@@ -2466,6 +2466,18 @@
 /processorParam:Quality=Medium
 /build:prep/cpu_3_1.wav
 
+#begin prep/cpu_4_0.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_4_0.wav
+
+#begin prep/cpu_4_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Medium
+/build:prep/cpu_4_1.wav
+
 #begin prep/cpu_5_0.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
