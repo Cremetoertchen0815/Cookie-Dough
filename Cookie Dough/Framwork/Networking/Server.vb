@@ -20,7 +20,7 @@ Namespace Framework.Networking
         Private registered As Dictionary(Of String, String) '(ID, Username)
         Private games As New Dictionary(Of Integer, IGame)
         Private RNG As New System.Random
-        Private LogPath As String = "Log/" & Date.Now.ToShortDateString & ".log"
+        Private LogPath As String = "Log/server/" & Date.Now.ToShortDateString & ".log"
         Private HostSendLockObj As New Object
         Friend streamw As StreamWriter
 

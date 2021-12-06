@@ -88,6 +88,7 @@ Namespace Game.BetretenVerboten
         Private Chat As List(Of (String, Color))
 
         'Debug shit
+        Private LogPath As String = "Log/chat/" & Date.Now.ToShortDateString & " " & Date.Now.ToShortTimeString.Replace(":"c, "."c) & ".log"
         Private Shared dbgKickuser As Integer = -1
         Private Shared dbgExecSync As Boolean = False
         Private Shared dbgPlaceCmd As (Integer, Integer, Integer)
@@ -1665,7 +1666,12 @@ Namespace Game.BetretenVerboten
         End Sub
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))
+            Log(txt)
             HUDChat.ScrollDown = True
+        End Sub
+
+        Private Sub Log(text As String)
+            IO.File.AppendAllText(LogPath, text & Environment.NewLine)
         End Sub
 
         Private Sub Sacrifice(pl As Integer, figur As Integer)

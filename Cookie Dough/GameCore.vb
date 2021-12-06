@@ -28,7 +28,8 @@ Public Class GameCore
 
         'Prepare program
         IO.Directory.CreateDirectory("Cache/server/")
-        IO.Directory.CreateDirectory("Log/")
+        IO.Directory.CreateDirectory("Log/server")
+        IO.Directory.CreateDirectory("Log/chat")
         IO.Directory.CreateDirectory("Save/")
         PauseOnFocusLost = False
         Screen.SetSize(1280, 720)

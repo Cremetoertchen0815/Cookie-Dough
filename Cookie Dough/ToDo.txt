@@ -3,7 +3,6 @@
 -Music stops playing
 
 BV:
--Implement chat log feature
 -Add snakes and ladders to snek map
 
 CR:
