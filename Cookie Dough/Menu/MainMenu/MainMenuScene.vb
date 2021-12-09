@@ -41,7 +41,7 @@ Namespace Menu.MainMenu
             Core.Instance.IsMouseVisible = True
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
-            GameList = {("Betreten Verboten", "Lido", True), ("Timestein", "Mühle", False), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
+            GameList = {("Betreten Verboten", "Lido", True), ("Car Crash", "Professional racing simulator", True), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
                         ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Just try it out already.", True)}
         End Sub
 
@@ -81,6 +81,8 @@ Namespace Menu.MainMenu
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.CreatorMenu))
                                 Case GameType.Corridor
                                     Core.StartSceneTransition(New FadeTransition(Function() New Game.Corridor.GameRoom))
+                                Case GameType.CarCrash
+                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.CarCrash.CreatorMenu))
                                 Case GameList.Length
                                     SwitchToSubmenu(0)
                             End Select

@@ -1,6 +1,13 @@
 ﻿-Test DC, BR and DT!
 -Work on code documentation
 -Music stops playing
+-Global leader board watching system
+
+CC:
+-Move JSONS to proper place
+-Implement 3D renderer
+-Implement networking
+-Implement SFX and bgm
 
 BV:
 -Add snakes and ladders to snek map

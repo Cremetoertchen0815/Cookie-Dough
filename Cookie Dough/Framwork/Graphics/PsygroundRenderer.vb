@@ -34,9 +34,10 @@ Namespace Framework.Graphics
         Public Property Colors As Color() = {Color.Blue, Color.DarkCyan, Color.Purple, Color.Orange, Color.Green, Color.Teal, Color.Black, Color.Maroon}
         Public Property Speed As Integer = 10000
 
-        Public Sub New(Optional order As Integer = 0, Optional Alpha As Single = 0.3F)
+        Public Sub New(Optional order As Integer = 0, Optional Alpha As Single = 0.3F, Optional UseRenderTexture As Boolean = True)
             MyBase.New(order)
             Me.Alpha = Alpha
+            If UseRenderTexture Then RenderTexture = New Textures.RenderTexture()
         End Sub
 
         Public Overrides Sub OnAddedToScene(scene As Scene)
@@ -62,8 +63,6 @@ Namespace Framework.Graphics
 
             Effect = New BasicEffect(Dev)
 
-            RenderTexture = New Textures.RenderTexture()
-
             faderA = New Transition(Of Color) With {.EndValue = RndColor(), .Value = .EndValue}
             faderB = New Transition(Of Color) With {.EndValue = RndColor(), .Value = .EndValue}
             faderC = New Transition(Of Color) With {.EndValue = RndColor(), .Value = .EndValue}
@@ -73,7 +72,7 @@ Namespace Framework.Graphics
         End Sub
 
         Public Overrides Sub Render(scene As Scene)
-            Dev.SetRenderTarget(RenderTexture)
+            If RenderTexture IsNot Nothing Then Dev.SetRenderTarget(RenderTexture)
 
             Effect.World = World
             Effect.View = View

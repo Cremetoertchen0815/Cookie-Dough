@@ -234,6 +234,8 @@ Namespace Framework.Networking
                     Return Game.DuoCard.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case GameType.DropTrop
                     Return Game.DropTrop.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
+                Case GameType.CarCrash
+                    Return Game.CarCrash.Networking.ExtGame.ServerSendCreateData(AddressOf ReadString, con, gamename, Key)
                 Case Else
                     Return Nothing
             End Select

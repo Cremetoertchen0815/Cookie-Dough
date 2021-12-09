@@ -11,7 +11,7 @@
     <AssemblyName>Cookie Dough</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
@@ -108,6 +108,15 @@
     <Compile Include="Game\Barrelled\Players\EgoPlayer.vb" />
     <Compile Include="Game\Barrelled\Players\CommonPlayer.vb" />
     <Compile Include="Game\Barrelled\Renderers\AdditionalHUDRendererable.vb" />
+    <Compile Include="Game\CarCrash\CreatorMenu.vb" />
+    <Compile Include="Game\CarCrash\Enums.vb" />
+    <Compile Include="Game\CarCrash\GameRoom.vb" />
+    <Compile Include="Game\CarCrash\IGameWindow.vb" />
+    <Compile Include="Game\CarCrash\Networking\ExtGame.vb" />
+    <Compile Include="Game\CarCrash\Networking\SyncMessage.vb" />
+    <Compile Include="Game\CarCrash\Player.vb" />
+    <Compile Include="Game\CarCrash\Rendering\Renderer3D.vb" />
+    <Compile Include="Game\CarCrash\Rendering\ScreenRenderer.vb" />
     <Compile Include="Game\Common\GameRoomTemplate.vb" />
     <Compile Include="Game\Common\BaseCardPlayer.vb" />
     <Compile Include="Game\Corridor\CreatorMenu.vb" />
@@ -250,6 +259,9 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -302,6 +314,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Users\Creme\source\repos\CarCrash\Carcrash\Carcrash.csproj">
+      <Project>{a7350e7c-2b1c-46ba-98ba-432994813c03}</Project>
+      <Name>Carcrash</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Nez-LF\Nez.Portable\Nez.csproj">
       <Project>{be8412bd-6f94-4c58-adbd-a24a3cead2f6}</Project>
       <Name>Nez</Name>

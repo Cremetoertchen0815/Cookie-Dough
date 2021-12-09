@@ -91,6 +91,18 @@
 /processorParam:TextureFormat=Color
 /build:btn_base_blali.png
 
+#begin C:/Users/Creme/Desktop/Dateien/Mixer/Cookie Dough/CarCrash/color_bars.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:C:/Users/Creme/Desktop/Dateien/Mixer/Cookie Dough/CarCrash/color_bars.jpg;games/CC/color_bars.jpg
+
 #begin dbg1.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -116,6 +128,13 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:font/ChatText.spritefont
+
+#begin font/ConsoleFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:font/ConsoleFont.spritefont
 
 #begin font/fnt_HKG_17_M.spritefont
 /importer:FontDescriptionImporter
@@ -1006,6 +1025,44 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:games/Cards/d9.png
+
+#begin games/CC/stool.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:games/CC/stool.fbx
+
+#begin games/CC/tv.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:games/CC/tv.fbx
 
 #begin games/MG/cards/A1.png
 /importer:TextureImporter

@@ -3,7 +3,7 @@
 ''' </summary>
 Public Enum GameType
     BetretenVerboten
-    Timestein
+    CarCrash
     Corridor
     Pain
     DuoCard
