@@ -91,18 +91,6 @@
 /processorParam:TextureFormat=Color
 /build:btn_base_blali.png
 
-#begin C:/Users/Creme/Desktop/Dateien/Mixer/Cookie Dough/CarCrash/color_bars.jpg
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:C:/Users/Creme/Desktop/Dateien/Mixer/Cookie Dough/CarCrash/color_bars.jpg;games/CC/color_bars.jpg
-
 #begin dbg1.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1025,6 +1013,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:games/Cards/d9.png
+
+#begin games/CC/color_bars.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:games/CC/color_bars.jpg
 
 #begin games/CC/stool.fbx
 /importer:FbxImporter

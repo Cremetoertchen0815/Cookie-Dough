@@ -2,6 +2,7 @@
 -Work on code documentation
 -Music stops playing
 -Global leader board watching system
+-Add controller support
 
 CC:
 -Move JSONS to proper place

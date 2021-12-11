@@ -9,6 +9,10 @@ Namespace Game.CarCrash.Rendering
 
 
         'Assets
+        Private Chairiel As Model
+        Private TViel As Model
+
+        'Graphics shit
         Private batchlor As Batcher
         Private dev As GraphicsDevice
         Private EffectA As BasicEffect
@@ -43,6 +47,9 @@ Namespace Game.CarCrash.Rendering
             MyBase.OnAddedToScene(scene)
 
             dev = Core.GraphicsDevice
+
+            Chairiel = scene.Content.Load(Of Model)("games/CC/stool")
+            TViel = scene.Content.Load(Of Model)("games/CC/tv")
 
             'Generate quad for map to be projected onto
             Dim vertices As New List(Of VertexPositionColorTexture) From {
@@ -79,6 +86,7 @@ Namespace Game.CarCrash.Rendering
         Public Overrides Sub Render(scene As Scene)
 
             CamMatrix = If(BeginTriggered, BeginCam.Value, Game.GetCamPos).GetMatrix
+            'CamMatrix = Matrix.Identity 'Matrix.CreateScale(0.4F) * Matrix.CreateRotationY(Time.TotalTime * 0.5F)
             View = CamMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
@@ -96,18 +104,55 @@ Namespace Game.CarCrash.Rendering
             dev.DepthStencilState = DepthStencilState.Default
             dev.SamplerStates(0) = SamplerState.AnisotropicClamp
 
-            'Render map
-            EffectA.World = Matrix.Identity
-            EffectA.View = View
-            EffectA.Projection = Projection
-            EffectA.TextureEnabled = True
-            EffectA.Texture = Game.EmuTexture
+            ''Render map
+            'EffectA.World = Matrix.Identity
+            'EffectA.View = View
+            'EffectA.Projection = Projection
+            'EffectA.TextureEnabled = True
+            'EffectA.Texture = Game.EmuTexture
 
-            For Each pass As EffectPass In EffectA.CurrentTechnique.Passes
-                dev.SetVertexBuffer(MapBuffer)
-                pass.Apply()
+            'For Each pass As EffectPass In EffectA.CurrentTechnique.Passes
+            '    dev.SetVertexBuffer(MapBuffer)
+            '    pass.Apply()
 
-                dev.DrawPrimitives(PrimitiveType.TriangleList, 0, MapBuffer.VertexCount)
+            '    dev.DrawPrimitives(PrimitiveType.TriangleList, 0, MapBuffer.VertexCount)
+            'Next
+
+
+
+            For Each mesh In TViel.Meshes
+                For i As Integer = 0 To mesh.Effects.Count - 1
+                    Dim fx As BasicEffect = CType(mesh.Effects(i), BasicEffect)
+                    fx.World = Matrix.CreateRotationY(Math.PI * 0.5F) * Matrix.CreateRotationZ(Math.PI * 0.5F) * Matrix.CreateScale(450, 400, 450)
+                    fx.View = View
+                    fx.Projection = Projection
+
+                    Select Case i
+                        Case 0
+                            fx.EnableDefaultLighting()
+                            fx.DiffuseColor = Vector3.One * 0.1F
+                        Case 1
+                            fx.DiffuseColor = Vector3.One
+                            fx.Texture = Game.EmuTexture
+                        Case 2
+                            fx.DiffuseColor = Vector3.One
+                            fx.EnableDefaultLighting()
+                    End Select
+                    'fx.DiffuseColor = Vector3.One
+                    'fx.EmissiveColor = Vector3.Zero
+                Next
+                mesh.Draw()
+                Next
+
+            For Each mesh In Chairiel.Meshes
+                For Each fx As BasicEffect In mesh.Effects
+                    fx.World = Matrix.CreateScale(400) * Matrix.CreateRotationX(Math.PI * 1.5F) * Matrix.CreateTranslation(0, -1380, 0)
+                    fx.View = View
+                    fx.Projection = Projection
+                    fx.EnableDefaultLighting()
+                    fx.DiffuseColor = Vector3.One
+                Next
+                mesh.Draw()
             Next
 
             '---END OF RENDERER3D---
@@ -131,10 +176,10 @@ Namespace Game.CarCrash.Rendering
         Friend Sub TriggerStartAnimation(FinalAction As Action)
             'Move camera down
             BeginTriggered = True
-            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_Acceleration(2500), New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False), New Keyframe3D(-79, -90, -169, 4.36, 1.39, 0.17, False), Sub()
-                                                                                                                                                                                                                                FinalAction()
-                                                                                                                                                                                                                                BeginTriggered = False
-                                                                                                                                                                                                                            End Sub)
+            BeginCam = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(3000), New Keyframe3D(0, 0, 5000, 1, 0, 0.2, True), New Keyframe3D(0, 0, 0, 0, 0, 0, True), Sub()
+                                                                                                                                                                                                      FinalAction()
+                                                                                                                                                                                                      BeginTriggered = False
+                                                                                                                                                                                                  End Sub)
             Automator.Add(BeginCam)
         End Sub
 

@@ -48,7 +48,7 @@ Namespace Game.CarCrash
         Friend Renderer As Renderer3D
 
         'Spielfeld
-        Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)} 'Bewegt die Kamera 
+        Friend CamPos As Keyframe3D = New Keyframe3D(0, 0, 5000, 1, 0, 0.2, True) 'Bewegt die Kamera 
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
 
         'HUD
@@ -100,7 +100,7 @@ Namespace Game.CarCrash
             EmulationRenderer = AddRenderer(New RenderLayerRenderer(0, -3) With {.RenderTexture = New Textures.RenderTexture(1920, 1080)})
             Dim EmuEntity = CreateEntity("emulation")
             TestCard = EmuEntity.AddComponent(New SpriteRenderer(Content.LoadTexture("games/CC/color_bars")) With {.RenderLayer = -3, .LayerDepth = 0F, .LocalOffset = New Vector2(1920, 1080) / 2})
-            Emulator = EmuEntity.AddComponent(New ConsoleEmulator(AddressOf Global.Carcrash.Menu.Main) With {.RenderLayer = -3, .LayerDepth = 0.5F, .Enabled = False, .TransformMatrix = Matrix.CreateScale(1.4F)})
+            Emulator = EmuEntity.AddComponent(New ConsoleEmulator(AddressOf Global.Carcrash.Menu.Main) With {.RenderLayer = -3, .LayerDepth = 0.5F, .Enabled = False, .TransformMatrix = Matrix.CreateScale(1.3F, 1.0F, 1.0F) * Matrix.CreateTranslation(0, 150, 0)})
             EmuEntity.AddComponent(New PrototypeSpriteRenderer(1920, 1080) With {.Color = Color.Black, .LocalOffset = New Vector2(1920, 1080) / 2, .RenderLayer = -3, .LayerDepth = 1.0F})
 
             Psyground = AddRenderer(New PsygroundRenderer(1, 0.3))
@@ -175,9 +175,10 @@ Namespace Game.CarCrash
                         StopUpdating = True
                         Core.Schedule(0.8, Sub()
                                                PostChat("The game has started!", Color.White)
-                                               FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = New Keyframe3D}
+                                               CamPos = New Keyframe3D
                                                'Start game
                                                Renderer.TriggerStartAnimation(Sub()
+                                                                                  TestCard.Enabled = False
                                                                                   Emulator.Enabled = True
                                                                                   HUDInstructions.Text = " "
                                                                               End Sub)
@@ -473,7 +474,7 @@ Namespace Game.CarCrash
         End Property
 
         Public Function GetCamPos() As Keyframe3D Implements IGameWindow.GetCamPos
-            Return Nothing
+            Return CamPos
         End Function
 
         Public ReadOnly Property EmuTexture As Texture2D Implements IGameWindow.EmuTexture
