@@ -5,8 +5,8 @@
 -Add controller support
 
 CC:
--Move JSONS to proper place
--Implement 3D renderer
+-Implement color switch by button press
+-Implement difficulty setting in selection menu
 -Implement networking
 -Implement SFX and bgm
 
