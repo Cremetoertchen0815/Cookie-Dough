@@ -32,6 +32,7 @@ Namespace Game.CarCrash
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
         Private StopWhenRealStart As Boolean = False 'Notices, that the game is supposed to be interrupted, as soon as it's being started
         Private MultiPlayer As Boolean
+        Private EmuEntity As Entity
         Private Emulator As ConsoleEmulator
         Private TestCard As SpriteRenderer
 
@@ -65,6 +66,9 @@ Namespace Game.CarCrash
         Private ShowDice As Boolean = False
         Private Chat As List(Of (String, Color))
 
+        'Buttons
+        Private BtnColorChange As VirtualButton
+
         'Konstanten
         Private Const WürfelDauer As Integer = 320
         Private Const WürfelAnimationCooldown As Integer = 4
@@ -97,17 +101,22 @@ Namespace Game.CarCrash
             Fanfare = Content.Load(Of Song)("bgm/fanfare")
             DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
 
+            'Create emulation renderer
             EmulationRenderer = AddRenderer(New RenderLayerRenderer(0, -3) With {.RenderTexture = New Textures.RenderTexture(1920, 1080)})
-            Dim EmuEntity = CreateEntity("emulation")
+            EmuEntity = CreateEntity("emulation")
             TestCard = EmuEntity.AddComponent(New SpriteRenderer(Content.LoadTexture("games/CC/color_bars")) With {.RenderLayer = -3, .LayerDepth = 0F, .LocalOffset = New Vector2(1920, 1080) / 2})
-            Emulator = EmuEntity.AddComponent(New ConsoleEmulator(AddressOf Global.Carcrash.Menu.Main) With {.RenderLayer = -3, .LayerDepth = 0.5F, .Enabled = False, .TransformMatrix = Matrix.CreateScale(1.3F, 1.0F, 1.0F) * Matrix.CreateTranslation(0, 150, 0)})
             EmuEntity.AddComponent(New PrototypeSpriteRenderer(1920, 1080) With {.Color = Color.Black, .LocalOffset = New Vector2(1920, 1080) / 2, .RenderLayer = -3, .LayerDepth = 1.0F})
 
+            'Creater other renderers
             Psyground = AddRenderer(New PsygroundRenderer(1, 0.3))
             Renderer = AddRenderer(New Renderer3D(Me, 2))
 
+            'Create virtual gamescreen
             AddRenderer(New RenderLayerRenderer(3, -2, -1)) 'HUD renderer
             CreateEntity("gamescreen").AddComponent(New ScreenRenderer(Renderer.RenderTexture) With {.RenderLayer = -1})
+
+            'Assign buttons
+            BtnColorChange = New VirtualButton(New VirtualButton.KeyboardKey(Keys.C))
 
             'Lade HUD
             Dim glass = New Color(5, 5, 5, 185)
@@ -179,11 +188,25 @@ Namespace Game.CarCrash
                                                'Start game
                                                Renderer.TriggerStartAnimation(Sub()
                                                                                   TestCard.Enabled = False
-                                                                                  Emulator.Enabled = True
+                                                                                  Emulator = EmuEntity.AddComponent(New ConsoleEmulator(AddressOf LaunchGame) With {.RenderLayer = -3, .LayerDepth = 0.5F, .TransformMatrix = Matrix.CreateScale(1.3F, 1.0F, 1.0F) * Matrix.CreateTranslation(0, 150, 0)})
                                                                                   HUDInstructions.Text = " "
+                                                                                  Status = SpielStatus.SpielAktiv
+                                                                                  StopUpdating = False
                                                                               End Sub)
                                                SendBeginGaem()
                                            End Sub)
+                    Case SpielStatus.SpielAktiv
+                        If BtnColorChange.IsPressed Then
+                            Select Case Emulator.FixedForegroundTint
+                                Case ConsoleColor.Cyan
+                                    Emulator.FixedForegroundTint = ConsoleColor.Red
+                                Case ConsoleColor.Red
+                                    Emulator.FixedForegroundTint = ConsoleColor.White
+                                Case Else
+                                    Emulator.FixedForegroundTint = ConsoleColor.Cyan
+                            End Select
+
+                        End If
                     Case SpielStatus.SpielZuEnde
                         StopUpdating = True
                 End Select
@@ -410,6 +433,11 @@ Namespace Game.CarCrash
 
 
 #Region "Hilfsfunktionen"
+
+        Private Sub LaunchGame()
+            Dim GameInstance = New Global.Carcrash.GameLoop()
+            GameInstance.Launch()
+        End Sub
 
         Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
             If ident <> IdentType.Custom Then

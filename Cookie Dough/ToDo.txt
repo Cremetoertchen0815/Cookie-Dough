@@ -5,7 +5,6 @@
 -Add controller support
 
 CC:
--Implement color switch by button press
 -Implement difficulty setting in selection menu
 -Implement networking
 -Implement SFX and bgm
