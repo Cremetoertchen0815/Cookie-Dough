@@ -5,6 +5,7 @@
 -Add controller support
 
 CC:
+-Replace local leaderboard with a personal high score & sync with server(when online)
 -Implement difficulty setting in selection menu
 -Implement SFX and bgm
 
