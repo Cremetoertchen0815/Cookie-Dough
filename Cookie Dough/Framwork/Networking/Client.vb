@@ -11,13 +11,6 @@ Namespace Framework.Networking
         Public Property IsHost As Boolean
         Public Property SecondaryClient As Boolean = False
         Public Property LeaveFlag As Boolean
-            Get
-                Return _LeaveFlag
-            End Get
-            Set
-                _LeaveFlag = Value
-            End Set
-        End Property
 
         Public Property AutomaticRefresh As Boolean = True
         Public Shared Property OutputDelegate As Action(Of String) = Sub(x) Return
@@ -33,7 +26,6 @@ Namespace Framework.Networking
         Private listener As Thread
         Private data As New List(Of String)
         Private naem As String
-        Private _LeaveFlag As Boolean = False
 
         Public Sub New()
             Directory.CreateDirectory("Cache/client/")

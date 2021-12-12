@@ -17,7 +17,7 @@ Namespace Game.CarCrash
         Private ChangeNameButtonPressed As Boolean = False
         Friend Arrow As Texture2D
         Protected AllUser As New List(Of (String, String)) '(ID, Name)
-        Protected NewGamePlayers As SpielerTyp() = {SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local, SpielerTyp.Local}
+        Protected NewGamePlayers As SpielerTyp()
         Protected Whitelist As Integer() = {0, 0}
         Protected SecondScreen As MenuMode = MenuMode.ModeSelect
         Protected SM4Scroll As Single
@@ -57,8 +57,37 @@ Namespace Game.CarCrash
                 Select Case SecondScreen
                     Case MenuMode.ModeSelect
                         If New Rectangle(560, 350, 800, 100).Contains(mpos) And OneshotPressed Then StartNewRound("")
-                        If New Rectangle(560, 500, 800, 100).Contains(mpos) And OneshotPressed Then StartNewRound("")
+                        If New Rectangle(560, 500, 800, 100).Contains(mpos) And OneshotPressed And LocalClient.Connected Then SwitchToOtherScreen(MenuMode.UserSelect, Sub()
+                                                                                                                                                                           AllUser = New List(Of (String, String)) From {("", "Open")}
+                                                                                                                                                                           AllUser.AddRange(LocalClient.GetAllUsers)
+                                                                                                                                                                           SM4Scroll = 0
+                                                                                                                                                                       End Sub)
                         If New Rectangle(560, 650, 800, 100).Contains(mpos) And OneshotPressed Then Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene)) : MenuAktiviert = False
+                    Case MenuMode.UserSelect
+                        Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
+                        If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
+                        If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
+                        SM4Scroll = Mathf.Clamp(SM4Scroll - scrollval * 30, 0, Math.Max(375 + (Whitelist.Length - 1) * 150 - 1050, 0))
+
+                        'Upper buttons
+                        If New Rectangle(560, 200, 400, 100).Contains(mpos) And OneshotPressed Then OpenInputbox("Enter a name for the round:", "Start Round", AddressOf StartNewRound)
+                        If New Rectangle(960, 200, 400, 100).Contains(mpos) And OneshotPressed Then SwitchToOtherScreen(MenuMode.ModeSelect) 'Go to player selection screen
+
+                        'Whitelist items
+                        Dim offset As Integer = 0
+                        For i As Integer = 0 To NewGamePlayers.Length - 1
+                            If NewGamePlayers(i) = SpielerTyp.Online Then
+                                If New Rectangle(560, 350 + offset * 150 - CInt(SM4Scroll), 800, 100).Contains(mpos) And OneshotPressed Then
+                                    'Increment player
+                                    Dim once As Boolean = True
+                                    Do While once Or IsIDtaken(i)
+                                        Whitelist(i) = (Whitelist(i) + 1) Mod AllUser.Count
+                                        once = False
+                                    Loop
+                                End If
+                                offset += 1
+                            End If
+                        Next
                 End Select
             End If
 
@@ -158,12 +187,12 @@ Namespace Game.CarCrash
                         batcher.DrawString(MediumFont, "Select a mode:", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Select a mode:").X / 2, 225), FgColor)
 
                         batcher.DrawHollowRect(New Rectangle(560, 350, 800, 100), FgColor)
-                        batcher.DrawHollowRect(New Rectangle(560, 500, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 500, 800, 100), If(LocalClient.Connected, FgColor, Color.Red))
                         batcher.DrawHollowRect(New Rectangle(560, 650, 800, 100), FgColor)
 
 
                         batcher.DrawString(MediumFont, "Singleplayer", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Singleplayer").X / 2, 375), FgColor)
-                        batcher.DrawString(MediumFont, "Local vs. Online", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Local vs. Online").X / 2, 525), FgColor)
+                        batcher.DrawString(MediumFont, "Local vs. Online", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Local vs. Online").X / 2, 525), If(LocalClient.Connected, FgColor, Color.Red))
                         batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 675), FgColor)
                         'Case MenuMode.PlayerSelect
                         '    batcher.DrawString(TitleFont, "Car Crash Multiplayer", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Car Crash Multiplayer").X / 2, 50), FgColor)
@@ -191,27 +220,27 @@ Namespace Game.CarCrash
                         '    batcher.DrawLine(New Vector2(1920.0F / 2, 900), New Vector2(1920.0F / 2, 1000), FgColor)
                         '    batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Back").X / 2, 925), FgColor)
                         '    batcher.DrawString(MediumFont, "Start Round", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Start Round").X / 2, 925), FgColor)
-                        'Case MenuMode.UserSelect
-                        '    batcher.DrawString(TitleFont, "Select User", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Select User").X / 2, 50), FgColor)
+                    Case MenuMode.UserSelect
+                        batcher.DrawString(TitleFont, "Select User", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Select User").X / 2, 50), FgColor)
 
-                        '    'Draw top button
-                        '    batcher.DrawHollowRect(New Rectangle(560, 200 - CInt(instance.SM4Scroll), 800, 100), FgColor)
-                        '    batcher.DrawLine(New Vector2(1920.0F / 2, 200 - CInt(instance.SM4Scroll)), New Vector2(1920.0F / 2, 300 - CInt(instance.SM4Scroll)), FgColor)
-                        '    batcher.DrawString(MediumFont, "Start", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Start").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
-                        '    batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Back").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
-                        '    'Draw scroll arrows
-                        '    batcher.Draw(instance.Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
-                        '    batcher.Draw(instance.Arrow, New Rectangle(1420, 930, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.FlipHorizontally, 0)
-                        '    'Draw online player
-                        '    Dim offset As Integer = 0
-                        '    For i As Integer = 0 To instance.NewGamePlayers.Length - 1
-                        '        If instance.NewGamePlayers(i) = SpielerTyp.Online Then
-                        '            Dim str As String = "Player " & (i + 1).ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item2
-                        '            batcher.DrawHollowRect(New Rectangle(560, 350 + offset * 150 - CInt(instance.SM4Scroll), 800, 100), FgColor)
-                        '            batcher.DrawString(MediumFont, str, New Vector2(1920.0F / 2 - MediumFont.MeasureString(str).X / 2, 375 + offset * 150 - CInt(instance.SM4Scroll)), FgColor)
-                        '            offset += 1
-                        '        End If
-                        '    Next
+                        'Draw top button
+                        batcher.DrawHollowRect(New Rectangle(560, 200 - CInt(instance.SM4Scroll), 800, 100), FgColor)
+                        batcher.DrawLine(New Vector2(1920.0F / 2, 200 - CInt(instance.SM4Scroll)), New Vector2(1920.0F / 2, 300 - CInt(instance.SM4Scroll)), FgColor)
+                        batcher.DrawString(MediumFont, "Start", New Vector2(1920.0F / 2 - 200 - MediumFont.MeasureString("Start").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 + 200 - MediumFont.MeasureString("Back").X / 2, 225 - CInt(instance.SM4Scroll)), FgColor)
+                        'Draw scroll arrows
+                        batcher.Draw(instance.Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
+                        batcher.Draw(instance.Arrow, New Rectangle(1420, 930, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.FlipHorizontally, 0)
+                        'Draw online player
+                        Dim offset As Integer = 0
+                        For i As Integer = 0 To instance.NewGamePlayers.Length - 1
+                            If instance.NewGamePlayers(i) = SpielerTyp.Online Then
+                                Dim str As String = "Player " & (i + 1).ToString & ": " & instance.AllUser(instance.Whitelist(i)).Item2
+                                batcher.DrawHollowRect(New Rectangle(560, 350 + offset * 150 - CInt(instance.SM4Scroll), 800, 100), FgColor)
+                                batcher.DrawString(MediumFont, str, New Vector2(1920.0F / 2 - MediumFont.MeasureString(str).X / 2, 375 + offset * 150 - CInt(instance.SM4Scroll)), FgColor)
+                                offset += 1
+                            End If
+                        Next
                 End Select
 
 

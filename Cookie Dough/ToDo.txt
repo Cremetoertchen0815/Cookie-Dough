@@ -6,7 +6,6 @@
 
 CC:
 -Implement difficulty setting in selection menu
--Implement networking
 -Implement SFX and bgm
 
 BV:

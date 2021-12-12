@@ -1,5 +1,7 @@
 ﻿Imports System.Collections.Generic
+Imports System.IO
 Imports System.Linq
+Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Framework.UI
 Imports Cookie_Dough.Framework.UI.Controls
 Imports Cookie_Dough.Game.CarCrash.Rendering
@@ -16,7 +18,7 @@ Namespace Game.CarCrash
     ''' <summary>
     ''' Enthällt den eigentlichen Code für das Basis-Spiel
     ''' </summary>
-    Public Class GameRoom
+    Public Class SlaveWindow
         Inherits Scene
         Implements IGameWindow
 
@@ -80,18 +82,39 @@ Namespace Game.CarCrash
         Private Const CamSpeed As Integer = 1300
         Private Const SacrificeWait As Integer = 5
         Private SaucerChance As Integer = 18
-        Sub New(onlineMode As Boolean)
+        Sub New(ins As OnlineGameInstance)
+            LocalClient.AutomaticRefresh = False
+            NetworkMode = False
+
+            If Not LocalClient.JoinGame(ins, Sub(x)
+                                                 'Load map info
+                                                 Dim PlCount = CInt(x())
+
+                                                 'Load player info
+                                                 ReDim Spielers(PlCount - 1)
+                                                 UserIndex = CInt(x())
+                                                 For i As Integer = 0 To PlCount - 1
+                                                     Dim type As SpielerTyp = CInt(x())
+                                                     Dim name As String = x()
+                                                     Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
+                                                 Next
+
+                                                 'Set rejoin flag
+                                                 x() '= "Rejoin"
+
+                                             End Sub) Then LocalClient.AutomaticRefresh = True : Return
+
             'Bereite Flags und Variablen vor
             LocalClient.LeaveFlag = False
             LocalClient.IsHost = True
             Chat = New List(Of (String, Color))
-            MultiPlayer = onlineMode
-            Status = SpielStatus.WarteAufOnlineSpieler
             SpielerIndex = -1
-            UserIndex = -1
+            NetworkMode = True
             Global.Carcrash.Shared.WriteData = AddressOf SendData
 
-            Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
+            Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
+
+            LoadContent()
         End Sub
 
         Public Sub LoadContent()
@@ -235,82 +258,92 @@ Namespace Game.CarCrash
         Private Sub ReadAndProcessInputData()
 
 
-            Try
-                Dim data As String() = LocalClient.ReadStream()
-                For Each element In data
-                    Dim source As Integer = CInt(element(0).ToString)
-                    Dim command As Char = element(1)
-                    Select Case command
-                        Case "a"c 'Player arrived
-                            Dim txt As String() = element.Substring(2).Split("|")
-                            Spielers(source).Name = txt(0)
-                            Spielers(source).MOTD = txt(1)
-                            Spielers(source).ID = txt(2)
-                            Spielers(source).Bereit = True
-                            PostChat(Spielers(source).Name & " arrived!", Color.White)
-                            SendPlayerArrived(source, Spielers(source).Name, Spielers(source).MOTD, Spielers(source).ID)
-                        Case "c"c 'Sent chat message
+            'Implement move active
+            Dim data As String() = LocalClient.ReadStream()
+            For Each element In data
+                Dim command As Char = element(0)
+                Select Case command
+                    Case "a"c 'Player arrived
+                        Dim source As Integer = element(1).ToString
+                        Dim txt As String() = element.Substring(2).Split("|")
+                        Spielers(source).Name = txt(0)
+                        Spielers(source).MOTD = txt(1)
+                        Spielers(source).Bereit = True
+                        PostChat(Spielers(source).Name & " arrived!", Color.White)
+                    Case "b"c 'Begin gaem
+                        StopUpdating = True
+                        Core.Schedule(0.8, Sub()
+                                               PostChat("The game has started!", Color.White)
+                                               CamPos = New Keyframe3D
+                                               'Start game
+                                               Renderer.TriggerStartAnimation(Sub()
+                                                                                  TestCard.Enabled = False
+                                                                                  Emulator = EmuEntity.AddComponent(New ConsoleEmulator(AddressOf LaunchGame) With {.RenderLayer = -3, .LayerDepth = 0.5F, .TransformMatrix = Matrix.CreateScale(1.3F, 1.0F, 1.0F) * Matrix.CreateTranslation(0, 150, 0)})
+                                                                                  HUDInstructions.Text = " "
+                                                                                  Status = SpielStatus.SpielAktiv
+                                                                                  StopUpdating = False
+                                                                              End Sub)
+                                           End Sub)
+                    Case "c"c 'Sent chat message
+                        Dim source As Integer = element(1).ToString
+                        If source = 9 Then
                             Dim text As String = element.Substring(2)
-                            If source = 9 Then
-                                PostChat("[Guest]: " & text, Color.Gray)
-                                SendChatMessage(source, text)
-                            Else
-                                PostChat("[" & Spielers(source).Name & "]: " & text, playcolor(source))
-                                SendChatMessage(source, text)
-                            End If
-                        Case "d"c 'Receiving game-related data from the client
-                            Global.Carcrash.Shared.ReadData(element.Substring(2)) 'Redirect data
-                        Case "e"c 'Suspend gaem
-                            LocalClient.LeaveFlag = True
-                            StopUpdating = False
-                        Case "m"c 'Sent chat message
-                            Dim msg As String = element.Substring(2)
-                            PostChat(msg, Color.White)
-                            'Case "z"c 'Transmit user data
-                            '    Dim s As New Threading.Thread(Sub()
-                            '                                      Dim IdentSound As IdentType = CInt(element(2).ToString)
-                            '                                      Dim dataNr As Integer = CInt(element(3).ToString)
-                            '                                      Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-                            '                                      Try
-                            '                                          If dataNr = 9 Then
-                            '                                              'Receive pfp
-                            '                                              If IdentSound = IdentType.Custom Then
-                            '                                                  IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-                            '                                                  Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/server/" & Spielers(source).Name & "_pp.png")
-                            '                                              End If
-                            '                                              SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
-                            '                                          Else
-                            '                                              'Receive sound
-                            '                                              If IdentSound = IdentType.Custom Then
-                            '                                                  IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            '                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav")
-                            '                                              Else
-                            '                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
-                            '                                              End If
-                            '                                              SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
-                            '                                          End If
+                            PostChat("[Guest]: " & text, Color.Gray)
+                        Else
+                            PostChat("[" & Spielers(source).Name & "]: " & element.Substring(2), playcolor(source))
+                        End If
+                    Case "d"c
+                        Global.Carcrash.Shared.ReadData(element.Substring(1))
+                    Case "m"c 'Sent chat message
+                        Dim msg As String = element.Substring(1)
+                        PostChat(msg, Color.White)
+                        'Case "z"c 'Receive sound
+                        '    Dim dataReceiver As New Threading.Thread(Sub()
+                        '                                                 Dim source As Integer = element(1).ToString
+                        '                                                 Dim IdentSound As IdentType = CInt(element(2).ToString)
+                        '                                                 Dim SoundNr As Integer = element(3).ToString
+                        '                                                 Dim dat As String = element.Substring(4).Replace("_TATA_", "")
+                        '                                                 If source = UserIndex Then Exit Sub
+                        '                                                 Dim sound As SoundEffect
 
-                            '                                      Catch ex As Exception
-                            '                                          'Data damaged, send standard sound
-                            '                                          If dataNr = 9 Then Exit Sub
-                            '                                          IdentSound = If(dataNr = 0, IdentType.TypeB, IdentType.TypeA)
-                            '                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
-                            '                                          SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_")
-                            '                                      End Try
-                            '                                  End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
-                            '    s.Start()
+                        '                                                 If SoundNr = 9 Then
+                        '                                                     Try
+                        '                                                         'Receive sound
+                        '                                                         If IdentSound = IdentType.Custom Then
+                        '                                                             File.WriteAllBytes("Cache/client/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                        '                                                             Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/client/" & Spielers(source).Name & "_pp.png")
+                        '                                                         End If
+                        '                                                     Catch ex As Exception
+                        '                                                     End Try
+                        '                                                 Else
+                        '                                                     Try
+                        '                                                         'Receive sound
+                        '                                                         If IdentSound = IdentType.Custom Then
+                        '                                                             File.WriteAllBytes("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
+                        '                                                             sound = SoundEffect.FromFile("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav")
+                        '                                                         Else
+                        '                                                             sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
+                        '                                                         End If
+                        '                                                     Catch ex As Exception
+                        '                                                         'Data damaged, send standard sound
+                        '                                                         IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
+                        '                                                         sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
+                        '                                                     End Try
 
-                    End Select
-                Next
+                        '                                                     'Set sound for player
+                        '                                                     Spielers(source).CustomSound(SoundNr) = sound
+                        '                                                 End If
+                        '                                             End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
+                        '    dataReceiver.Start()
 
-            Catch ex As Exception
-
-            End Try
+                End Select
+            Next
         End Sub
 
         ' ---Methoden um Daten via den Server an die Clients zu senden---
-        Private Sub SendPlayerArrived(index As Integer, name As String, MOTD As String, ID As String)
-            SendNetworkMessageToAll("a" & index.ToString & name & "|" & MOTD & "|" & ID)
+
+        Friend Sub SendArrived()
+            LocalClient.WriteStream("a" & My.Settings.Username & "|" & My.Settings.MOTD & "|" & My.Settings.UniqueIdentifier) 'Nujoin
         End Sub
         Private Sub SendBeginGaem()
             Dim appendix As String = ""
@@ -390,13 +423,8 @@ Namespace Game.CarCrash
 #Region "Hilfsfunktionen"
 
         Private Sub LaunchGame()
-            If NetworkMode Then
-                Dim GameInstance = New Global.Carcrash.Game.OnlineGame.Host()
-                GameInstance.Run()
-            Else
-                Dim GameInstance = New Global.Carcrash.GameLoop()
-                GameInstance.Run()
-            End If
+            Dim GameInstance = New Global.Carcrash.Game.OnlineGame.Client()
+            GameInstance.Run()
         End Sub
 
         Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect

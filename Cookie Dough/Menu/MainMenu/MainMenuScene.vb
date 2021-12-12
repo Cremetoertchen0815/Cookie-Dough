@@ -436,6 +436,15 @@ Namespace Menu.MainMenu
                         BlockOnlineJoin = False
                         MsgBoxer.EnqueueMsgbox("Error connecting! " & ex.ToString)
                     End Try
+                Case GameType.CarCrash
+                    Try
+                        BlockOnlineJoin = True
+                        Dim client As New Game.CarCrash.SlaveWindow(ins)
+                        If client.NetworkMode Then Core.StartSceneTransition(New FadeTransition(Function() client)).OnTransitionCompleted = AddressOf client.SendArrived : BlockOnlineJoin = False Else MsgBoxer.EnqueueMsgbox("Error connecting!") : BlockOnlineJoin = False
+                    Catch ex As Exception
+                        BlockOnlineJoin = False
+                        MsgBoxer.EnqueueMsgbox("Error connecting! " & ex.ToString)
+                    End Try
             End Select
         End Sub
 

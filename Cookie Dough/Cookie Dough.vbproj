@@ -110,6 +110,7 @@
     <Compile Include="Game\Barrelled\Renderers\AdditionalHUDRendererable.vb" />
     <Compile Include="Game\CarCrash\CreatorMenu.vb" />
     <Compile Include="Game\CarCrash\Enums.vb" />
+    <Compile Include="Game\CarCrash\SlaveWindow.vb" />
     <Compile Include="Game\CarCrash\GameRoom.vb" />
     <Compile Include="Game\CarCrash\IGameWindow.vb" />
     <Compile Include="Game\CarCrash\Networking\ExtGame.vb" />
