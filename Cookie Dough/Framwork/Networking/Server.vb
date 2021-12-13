@@ -5,6 +5,7 @@ Imports System.Net
 Imports System.Net.Sockets
 Imports System.Text
 Imports System.Threading
+Imports Newtonsoft.Json
 Imports Nez.Console
 
 Namespace Framework.Networking
@@ -196,6 +197,81 @@ Namespace Framework.Networking
                             End Try
                         Case "membercount"
                             WriteString(con, list.Count)
+                        Case "leaderboard_submit"
+
+                            'Receive player scores
+                            Dim game As Integer = ReadString(con)
+                                Dim map As Integer = ReadString(con)
+                                Dim TeamMode As Boolean = CInt(ReadString(con)) = 1
+                                Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
+                            Dim highscore As List(Of (String, Double))
+                            Dim data As List(Of (String, Double)) = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(ReadString(con))
+                            Dim updated As Boolean() = New Boolean(2) {}
+                                Dim takenIDs As New List(Of String)
+                            'Load and update highscores
+                            If File.Exists(path) Then highscore = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Double))
+                            highscore.AddRange(data.ToArray)
+                                'Sort list
+                                highscore = highscore.OrderBy(Function(x) x.Item2).ToList()
+                                highscore.Reverse()
+
+
+                                'Send highscore feedback via chat
+                                If TeamMode Then
+                                    'Remove double gangers
+                                    Dim indx As Integer = 0
+                                    Dim ent As Integer = highscore.Count
+                                    Do Until indx >= ent
+                                        If takenIDs.Contains(highscore(indx).Item1) Then
+                                            highscore.RemoveAt(indx)
+                                            ent -= 1
+                                        Else
+                                            takenIDs.Add(highscore(indx).Item1)
+                                            indx += 1
+                                        End If
+                                    Loop
+                                End If
+
+                                'Delete access
+                                Do While highscore.Count > 10
+                                    highscore.RemoveAt(highscore.Count - 1)
+                                Loop
+
+                                'Update "updated" list
+                                For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
+                                    updated(i) = data.Contains(highscore(i))
+                                Next
+                                'Save to file
+                                File.WriteAllText(path, JsonConvert.SerializeObject(highscore))
+
+                                Dim ret_data = New List(Of (String, String, Double))()
+                                For Each element In highscore
+                                    ret_data.Add((registered(element.Item1), element.Item1, element.Item2))
+                                Next
+                                WriteString(con, JsonConvert.SerializeObject(ret_data))
+
+                            'Return data
+                            WriteString(con, "Yoshaas!")
+                        Case "leaderboard_read"
+
+                            'Receive player scores
+                            Dim game As Integer = ReadString(con)
+                            Dim map As Integer = ReadString(con)
+                            Dim TeamMode As Boolean = CInt(ReadString(con)) = 1
+                            Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
+                            Dim highscore As List(Of (String, Double))
+                            'Load and update highscores
+                            If File.Exists(path) Then highscore = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Double))
+
+
+                            Dim ret_data = New List(Of (String, String, Double))()
+                            For Each element In highscore
+                                ret_data.Add((registered(element.Item1), element.Item1, element.Item2))
+                            Next
+                            WriteString(con, JsonConvert.SerializeObject(ret_data))
+
+                            'Return data
+                            WriteString(con, "Yoshaas!")
                         Case Else
                             Console.WriteLine("sos")
                     End Select
@@ -333,17 +409,19 @@ Namespace Framework.Networking
                             Dim map As Integer = nl(2).ToString
                             Dim TeamMode As Boolean = CInt(nl(3).ToString) = 1
                             Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
-                            Dim highscore As List(Of (String, Integer))
-                            Dim data As List(Of (String, Integer)) = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(nl.Substring(4))
+                            Dim highscore As List(Of (String, Double))
+                            Dim data As List(Of (String, Double)) = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(nl.Substring(4))
                             Dim updated As Boolean() = New Boolean(2) {}
                             Dim takenIDs As New List(Of String)
                             'Load and update highscores
-                            If File.Exists(path) Then highscore = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, Integer)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Integer))
+                            If File.Exists(path) Then highscore = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Double))
                             highscore.AddRange(data.ToArray)
                             'Sort list
                             highscore = highscore.OrderBy(Function(x) x.Item2).ToList()
                             highscore.Reverse()
 
+
+                            'Send highscore feedback via chat
                             If TeamMode Then
                                 'Remove double gangers
                                 Dim indx As Integer = 0
@@ -369,23 +447,33 @@ Namespace Framework.Networking
                                 updated(i) = data.Contains(highscore(i))
                             Next
                             'Save to file
-                            File.WriteAllText(path, Newtonsoft.Json.JsonConvert.SerializeObject(highscore))
+                            File.WriteAllText(path, JsonConvert.SerializeObject(highscore))
 
-                            If TeamMode Then
-                                'Send chat stuff
-                                SendToAllGameClients(gaem, "mHighscores:", False)
-                                For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
-                                    Dim ii As Integer = i
-                                    Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & highscore(ii).Item1 & "(" & highscore(ii).Item2.ToString & If(updated(ii), ", GG!)", ")"), False))
-                                Next
-                            Else
-                                'Send chat stuff
-                                SendToAllGameClients(gaem, "mHighscores:", False)
-                                For i As Integer = 0 To 2
-                                    Dim ii As Integer = i
-                                    Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & registered(highscore(ii).Item1) & "(" & highscore(ii).Item2.ToString & If(updated(ii), ", GG!)", ")"), False))
-                                Next
-                            End If
+
+                            Select Case CType(game, GameType)
+                                Case GameType.CarCrash
+                                    Dim ret_data = New List(Of (String, String, Double))()
+                                    For Each element In highscore
+                                        ret_data.Add((registered(element.Item1), element.Item1, element.Item2))
+                                    Next
+                                    SendToAllGameClients(gaem, "h" & JsonConvert.SerializeObject(ret_data), False)
+                                Case Else
+                                    If TeamMode Then
+                                        'Send chat stuff
+                                        SendToAllGameClients(gaem, "mHighscores:", False)
+                                        For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
+                                            Dim ii As Integer = i
+                                            Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & highscore(ii).Item1 & "(" & highscore(ii).Item2.ToString & If(updated(ii), ", GG!)", ")"), False))
+                                        Next
+                                    Else
+                                        'Send chat stuff
+                                        SendToAllGameClients(gaem, "mHighscores:", False)
+                                        For i As Integer = 0 To 2
+                                            Dim ii As Integer = i
+                                            Core.Schedule(i + 1, Sub() SendToAllGameClients(gaem, "m" & (ii + 1).ToString & ": " & registered(highscore(ii).Item1) & "(" & highscore(ii).Item2.ToString & If(updated(ii), ", GG!)", ")"), False))
+                                        Next
+                                    End If
+                            End Select
                         Case "l"c, "I"c
                             'If host left, end game for everyone
                             SendEndToAllGameClients(gaem)

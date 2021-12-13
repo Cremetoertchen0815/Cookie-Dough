@@ -10,6 +10,7 @@ Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
+Imports Newtonsoft.Json
 Imports Nez.Console
 Imports Nez.Sprites
 Imports Nez.Tweens
@@ -111,6 +112,7 @@ Namespace Game.CarCrash
             SpielerIndex = -1
             NetworkMode = True
             Global.Carcrash.Shared.WriteData = AddressOf SendData
+            Global.Carcrash.Shared.RequestLeaderboardUpdate = AddressOf SendScore
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
@@ -294,47 +296,11 @@ Namespace Game.CarCrash
                         End If
                     Case "d"c
                         Global.Carcrash.Shared.ReadData(element.Substring(1))
+                    Case "p"c
+                        Global.Carcrash.Shared.CallbackLeaderboard(JsonConvert.DeserializeObject(Of (String, String, Double)())(element.Substring(1)), False)
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(1)
                         PostChat(msg, Color.White)
-                        'Case "z"c 'Receive sound
-                        '    Dim dataReceiver As New Threading.Thread(Sub()
-                        '                                                 Dim source As Integer = element(1).ToString
-                        '                                                 Dim IdentSound As IdentType = CInt(element(2).ToString)
-                        '                                                 Dim SoundNr As Integer = element(3).ToString
-                        '                                                 Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-                        '                                                 If source = UserIndex Then Exit Sub
-                        '                                                 Dim sound As SoundEffect
-
-                        '                                                 If SoundNr = 9 Then
-                        '                                                     Try
-                        '                                                         'Receive sound
-                        '                                                         If IdentSound = IdentType.Custom Then
-                        '                                                             File.WriteAllBytes("Cache/client/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-                        '                                                             Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/client/" & Spielers(source).Name & "_pp.png")
-                        '                                                         End If
-                        '                                                     Catch ex As Exception
-                        '                                                     End Try
-                        '                                                 Else
-                        '                                                     Try
-                        '                                                         'Receive sound
-                        '                                                         If IdentSound = IdentType.Custom Then
-                        '                                                             File.WriteAllBytes("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                        '                                                             sound = SoundEffect.FromFile("Cache/client/" & Spielers(source).Name & SoundNr.ToString & ".wav")
-                        '                                                         Else
-                        '                                                             sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
-                        '                                                         End If
-                        '                                                     Catch ex As Exception
-                        '                                                         'Data damaged, send standard sound
-                        '                                                         IdentSound = If(SoundNr = 0, IdentType.TypeB, IdentType.TypeA)
-                        '                                                         sound = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
-                        '                                                     End Try
-
-                        '                                                     'Set sound for player
-                        '                                                     Spielers(source).CustomSound(SoundNr) = sound
-                        '                                                 End If
-                        '                                             End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
-                        '    dataReceiver.Start()
 
                 End Select
             Next
@@ -351,8 +317,6 @@ Namespace Game.CarCrash
                 If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.CPU Then appendix &= i.ToString
             Next
             SendNetworkMessageToAll("b" & appendix)
-            SendPlayerData()
-            'SendSync()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
@@ -366,28 +330,9 @@ Namespace Game.CarCrash
         Private Sub SendMessage(msg As String)
             SendNetworkMessageToAll("m" & msg)
         End Sub
-        Private Sub SendPlayerData()
-            Dim dataSender As New Threading.Thread(Sub()
-                                                       For i As Integer = 0 To Spielers.Length - 1
-                                                           Dim pl = Spielers(i)
-                                                           If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
-                                                               'Send Sound A
-                                                               Dim txt As String = ""
-                                                               Dim snd As IdentType = GetPlayerAudio(i, False, txt)
-                                                               SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
-
-                                                               'Send Sound B
-                                                               snd = GetPlayerAudio(i, True, txt)
-                                                               SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
-
-                                                               'Send Thumbnail
-                                                               txt = ""
-                                                               If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/pp.png")))
-                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
-                                                           End If
-                                                       Next
-                                                   End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
-            dataSender.Start()
+        Private Sub SendScore(score As Double)
+            SendNetworkMessageToAll("p" & score.ToString)
+            Status = SpielStatus.SpielZuEnde
         End Sub
 
         Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType

@@ -8,6 +8,7 @@ Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 Imports Microsoft.Xna.Framework.Media
+Imports Newtonsoft.Json
 Imports Nez.Console
 Imports Nez.Sprites
 Imports Nez.Tweens
@@ -32,9 +33,6 @@ Namespace Game.CarCrash
         Private lastkstate As KeyboardState 'Enthält den Status der Tastatur aus dem letzten Frame
         Private StopWhenRealStart As Boolean = False 'Notices, that the game is supposed to be interrupted, as soon as it's being started
         Private MultiPlayer As Boolean
-        Private EmuEntity As Entity
-        Private Emulator As ConsoleEmulator
-        Private TestCard As SpriteRenderer
 
         'Assets
         Private Fanfare As Song
@@ -42,6 +40,11 @@ Namespace Game.CarCrash
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
         Private DataTransmissionThread As Threading.Thread
+
+        'Emulation
+        Private EmuEntity As Entity
+        Private Emulator As ConsoleEmulator
+        Private TestCard As SpriteRenderer
 
         'Renderer
         Friend Psyground As PsygroundRenderer
@@ -89,7 +92,13 @@ Namespace Game.CarCrash
             Status = SpielStatus.WarteAufOnlineSpieler
             SpielerIndex = -1
             UserIndex = -1
-            Global.Carcrash.Shared.WriteData = AddressOf SendData
+            Global.Carcrash.Shared.Username = My.Settings.Username
+            Global.Carcrash.Shared.ID = My.Settings.UniqueIdentifier
+            Global.Carcrash.Shared.WriteData = AddressOf SendGeneralPurposeData
+            Global.Carcrash.Shared.RequestLeaderboardUpdate = Sub(x)
+                                                                  Spielers(0).Score = x
+                                                                  Status = SpielStatus.SpielZuEnde
+                                                              End Sub
 
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
         End Sub
@@ -133,7 +142,6 @@ Namespace Game.CarCrash
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = Color.White
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
-
 
             'Screen content renderable
 
@@ -209,7 +217,25 @@ Namespace Game.CarCrash
 
                         End If
                     Case SpielStatus.SpielZuEnde
+                        'Check for highscore submission
+                        For Each element In Spielers
+                            If element.Score < 0 Then Exit Select
+                        Next
+
                         StopUpdating = True
+
+                        If MultiPlayer Or LocalClient.Connected Then
+                            'Submit highscore
+                            Dim hscore As New List(Of (String, Double))
+                            For Each element In Spielers
+                                hscore.Add((element.ID, element.Score))
+                            Next
+                            SendHighscore(hscore)
+                        Else
+                            Global.Carcrash.Shared.CallbackLeaderboard(Nothing, True)
+                        End If
+
+                        Status = SpielStatus.Waitn
                 End Select
             End If
 
@@ -263,43 +289,18 @@ Namespace Game.CarCrash
                         Case "e"c 'Suspend gaem
                             LocalClient.LeaveFlag = True
                             StopUpdating = False
+                        Case "h"c
+                            Dim dat = element.Substring(2)
+                            Global.Carcrash.Shared.CallbackLeaderboard(JsonConvert.DeserializeObject(Of (String, String, Double)())(dat), False)
+                            If MultiPlayer Then SendScoreboards(dat)
                         Case "m"c 'Sent chat message
                             Dim msg As String = element.Substring(2)
                             PostChat(msg, Color.White)
-                            'Case "z"c 'Transmit user data
-                            '    Dim s As New Threading.Thread(Sub()
-                            '                                      Dim IdentSound As IdentType = CInt(element(2).ToString)
-                            '                                      Dim dataNr As Integer = CInt(element(3).ToString)
-                            '                                      Dim dat As String = element.Substring(4).Replace("_TATA_", "")
-                            '                                      Try
-                            '                                          If dataNr = 9 Then
-                            '                                              'Receive pfp
-                            '                                              If IdentSound = IdentType.Custom Then
-                            '                                                  IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
-                            '                                                  Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/server/" & Spielers(source).Name & "_pp.png")
-                            '                                              End If
-                            '                                              SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
-                            '                                          Else
-                            '                                              'Receive sound
-                            '                                              If IdentSound = IdentType.Custom Then
-                            '                                                  IO.File.WriteAllBytes("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav", Compress.Decompress(Convert.FromBase64String(dat)))
-                            '                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Cache/server/" & Spielers(source).Name & dataNr.ToString & ".wav")
-                            '                                              Else
-                            '                                                  Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
-                            '                                              End If
-                            '                                              SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_" & dat)
-                            '                                          End If
-
-                            '                                      Catch ex As Exception
-                            '                                          'Data damaged, send standard sound
-                            '                                          If dataNr = 9 Then Exit Sub
-                            '                                          IdentSound = If(dataNr = 0, IdentType.TypeB, IdentType.TypeA)
-                            '                                          Spielers(source).CustomSound(dataNr) = SoundEffect.FromFile("Content/prep/audio_" & CInt(IdentSound).ToString & ".wav")
-                            '                                          SendNetworkMessageToAll("z" & source.ToString & CInt(IdentSound).ToString & dataNr.ToString & "_TATA_")
-                            '                                      End Try
-                            '                                  End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
-                            '    s.Start()
-
+                        Case "p"c
+                            Dim score As Integer = CInt(element.Substring(2))
+                            Spielers(source).Score = score
+                        Case Else
+                            Throw New Exception("Wat")
                     End Select
                 Next
 
@@ -318,14 +319,30 @@ Namespace Game.CarCrash
                 If Spielers(i).Typ = SpielerTyp.Local Or Spielers(i).Typ = SpielerTyp.CPU Then appendix &= i.ToString
             Next
             SendNetworkMessageToAll("b" & appendix)
-            SendPlayerData()
-            'SendSync()
         End Sub
         Private Sub SendChatMessage(index As Integer, text As String)
             SendNetworkMessageToAll("c" & index.ToString & text)
         End Sub
-        Private Sub SendData(data As String)
+        Private Sub SendGeneralPurposeData(data As String)
             SendNetworkMessageToAll("d" & data)
+        End Sub
+        Private Sub SendHighscore(data As List(Of (String, Double)))
+            Dim diff = If(Global.Carcrash.Shared.Difficulty = Global.Carcrash.Game.Difficulty.Easy, 0, 2 - Global.Carcrash.Shared.Difficulty)
+
+            If MultiPlayer Then
+                'Registered round
+                SendNetworkMessageToAll("h" & CInt(GameType.CarCrash) & diff & "0" & JsonConvert.SerializeObject(data))
+            Else
+                'Idle commands for single player leaderboard registration
+                LocalClient.WriteStream("leaderboard_submit")
+                LocalClient.WriteStream(CInt(GameType.CarCrash))
+                LocalClient.WriteStream(diff)
+                LocalClient.WriteStream(0)
+                LocalClient.WriteStream(JsonConvert.SerializeObject(data))
+                'Receive data from server
+                Global.Carcrash.Shared.CallbackLeaderboard(JsonConvert.DeserializeObject(Of (String, String, Double)())(LocalClient.ReadString()), False)
+                If LocalClient.ReadString() <> "Yoshaas!" Then Throw New Exception("W A T")
+            End If
         End Sub
         Private Sub SendGameClosed()
             SendNetworkMessageToAll("l")
@@ -333,28 +350,8 @@ Namespace Game.CarCrash
         Private Sub SendMessage(msg As String)
             SendNetworkMessageToAll("m" & msg)
         End Sub
-        Private Sub SendPlayerData()
-            Dim dataSender As New Threading.Thread(Sub()
-                                                       For i As Integer = 0 To Spielers.Length - 1
-                                                           Dim pl = Spielers(i)
-                                                           If pl.Typ = SpielerTyp.Local Or pl.Typ = SpielerTyp.CPU Then
-                                                               'Send Sound A
-                                                               Dim txt As String = ""
-                                                               Dim snd As IdentType = GetPlayerAudio(i, False, txt)
-                                                               SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
-
-                                                               'Send Sound B
-                                                               snd = GetPlayerAudio(i, True, txt)
-                                                               SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
-
-                                                               'Send Thumbnail
-                                                               txt = ""
-                                                               If My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/pp.png")))
-                                                               SendNetworkMessageToAll("z" & i.ToString & If(My.Settings.Thumbnail And pl.Typ = SpielerTyp.Local, CInt(IdentType.Custom), 0).ToString & "9" & "_TATA_" & txt)
-                                                           End If
-                                                       Next
-                                                   End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
-            dataSender.Start()
+        Private Sub SendScoreboards(data As String)
+            SendNetworkMessageToAll("p" & data)
         End Sub
 
         Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType

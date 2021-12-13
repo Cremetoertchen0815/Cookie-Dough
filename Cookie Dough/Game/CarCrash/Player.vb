@@ -14,6 +14,7 @@ Namespace Game.CarCrash
         Public Property ID As String Implements IPlayer.ID
         Public Property CustomSound As SoundEffect() Implements IPlayer.CustomSound
         Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
+        Public Property Score As Double = -1D
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ
         End Sub

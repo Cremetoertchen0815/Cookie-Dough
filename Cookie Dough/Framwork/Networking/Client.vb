@@ -115,7 +115,7 @@ Namespace Framework.Networking
             blastmode = False
         End Sub
 
-        Private Function ReadString() As String
+        Friend Function ReadString() As String
             Try
                 Dim tmp As String = streamr.ReadLine
                 If Not Server.ServerActive And Not tmp.Contains("_TATA_") Then Console.WriteLine("[Client/I]" & tmp)

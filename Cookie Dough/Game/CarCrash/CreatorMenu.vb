@@ -105,12 +105,11 @@ Namespace Game.CarCrash
 
             OnlineMode = servername <> ""
             If OnlineMode Then LocalClient.AutomaticRefresh = False
-
             Dim local_count As Integer = 1
             Dim AktuellesSpiel As New GameRoom(OnlineMode)
             ReDim AktuellesSpiel.Spielers(If(OnlineMode, 1, 0))
             AktuellesSpiel.NetworkMode = False
-            AktuellesSpiel.Spielers(0) = New Player(SpielerTyp.Local) With {.Name = My.Settings.Username, .Bereit = True}
+            AktuellesSpiel.Spielers(0) = New Player(SpielerTyp.Local) With {.Name = My.Settings.Username, .ID = My.Settings.UniqueIdentifier, .Bereit = True}
             If OnlineMode Then AktuellesSpiel.Spielers(1) = New Player(SpielerTyp.Online) With {.Bereit = False}
             AktuellesSpiel.LoadContent()
 
