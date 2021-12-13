@@ -41,8 +41,8 @@ Namespace Menu.MainMenu
             Core.Instance.IsMouseVisible = True
             rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
 
-            GameList = {("Betreten Verboten", "Lido", True), ("Car Crash", "Professional racing simulator", True), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
-                        ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Just try it out already.", True)}
+            GameList = {("Betreten Verboten", "Lido", True), ("Car Crash", "Wheel speen sim", True), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
+                        ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Error 404", True)}
         End Sub
 
         Public Overrides Sub Update()
