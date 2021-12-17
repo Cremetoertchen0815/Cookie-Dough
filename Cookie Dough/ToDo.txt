@@ -1,5 +1,4 @@
 ﻿-Test DC, BR and DT!
--Work on code documentation
 -Music stops playing
 -Global leader board watching system
 -Add controller support
@@ -10,12 +9,17 @@ CC:
 -Implement SFX and bgm
 
 BV:
+-Fix UFO for snek
+-Fix cam intro for snek
 -Add snakes and ladders to snek map
 
 CR:
 -Johannes soll seinen Arsch bewegen
 
 DC:
+
+-Add play figures
+-Add glow to figures if clickable
 -Add CPUs (JOHANNES)
 
 BR:
