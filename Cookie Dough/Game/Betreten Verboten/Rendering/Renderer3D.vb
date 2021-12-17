@@ -188,9 +188,9 @@ Namespace Game.BetretenVerboten.Rendering
                 Dim source = FieldOffset + GetMapVectorPos(Game.Map, element.Item1)
                 Dim destination = FieldOffset + GetMapVectorPos(Game.Map, element.Item2)
                 Dim dir_vec = Vector2.Normalize(destination - source)
-                Dim clor = If(element.Item1 < element.Item2, Color.Lime, Color.Red)
+                Dim clor = If(element.Item1 < element.Item2, New Color(50, 120, 50), New Color(180, 30, 30))
                 Dim radius = sizes.Item1 + 2
-                batchlor.DrawLine(source + dir_vec * radius, destination, clor, 3)
+                batchlor.DrawLine(source + dir_vec * radius, destination, clor, 5)
                 batchlor.DrawCircle(destination, 3, clor, 6)
                 batchlor.DrawCircle(source, radius, clor, 6)
             Next
