@@ -9,6 +9,9 @@ CC:
 -Implement SFX and bgm
 
 BV:
+-Darken slide arrows
+-Give UFO priority over sliding
+-Fix landing UFO un slide field, doesn't trigger
 -Fix UFO for snek
 -Fix cam intro for snek
 

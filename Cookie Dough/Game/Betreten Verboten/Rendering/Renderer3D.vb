@@ -407,11 +407,11 @@ Namespace Game.BetretenVerboten.Rendering
 
             Core.Schedule(0.5, Sub()
                                    SlideActive = True
-                                   SlideMover = New Transition(Of Vector2)(New TransitionTypes.TransitionType_Acceleration(Math.Max(Math.Abs(aim - src), 1) * 500), startpos, aimpos, Sub()
-                                                                                                                                                                                          Game.Spielers(target.Item1).Spielfiguren(target.Item2) = aim
-                                                                                                                                                                                          SlideActive = False
-                                                                                                                                                                                          FinalAction()
-                                                                                                                                                                                      End Sub)
+                                   SlideMover = New Transition(Of Vector2)(New TransitionTypes.TransitionType_Acceleration(800), startpos, aimpos, Sub()
+                                                                                                                                                       Game.Spielers(target.Item1).Spielfiguren(target.Item2) = aim
+                                                                                                                                                       SlideActive = False
+                                                                                                                                                       FinalAction()
+                                                                                                                                                   End Sub)
                                    Automator.Add(SlideMover)
 
                                    'Play sound
