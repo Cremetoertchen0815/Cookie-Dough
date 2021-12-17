@@ -1241,8 +1241,15 @@ Namespace Game.BetretenVerboten
                                                                              End If
                                                                          Next
 
-                                                                         'Check for landing on suicide field
-                                                                         If CheckTeamSuicide() Then saucertrigger = False
+                                                                         If CheckTeamSuicide() Then
+                                                                             'Trigger suicide
+                                                                             saucertrigger = False
+                                                                         ElseIf Not saucertrigger AndAlso CheckForSlide() Then
+                                                                             'Trigger slide
+                                                                             Status = SpielStatus.Waitn
+                                                                             Return
+                                                                         End If
+
 
                                                                          'Trigger UFO, falls auf Feld gelandet
                                                                          If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then TriggerSaucer(nr) Else If Status <> SpielStatus.SpielZuEnde Then SwitchPlayer()
@@ -1295,10 +1302,14 @@ Namespace Game.BetretenVerboten
                                                                             End If
                                                                         Next
 
-                                                                        If Not saucertrigger Then CheckForSlide()
-
-                                                                        'Trigger suicide
-                                                                        If CheckTeamSuicide() Then saucertrigger = False
+                                                                        If CheckTeamSuicide() Then
+                                                                            'Trigger suicide
+                                                                            saucertrigger = False
+                                                                        ElseIf Not saucertrigger AndAlso CheckForSlide() Then
+                                                                            'Trigger slide
+                                                                            Status = SpielStatus.Waitn
+                                                                            Return
+                                                                        End If
 
                                                                         'Trigger UFO, falls auf Feld gelandet
                                                                         If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then
@@ -1617,13 +1628,14 @@ Namespace Game.BetretenVerboten
                     End If
                 Next
 
-                If Not saucertrigger AndAlso CheckForSlide() Then
+                If CheckTeamSuicide() Then
+                    'Trigger suicide
+                    saucertrigger = False
+                ElseIf Not saucertrigger AndAlso CheckForSlide() Then
+                    'Trigger slide
                     Status = SpielStatus.Waitn
                     Return
                 End If
-
-                'Trigger suicide
-                If CheckTeamSuicide() Then saucertrigger = False
 
                 'Trigger UFO, falls auf Feld gelandet
                 If saucertrigger And Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) < If(Map > 2, SpceCount, PlCount * SpceCount) Then TriggerSaucer(nr) Else SwitchPlayer()

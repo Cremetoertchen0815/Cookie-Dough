@@ -9,7 +9,6 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Give suicide priority over sliding
 -Fix landing UFO un slide field, doesn't trigger
 -Fix UFO for snek
 -Fix cam intro for snek
