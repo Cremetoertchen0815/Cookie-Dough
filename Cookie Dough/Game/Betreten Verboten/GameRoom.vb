@@ -137,6 +137,8 @@ Namespace Game.BetretenVerboten
             MoveActive = False
             Me.Map = Map
 
+            SaucerFields.Add(10)
+
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
             Select Case Map
@@ -1615,7 +1617,7 @@ Namespace Game.BetretenVerboten
                     End If
                 Next
 
-                If Not saucertrigger And CheckForSlide() Then
+                If Not saucertrigger AndAlso CheckForSlide() Then
                     Status = SpielStatus.Waitn
                     Return
                 End If
