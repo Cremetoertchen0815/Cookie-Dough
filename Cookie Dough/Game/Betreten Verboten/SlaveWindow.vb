@@ -193,7 +193,7 @@ Namespace Game.BetretenVerboten
 
             'Adapt colors to team mode
             If TeamMode Then
-                hudcolors = {Color.Lerp(Color.Red, Color.Yellow, 0F), Color.Lerp(Color.Cyan, Color.Navy, 0F), Color.Lerp(Color.Red, Color.Yellow, 0.33F), Color.Lerp(Color.Cyan, Color.Navy, 0.33F), Color.Lerp(Color.Red, Color.Yellow, 0.66F), Color.Lerp(Color.Cyan, Color.Navy, 0.75F), Color.Lerp(Color.Red, Color.Yellow, 1.0F), Color.Lerp(Color.Cyan, Color.Navy, 1.0F)}
+                hudcolors = {Color.Lerp(Color.Red, Color.Yellow, 0F), Color.Lerp(Color.Turquoise, Color.Navy, 0F), Color.Lerp(Color.Red, Color.Yellow, 0.2F), Color.Lerp(Color.Turquoise, Color.Navy, 0.5F), Color.Lerp(Color.Red, Color.Yellow, 0.55F), Color.Lerp(Color.Turquoise, Color.Navy, 1.0F), Color.Lerp(Color.Red, Color.Yellow, 1.0F), New Color(50, 0, 100)}
                 playcolor = hudcolors
                 Farben = {"Kamerad A1", "Kamerad B1", "Kamerad A2", "Kamerad B2", "Kamerad A3", "Kamerad B3", "Kamerad A4", "Kamerad B4"}
             Else

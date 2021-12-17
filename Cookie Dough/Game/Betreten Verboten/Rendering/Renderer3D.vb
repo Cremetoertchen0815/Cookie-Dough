@@ -306,7 +306,7 @@ Namespace Game.BetretenVerboten.Rendering
 
                 For Each effect As BasicEffect In mesh.Effects
                     Dim rotato As Matrix = Matrix.CreateRotationZ(MathHelper.ToRadians(Time.TotalTime / 15 * 360))
-                    effect.World = rotato * Matrix.CreateTranslation(New Vector3(-SaucerMover.Value.X, -SaucerMover.Value.Y, -182 - SaucerLift.Value))
+                    effect.World = rotato * Matrix.CreateTranslation(New Vector3(-SaucerMover.Value.X, -SaucerMover.Value.Y, -182 - SaucerLift.Value) + If(Game.Map > 2, New Vector3(475, 475, 0), Vector3.Zero))
                     effect.View = View
                     effect.Projection = Projection
                     effect.Alpha = 1

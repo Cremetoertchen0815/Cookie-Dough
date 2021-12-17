@@ -172,10 +172,12 @@ Namespace Game.BetretenVerboten
                     SaucerChance = 10
             End Select
 
+            'GEILES MINT: New Color(0, 255, 100)
+
             'Adapt colors to team mode
             Me.TeamMode = TeamMode
             If TeamMode Then
-                hudcolors = {Color.Lerp(Color.Red, Color.Yellow, 0F), Color.Lerp(Color.Turquoise, Color.Navy, 0F), Color.Lerp(Color.Red, Color.Yellow, 0.2F), Color.Lerp(Color.Turquoise, Color.Navy, 0.42F), Color.Lerp(Color.Red, Color.Yellow, 0.55F), Color.Lerp(Color.Turquoise, Color.Navy, 0.77F), Color.Lerp(Color.Red, Color.Yellow, 1.0F), Color.Lerp(Color.Turquoise, Color.Navy, 1.0F)}
+                hudcolors = {Color.Lerp(Color.Red, Color.Yellow, 0F), Color.Lerp(Color.Turquoise, Color.Navy, 0F), Color.Lerp(Color.Red, Color.Yellow, 0.2F), Color.Lerp(Color.Turquoise, Color.Navy, 0.5F), Color.Lerp(Color.Red, Color.Yellow, 0.55F), Color.Lerp(Color.Turquoise, Color.Navy, 1.0F), Color.Lerp(Color.Red, Color.Yellow, 1.0F), New Color(50, 0, 100)}
                 playcolor = hudcolors
                 Farben = {"Kamerad A1", "Kamerad B1", "Kamerad A2", "Kamerad B2", "Kamerad A3", "Kamerad B3", "Kamerad A4", "Kamerad B4"}
             Else

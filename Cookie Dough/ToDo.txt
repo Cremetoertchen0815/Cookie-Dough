@@ -9,7 +9,7 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Fix UFO graphics for snek
+-Fix CPU sacrificing
 -Fix cam intro for snek
 
 CR:
