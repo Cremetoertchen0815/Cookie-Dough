@@ -9,8 +9,7 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Fix landing UFO un slide field, doesn't trigger
--Fix UFO for snek
+-Fix UFO graphics for snek
 -Fix cam intro for snek
 
 CR:
