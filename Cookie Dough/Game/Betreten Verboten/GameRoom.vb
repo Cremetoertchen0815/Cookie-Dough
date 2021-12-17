@@ -488,9 +488,6 @@ Namespace Game.BetretenVerboten
                                 Next
 
                                 If ichmagzüge.Count = 1 Then
-                                    'Move camera
-                                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
-
                                     SFX(2).Play()
                                     Dim k As Integer = ichmagzüge(0)
                                     'Setze flags
@@ -657,9 +654,6 @@ Namespace Game.BetretenVerboten
                                     Status = SpielStatus.FahreFelder
                                     FigurFaderZiel = (SpielerIndex, k)
 
-                                    'Move camera
-                                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
-
                                     'Animiere wie die Figur sich nach vorne bewegt, anschließend prüfe ob andere Spieler rausgeschmissen wurden
                                     StartMoverSub()
                                     SendFigureTransition(SpielerIndex, k, defaultmov + Fahrzahl)
@@ -681,8 +675,6 @@ Namespace Game.BetretenVerboten
 
                             If ichmagzüge.Count = 1 Then
                                 Sacrifice(SpielerIndex, ichmagzüge(0))
-                                'Move camera
-                                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
                             ElseIf ichmagzüge.Count = 0 Then
                                 StopUpdating = True
                                 HUDInstructions.Text = "No sacrificable piece!"
@@ -1119,8 +1111,10 @@ Namespace Game.BetretenVerboten
                     SendFigureTransition(SpielerIndex, homebase, Fahrzahl)
                 Else 'We can't so s$*!, also schieben wir unsere Probleme einfach auf den nächst besten Deppen, der gleich dran ist
 
-                    'Move camera
-                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                    If Map <> GaemMap.Snakes And Spielers(SpielerIndex).Typ <> SpielerTyp.CPU Then
+                        'Move camera
+                        FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                    End If
 
                     Status = SpielStatus.WähleFigur
                     StopUpdating = True
@@ -1137,8 +1131,10 @@ Namespace Game.BetretenVerboten
                 HUDInstructions.Text = "Select piece to be moved " & Fahrzahl & " spaces!"
                 Status = SpielStatus.WähleFigur
 
-                'Move camera
-                FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                If Map <> GaemMap.Snakes And Spielers(SpielerIndex).Typ <> SpielerTyp.CPU Then
+                    'Move camera
+                    FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, New Keyframe3D(0, 0, 0, 0, 0, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
+                End If
             End If
         End Sub
 
