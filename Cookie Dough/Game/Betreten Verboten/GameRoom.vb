@@ -137,8 +137,6 @@ Namespace Game.BetretenVerboten
             MoveActive = False
             Me.Map = Map
 
-            SaucerFields.Add(6)
-
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
             Select Case Map
