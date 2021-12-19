@@ -9,7 +9,7 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Add CPU sacrificing(if CPU can enter home with next move, but will lose according to the points)
+(if CPU can enter home with next move, but will lose according to the points)
 -Fix cam intro for snek
 
 CR:

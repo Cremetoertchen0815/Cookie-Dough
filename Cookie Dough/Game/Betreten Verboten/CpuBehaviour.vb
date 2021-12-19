@@ -30,6 +30,12 @@
         Public AttackOpportunityMultiplier As Single 'Gives figures an advantage if they'll kick an enemy figure with this move
         Public AttackPartyMemberMultiplier As Single 'Gives figures a disadvantage if they'll kick a figure from their own team with this move
         Public SuicideMultiplier As Single 'Gives figures a disadvantage if they'll land on their own or team mates' suicide field
+        Public SacrificeCondition As CPUSacrificeCondition 'Gives figures a disadvantage if they'll land on their own or team mates' suicide field
         Public DeezNuts As Object ' Does absolutely nothing, but Jakob wanted me to add it, oh well...
     End Structure
+
+    <Flags>
+    Public Enum CPUSacrificeCondition As Integer
+        EndGameWithNoWin = 0 'Sacrifice figure if next move would finish the game, but the CPU would loose due to lack of points
+    End Enum
 End Namespace

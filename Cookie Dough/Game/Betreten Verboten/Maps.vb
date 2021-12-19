@@ -2,8 +2,7 @@
 
 Namespace Game.BetretenVerboten
     Friend Module Maps
-        Friend Function RollDice(Optional hard As Boolean = False) As Integer
-            If hard Then Return (Nez.Random.Range(0, 17) Mod 6) + 1
+        Friend Function RollDice() As Integer
             Return Nez.Random.Range(1, 7)
         End Function
 

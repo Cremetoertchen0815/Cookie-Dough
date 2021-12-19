@@ -540,6 +540,7 @@ Namespace Game.BetretenVerboten
                                     Dim k As Integer
                                     Dim ichmagzüge As New List(Of Integer)
                                     Dim defaultmov As Integer
+                                    Dim dontmove As Boolean = True
                                     For i As Integer = 0 To FigCount - 1
                                         defaultmov = pl.Spielfiguren(i)
                                         If defaultmov > -1 And defaultmov + Fahrzahl <= If(Map > 2, SpceCount, PlCount * SpceCount) + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
@@ -559,6 +560,46 @@ Namespace Game.BetretenVerboten
                                             For Each element In ichmagzüge
                                                 Scores.Add(element, 1)
                                             Next
+
+                                            'Sacrifice: Check for figure sacrificing
+                                            If behaviour.SacrificeCondition.HasFlag(CPUSacrificeCondition.EndGameWithNoWin) Then
+                                                Dim house_count As Integer = 0
+                                                Dim missing_fig As Integer
+                                                Dim limit As Integer = If(Map > 2, SpceCount, PlCount * SpceCount)
+                                                'Check for current state of figures
+                                                For j As Integer = 0 To FigCount - 1
+                                                    If pl.Spielfiguren(j) > limit Then
+                                                        house_count += 1
+                                                    Else
+                                                        missing_fig = j
+                                                    End If
+                                                Next
+
+                                                'If exactly one figure is not yet in it's house and the next move will land in it's house, but it's lacking in points, sacrifice
+                                                If house_count = FigCount - 1 AndAlso pl.Spielfiguren(missing_fig) + Fahrzahl = limit Then
+                                                    If TeamMode Then
+                                                        Dim teamA As Integer = 0
+                                                        Dim teamB As Integer = 0
+                                                        For i As Integer = 0 To PlCount / 2 - 1
+                                                            teamA += GetScore(i * 2)
+                                                            teamB += GetScore(i * 2 + 1)
+                                                        Next
+                                                        If If(SpielerIndex Mod 2 = 0, teamB, teamA) > If(SpielerIndex Mod 2 = 1, teamB, teamA) + Fahrzahl * 10 Then
+                                                            Sacrifice(SpielerIndex, ichmagzüge(0))
+                                                            dontmove = True
+                                                        End If
+                                                    Else
+                                                        Dim max_pnt As Integer = 0
+                                                        For i As Integer = 0 To PlCount - 1
+                                                            max_pnt = Math.Max(GetScore(i), max_pnt)
+                                                        Next
+                                                        If max_pnt >= GetScore(SpielerIndex) + Fahrzahl * 10 Then
+                                                            Sacrifice(SpielerIndex, ichmagzüge(0))
+                                                            dontmove = True
+                                                        End If
+                                                    End If
+                                                End If
+                                            End If
 
                                             'Spielfigurimportans: eine Figur die näher am Ziel ist ist wichtiger
                                             Dim counts As New List(Of (Integer, Integer))
@@ -648,7 +689,7 @@ Namespace Game.BetretenVerboten
                                             k = NeueLIsteweilIChsehrcreativebin(0).Item1
                                     End Select
 
-
+                                    If dontmove Then Exit Select
                                     defaultmov = pl.Spielfiguren(k)
                                     'Setze flags
                                     Status = SpielStatus.FahreFelder
@@ -1343,7 +1384,7 @@ Namespace Game.BetretenVerboten
             Return False
         End Function
 
-        Private Function GetFigureCountInHaus(spieler As Integer)
+        Private Function GetFigureCountInHaus(spieler As Integer) As Integer
             Dim ret As Integer = 0
             Dim pl As Player = Spielers(spieler)
             For j As Integer = 0 To FigCount - 1
