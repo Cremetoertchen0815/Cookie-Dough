@@ -98,6 +98,7 @@ Namespace Game.Common
             Dim rotatoA As Matrix = Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0))
             Dim rotatoB As Matrix = Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.SpielerIndex * MathHelper.PiOver2, 0))
             SetViewMatrix(Game.GetCamPos, rotatoA * rotatoB)
+            'SetViewMatrix(New Keyframe3D(200, 0, 1000, 0.5, 1, 0, False), Matrix.Identity)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
             '---RENDERER 3D---
@@ -132,13 +133,14 @@ Namespace Game.Common
                 Next
             End If
 
-            SetViewMatrix(Game.GetCamPos, Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0)))
+            'SetViewMatrix(Game.GetCamPos, Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0)))
 
             'Draw other player's hand decks
             dev.RasterizerState = RasterizerState.CullClockwise
+            dev.RasterizerState = RasterizerState.CullNone
             For i As Integer = 0 To Game.Spielers.Length - 1
                 For j As Integer = 0 To Game.Spielers(i).HandDeck.Count - 1
-                    Dim transform As Matrix = Matrix.CreateRotationZ(MathHelper.PiOver2) * Matrix.CreateTranslation(0, 0, Math.Floor(j / 7) * 2.1) * Matrix.CreateRotationY(0.4) * Matrix.CreateScale(80) * Matrix.CreateTranslation(550, 300 - (j Mod 7) * 100, -150) * Matrix.CreateRotationZ((i - 1) * MathHelper.PiOver2)
+                    Dim transform As Matrix = Matrix.CreateRotationZ(MathHelper.PiOver2) * Matrix.CreateTranslation(0, 0, Math.Floor(j / 7) * 2.1) * Matrix.CreateRotationY(0.4) * Matrix.CreateScale(50) * Matrix.CreateTranslation(650, 200 - (j Mod 7) * 65, -150) * Matrix.CreateRotationZ((i / Game.Spielers.Length - 0.25) * Math.PI * 2)
                     card_fx.Texture = CardTextures(CardTextures.Count - 1)
                     For Each element In card_model.Meshes
                         ApplyFX(element, element.ParentBone.ModelTransform * transform)
@@ -154,10 +156,15 @@ Namespace Game.Common
                 element.Draw()
             Next
 
+            Dim pl_total = Game.Spielers.Length
+            For i As Integer = 0 To pl_total - 1
+                DrawChr(New Vector2(-1000 * Math.Sin(Math.PI * 2 * i / pl_total), 1000 * Math.Cos(Math.PI * 2 * i / pl_total)), playcolor(i), 30, -400)
+            Next
+
             'Draw Hand Deck
             If Game.State <> CardGameState.SelectAction Then Return
             dev.DepthStencilState = DepthStencilState.None
-            SetViewMatrix(New Keyframe3D, Matrix.Identity)
+            'SetViewMatrix(New Keyframe3D, Matrix.Identity)
             For i As Integer = 0 To Game.HandDeck.Count - 1
                 If Game.DeckScroll <> Math.Floor(i / 7) OrElse Not Game.HandDeck(i).Visible Then Continue For
                 Dim transform As Matrix = GetHandCardWorldMatrix(i)
@@ -166,6 +173,31 @@ Namespace Game.Common
                     ApplyFX(element, element.ParentBone.ModelTransform * transform)
                     element.Draw()
                 Next
+            Next
+        End Sub
+
+        Private Sub DrawChr(pos As Vector2, color As Color, basescale As Single, Optional zpos As Integer = 0, Optional scale As Single = 1)
+            For Each mesh In figur_model.Meshes
+                For Each element As BasicEffect In mesh.Effects
+                    element.VertexColorEnabled = False
+                    element.TextureEnabled = False
+                    element.DiffuseColor = Color.White.ToVector3
+                    element.LightingEnabled = True '// turn on the lighting subsystem.
+                    element.PreferPerPixelLighting = True
+                    element.AmbientLightColor = Vector3.Zero
+                    element.EmissiveColor = color.ToVector3 * 0.12
+                    element.DirectionalLight0.Direction = New Vector3(0, 0.8, 1.5)
+                    element.DirectionalLight0.DiffuseColor = color.ToVector3 * 0.6 '// a gray light
+                    element.DirectionalLight0.SpecularColor = New Vector3(1, 1, 1) '// with white highlights
+                    element.World = Matrix.CreateScale(basescale * scale * New Vector3(1, 1, 1)) * Matrix.CreateRotationY(Math.PI) * Matrix.CreateTranslation(New Vector3(-pos.X, -pos.Y, -zpos))
+                    element.View = View
+                    element.Projection = Projection
+                    element.FogEnabled = True
+                    element.FogColor = Vector3.Zero
+                    element.FogStart = 0.5F
+                    element.FogEnd = 2.5F
+                Next
+                mesh.Draw()
             Next
         End Sub
 

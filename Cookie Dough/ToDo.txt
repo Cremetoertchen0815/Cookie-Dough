@@ -9,7 +9,8 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Fix CPU sacrificing
+-Fix cam transition
+-Add CPU sacrificing
 -Fix cam intro for snek
 
 CR:
@@ -20,7 +21,6 @@ DC:
 -Change ROTATE
 -Better animations
 -Ani-aliasing
--Add play figures
 -Add glow to figures if clickable
 -Add CPUs (JOHANNES)
 
