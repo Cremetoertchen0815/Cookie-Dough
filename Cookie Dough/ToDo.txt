@@ -18,10 +18,10 @@ CR:
 
 DC:
 -Fix not laying cards back on stack
--Change ROTATE
--Better animations
--Ani-aliasing
+-Replace card stack hitbox with ray cast
+-Increase Card contrast
 -Add glow to figures if clickable
+-Fix rejoining
 -Add CPUs (JOHANNES)
 
 BR:

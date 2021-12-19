@@ -608,8 +608,8 @@ Namespace Game.DuoCard
             SendNewPlayerActive(SpielerIndex)
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             HUD.Color = hudcolors(UserIndex)
-            'Reset camera if not already moving
-            FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(750), FigurFaderCamera.Value, New Keyframe3D(StdCam.X, StdCam.Y, StdCam.Z, StdCam.Roll, StdCam.Pitch, If(SpielerIndex > -1, UserIndex / Spielers.Length * -Math.PI * 2, 0), True), Nothing)
+            'Set camera
+            FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(750), FigurFaderCamera.Value, New Keyframe3D(StdCam.X, StdCam.Y, StdCam.Z, StdCam.Yaw, StdCam.Pitch, GetUserCamRoll(), True), Nothing)
             Automator.Add(FigurFaderCamera)
             'Set game flags
             StopUpdating = False
@@ -629,6 +629,10 @@ Namespace Game.DuoCard
             ResetHUD()
             HUDInstructions.Text = "Place a card!"
         End Sub
+
+        Private Function GetUserCamRoll() As Single
+            Return If(SpielerIndex > -1, UserIndex / Spielers.Length * -Math.PI * 2, 0)
+        End Function
 
         Private Sub ResetHUD()
             'HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex

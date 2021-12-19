@@ -36,6 +36,7 @@ Public Class GameCore
         Scene.SetDefaultDesignResolution(1920, 1080, Scene.SceneResolutionPolicy.BestFit)
         Window.AllowUserResizing = True
         ExitOnEscapeKeypress = False
+        GraphicsDevice.PresentationParameters.MultiSampleCount = 4
 
         'Upgrade settings if necessairy
         If My.Settings.MissingNo Then

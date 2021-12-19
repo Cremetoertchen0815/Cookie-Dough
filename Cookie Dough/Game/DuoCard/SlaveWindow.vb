@@ -86,7 +86,7 @@ Namespace Game.DuoCard
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
         Private Center As Vector2 'Gibt den Mittelpunkt des Screen-Viewports des Spielfelds an
         Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(0, 0, 0, 0, 0, 0, False)} 'Bewegt die Kamera New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)
-        Friend StdCam As New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False) 'Gibt die Standard-Position der Kamera an
+        Friend StdCam As New Keyframe3D 'Gibt die Standard-Position der Kamera an
 
         'Konstanten
         Private Const SyncLoc As Single = 1 / 2
@@ -115,8 +115,8 @@ Namespace Game.DuoCard
                                                  Rejoin = x() = "Rejoin"
 
                                                  'Load camera info
-                                                 StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, 0, False)
-                                                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = If(Rejoin, StdCam, New Keyframe3D)}
+                                                 StdCam = New Keyframe3D(-30, -20, -50, 0, 0.75, GetUserCamRoll(), False)
+                                                 FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = If(Rejoin, StdCam, New Keyframe3D(0, 0, 0, 0, 0, GetUserCamRoll(), False))}
                                              End Sub) Then LocalClient.AutomaticRefresh = True : Return
 
             'Bereite Flags und Variablen vor
@@ -546,6 +546,10 @@ Namespace Game.DuoCard
             Dim ret As Card = CardStack(indx)
             CardStack.RemoveAt(indx)
             Return ret
+        End Function
+
+        Private Function GetUserCamRoll() As Single
+            Return UserIndex / Spielers.Length * -Math.PI * 2
         End Function
 
         Private Sub PrepareMove()
