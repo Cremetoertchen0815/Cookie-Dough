@@ -216,7 +216,7 @@ Namespace Game.DuoCard
                     FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
                 End If
 
-                'TODO: Show remaining cards in player title
+
                 Select Case Status
                     Case CardGameState.SelectAction
                         Select Case SelectionState
@@ -261,13 +261,13 @@ Namespace Game.DuoCard
 
                                 If DrawForces > 0 Then
                                     DrawForces -= 1
-                                    Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                                    Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces, GetUserCamRoll(SpielerIndex))
                                 Else
                                     Core.Schedule(0.5, AddressOf SwitchPlayer)
                                 End If
                             Else
                                 'Draw card
-                                If Renderer.card_deck_top_pos Is Nothing OrElse Renderer.card_deck_top_pos.State <> TransitionState.InProgress Then Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                                If Renderer.card_deck_top_pos Is Nothing OrElse Renderer.card_deck_top_pos.State <> TransitionState.InProgress Then Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces, GetUserCamRoll(SpielerIndex))
                             End If
                         End If
                     Case CardGameState.WarteAufOnlineSpieler
@@ -347,7 +347,7 @@ Namespace Game.DuoCard
                                                               StopUpdating = True
 
                                                               Core.Schedule(0.5, AddressOf SwitchPlayer)
-                                                          End Sub)
+                                                          End Sub, GetUserCamRoll(SpielerIndex))
                     Case "e"c 'Suspend gaem
                         If Spielers(source).Typ = SpielerTyp.None Then Continue For
                         Spielers(source).Bereit = False
@@ -388,10 +388,10 @@ Namespace Game.DuoCard
                             StopUpdating = True
 
                             DrawForces -= 1
-                            Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                            Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces, GetUserCamRoll(SpielerIndex))
                         Else
                             'Draw card
-                            If Renderer.card_deck_top_pos Is Nothing OrElse Renderer.card_deck_top_pos.State <> TransitionState.InProgress Then Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                            If Renderer.card_deck_top_pos Is Nothing OrElse Renderer.card_deck_top_pos.State <> TransitionState.InProgress Then Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces, GetUserCamRoll(SpielerIndex))
                         End If
                     Case "r"c 'Player is back
                         Dim txt As String() = element.Substring(2).Split("|")
@@ -530,7 +530,7 @@ Namespace Game.DuoCard
                                                       StopUpdating = True
 
                                                       Core.Schedule(0.5, AddressOf SwitchPlayer)
-                                                  End Sub)
+                                                  End Sub, GetUserCamRoll(SpielerIndex))
                 Return False
             End If
 
@@ -553,7 +553,7 @@ Namespace Game.DuoCard
 
             If DrawForces > 0 Then
                 DrawForces -= 1
-                Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces)
+                Renderer.TriggerDeckPullAnimation(AddressOf CheckDrawForces, GetUserCamRoll(SpielerIndex))
             Else
                 Core.Schedule(0.5, AddressOf SwitchPlayer)
             End If
@@ -562,7 +562,7 @@ Namespace Game.DuoCard
         Private Sub LayCard(card As Card)
 
             TableCard = card
-            If CardStack.Contains(card) Then CardStack.Remove(card)
+            If Not CardStack.Contains(card) Then CardStack.Add(card)
             Status = CardGameState.CardAnimationActive
             SendLayCard(card)
 
@@ -630,8 +630,8 @@ Namespace Game.DuoCard
             HUDInstructions.Text = "Place a card!"
         End Sub
 
-        Private Function GetUserCamRoll() As Single
-            Return If(SpielerIndex > -1, UserIndex / Spielers.Length * -Math.PI * 2, 0)
+        Private Function GetUserCamRoll(Optional nr As Integer = -1) As Single
+            Return If(SpielerIndex > -1, If(nr < 0, UserIndex, nr) / Spielers.Length * -Math.PI * 2, 0)
         End Function
 
         Private Sub ResetHUD()

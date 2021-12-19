@@ -18,7 +18,7 @@ CR:
 
 DC:
 -Fix not laying cards back on stack
--Replace card stack hitbox with ray cast
+-Replace card stack hitbox with general table hitbox
 -Increase Card contrast
 -Add glow to figures if clickable
 -Fix rejoining

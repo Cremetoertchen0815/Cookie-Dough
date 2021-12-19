@@ -243,7 +243,7 @@ Namespace Game.Common
 #End Region
 
 #Region "Animation"
-        Friend Sub TriggerDeckPullAnimation(final As Transition(Of Vector3).FinishedDelegate)
+        Friend Sub TriggerDeckPullAnimation(final As Transition(Of Vector3).FinishedDelegate, pullingAngle As Integer)
             If card_deck_top_pos.State = TransitionState.InProgress AndAlso card_deck_top_pos.FinishAction IsNot Nothing Then card_deck_top_pos.FinishAction.Invoke(card_deck_top_pos)
             card_deck_top_pos = New Transition(Of Vector3)(New TransitionTypes.TransitionType_Acceleration(500), New Vector3(0, 0, -0.1), New Vector3(0, -700, -0.1), final)
             Automator.Add(card_deck_top_pos)

@@ -287,7 +287,7 @@ Namespace Game.DuoCard
                     Case "d"c 'Draw card
                         Dim card As New Card(CInt(element.Substring(2)), CInt(element(1).ToString))
                         StopUpdating = True
-                        Renderer.TriggerDeckPullAnimation(Sub() Spielers(UserIndex).HandDeck.Add(card))
+                        Renderer.TriggerDeckPullAnimation(Sub() Spielers(SpielerIndex).HandDeck.Add(card), GetUserCamRoll(SpielerIndex))
                     Case "e"c 'Suspend gaem
                         Dim who As Integer = element(1).ToString
                         StopUpdating = True
@@ -548,8 +548,9 @@ Namespace Game.DuoCard
             Return ret
         End Function
 
-        Private Function GetUserCamRoll() As Single
-            Return UserIndex / Spielers.Length * -Math.PI * 2
+
+        Private Function GetUserCamRoll(Optional nr As Integer = -1) As Single
+            Return If(nr < 0, UserIndex, nr) / Spielers.Length * -Math.PI * 2
         End Function
 
         Private Sub PrepareMove()
