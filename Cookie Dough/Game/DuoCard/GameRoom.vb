@@ -233,7 +233,7 @@ Namespace Game.DuoCard
                                             Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
                                             DebugConsole.Instance.Log(card.ToString)
                                             LayCard(card)
-                                        Else
+                                        ElseIf HUDInstructions.Text = "Place a card!" Then
                                             HUDInstructions.Text = "Card invalid!"
                                         End If
                                         Exit For
