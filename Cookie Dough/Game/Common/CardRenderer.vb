@@ -54,7 +54,7 @@ Namespace Game.Common
             card_model = scene.Content.Load(Of Model)("games/Cards/card")
             card_fx = CType(card_model.Meshes(1).Effects(0), BasicEffect)
             card_Matrix = Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateScale(150) * Matrix.CreateTranslation(-150, 0, 0)
-            CardWhite = New Color(228, 228, 228)
+            CardWhite = Color.White
             ApplyCardFX(card_model, Projection)
 
             card_deck_model = scene.Content.Load(Of Model)("games/Cards/card_deck")

@@ -18,7 +18,6 @@ CR:
 
 DC:
 -Add card preview if not active in the bottom right
--Increase Card contrast
 -Implement rejoining
 -Add CPUs (JOHANNES)
 
