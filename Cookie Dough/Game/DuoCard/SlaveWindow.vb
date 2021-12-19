@@ -274,7 +274,7 @@ Namespace Game.DuoCard
                         StopUpdating = False
                         Status = CardGameState.Waitn
                         PostChat("The game has started!", Color.White)
-                        FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(1500), New Keyframe3D, StdCam, Sub() StopUpdating = True)
+                        FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(1500), GetCamPos(), StdCam, Sub() StopUpdating = True)
                         Automator.Add(FigurFaderCamera)
                     Case "c"c 'Sent chat message
                         Dim source As Integer = element(1).ToString
