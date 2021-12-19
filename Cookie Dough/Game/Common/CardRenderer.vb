@@ -1,6 +1,7 @@
 ﻿Imports System.Collections.Generic
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
+Imports Nez.Textures
 
 Namespace Game.Common
     Public Class CardRenderer
@@ -28,6 +29,9 @@ Namespace Game.Common
         Private View As Matrix
         Private Projection As Matrix
 
+        'Common fields
+        Public BlurredContents As RenderTexture
+        Private BlurEffect As GaussianBlurPostProcessor
         Private Game As ICardRendererWindow
         Private Feld As Rectangle
         Private Center As Vector2
@@ -35,6 +39,9 @@ Namespace Game.Common
         Public Sub New(window As ICardRendererWindow, Optional order As Integer = 0)
             MyBase.New(order)
             Game = window
+
+            RenderTexture = New RenderTexture()
+            BlurredContents = New RenderTexture(1920, 1080)
         End Sub
 
         Public Overrides Sub OnAddedToScene(scene As Scene)
@@ -58,6 +65,9 @@ Namespace Game.Common
             TableModel = scene.Content.Load(Of Model)("mesh/table")
             TableMatrix = Matrix.CreateScale(New Vector3(3.2, 3.2, 3) * 150) * Matrix.CreateTranslation(New Vector3(0, 0, 590))
             ApplyDefaultFX(TableModel, Projection, Color.White)
+
+            BlurEffect = scene.AddPostProcessor(New GaussianBlurPostProcessor(0) With {.Enabled = False})
+            BlurEffect.Effect.BlurAmount = 4
 
             'Load cards
             CardTextures = New List(Of Texture2D)
@@ -95,9 +105,7 @@ Namespace Game.Common
 #Region "Rendering"
 
         Public Overrides Sub Render(scene As Scene)
-            Dim rotatoA As Matrix = Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0))
-            Dim rotatoB As Matrix = Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.SpielerIndex * MathHelper.PiOver2, 0))
-            SetViewMatrix(Game.GetCamPos, rotatoA * rotatoB)
+            SetViewMatrix(Game.GetCamPos)
             'SetViewMatrix(New Keyframe3D(200, 0, 1000, 0.5, 1, 0, False), Matrix.Identity)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
@@ -133,8 +141,6 @@ Namespace Game.Common
                 Next
             End If
 
-            'SetViewMatrix(Game.GetCamPos, Matrix.CreateRotationZ(If(Game.SpielerIndex > -1, Game.UserIndex * -MathHelper.PiOver2, 0)))
-
             'Draw other player's hand decks
             dev.RasterizerState = RasterizerState.CullClockwise
             dev.RasterizerState = RasterizerState.CullNone
@@ -164,7 +170,7 @@ Namespace Game.Common
             'Draw Hand Deck
             If Game.State <> CardGameState.SelectAction Then Return
             dev.DepthStencilState = DepthStencilState.None
-            'SetViewMatrix(New Keyframe3D, Matrix.Identity)
+            SetViewMatrix(New Keyframe3D)
             For i As Integer = 0 To Game.HandDeck.Count - 1
                 If Game.DeckScroll <> Math.Floor(i / 7) OrElse Not Game.HandDeck(i).Visible Then Continue For
                 Dim transform As Matrix = GetHandCardWorldMatrix(i)
@@ -174,6 +180,11 @@ Namespace Game.Common
                     element.Draw()
                 Next
             Next
+
+            '---END OF RENDERER3D---
+
+            'Apply blur to the contents
+            BlurEffect.Process(RenderTexture, BlurredContents)
         End Sub
 
         Private Sub DrawChr(pos As Vector2, color As Color, basescale As Single, Optional zpos As Integer = 0, Optional scale As Single = 1)
@@ -217,8 +228,8 @@ Namespace Game.Common
             Next
         End Sub
 
-        Private Sub SetViewMatrix(cam As Keyframe3D, FinalMatrix As Matrix)
-            View = FinalMatrix * cam.GetMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
+        Private Sub SetViewMatrix(cam As Keyframe3D)
+            View = cam.GetMatrix * Matrix.CreateScale(1, 1, 1 / 1080) * Matrix.CreateLookAt(New Vector3(0, 0, -1), New Vector3(0, 0, 0), Vector3.Up)
         End Sub
 
         Friend Sub ApplyCardFX(model As Model, Projection As Matrix)

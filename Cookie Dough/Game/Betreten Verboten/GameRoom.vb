@@ -2097,6 +2097,12 @@ Namespace Game.BetretenVerboten
             End Get
         End Property
 
+        Public ReadOnly Property GameTexture As Texture2D Implements IGameWindow.GameTexture
+            Get
+                Return Renderer.RenderTexture
+            End Get
+        End Property
+
         Private ReadOnly Property IGameWindow_HUDNameBtn As Button Implements IGameWindow.HUDNameBtn
             Get
                 Return HUDNameBtn
@@ -2118,12 +2124,6 @@ Namespace Game.BetretenVerboten
         Public ReadOnly Property TeamNames As String() Implements IGameWindow.TeamNames
             Get
                 Return {TeamNameA, TeamNameB}
-            End Get
-        End Property
-
-        Public ReadOnly Property GameTexture As Texture2D Implements IGameWindow.GameTexture
-            Get
-                Return Renderer.RenderTexture
             End Get
         End Property
 

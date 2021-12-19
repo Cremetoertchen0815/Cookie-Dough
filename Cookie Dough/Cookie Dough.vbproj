@@ -210,7 +210,6 @@
     <Compile Include="Game\Betreten Verboten\SlaveWindow.vb" />
     <Compile Include="Game\DuoCard\CreatorMenu.vb" />
     <Compile Include="Game\DuoCard\GameRoom.vb" />
-    <Compile Include="Game\DuoCard\IGameWindow.vb" />
     <Compile Include="Game\DuoCard\Networking\ExtGame.vb" />
     <Compile Include="Game\DuoCard\Networking\SyncMessage.vb" />
     <Compile Include="Game\DuoCard\Rendering\GameRenderable.vb" />

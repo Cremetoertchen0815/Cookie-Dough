@@ -121,30 +121,32 @@ Namespace Game.DuoCard
             DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
 
             'Lade HUD
+            Dim glass = New Color(5, 5, 5, 185)
             HUD = New GuiSystem
-            HUDSoftBtn = New GameRenderable(Me) : HUD.Controls.Add(HUDSoftBtn)
-            HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
-            HUDBtnC = New Button("Mau", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
+            HUDSoftBtn = New GameRenderable(Me) With {.RedrawBackground = True, .BackgroundColor = glass} : HUD.Controls.Add(HUDSoftBtn)
+            HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnB)
+            HUDBtnC = New Button("Mau", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDBtnC)
             HUDArrowUp = New TextureButton(DebugTexture, New Vector2(935, 700), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowUp)
             HUDArrowDown = New TextureButton(DebugTexture, New Vector2(935, 970), New Vector2(50, 20)) With {.Active = False} : HUD.Controls.Add(HUDArrowDown)
-            HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = New Color(0, 0, 0, 100), .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
-            HUDChatBtn = New Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
+            HUDChat = New TextscrollBox(Function() Chat.ToArray, New Vector2(50, 50), New Vector2(400, 800)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Transparent, 3), .Color = Color.Yellow, .LenLimit = 35} : HUD.Controls.Add(HUDChat)
+            HUDChatBtn = New Button("Send Message", New Vector2(50, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDChatBtn)
             HUDInstructions = New Label("Wait for all Players to arrive...", New Vector2(50, 1005)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond} : HUD.Controls.Add(HUDInstructions)
             HUDdbgLabel = New Label(Function() FigurFaderCamera.Value.ToString, New Vector2(500, 120)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond, .Active = False} : HUD.Controls.Add(HUDdbgLabel)
             HUDmotdLabel = New Label("", New Vector2(400, 750)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond, .Active = False} : HUD.Controls.Add(HUDmotdLabel)
             InstructionFader = HUDInstructions.Tween("Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), 0.7).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut) : InstructionFader.Start()
             HUDNameBtn = New Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Controls.Add(HUDNameBtn)
-            HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
-            HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
-            HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = Color.Black, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
+            HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDFullscrBtn)
+            HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDMusicBtn)
+            HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent} : HUD.Controls.Add(HUDAfkBtn)
             CreateEntity("HUD").AddComponent(HUD)
             HUD.Color = Color.White
 
-            Renderer = AddRenderer(New CardRenderer(Me, -1))
-            Psyground = AddRenderer(New PsygroundRenderer(0, 0.3))
+            Renderer = AddRenderer(New CardRenderer(Me, 1))
+            Psyground = AddRenderer(New PsygroundRenderer(0, 0.25))
+            AddRenderer(New DefaultRenderer(2))
+            GuiControl.BackgroundImage = Renderer.BlurredContents
 
-            AddRenderer(New DefaultRenderer(1))
-            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.4).SetThreshold(0.15)
+            AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.4F).SetThreshold(0)
             ClearColor = Color.Black
             Material.DefaultMaterial.SamplerState = SamplerState.AnisotropicClamp
 
@@ -607,7 +609,8 @@ Namespace Game.DuoCard
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
             HUD.Color = hudcolors(UserIndex)
             'Reset camera if not already moving
-            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+            FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(750), FigurFaderCamera.Value, New Keyframe3D(StdCam.X, StdCam.Y, StdCam.Z, StdCam.Roll, StdCam.Pitch, If(SpielerIndex > -1, UserIndex / Spielers.Length * -Math.PI * 2, 0), True), Nothing)
+            Automator.Add(FigurFaderCamera)
             'Set game flags
             StopUpdating = False
             SelectionState = SelectionMode.Standard
@@ -708,6 +711,12 @@ Namespace Game.DuoCard
         End Property
 
         Public ReadOnly Property BGTexture As Texture2D Implements ICardRendererWindow.BGTexture
+            Get
+                Return Psyground.RenderTexture
+            End Get
+        End Property
+
+        Public ReadOnly Property GameTexture As Texture2D Implements ICardRendererWindow.GameTexture
             Get
                 Return Renderer.RenderTexture
             End Get

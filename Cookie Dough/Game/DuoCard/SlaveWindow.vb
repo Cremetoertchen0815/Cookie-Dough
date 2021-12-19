@@ -614,7 +614,14 @@ Namespace Game.DuoCard
             End Get
         End Property
 
+
         Public ReadOnly Property BGTexture As Texture2D Implements ICardRendererWindow.BGTexture
+            Get
+                Return Psyground.RenderTexture
+            End Get
+        End Property
+
+        Public ReadOnly Property GameTexture As Texture2D Implements ICardRendererWindow.GameTexture
             Get
                 Return Renderer.RenderTexture
             End Get
