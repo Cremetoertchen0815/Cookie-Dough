@@ -115,13 +115,13 @@ Namespace Game.BetretenVerboten
         'Konstanten
         Private Const WürfelDauer As Integer = 320
         Private Const WürfelAnimationCooldown As Integer = 4
-        Private Const FigurSpeed As Integer = 450
+        Private Const FigurSpeed As Integer = 400
         Private Const ErrorCooldown As Integer = 1
         Private Const RollDiceCooldown As Single = 0.5
-        Private Const CPUThinkingTime As Single = 0.6
-        Private Const DopsHöhe As Integer = 150
-        Private Const CamSpeed As Integer = 1300
-        Private Const SacrificeWait As Integer = 5
+        Private Const CPUThinkingTime As Single = 0.5
+        Private Const DopsHöhe As Integer = 130
+        Private Const CamSpeed As Integer = 1200
+        Private Const SacrificeWait As Integer = 4
         Private SaucerChance As Integer = 18
 
         Public Sub New(Map As GaemMap, TeamMode As Boolean)
@@ -1847,7 +1847,7 @@ Namespace Game.BetretenVerboten
             ResetHUD()
             HUDInstructions.Text = "Roll the Dice!"
             'Reset camera if not already moving
-            If FigurFaderCamera.State <> TransitionState.InProgress Then FigurFaderCamera = New Transition(Of Keyframe3D) With {.Value = StdCam}
+            FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
         End Sub
 
         Private Sub ResetHUD()
