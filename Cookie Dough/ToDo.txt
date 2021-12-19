@@ -10,7 +10,7 @@ CC:
 
 BV:
 -Fix cam transition
--Add CPU sacrificing
+-Add CPU sacrificing(if CPU can enter home with next move, but will lose according to the points)
 -Fix cam intro for snek
 
 CR:
@@ -18,9 +18,9 @@ CR:
 
 DC:
 -Replace card stack hitbox with general table hitbox
+-Add card preview if not active in the bottom right
 -Increase Card contrast
--Add glow to figures if clickable
--Fix rejoining
+-Implement rejoining
 -Add CPUs (JOHANNES)
 
 BR:
