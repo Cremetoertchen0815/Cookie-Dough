@@ -9,14 +9,14 @@ CC:
 -Implement SFX and bgm
 
 BV:
-(if CPU can enter home with next move, but will lose according to the points)
+-Remove sacrificing from snek map
+-Replace UFO fields with god fields
 -Fix cam intro for snek
 
 CR:
 -Johannes soll seinen Arsch bewegen
 
 DC:
--Replace card stack hitbox with general table hitbox
 -Add card preview if not active in the bottom right
 -Increase Card contrast
 -Implement rejoining

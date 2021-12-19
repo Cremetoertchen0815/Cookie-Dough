@@ -249,7 +249,7 @@ Namespace Game.DuoCard
                         End Select
 
                         'Card stack pressed
-                        If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(710, 420, 220, 270).Contains(mpos) AndAlso CardStack.Count > 0 Then
+                        If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) AndAlso New Rectangle(450, 220, 1000, 470).Contains(mpos) AndAlso CardStack.Count > 0 Then
                             If BeSkipped Then
                                 'Skip player
                                 StopUpdating = True
