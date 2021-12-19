@@ -56,9 +56,9 @@ Namespace Menu.MainMenu
                 Case 0
                     If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(1)
                     If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(2)
-                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(3)
+                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(6)
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
-                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then Core.Exit()
+                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(3)
                 Case 1
                     'Scroll game list
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
@@ -123,6 +123,7 @@ Namespace Menu.MainMenu
                         My.Settings.Save()
                     End If
                     If New Rectangle(560, 875, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
+                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 4
                     'Scroll online game list
                     Dim ln As Integer = If(IsConnectedToServer And ServerActive, ConnectedUsers, AvailableServerList).Count
@@ -179,7 +180,6 @@ Namespace Menu.MainMenu
                         End If
                     Next
 
-                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 5
 
                     'Nick name
@@ -320,6 +320,14 @@ Namespace Menu.MainMenu
 
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                     If New Rectangle(560, 955, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
+                Case 6
+
+                    If New Rectangle(20, 190, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Change game
+                    If New Rectangle(20, 290, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Change map
+                    If New Rectangle(20, 390, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Change team
+
+                    If New Rectangle(30, 950, 300, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Back
+                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4) 'Server settings
             End Select
 
 
@@ -483,18 +491,19 @@ Namespace Menu.MainMenu
                 'Zeichne Menü
                 Select Case CounterScene.Submenu
                     Case 0 'Root
+                        Dim onlinecolor = If(LocalClient.Connected, FgColor, Color.Red)
                         'Draw heading
                         batcher.DrawString(TitleFont, "Cookie Dough", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Cookie Dough").X / 2, 50), FgColor)
                         'Draw rectangles
                         batcher.DrawHollowRect(New Rectangle(560, 275, 800, 100), FgColor)
-                        batcher.DrawHollowRect(New Rectangle(560, 425, 800, 100), FgColor)
-                        batcher.DrawHollowRect(New Rectangle(560, 575, 800, 100), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 425, 800, 100), onlinecolor)
+                        batcher.DrawHollowRect(New Rectangle(560, 575, 800, 100), onlinecolor)
                         batcher.DrawHollowRect(New Rectangle(560, 725, 800, 100), FgColor)
                         'Draw text
                         batcher.DrawString(MediumFont, "Start Game", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Start Game").X / 2, 300), FgColor)
-                        batcher.DrawString(MediumFont, "Join Round", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Join Round").X / 2, 450), FgColor) 'If(IsConnectedToServer, FgColor, Color.Red)
-                        batcher.DrawString(MediumFont, "Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Settings").X / 2, 600), FgColor)
-                        batcher.DrawString(MediumFont, "Exit Game", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Exit Game").X / 2, 750), FgColor)
+                        batcher.DrawString(MediumFont, "Join Round", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Join Round").X / 2, 450), onlinecolor)
+                        batcher.DrawString(MediumFont, "Leaderboard", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Leaderboard").X / 2, 600), onlinecolor)
+                        batcher.DrawString(MediumFont, "Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Settings").X / 2, 750), FgColor)
                     Case 1 'Start Round
                         'Draw scroll arrows
                         batcher.Draw(Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
@@ -625,6 +634,30 @@ Namespace Menu.MainMenu
                         'Draw back button
                         batcher.DrawHollowRect(New Rectangle(560, 955, 800, 100), FgColor)
                         batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 975), FgColor)
+                    Case 6 'Leaderboards
+                        'Draw heading
+                        batcher.DrawString(TitleFont, "Leaderboard", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Leaderboard").X / 2, 50), FgColor)
+
+                        'Draw settings
+                        batcher.DrawString(MediumFont, "Game: BV", New Vector2(30, 200), FgColor)
+                        batcher.DrawString(MediumFont, "Map: Plus", New Vector2(30, 300), FgColor)
+                        batcher.DrawString(MediumFont, "Team: Yes", New Vector2(30, 400), FgColor)
+
+                        Dim margin_left As Integer = 470
+                        Dim margin_top As Integer = 200
+                        Dim cell_height As Integer = 70
+                        Dim cell_width As Integer = 500
+                        'Draw table
+                        batcher.DrawLine(New Vector2(margin_left + cell_width, margin_top), New Vector2(margin_left + cell_width, margin_top + 11 * cell_height), FgColor, 3)
+                        batcher.DrawLine(New Vector2(margin_left, margin_top), New Vector2(margin_left, margin_top + 11 * cell_height), FgColor, 3)
+                        batcher.DrawLine(New Vector2(margin_left + 2 * cell_width, margin_top), New Vector2(margin_left + 2 * cell_width, margin_top + 11 * cell_height), FgColor, 3)
+                        For i As Integer = 0 To 11
+                            batcher.DrawLine(New Vector2(margin_left, margin_top + i * cell_height), New Vector2(margin_left + 2 * cell_width, margin_top + i * cell_height), FgColor, 3)
+                        Next
+
+                        'Draw back button
+                        batcher.DrawHollowRect(New Rectangle(30, 950, 300, 100), FgColor, 3)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(120, 975), FgColor)
                 End Select
 
 
@@ -645,6 +678,32 @@ Namespace Menu.MainMenu
                 If i = 0 Then Return
                 batcher.DrawLine(New Vector2(450, 230 + i * 80), New Vector2(1920 - 450, 230 + i * 80), Color.Yellow, 1)
             End Sub
+
+
+            Private Function GetShortGameTitle(gaem As GameType) As String
+                Select Case gaem
+                    Case GameType.BetretenVerboten
+                        Return "BV"
+                    Case GameType.CarCrash
+                        Return "CC"
+                    Case GameType.Corridor
+                        Return "CR"
+                    Case GameType.Pain
+                        Return "PN"
+                    Case GameType.DuoCard
+                        Return "DC"
+                    Case GameType.DooDooHead
+                        Return "DDH"
+                    Case GameType.Megäa
+                        Return "MG"
+                    Case GameType.Barrelled
+                        Return "BR"
+                    Case GameType.DropTrop
+                        Return "DT"
+                    Case Else
+                        Return ""
+                End Select
+            End Function
 
             Private Function GetGameTitle(gaem As GameType) As String
                 Select Case gaem
