@@ -339,9 +339,10 @@ Namespace Game.BetretenVerboten
                         SaucerFields.Add(element)
                     Next
                     Timer = data.time_left
+                    SendSync()
                     DebugConsole.Instance.Log("Game cache loaded!")
                 End If
-                Nez.Console.DebugConsole.Instance.Log("Game cache file not present!")
+                DebugConsole.Instance.Log("Game cache file not present!")
             End If
 
 
