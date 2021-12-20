@@ -139,6 +139,16 @@ Namespace Framework.Networking
             End Try
         End Sub
 
+        Friend Function GetLeaderboard(game As Integer, map As Integer, team As Boolean) As List(Of (String, String, Double))
+            WriteString("leaderboard_read")
+            WriteString(game)
+            WriteString(map)
+            WriteString(If(team, "1", "0"))
+            Dim data = ReadString()
+            If ReadString() <> "Yoshaas!" Then Throw New Exception("Communication error! OwO")
+            Return Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of (String, String, Double)))(data)
+        End Function
+
         Friend Function ReadStream() As String()
             SyncLock data
                 Dim dataS As String() = data.ToArray

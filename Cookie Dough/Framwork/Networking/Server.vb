@@ -257,7 +257,7 @@ Namespace Framework.Networking
                             'Receive player scores
                             Dim game As Integer = ReadString(con)
                             Dim map As Integer = ReadString(con)
-                            Dim TeamMode As Boolean = CInt(ReadString(con)) = 1
+                            Dim TeamMode As Boolean = (CInt(ReadString(con)) = 1)
                             Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
                             Dim highscore As List(Of (String, Double))
                             'Load and update highscores
@@ -266,7 +266,7 @@ Namespace Framework.Networking
 
                             Dim ret_data = New List(Of (String, String, Double))()
                             For Each element In highscore
-                                ret_data.Add((registered(element.Item1), element.Item1, element.Item2))
+                                ret_data.Add((If(registered.ContainsKey(element.Item1), registered(element.Item1), element.Item1), element.Item1, element.Item2))
                             Next
                             WriteString(con, JsonConvert.SerializeObject(ret_data))
 

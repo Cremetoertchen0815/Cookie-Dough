@@ -30,6 +30,12 @@ Namespace Menu.MainMenu
         Friend AvailableServerList As New List(Of String)
         Friend ConnectedUsers As New List(Of String)
 
+        'Leaderboards
+        Friend LdbSelectedGame As GameType = GameType.BetretenVerboten
+        Friend LdbSelectedMap As Integer = 0
+        Friend LdbSelectedTeam As Boolean = False
+        Friend LdbData As New List(Of (String, String, Double))
+
 
         Protected Schwarzblende As New Transition(Of Single)
 
@@ -56,7 +62,7 @@ Namespace Menu.MainMenu
                 Case 0
                     If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(1)
                     If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(2)
-                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(6)
+                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(6, Sub() LdbData = LocalClient.GetLeaderboard(LdbSelectedGame, LdbSelectedMap, LdbSelectedTeam))
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                     If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(3)
                 Case 1
@@ -321,11 +327,32 @@ Namespace Menu.MainMenu
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                     If New Rectangle(560, 955, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
                 Case 6
+                    'Change options
+                    Dim loaddata As Boolean = False
+                    If New Rectangle(20, 190, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then 'Change game
+                        LdbSelectedGame = If(LdbSelectedGame = GameType.BetretenVerboten, GameType.CarCrash, GameType.BetretenVerboten)
+                        LdbSelectedMap = 0
+                        LdbSelectedTeam = False
+                        loaddata = True
+                    End If
+                    If New Rectangle(20, 290, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then 'Change map
+                        Select Case LdbSelectedGame
+                            Case GameType.BetretenVerboten
+                                LdbSelectedMap = (LdbSelectedMap + 1) Mod 4
+                            Case GameType.CarCrash
+                                LdbSelectedMap = (LdbSelectedMap + 1) Mod 3
+                        End Select
+                        loaddata = True
+                    End If
+                    If New Rectangle(20, 390, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And LdbSelectedGame = GameType.BetretenVerboten Then 'Change team
+                        LdbSelectedTeam = Not LdbSelectedTeam
+                        loaddata = True
+                    End If
 
-                    If New Rectangle(20, 190, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Change game
-                    If New Rectangle(20, 290, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Change map
-                    If New Rectangle(20, 390, 260, 70).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Change team
+                    'Fetching data
+                    If loaddata Then LdbData = LocalClient.GetLeaderboard(LdbSelectedGame, LdbSelectedMap, LdbSelectedTeam)
 
+                    'Navigation
                     If New Rectangle(30, 950, 300, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Back
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4) 'Server settings
             End Select
@@ -639,20 +666,36 @@ Namespace Menu.MainMenu
                         batcher.DrawString(TitleFont, "Leaderboard", New Vector2(1920.0F / 2 - TitleFont.MeasureString("Leaderboard").X / 2, 50), FgColor)
 
                         'Draw settings
-                        batcher.DrawString(MediumFont, "Game: BV", New Vector2(30, 200), FgColor)
-                        batcher.DrawString(MediumFont, "Map: Plus", New Vector2(30, 300), FgColor)
-                        batcher.DrawString(MediumFont, "Team: Yes", New Vector2(30, 400), FgColor)
+                        batcher.DrawString(MediumFont, "Game: " & GetShortGameTitle(CounterScene.LdbSelectedGame), New Vector2(30, 200), FgColor)
+                        batcher.DrawString(MediumFont, "Map: " & GetMapName(CounterScene.LdbSelectedGame, CounterScene.LdbSelectedMap), New Vector2(30, 300), FgColor)
+                        If CounterScene.LdbSelectedGame = GameType.BetretenVerboten Then batcher.DrawString(MediumFont, "Team: " & If(CounterScene.LdbSelectedTeam, "Yes", "No"), New Vector2(30, 400), FgColor)
 
                         Dim margin_left As Integer = 470
                         Dim margin_top As Integer = 200
                         Dim cell_height As Integer = 70
-                        Dim cell_width As Integer = 500
+                        Dim cell_width_A As Integer = 800
+                        Dim cell_width_B As Integer = 300
+                        Dim cell_width_index As Integer = 80
                         'Draw table
-                        batcher.DrawLine(New Vector2(margin_left + cell_width, margin_top), New Vector2(margin_left + cell_width, margin_top + 11 * cell_height), FgColor, 3)
+                        batcher.DrawLine(New Vector2(margin_left + cell_width_index, margin_top + cell_height), New Vector2(margin_left + cell_width_index, margin_top + 11 * cell_height), FgColor, 3)
+                        batcher.DrawLine(New Vector2(margin_left + cell_width_A, margin_top), New Vector2(margin_left + cell_width_A, margin_top + 11 * cell_height), FgColor, 3)
                         batcher.DrawLine(New Vector2(margin_left, margin_top), New Vector2(margin_left, margin_top + 11 * cell_height), FgColor, 3)
-                        batcher.DrawLine(New Vector2(margin_left + 2 * cell_width, margin_top), New Vector2(margin_left + 2 * cell_width, margin_top + 11 * cell_height), FgColor, 3)
+                        batcher.DrawLine(New Vector2(margin_left + cell_width_A + cell_width_B, margin_top), New Vector2(margin_left + cell_width_A + cell_width_B, margin_top + 11 * cell_height), FgColor, 3)
                         For i As Integer = 0 To 11
-                            batcher.DrawLine(New Vector2(margin_left, margin_top + i * cell_height), New Vector2(margin_left + 2 * cell_width, margin_top + i * cell_height), FgColor, 3)
+                            batcher.DrawLine(New Vector2(margin_left, margin_top + i * cell_height), New Vector2(margin_left + cell_width_A + cell_width_B, margin_top + i * cell_height), FgColor, 3)
+                        Next
+
+                        'Draw table headers
+                        batcher.DrawString(MediumFont, "Name", New Vector2(800, 200), FgColor)
+                        batcher.DrawString(MediumFont, "Score", New Vector2(1350, 200), FgColor)
+                        For i As Integer = 1 To 10
+                            batcher.DrawString(MediumFont, i.ToString() & ".", New Vector2(margin_left + 5, margin_top + cell_height * i), FgColor)
+                        Next
+
+                        'Draw contents
+                        For i As Integer = 0 To CounterScene.LdbData.Count - 1
+                            batcher.DrawString(MediumFont, CounterScene.LdbData(i).Item1, New Vector2(margin_left + cell_width_index + 10, 200 + (i + 1) * cell_height), FgColor)
+                            batcher.DrawString(MediumFont, CounterScene.LdbData(i).Item3.ToString, New Vector2(margin_left + cell_width_A + 10, 200 + (i + 1) * cell_height), FgColor)
                         Next
 
                         'Draw back button
@@ -702,6 +745,24 @@ Namespace Menu.MainMenu
                         Return "DT"
                     Case Else
                         Return ""
+                End Select
+            End Function
+
+            Private Function GetMapName(gaem As GameType, map As Integer) As String
+                Select Case gaem
+                    Case GameType.BetretenVerboten
+                        Return Game.BetretenVerboten.Maps.GetMapName(map)
+                    Case GameType.CarCrash
+                        Select Case map
+                            Case 0
+                                Return "Easy"
+                            Case 1
+                                Return "Medium"
+                            Case Else
+                                Return "Hard"
+                        End Select
+                    Case Else
+                        Return "NaNi"
                 End Select
             End Function
 
