@@ -116,6 +116,7 @@ Namespace Game.BetretenVerboten.Rendering
                     SpceCount = 100
                     FigCount = 1
                     FieldOffset = New Vector2(0)
+
             End Select
             SlideFields = GetSnakeFields(Game.Map)
             Feld = New Rectangle(500, 70, 950, 950)

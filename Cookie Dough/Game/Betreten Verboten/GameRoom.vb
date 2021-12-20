@@ -169,7 +169,7 @@ Namespace Game.BetretenVerboten
                     FigCount = 1
                     PlCount = 4
                     SpceCount = 100
-                    SaucerChance = 10
+                    SaucerChance = 8
             End Select
 
             'GEILES MINT: New Color(0, 255, 100)
