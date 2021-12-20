@@ -6,8 +6,6 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Add game state load/save features
--Remove sacrificing from snek map
 -Replace UFO fields with god fields
 -Fix cam intro for snek
 
