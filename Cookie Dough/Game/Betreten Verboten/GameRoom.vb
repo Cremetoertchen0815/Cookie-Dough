@@ -98,6 +98,8 @@ Namespace Game.BetretenVerboten
         Private Shared dbgCam As Keyframe3D = Nothing
         Private Shared dbgLoguser As Integer = -1
         Private Shared dbgEndlessAnger As Boolean = False
+        Private Shared dbgLoadState As Boolean = False
+        Private Shared dbgSaveState As Boolean = False
 
         'Spielfeld
         Friend Property SelectFader As Single 'Fader, welcher die zur Auswahl stehenden Figuren blinken lässt
@@ -319,6 +321,37 @@ Namespace Game.BetretenVerboten
 
             'Move cam
             If dbgCamFree Then FigurFaderCamera.Value += New Keyframe3D(If(kstate.IsKeyDown(Keys.A), -1, 0) + If(kstate.IsKeyDown(Keys.D), 1, 0), If(kstate.IsKeyDown(Keys.S), -1, 0) + If(kstate.IsKeyDown(Keys.W), 1, 0), If(kstate.IsKeyDown(Keys.LeftShift), -1, 0) + If(kstate.IsKeyDown(Keys.Space), 1, 0), If(kstate.IsKeyDown(Keys.J), -0.01, 0) + If(kstate.IsKeyDown(Keys.L), 0.01, 0), If(kstate.IsKeyDown(Keys.K), -0.01, 0) + If(kstate.IsKeyDown(Keys.I), 0.01, 0), If(kstate.IsKeyDown(Keys.RightShift), -0.01, 0) + If(kstate.IsKeyDown(Keys.Enter), 0.01, 0), True) : HUDdbgLabel.Active = True
+
+            'Load map
+            If dbgLoadState Then
+                dbgLoadState = False
+                If IO.File.Exists("Cache\client\bv_game_cache.dat") Then
+                    Dim data = Newtonsoft.Json.JsonConvert.DeserializeObject(Of (player_data As Player(), saucer_fields As Integer(), time_left As TimeSpan))(IO.File.ReadAllText("Cache\client\bv_game_cache.dat"))
+                    For i As Integer = 0 To PlCount - 1
+                        Spielers(i).AdditionalPoints = data.player_data(i).AdditionalPoints
+                        Spielers(i).AngerCount = data.player_data(i).AngerCount
+                        Spielers(i).SacrificeCounter = data.player_data(i).SacrificeCounter
+                        Spielers(i).Spielfiguren = data.player_data(i).Spielfiguren
+                        Spielers(i).SuicideField = data.player_data(i).SuicideField
+                    Next
+                    SaucerFields.Clear()
+                    For Each element In data.saucer_fields
+                        SaucerFields.Add(element)
+                    Next
+                    Timer = data.time_left
+                    DebugConsole.Instance.Log("Game cache loaded!")
+                End If
+                Nez.Console.DebugConsole.Instance.Log("Game cache file not present!")
+            End If
+
+
+            'Save map
+            If dbgSaveState Then
+                dbgSaveState = False
+                Dim data = (Spielers, SaucerFields.ToArray(), Timer)
+                IO.File.WriteAllText("Cache\client\bv_game_cache.dat", Newtonsoft.Json.JsonConvert.SerializeObject(data))
+                DebugConsole.Instance.Log("Game cache saved!")
+            End If
 
             If Not StopUpdating Then
 
@@ -2027,6 +2060,19 @@ Namespace Game.BetretenVerboten
         <Command("bv-end", "Ends the game.")>
         Public Shared Sub dbgEndGame()
             dbgEnd = True
+        End Sub
+
+        <Command("bv-cache", "Ends the game.")>
+        Public Shared Sub dbgCache(cmd As String)
+            Select Case cmd
+                Case "save"
+                    dbgSaveState = True
+                Case "load"
+                    dbgLoadState = True
+                Case Else
+                    Nez.Console.DebugConsole.Instance.Log("Wat")
+                    Nez.Console.DebugConsole.Instance.Log("Type ""save"" or ""load""!")
+            End Select
         End Sub
 
         <Command("bv-cam-place", "Sets up the camera in a specific way.")>
