@@ -106,7 +106,6 @@ Namespace Game.Common
 
         Public Overrides Sub Render(scene As Scene)
             SetViewMatrix(Game.GetCamPos)
-            'SetViewMatrix(New Keyframe3D(200, 0, 1000, 0.5, 1, 0, False), Matrix.Identity)
             Projection = Matrix.CreateScale(100) * Matrix.CreatePerspective(1920, 1080, 1, 100000)
 
             '---RENDERER 3D---
@@ -114,8 +113,14 @@ Namespace Game.Common
             dev.SetRenderTarget(RenderTexture)
             dev.Clear(Color.Transparent)
 
+            dev.DepthStencilState = DepthStencilState.None
+            batchlor.Begin()
+            batchlor.Draw(Game.BGTexture, New Rectangle(0, 0, 1920, 1080))
+            batchlor.End()
+
             dev.RasterizerState = RasterizerState.CullNone
             dev.DepthStencilState = DepthStencilState.Default
+
 
             'Draw card
             If Game.TableCard.Visible Then
