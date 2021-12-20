@@ -201,54 +201,53 @@ Namespace Framework.Networking
 
                             'Receive player scores
                             Dim game As Integer = ReadString(con)
-                                Dim map As Integer = ReadString(con)
-                                Dim TeamMode As Boolean = CInt(ReadString(con)) = 1
-                                Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
+                            Dim map As Integer = ReadString(con)
+                            Dim TeamMode As Boolean = CInt(ReadString(con)) = 1
+                            Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
                             Dim highscore As List(Of (String, Double))
                             Dim data As List(Of (String, Double)) = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(ReadString(con))
                             Dim updated As Boolean() = New Boolean(2) {}
-                                Dim takenIDs As New List(Of String)
+                            Dim takenIDs As New List(Of String)
                             'Load and update highscores
                             If File.Exists(path) Then highscore = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Double))
                             highscore.AddRange(data.ToArray)
-                                'Sort list
-                                highscore = highscore.OrderBy(Function(x) x.Item2).ToList()
-                                highscore.Reverse()
+                            'Sort list
+                            highscore = highscore.OrderBy(Function(x) x.Item2).ToList()
+                            highscore.Reverse()
 
 
-                                'Send highscore feedback via chat
-                                If TeamMode Then
-                                    'Remove double gangers
-                                    Dim indx As Integer = 0
-                                    Dim ent As Integer = highscore.Count
-                                    Do Until indx >= ent
-                                        If takenIDs.Contains(highscore(indx).Item1) Then
-                                            highscore.RemoveAt(indx)
-                                            ent -= 1
-                                        Else
-                                            takenIDs.Add(highscore(indx).Item1)
-                                            indx += 1
-                                        End If
-                                    Loop
-                                End If
-
-                                'Delete access
-                                Do While highscore.Count > 10
-                                    highscore.RemoveAt(highscore.Count - 1)
+                            If Not TeamMode Then
+                                'Remove double gangers
+                                Dim indx As Integer = 0
+                                Dim ent As Integer = highscore.Count
+                                Do Until indx >= ent
+                                    If takenIDs.Contains(highscore(indx).Item1) Then
+                                        highscore.RemoveAt(indx)
+                                        ent -= 1
+                                    Else
+                                        takenIDs.Add(highscore(indx).Item1)
+                                        indx += 1
+                                    End If
                                 Loop
+                            End If
 
-                                'Update "updated" list
-                                For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
-                                    updated(i) = data.Contains(highscore(i))
-                                Next
-                                'Save to file
-                                File.WriteAllText(path, JsonConvert.SerializeObject(highscore))
+                            'Delete access
+                            Do While highscore.Count > 10
+                                highscore.RemoveAt(highscore.Count - 1)
+                            Loop
 
-                                Dim ret_data = New List(Of (String, String, Double))()
-                                For Each element In highscore
-                                    ret_data.Add((registered(element.Item1), element.Item1, element.Item2))
-                                Next
-                                WriteString(con, JsonConvert.SerializeObject(ret_data))
+                            'Update "updated" list
+                            For i As Integer = 0 To Math.Min(2, highscore.Count - 1)
+                                updated(i) = data.Contains(highscore(i))
+                            Next
+                            'Save to file
+                            File.WriteAllText(path, JsonConvert.SerializeObject(highscore))
+
+                            Dim ret_data = New List(Of (String, String, Double))()
+                            For Each element In highscore
+                                ret_data.Add((registered(element.Item1), element.Item1, element.Item2))
+                            Next
+                            WriteString(con, JsonConvert.SerializeObject(ret_data))
 
                             'Return data
                             WriteString(con, "Yoshaas!")
@@ -422,7 +421,7 @@ Namespace Framework.Networking
 
 
                             'Send highscore feedback via chat
-                            If TeamMode Then
+                            If Not TeamMode Then
                                 'Remove double gangers
                                 Dim indx As Integer = 0
                                 Dim ent As Integer = highscore.Count
