@@ -1290,6 +1290,11 @@ Namespace Game.BetretenVerboten
 
 
         Private Sub TriggerSaucer(last As Integer)
+            'If we're in snek Map, trigger god field
+            Sacrifice(FigurFaderZiel.Item1, -1)
+            Return
+
+            'Trigger UFO
             SaucerFields.Remove(last)
             Status = SpielStatus.SaucerFlight
             Dim distance As Integer = Nez.Random.Range(-6, 7)
@@ -1760,14 +1765,25 @@ Namespace Game.BetretenVerboten
         End Sub
 
         Private Sub Sacrifice(pl As Integer, figur As Integer)
-            Spielers(pl).AdditionalPoints += 25
             StopUpdating = True
             Status = SpielStatus.Waitn
-            PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
-            SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
-            If Not DontKickSacrifice Then KickedByGod(pl, figur) 'Kick sacrifice
-            Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
-            Dim pogfactor = progress * 0.5F + 0.3F 'Field 0: Chance of sth good: 35%;  Field max.: Chance of sth good: 80%
+            Dim pogfactor As Single 'Chance of getting sth good
+            Dim semipogfactor As Single 'Chance of getting sth neutral
+            If figur > -1 Then
+                'Sacrifice
+                Spielers(pl).AdditionalPoints += 25
+                PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
+                SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
+                If Not DontKickSacrifice Then KickedByGod(pl, figur) 'Kick sacrifice
+                Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
+                pogfactor = progress * 0.4F + 0.2F 'Field 0: Chance of sth good: 20%;  Field max.: Chance of sth good: 50%
+                semipogfactor = 0.2F
+            Else
+                'God field
+                SendMessage(Spielers(pl).Name & "stepped on a god field...")
+                pogfactor = 0.4F
+                semipogfactor = 0.2F
+            End If
             Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
 
@@ -1782,8 +1798,9 @@ Namespace Game.BetretenVerboten
                                                      Dim boost = Nez.Random.Range(1, PlCount * 5)
                                                      Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
                                                      If futurefield < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
-                                                         PostChat("You're lucky! A random figure of yours is being boosted!", Color.White)
-                                                         SendMessage("You're lucky! A random figure of yours is being boosted!")
+                                                         Dim txt = If(FigCount <= 1, "You're lucky! Your figure is being boosted!", "You're lucky! A random figure of yours is being boosted!")
+                                                         PostChat(txt, Color.White)
+                                                         SendMessage(txt)
                                                          plsdont = True
                                                          FigurFaderZiel = (pl, fig)
                                                          StartMoverSub(futurefield)
@@ -1830,7 +1847,7 @@ Namespace Game.BetretenVerboten
                                                  Spielers(pl).AdditionalPoints += 75
                                                  Exit Do
                                          End Select
-                                     ElseIf RNG > pogfactor + (1 - pogfactor) / 5 * 3 Then 'Negative effect
+                                     ElseIf RNG > pogfactor + semipogfactor Then 'Negative effect
                                          Select Case Nez.Random.Range(0, 3)
                                              Case 0
                                                  'Subtract points
@@ -1851,8 +1868,9 @@ Namespace Game.BetretenVerboten
                                                      If count > 20 Then dont = True : Exit Do
                                                  Loop
                                                  If Not TeamMode Or (TeamMode And pl Mod 2 = pla Mod 2) And Not dont Then
-                                                     PostChat("Oh ooh! One of your " & If(TeamMode, "team's ", "") & "pieces died!", Color.White)
-                                                     SendMessage("Oh ooh! Of your " & If(TeamMode, "team's ", "") & "pieces died!")
+                                                     Dim txt = If(FigCount <= 1, "Oh ooh! Your piece died!", "Oh ooh! One of your " & If(TeamMode, "team's ", "") & "pieces died!")
+                                                     PostChat(txt, Color.White)
+                                                     SendMessage(txt)
                                                      KickedByGod(pl, fig)
                                                      Exit Do
                                                  End If
@@ -1865,8 +1883,14 @@ Namespace Game.BetretenVerboten
                                                  Exit Do
                                          End Select
                                      Else
-                                         PostChat("You got spared.", Color.White)
-                                         SendMessage("You got spared.")
+                                         If figur > -1 Or Nez.Random.Range(0, 3) = 1 Then
+                                             'If on god field there a 2/3 chance of getting spared, if on sacrifice theres a 100% chance
+                                             PostChat("You got spared.", Color.White)
+                                             SendMessage("You got spared.")
+                                         Else
+                                             'Swap places with figure
+
+                                         End If
                                          Exit Do
                                      End If
                                  Loop
