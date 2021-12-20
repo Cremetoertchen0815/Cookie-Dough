@@ -693,7 +693,7 @@ Namespace Game.DuoCard
         End Sub
         Private Sub ScrollDown() Handles HUDArrowDown.Clicked
             If ScrollingDown Then Return
-            Tween("DeckScroll", CSng(Math.Min(Math.Floor((HandDeck.Count - 1) / 7), DeckScroll + 1)), 0.3F).SetEaseType(EaseType.Linear).SetCompletionHandler(Sub() ScrollingDown = True).Start()
+            Tween("DeckScroll", CSng(Math.Min(Math.Floor((HandDeck.Count - 1) / 7), DeckScroll + 1)), 0.3F).SetEaseType(EaseType.Linear).SetCompletionHandler(Sub() ScrollingDown = False).Start()
             ScrollingDown = True
         End Sub
 #End Region
@@ -738,10 +738,10 @@ Namespace Game.DuoCard
             End Get
         End Property
 
-        Private SuitStack = New List(Of Card) From {New Card(CardType.Clear, CardSuit.Clubs), New Card(CardType.Clear, CardSuit.Diamonds), New Card(CardType.Clear, CardSuit.Hearts), New Card(CardType.Clear, CardSuit.Spades)}
+        Private SuitStack As New List(Of Card) From {New Card(CardType.Clear, CardSuit.Clubs), New Card(CardType.Clear, CardSuit.Diamonds), New Card(CardType.Clear, CardSuit.Hearts), New Card(CardType.Clear, CardSuit.Spades), New Card(CardType.Ace, CardSuit.Clubs, False), New Card(CardType.Ace, CardSuit.Clubs, False), New Card(CardType.Ace, CardSuit.Clubs, False)}
         Public ReadOnly Property HandDeck As List(Of Card) Implements ICardRendererWindow.HandDeck
             Get
-                If SelectionState = SelectionMode.Suit Then Return SuitStack
+                If SelectionState = SelectionMode.Suit Then Return SuitStack.Concat(Spielers(UserIndex).HandDeck).ToList()
                 Return Spielers(UserIndex).HandDeck
             End Get
         End Property
