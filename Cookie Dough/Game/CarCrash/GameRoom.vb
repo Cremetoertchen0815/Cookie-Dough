@@ -197,7 +197,7 @@ Namespace Game.CarCrash
                                                'Start game
                                                Renderer.TriggerStartAnimation(Sub()
                                                                                   TestCard.Enabled = False
-                                                                                  Emulator = EmuEntity.AddComponent(New ConsoleEmulator(AddressOf LaunchGame) With {.RenderLayer = -3, .LayerDepth = 0.5F, .TransformMatrix = Matrix.CreateScale(1.3F, 1.0F, 1.0F) * Matrix.CreateTranslation(0, 150, 0)})
+                                                                                  Emulator = EmuEntity.AddComponent(New ConsoleEmulator(AddressOf LaunchGame) With {.RenderLayer = -3, .LayerDepth = 0.5F, .TransformMatrix = Matrix.CreateScale(1.2F, 0.9F, 1.0F) * Matrix.CreateTranslation(20, 180, 0)})
                                                                                   HUDInstructions.Text = " "
                                                                                   Status = SpielStatus.SpielAktiv
                                                                                   StopUpdating = False

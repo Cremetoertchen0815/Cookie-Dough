@@ -1,6 +1,4 @@
 ﻿-Test DC, BR and DT!
--Music stops playing
--Fix leader board not looking for all duplicates
 -Add controller support
 
 CC:
