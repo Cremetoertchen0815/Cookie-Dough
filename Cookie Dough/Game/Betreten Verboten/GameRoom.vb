@@ -573,7 +573,7 @@ Namespace Game.BetretenVerboten
                                     Dim k As Integer
                                     Dim ichmagzüge As New List(Of Integer)
                                     Dim defaultmov As Integer
-                                    Dim dontmove As Boolean = True
+                                    Dim dontmove As Boolean = False
                                     For i As Integer = 0 To FigCount - 1
                                         defaultmov = pl.Spielfiguren(i)
                                         If defaultmov > -1 And defaultmov + Fahrzahl <= If(Map > 2, SpceCount, PlCount * SpceCount) + FigCount - 1 And Not IsFutureFieldCoveredByOwnFigure(SpielerIndex, defaultmov + Fahrzahl, i) And Not IsÜberholingInSeHaus(defaultmov) Then ichmagzüge.Add(i)
