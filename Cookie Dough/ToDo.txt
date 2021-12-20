@@ -4,7 +4,6 @@
 -Add controller support
 
 CC:
--Fix leader board keeping doubles
 -Implement difficulty setting in selection menu
 -Implement SFX and bgm
 
