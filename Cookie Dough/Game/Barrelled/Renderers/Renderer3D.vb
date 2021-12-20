@@ -224,6 +224,7 @@ Namespace Game.Barrelled.Renderers
                     FloorEffect.DirectionalLight2.Direction = BaseClass.EgoPlayer.Direction * New Vector3(1, -1, 1)
                     FloorEffect.World = Matrix.CreateTranslation(New Vector3(x, y, 0)) * Matrix.CreateScale(40) * Matrix.CreateRotationX(0.5 * Math.PI) * Matrix.CreateTranslation(-20, 0, -20)
                     FloorEffect.View = View
+                    FloorEffect.Projection = Projection
                     FloorEffect.DiffuseColor = Vector3.Zero
                     For Each pass As EffectPass In FloorEffect.CurrentTechnique.Passes
                         Dev.SetVertexBuffer(QuadClockwise)

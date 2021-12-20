@@ -1894,7 +1894,7 @@ Namespace Game.BetretenVerboten
         Private Sub ResetHUD()
             If UserIndex < 0 Then Return
             HUDBtnC.Active = CanAnger(UserIndex) And SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
-            HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+            HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK And Map <> GaemMap.Snakes
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
             HUD.TweenColorTo(If(UserIndex >= 0, hudcolors(UserIndex), Color.White), 0.5).SetEaseType(EaseType.CubicInOut).Start()

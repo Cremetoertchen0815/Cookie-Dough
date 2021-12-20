@@ -591,7 +591,7 @@ Namespace Game.BetretenVerboten
                         Dim who As Integer = element(1).ToString
                         SpielerIndex = who
                         HUDBtnC.Active = CanAnger(UserIndex) And Not Spielers(UserIndex).IsAFK And SpielerIndex = UserIndex
-                        HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK
+                        HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK And Map <> GaemMap.Snakes
                         HUDScores.Active = UserIndex <> SpielerIndex
                         HUDNameBtn.Active = True
                         If UserIndex < 0 Then Continue For
