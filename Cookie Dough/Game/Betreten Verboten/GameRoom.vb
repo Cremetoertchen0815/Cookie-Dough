@@ -1904,7 +1904,7 @@ Namespace Game.BetretenVerboten
         Private Sub SwitchPlayer()
             'Generate SaucerFields
             If Nez.Random.Range(0, SaucerChance) = 5 Then
-                Dim nr As Integer = Nez.Random.Range(0, PlCount * SpceCount)
+                Dim nr As Integer = Nez.Random.Range(0, If(Map < GaemMap.Snakes, PlCount * SpceCount, SpceCount))
                 Do While ((nr Mod SpceCount) = 0 Or SaucerFields.Contains(nr) Or IsFieldCovered(SpielerIndex, -1, nr)) And nr > 0
                     nr -= 1
                 Loop

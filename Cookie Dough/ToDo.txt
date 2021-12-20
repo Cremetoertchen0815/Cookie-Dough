@@ -6,7 +6,7 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Replace UFO fields with god fields
+-Add god feature "swapping chrs"
 -Fix cam intro for snek
 
 CR:
