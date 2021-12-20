@@ -642,7 +642,7 @@ Namespace Game.DuoCard
 
         Public Property TableCard As Card Implements ICardRendererWindow.TableCard
 
-        Private ReadOnly Property ICardRendererWindow_DeckScroll As Integer Implements ICardRendererWindow.DeckScroll
+        Private ReadOnly Property ICardRendererWindow_DeckScroll As Single Implements ICardRendererWindow.DeckScroll
             Get
                 Return DeckScroll
             End Get

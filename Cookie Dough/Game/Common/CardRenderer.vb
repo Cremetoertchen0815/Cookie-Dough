@@ -172,11 +172,12 @@ Namespace Game.Common
             dev.DepthStencilState = DepthStencilState.None
             SetViewMatrix(New Keyframe3D)
             For i As Integer = 0 To Game.HandDeck.Count - 1
-                If Game.DeckScroll <> Math.Floor(i / 7) OrElse Not Game.HandDeck(i).Visible Then Continue For
-                Dim transform As Matrix = GetHandCardWorldMatrix(i)
+                If Not Game.HandDeck(i).Visible Then Continue For
+                Dim transform As Matrix = GetHandCardWorldMatrix(i) * Matrix.CreateTranslation(0, (-Game.DeckScroll + Math.Floor(i / 7)) * -2.2, 0)
+                Dim alpha = Mathf.Clamp(1.0F - CSng(Math.Abs(Game.DeckScroll - Math.Floor(i / 7))) * 0.9F, 0, 1)
                 card_fx.Texture = CardTextures(Game.HandDeck(i).ID)
                 For Each element In card_model.Meshes
-                    ApplyFX(element, element.ParentBone.ModelTransform * transform)
+                    ApplyFX(element, element.ParentBone.ModelTransform * transform, alpha)
                     element.Draw()
                 Next
             Next
@@ -216,12 +217,13 @@ Namespace Game.Common
             Return Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(4.3 - (i Mod 7) * 1.4, -3, -1069.2)
         End Function
 
-        Private Sub ApplyFX(mesh As ModelMesh, world As Matrix, Optional yflip As Integer = 1)
+        Private Sub ApplyFX(mesh As ModelMesh, world As Matrix, Optional alpha As Single = 1)
             For Each effect As BasicEffect In mesh.Effects
-                effect.DirectionalLight2.Direction = New Vector3(1, -1 * yflip, 1)
+                effect.DirectionalLight2.Direction = New Vector3(1, -1, 1)
                 effect.DirectionalLight0.Enabled = True
                 effect.DirectionalLight1.Enabled = True
                 effect.DirectionalLight2.Enabled = True
+                effect.Alpha = alpha
                 effect.World = world
                 effect.View = View
                 effect.Projection = Projection

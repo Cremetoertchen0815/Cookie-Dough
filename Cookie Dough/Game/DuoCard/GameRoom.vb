@@ -69,9 +69,10 @@ Namespace Game.DuoCard
         Private WithEvents HUDmotdLabel As Label
         Private WithEvents HUDSoftBtn As GameRenderable
         Private WithEvents HUDAfkBtn As Button
-        Private DeckScroll As Integer
+        Private DeckScroll As Single
         Private InstructionFader As ITween(Of Color)
         Private Chat As List(Of (String, Color))
+        Private ScrollingDown As Boolean = False
 
         'Keystack & other debug shit
         Private keysa As New List(Of Keys)
@@ -221,6 +222,9 @@ Namespace Game.DuoCard
                     Case CardGameState.SelectAction
                         Select Case SelectionState
                             Case SelectionMode.Standard
+                                'Check for moving select cards
+                                If DeckScroll <> Math.Floor(DeckScroll) Then Exit Select
+
                                 'Lay down card
                                 For i As Integer = 0 To 6
                                     Dim card_nr As Integer = i + 7 * DeckScroll
@@ -301,11 +305,15 @@ Namespace Game.DuoCard
 
             If NetworkMode Then ReadAndProcessInputData()
 
+            If DeckScroll > CSng(Math.Floor((HandDeck.Count - 1) / 7.0F)) And Not ScrollingDown Then
+                Tween("DeckScroll", CSng(Math.Min(Math.Floor((HandDeck.Count - 1) / 7), DeckScroll + 1)), 0.3F).SetEaseType(EaseType.Linear).SetCompletionHandler(Sub() ScrollingDown = False).Start()
+                ScrollingDown = True
+            End If
+
             'Misc things
             If kstate.IsKeyDown(Keys.Escape) And lastkstate.IsKeyUp(Keys.Escape) Then MenuButton()
             lastmstate = mstate
             lastkstate = kstate
-            DeckScroll = Mathf.Clamp(DeckScroll, 0, CInt(Math.Floor((HandDeck.Count - 1) / 7.0F)))
             MyBase.Update()
         End Sub
 
@@ -679,10 +687,14 @@ Namespace Game.DuoCard
                                                                 End Sub, {"Yeah", "Nope"})
         End Sub
         Private Sub ScrollUp() Handles HUDArrowUp.Clicked
-            DeckScroll = Math.Max(0, DeckScroll - 1)
+            If ScrollingDown Then Return
+            Tween("DeckScroll", CSng(Math.Max(0, DeckScroll - 1)), 0.3F).SetEaseType(EaseType.Linear).SetCompletionHandler(Sub() ScrollingDown = False).Start()
+            ScrollingDown = True
         End Sub
         Private Sub ScrollDown() Handles HUDArrowDown.Clicked
-            DeckScroll = Math.Min(Math.Floor((HandDeck.Count - 1) / 7), DeckScroll + 1)
+            If ScrollingDown Then Return
+            Tween("DeckScroll", CSng(Math.Min(Math.Floor((HandDeck.Count - 1) / 7), DeckScroll + 1)), 0.3F).SetEaseType(EaseType.Linear).SetCompletionHandler(Sub() ScrollingDown = True).Start()
+            ScrollingDown = True
         End Sub
 #End Region
 #Region "Debug Commands"
@@ -736,7 +748,7 @@ Namespace Game.DuoCard
 
         Public Property TableCard As Card Implements ICardRendererWindow.TableCard
 
-        Private ReadOnly Property ICardRendererWindow_DeckScroll As Integer Implements ICardRendererWindow.DeckScroll
+        Private ReadOnly Property ICardRendererWindow_DeckScroll As Single Implements ICardRendererWindow.DeckScroll
             Get
                 Return DeckScroll
             End Get
