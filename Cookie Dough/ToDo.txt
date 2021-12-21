@@ -6,18 +6,23 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Add god feature "swapping chrs"
+-Snek map reduce god field spawn rate & fix fields not despawning when stepping on it
+-Add god feature "swapping chrs"(speen)
 -Fix cam intro for snek
 
 CR:
 -Johannes soll seinen Arsch bewegen
 
 DC:
+-Leaving round as slave shows "0 humans online" bug
+-Fix "Mau and Mau Mau" for slave and also check for host
+-Remove score and replace with "bla has won"
 -Implement rejoining
 -Add CPUs (JOHANNES)
 
 BR:
 -Decrease view distance for chaser
+-Fix jump sound
 -Add grass noises
 -Add new map(Lukas soll seinen Arsch bewegen[er hat gesagt, dass ich das so sagen soll])
 -Implement jump meter(3 jump per minute, can stack up to 5 jumps)
