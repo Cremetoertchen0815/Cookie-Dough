@@ -169,7 +169,7 @@ Namespace Game.BetretenVerboten
                     FigCount = 1
                     PlCount = 4
                     SpceCount = 100
-                    SaucerChance = 8
+                    SaucerChance = 6
             End Select
 
             'GEILES MINT: New Color(0, 255, 100)
@@ -1780,6 +1780,7 @@ Namespace Game.BetretenVerboten
                 semipogfactor = 0.2F
             Else
                 'God field
+                PostChat(Spielers(pl).Name & "stepped on a god field...", Color.White)
                 SendMessage(Spielers(pl).Name & "stepped on a god field...")
                 pogfactor = 0.4F
                 semipogfactor = 0.2F
@@ -1889,7 +1890,8 @@ Namespace Game.BetretenVerboten
                                              SendMessage("You got spared.")
                                          Else
                                              'Swap places with figure
-
+                                             PostChat("You swap place with another figure!", Color.White)
+                                             SendMessage("You swap place with another figure!")
                                          End If
                                          Exit Do
                                      End If

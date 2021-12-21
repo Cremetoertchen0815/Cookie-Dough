@@ -418,7 +418,7 @@ Namespace Game.BetretenVerboten
         Friend Function GetSnakeFields(map As GaemMap) As (Integer, Integer)()
             Select Case map
                 Case GaemMap.Snakes
-                    Return {(10, 8), (12, 43), (32, 14), (46, 70), (98, 0), (63, 83), (77, 57), (71, 45), (6, 22), (88, 91), (94, 65)}
+                    Return {(10, 8), (12, 33), (32, 14), (46, 70), (98, 41), (63, 83), (77, 57), (71, 45), (6, 17), (88, 91), (94, 65), (21, 35)}
                 Case Else
                     Return {}
             End Select
