@@ -37,6 +37,7 @@ Namespace Framework.UI
         Public Overrides Sub OnAddedToEntity()
             GlobalFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/fnt_HKG_17_M"))
             Material = New Material(DepthStencilState.None) With {.SamplerState = SamplerState.LinearClamp}
+            _gpadcontrol = New GuiGpadController
 
             For Each element In _controls
                 element.Init(Me)
@@ -66,6 +67,8 @@ Namespace Framework.UI
             For Each element In _controls
                 If element.Active Then element.Render(batcher, color)
             Next
+
+            _gpadcontrol.Render(batcher)
         End Sub
 
         Public Sub Update(cstate As GuiInput, offset As Vector2) Implements IParent.Update
@@ -109,6 +112,8 @@ Namespace Framework.UI
             For Each element In _controls
                 If element.Active Then element.Update(cstate, Vector2.Zero)
             Next
+
+            _gpadcontrol.Update()
 
             lastmstate = mstate
         End Sub
