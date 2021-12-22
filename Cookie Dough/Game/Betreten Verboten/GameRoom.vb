@@ -169,7 +169,7 @@ Namespace Game.BetretenVerboten
                     FigCount = 1
                     PlCount = 4
                     SpceCount = 100
-                    SaucerChance = 6
+                    SaucerChance = 7
             End Select
 
             'GEILES MINT: New Color(0, 255, 100)
@@ -1290,12 +1290,15 @@ Namespace Game.BetretenVerboten
 
 
         Private Sub TriggerSaucer(last As Integer)
+            SaucerFields.Remove(last)
+
             'If we're in snek Map, trigger god field
-            Sacrifice(FigurFaderZiel.Item1, -1)
-            Return
+            If Map = GaemMap.Snakes Then
+                Sacrifice(FigurFaderZiel.Item1, -1)
+                Return
+            End If
 
             'Trigger UFO
-            SaucerFields.Remove(last)
             Status = SpielStatus.SaucerFlight
             Dim distance As Integer = Nez.Random.Range(-6, 7)
             Do While IsFieldCovered(SpielerIndex, -1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance) Or distance = 0 Or Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance < 0 Or Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + distance >= If(Map > 2, SpceCount, PlCount * SpceCount) + FigCount
