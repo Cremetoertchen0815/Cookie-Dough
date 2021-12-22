@@ -56,14 +56,16 @@ Namespace Framework.UI.Controls
             workingtext = Text & ": " & Value
             rect = New Rectangle(Location.X + offset.X, Location.Y + offset.Y, Size.X, Size.Y)
 
-            If mstate.LeftClickOneshot And rect.Contains(mstate.MousePosition) Then
-                MsgBoxer.OpenInputbox("Enter the new value:", Sub(x, y)
-                                                                  If y = 0 AndAlso ValidCheck(x) Then
-                                                                      Value = x
-                                                                      ValueChanger(x)
-                                                                  End If
-                                                              End Sub, Value)
-            End If
+            If mstate.LeftClickOneshot And rect.Contains(mstate.MousePosition) Then Activate()
+        End Sub
+
+        Public Overrides Sub Activate()
+            MsgBoxer.OpenInputbox("Enter the new value:", Sub(x, y)
+                                                              If y = 0 AndAlso ValidCheck(x) Then
+                                                                  Value = x
+                                                                  ValueChanger(x)
+                                                              End If
+                                                          End Sub, Value)
         End Sub
     End Class
 End Namespace

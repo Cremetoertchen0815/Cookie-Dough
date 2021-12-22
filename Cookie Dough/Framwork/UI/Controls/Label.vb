@@ -56,5 +56,9 @@ Namespace Framework.UI.Controls
                 RaiseEvent Clicked(Me, New EventArgs())
             End If
         End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

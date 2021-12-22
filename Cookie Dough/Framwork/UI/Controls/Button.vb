@@ -32,6 +32,7 @@ Namespace Framework.UI.Controls
             Color = Color.White
             Border = New ControlBorder(Color.White, 2)
             BackgroundColor = New Color(40, 40, 40, 255)
+            GamepadInteractable = True
         End Sub
 
         Public Overrides Sub Init(system As IParent)
@@ -48,9 +49,11 @@ Namespace Framework.UI.Controls
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)
             rect = New Rectangle(Location.X + offset.X, Location.Y + offset.Y, Size.X, Size.Y)
-            If mstate.LeftClickOneshot And rect.Contains(mstate.MousePosition) Then
-                RaiseEvent Clicked(Me, New EventArgs())
-            End If
+            If mstate.LeftClickOneshot And rect.Contains(mstate.MousePosition) Then Activate()
+        End Sub
+
+        Public Overrides Sub Activate()
+            RaiseEvent Clicked(Me, New EventArgs())
         End Sub
     End Class
 End Namespace

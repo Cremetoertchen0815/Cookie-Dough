@@ -54,5 +54,9 @@ Namespace Game.DropTrop.Renderers
                     Return New Rectangle(0, 0, 0, 0)
             End Select
         End Function
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

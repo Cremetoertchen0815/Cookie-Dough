@@ -81,5 +81,9 @@ Namespace Framework.UI.Controls
         Friend Sub Scroll(index As Integer)
             scrolloffset = Math.Max(0, index - maxlines)
         End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

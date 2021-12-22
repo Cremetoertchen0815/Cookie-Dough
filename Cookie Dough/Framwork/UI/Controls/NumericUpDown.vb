@@ -4,6 +4,7 @@ Imports Microsoft.Xna.Framework.Graphics
 Namespace Framework.UI.Controls
     Public Class NumericUpDown
         Inherits GuiControl
+
         'Shared assets
         Private Shared Loaded As Boolean = False
         Private Shared ArrowA As Texture2D
@@ -88,6 +89,10 @@ Namespace Framework.UI.Controls
             End If
 
             Value = Math.Round(Math.Min(Math.Max(Value, MinValue), MaxValue), 3)
+        End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
         End Sub
     End Class
 End Namespace

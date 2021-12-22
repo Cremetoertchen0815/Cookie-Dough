@@ -54,5 +54,8 @@ Namespace Game.DuoCard.Rendering
             End Select
         End Function
 
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

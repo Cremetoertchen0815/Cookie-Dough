@@ -3,6 +3,7 @@
 Namespace Framework.UI.Controls
     Public Class FoldableContainer
         Inherits GuiControl
+
         Public Overrides ReadOnly Property InnerBounds As Rectangle
             Get
                 Return rect
@@ -63,16 +64,18 @@ Namespace Framework.UI.Controls
             rect = New Rectangle(Location.X + offset.X, Location.Y + offset.Y + 18, Size.X, Size.Y - 18)
             header = New Rectangle(Location.X + offset.X, Location.Y + offset.Y, Size.X, 18)
 
-            If mstate.LeftClickOneshot And header.Contains(mstate.MousePosition) Then
-                Checked = Not Checked
-                RaiseEvent CheckedChanged(Me, New EventArgs)
-            End If
+            If mstate.LeftClickOneshot And header.Contains(mstate.MousePosition) Then Activate()
 
             If Checked Then
                 For Each element In Children
                     If element.Active Then element.Update(mstate, InnerBounds.Location.ToVector2)
                 Next
             End If
+        End Sub
+
+        Public Overrides Sub Activate()
+            Checked = Not Checked
+            RaiseEvent CheckedChanged(Me, New EventArgs)
         End Sub
     End Class
 End Namespace

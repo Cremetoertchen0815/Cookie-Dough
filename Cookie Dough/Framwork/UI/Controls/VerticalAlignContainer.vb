@@ -3,6 +3,7 @@
 Namespace Framework.UI.Controls
     Public Class VerticalAlignContainer
         Inherits GuiControl
+
         Public Overrides ReadOnly Property InnerBounds As Rectangle
             Get
                 Return rect
@@ -16,6 +17,7 @@ Namespace Framework.UI.Controls
             Me.Location = location
             Color = Color.White
             Me.Size = size
+            GamepadInteractable = False
         End Sub
 
         Public Overrides Sub Init(system As IParent)
@@ -50,6 +52,10 @@ Namespace Framework.UI.Controls
             For Each element In Children
                 If element.Active Then element.Update(mstate, off) : off.Y += element.OuterBounds.Size.Y
             Next
+        End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
         End Sub
     End Class
 End Namespace

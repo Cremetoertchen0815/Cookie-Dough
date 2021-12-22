@@ -34,5 +34,9 @@ Namespace Game.Corridor.Rendering
             batcher.Draw(window.BGTexture, New Rectangle(0, 0, 1920, 1080), Nothing, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0)
 
         End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

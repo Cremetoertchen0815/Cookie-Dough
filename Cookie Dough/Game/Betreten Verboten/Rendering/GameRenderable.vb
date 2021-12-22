@@ -19,6 +19,7 @@ Namespace Game.BetretenVerboten.Rendering
         Public Sub New(window As IGameWindow)
             MyBase.New()
             Me.window = window
+            Me.GamepadInteractable = False
         End Sub
 
         Public Overrides Sub Init(system As Framework.UI.IParent)
@@ -81,5 +82,9 @@ Namespace Game.BetretenVerboten.Rendering
                     Return New Rectangle(0, 0, 0, 0)
             End Select
         End Function
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

@@ -42,5 +42,9 @@ Namespace Framework.UI.Controls
             rect = New Rectangle(Location.X + offset.X, Location.Y + offset.Y, Size.X, Size.Y)
             UpdateSubroutine(mstate, rect)
         End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
+        End Sub
     End Class
 End Namespace

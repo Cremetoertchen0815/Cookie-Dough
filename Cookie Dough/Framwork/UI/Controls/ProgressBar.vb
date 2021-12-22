@@ -3,6 +3,7 @@
 Namespace Framework.UI.Controls
     Public Class ProgressBar
         Inherits GuiControl
+
         Public Property Progress As Func(Of Single)
         Public Property Max As Single
         Public Overrides ReadOnly Property InnerBounds As Rectangle
@@ -37,6 +38,10 @@ Namespace Framework.UI.Controls
 
         Public Overrides Sub Update(mstate As GuiInput, offset As Vector2)
             rect = New Rectangle(Location.X + offset.X, Location.Y + offset.Y, Size.X, Size.Y)
+        End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
         End Sub
     End Class
 End Namespace

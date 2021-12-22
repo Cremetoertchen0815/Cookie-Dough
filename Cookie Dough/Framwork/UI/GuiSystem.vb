@@ -8,7 +8,8 @@ Namespace Framework.UI
         Inherits RenderableComponent
         Implements IParent, IUpdatable
 
-        Public Property Controls As New List(Of GuiControl)
+        Private _controls As New List(Of GuiControl)
+        Private _gpadcontrol As GuiGpadController
         Public Property GlobalFont As NezSpriteFont Implements IParent.Font
         Public Overrides ReadOnly Property Bounds As RectangleF
             Get
@@ -37,7 +38,7 @@ Namespace Framework.UI
             GlobalFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/fnt_HKG_17_M"))
             Material = New Material(DepthStencilState.None) With {.SamplerState = SamplerState.LinearClamp}
 
-            For Each element In Controls
+            For Each element In _controls
                 element.Init(Me)
             Next
             MyBase.OnAddedToEntity()
@@ -47,7 +48,8 @@ Namespace Framework.UI
         End Sub
 
         Public Sub Unload()
-            For Each element In Controls
+            For Each element In _controls
+                If _gpadcontrol IsNot Nothing Then _gpadcontrol.DeregisterControl(element)
                 element.Unload()
                 element = Nothing
             Next
@@ -61,13 +63,18 @@ Namespace Framework.UI
             batcher.Begin(Material, Transform.LocalToWorldTransform)
             SetLayerDepth(0)
             Core.GraphicsDevice.DepthStencilState = DepthStencilState.None
-            For Each element In Controls
+            For Each element In _controls
                 If element.Active Then element.Render(batcher, color)
             Next
         End Sub
 
         Public Sub Update(cstate As GuiInput, offset As Vector2) Implements IParent.Update
 
+        End Sub
+
+        Public Sub Add(c As GuiControl)
+            _controls.Add(c)
+            If _gpadcontrol IsNot Nothing And c.GamepadInteractable Then _gpadcontrol.RegisterControl(c)
         End Sub
 
         Public Sub Update() Implements IUpdatable.Update
@@ -99,7 +106,7 @@ Namespace Framework.UI
             .LeftClickFullBlast = fullblast
             }
 
-            For Each element In Controls
+            For Each element In _controls
                 If element.Active Then element.Update(cstate, Vector2.Zero)
             Next
 

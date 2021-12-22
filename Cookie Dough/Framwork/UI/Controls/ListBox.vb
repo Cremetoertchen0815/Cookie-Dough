@@ -4,6 +4,7 @@ Imports Microsoft.Xna.Framework.Graphics
 Namespace Framework.UI.Controls
     Public Class ListBox
         Inherits GuiControl
+
         'Shared assets
         Private Shared Loaded As Boolean = False
         Private Shared ArrowA As Texture2D
@@ -86,6 +87,10 @@ Namespace Framework.UI.Controls
             End If
 
             offsetY = Math.Min(Math.Max(0, offsetY), (workingtext.Length - Size.Y / 30) * -20)
+        End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
         End Sub
     End Class
 End Namespace

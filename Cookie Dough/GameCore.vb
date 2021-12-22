@@ -51,6 +51,9 @@ Public Class GameCore
         FinalRenderable = MsgBoxer
         RegisterGlobalManager(MsgBoxer)
 
+        'Implement gamepad support for UI
+        RegisterGlobalManager(New GuiGpadController)
+
         'Load settings
         If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection From {"weihnachtsaktion.ddns.net"}
         If My.Settings.Username = "" Then My.Settings.Username = Environment.UserName

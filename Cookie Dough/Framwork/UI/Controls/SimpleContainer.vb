@@ -3,6 +3,7 @@
 Namespace Framework.UI.Controls
     Public Class SimpleContainer
         Inherits GuiControl
+
         Public Overrides ReadOnly Property InnerBounds As Rectangle
             Get
                 Return rect
@@ -50,6 +51,10 @@ Namespace Framework.UI.Controls
             For Each element In Children
                 If element.Active Then element.Update(mstate, rect.Location.ToVector2)
             Next
+        End Sub
+
+        Public Overrides Sub Activate()
+            Throw New NotImplementedException()
         End Sub
     End Class
 End Namespace
