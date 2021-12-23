@@ -1294,7 +1294,7 @@ Namespace Game.BetretenVerboten
 
             'If we're in snek Map, trigger god field
             If Map = GaemMap.Snakes Then
-                Sacrifice(FigurFaderZiel.Item1, -1)
+                God(FigurFaderZiel.Item1)
                 Return
             End If
 
@@ -1710,9 +1710,10 @@ Namespace Game.BetretenVerboten
                 If CheckTeamSuicide() Then
                     'Trigger suicide
                     saucertrigger = False
-                ElseIf Not saucertrigger AndAlso CheckForSlide() Then
+                ElseIf CheckForSlide() Then
                     'Trigger slide
                     Status = SpielStatus.Waitn
+                    saucertrigger = False
                     Return
                 End If
 
@@ -1772,23 +1773,15 @@ Namespace Game.BetretenVerboten
             Status = SpielStatus.Waitn
             Dim pogfactor As Single 'Chance of getting sth good
             Dim semipogfactor As Single 'Chance of getting sth neutral
-            If figur > -1 Then
-                'Sacrifice
-                Spielers(pl).AdditionalPoints += 25
+            'Sacrifice
+            Spielers(pl).AdditionalPoints += 25
                 PostChat(Spielers(pl).Name & " offered one of his pieces to the gods...", Color.White)
                 SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
                 If Not DontKickSacrifice Then KickedByGod(pl, figur) 'Kick sacrifice
                 Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
                 pogfactor = progress * 0.4F + 0.2F 'Field 0: Chance of sth good: 20%;  Field max.: Chance of sth good: 50%
                 semipogfactor = 0.2F
-            Else
-                'God field
-                PostChat(Spielers(pl).Name & "stepped on a god field...", Color.White)
-                SendMessage(Spielers(pl).Name & "stepped on a god field...")
-                pogfactor = 0.4F
-                semipogfactor = 0.2F
-            End If
-            Core.Schedule(2, Sub() 'Wait a sec
+                Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
 
                                  Do
@@ -1898,6 +1891,93 @@ Namespace Game.BetretenVerboten
                                          End If
                                          Exit Do
                                      End If
+                                 Loop
+                                 SendSync()
+
+                                 'Switch player
+                                 If Not plsdont Then Core.Schedule(2, Sub() SwitchPlayer())
+                             End Sub)
+        End Sub
+
+        Private Sub God(pl As Integer)
+            StopUpdating = True
+            Status = SpielStatus.Waitn
+
+            'God field
+            PostChat(Spielers(pl).Name & "stepped on a god field...", Color.White)
+            SendMessage(Spielers(pl).Name & "stepped on a god field...")
+
+            Core.Schedule(2, Sub() 'Wait a sec
+                                 Dim plsdont As Boolean = False
+
+                                 Do
+                                     Select Case Nez.Random.Range(0, 5)
+                                         Case 0
+                                             Try
+                                                 'Boost random figure
+                                                 Dim fig = Nez.Random.Range(0, FigCount)
+                                                 Dim boost = Nez.Random.Range(1, PlCount * 5)
+                                                 Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
+                                                 If futurefield < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                                     Dim txt = If(FigCount <= 1, "You're lucky! Your figure is being boosted!", "You're lucky! A random figure of yours is being boosted!")
+                                                     PostChat(txt, Color.White)
+                                                     SendMessage(txt)
+                                                     plsdont = True
+                                                     FigurFaderZiel = (pl, fig)
+                                                     StartMoverSub(futurefield)
+                                                     SendFigureTransition(pl, fig, futurefield)
+                                                     Exit Do
+                                                 End If
+                                             Catch ex As Exception
+
+                                             End Try
+                                         Case 1
+                                             'Kick random enemy figure
+                                             Dim pla = Nez.Random.Range(0, PlCount)
+                                             Dim fig = Nez.Random.Range(0, FigCount)
+                                             Dim dont = False
+                                             Dim count = 0
+                                             Do While Spielers(pla).Spielfiguren(fig) < 0 And Spielers(pla).Spielfiguren(fig) >= PlCount * SpceCount
+                                                 pla = Nez.Random.Range(0, PlCount)
+                                                 fig = Nez.Random.Range(0, FigCount)
+                                                 count += 1
+                                                 If count > 20 Then dont = True : Exit Do
+                                             Loop
+                                             If (Not TeamMode And pla <> pl) Or (TeamMode And (pla Mod 2) <> (pl Mod 2)) And Not dont Then
+                                                 PostChat("You're lucky! A random enemy got kicked!", Color.White)
+                                                 SendMessage("You're lucky! A random enemy got kicked!")
+                                                 KickedByGod(pla, fig)
+                                                 Exit Do
+                                             End If
+                                         Case 2
+                                             'Kick random figure
+                                             Dim fig = Nez.Random.Range(0, FigCount)
+                                             Dim pla = Nez.Random.Range(0, PlCount)
+                                             Dim dont = False
+                                             Dim count = 0
+                                             Do While Spielers(pl).Spielfiguren(fig) < 0 And Spielers(pl).Spielfiguren(fig) >= PlCount * SpceCount
+                                                 fig = Nez.Random.Range(0, FigCount)
+                                                 pla = Nez.Random.Range(0, PlCount)
+                                                 count += 1
+                                                 If count > 20 Then dont = True : Exit Do
+                                             Loop
+                                             If Not TeamMode Or (TeamMode And pl Mod 2 = pla Mod 2) And Not dont Then
+                                                 PostChat("Oh ooh! Your piece died!", Color.White)
+                                                 SendMessage("Oh ooh! Your piece died!")
+                                                 KickedByGod(pl, fig)
+                                                 Exit Do
+                                             End If
+                                         Case 3
+                                             'If on god field there a 2/3 chance of getting spared, if on sacrifice theres a 100% chance
+                                             PostChat("You got spared.", Color.White)
+                                             SendMessage("You got spared.")
+                                             Exit Do
+                                         Case 4
+                                             'Swap places with figure
+                                             PostChat("You swap place with another figure!", Color.White)
+                                             SendMessage("You swap place with another figure!")
+                                             Exit Do
+                                     End Select
                                  Loop
                                  SendSync()
 
