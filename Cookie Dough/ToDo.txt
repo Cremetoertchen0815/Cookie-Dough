@@ -7,7 +7,6 @@ CC:
 
 BV:
 -Figures don't duck on snek map(and no kick sounds)
--Remove highscores & points from snek map
 -Add god feature "swapping chrs"(speen)
 -Fix cam intro for snek
 
@@ -19,7 +18,6 @@ DC:
 -Add CPUs (JOHANNES)
 
 BR:
--Decrease view distance for chaser
 -Fix jump sound
 -Add grass noises
 -Add new map(Lukas soll seinen Arsch bewegen[er hat gesagt, dass ich das so sagen soll])

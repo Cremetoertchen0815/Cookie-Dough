@@ -372,7 +372,17 @@ Namespace Game.BetretenVerboten
                     dbgEnd = False
                     HUDInstructions.Text = "Game over!"
 
-                    If TeamMode Then
+                    If Map = GaemMap.Snakes Then
+                        'Get winning player
+                        Dim p As Integer = 0
+                        For i As Integer = 0 To PlCount - 1
+                            If Spielers(i).Spielfiguren(0) > 99 Then p = i
+                        Next
+
+                        Core.Schedule(2, Sub() PostChat(Spielers(p).Name & " won!", Color.White))
+                        Core.Schedule(2, Sub() SendMessage(Spielers(p).Name & " won!"))
+                        Core.Schedule(5, AddressOf SendHighscore)
+                    ElseIf TeamMode Then
                         'Get ranks
                         Dim teamA As Integer = 0
                         Dim teamB As Integer = 0
