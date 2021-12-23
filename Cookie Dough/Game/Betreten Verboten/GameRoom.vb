@@ -675,7 +675,7 @@ Namespace Game.BetretenVerboten
                                                 Dim Ergebnis As (Integer, Integer) = GetKickFigur(SpielerIndex, element, Fahrzahl)
                                                 If Ergebnis.Item1 <> -1 And Ergebnis.Item2 <> -1 Then
                                                     Dim targetTeam As Integer = Ergebnis.Item1 Mod 2
-                                                    Scores(element) *= If(playerTeam = targetTeam, behaviour.AttackPartyMemberMultiplier, behaviour.AttackOpportunityMultiplier) 'Worsen score if kicking party member
+                                                    Scores(element) *= If(playerTeam = targetTeam And TeamMode, behaviour.AttackPartyMemberMultiplier, behaviour.AttackOpportunityMultiplier) 'Worsen score if kicking party member
                                                 End If
 
 

@@ -7,7 +7,6 @@ CC:
 
 BV:
 -Sacrificing 1 field in front of house is still buggy for host(slave seems to be fine)
--CPU sees you as friend, even in PvP map
 -Figures don't duck on snek map(and no kick sounds)
 -Remove highscores & points from snek map
 -Add god feature "swapping chrs"(speen)
