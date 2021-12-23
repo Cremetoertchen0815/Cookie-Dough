@@ -428,11 +428,8 @@ Namespace Game.DuoCard
         Private Sub SendCardLay(card As Card)
             LocalClient.WriteStream("g" & CInt(card.Suit).ToString & CInt(card.Type).ToString)
         End Sub
-        Private Sub SendAfkSignal() Handles HUDAfkBtn.Clicked
-            LocalClient.WriteStream("i")
-        End Sub
         Private Sub SendMauSignal() Handles HUDBtnC.Clicked
-            If Spielers(UserIndex).HandDeck.Count <> 2 Then Return
+            If Spielers(UserIndex).HandDeck.Count > 2 Or SpielerIndex <> UserIndex Then Return
             HUDBtnC.Active = False
             LocalClient.WriteStream("i")
         End Sub

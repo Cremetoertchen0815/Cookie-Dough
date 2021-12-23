@@ -17,8 +17,6 @@ CR:
 
 DC:
 -Leaving round as slave shows "0 humans online" bug
--Fix "Mau and Mau Mau" for slave and also check for host
--Remove score and replace with "bla has won"
 -Implement rejoining
 -Add CPUs (JOHANNES)
 

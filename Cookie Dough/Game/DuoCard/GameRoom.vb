@@ -38,6 +38,7 @@ Namespace Game.DuoCard
         Private CardStack As List(Of Card)
         Private BeSkipped As Boolean = False
         Private DrawForces As Integer = 0
+        Private CurrentMauDepressed As Boolean = False
 
         'Game flags
         Private MoveActive As Boolean = False 'Gibt an, ob eine Figuranimation in Gange ist
@@ -56,7 +57,6 @@ Namespace Game.DuoCard
         Private WithEvents HUD As GuiSystem
         Private WithEvents HUDBtnB As Button
         Private WithEvents HUDBtnC As Button
-        'Private WithEvents HUDBtnD As Button
         Private WithEvents HUDArrowUp As TextureButton
         Private WithEvents HUDArrowDown As TextureButton
         Private WithEvents HUDChat As TextscrollBox
@@ -235,7 +235,6 @@ Namespace Game.DuoCard
                                         If IsLayingCardValid(card) Then
                                             'Read and pop card from hand deck
                                             Spielers(UserIndex).HandDeck.RemoveAt(card_nr)
-                                            DebugConsole.Instance.Log(card.ToString)
                                             LayCard(card)
                                         ElseIf HUDInstructions.Text = "Place a card!" Then
                                             HUDInstructions.Text = "Card invalid!"
@@ -378,9 +377,9 @@ Namespace Game.DuoCard
                         If card.Type = CardType.Clear Then SendLayCard(card)
                         StopUpdating = True
                         Core.Schedule(0.5, AddressOf SwitchPlayer)
-                    Case "k"c
+                    Case "i"c 'Pressing Mau/Mau Mau
                         Spielers(source).CustomSound(0).Play()
-                        SendMauSignal(source)
+                        If source = SpielerIndex Then CurrentMauDepressed = True
                     Case "m"c 'Sent chat message
                         Dim msg As String = element.Substring(2)
                         PostChat(msg, Color.White)
@@ -526,11 +525,13 @@ Namespace Game.DuoCard
             If DrawForces > 0 And card.Type <> CardType.Seven Then Return False
             Dim ret As Boolean = card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
 
+            If Not (card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack) Then Return False
+
             'Check if card has to be drawn
-            If (Spielers(SpielerIndex).HandDeck.Count = 1 Or Spielers(SpielerIndex).HandDeck.Count = 2) And HUDBtnC.Active And ret Then
+            If (Spielers(SpielerIndex).HandDeck.Count = 1 Or Spielers(SpielerIndex).HandDeck.Count = 2) And Not CurrentMauDepressed And ret Then
                 StopUpdating = True
-                If Spielers(SpielerIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau Mau!")
-                If Spielers(SpielerIndex).HandDeck.Count = 2 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau!")
+                If Spielers(SpielerIndex).HandDeck.Count = 2 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau Mau!")
+                If Spielers(SpielerIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau!")
                 Renderer.TriggerDeckPullAnimation(Sub()
                                                       Dim res As Card = DrawRandomCard()
                                                       Spielers(SpielerIndex).HandDeck.Add(res)
@@ -543,7 +544,7 @@ Namespace Game.DuoCard
             End If
 
             'Normal card
-            Return card.Suit = TableCard.Suit Or card.Type = TableCard.Type Or card.Type = CardType.Jack
+            Return True
         End Function
 
         Private Function CheckWin() As Boolean
@@ -631,6 +632,7 @@ Namespace Game.DuoCard
             Else
                 HUDBtnC.Active = False
             End If
+            CurrentMauDepressed = False
 
             SendParamUpdate()
             SendGameActive()
@@ -643,9 +645,6 @@ Namespace Game.DuoCard
         End Function
 
         Private Sub ResetHUD()
-            'HUDBtnC.Active = Not Spielers(SpielerIndex).Angered And SpielerIndex = UserIndex
-            'HUDBtnD.Active = SpielerIndex = UserIndex
-            'HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
             HUDAfkBtn.Text = If(Spielers(SpielerIndex).IsAFK, "Back Again", "AFK")
             HUD.TweenColorTo(If(UserIndex >= 0, hudcolors(UserIndex), Color.White), 0.5).SetEaseType(EaseType.CubicInOut).Start()
             HUDNameBtn.Active = True
@@ -674,7 +673,7 @@ Namespace Game.DuoCard
             If Spielers(UserIndex).HandDeck.Count > 2 Then Return
             HUDBtnC.Active = False
             Spielers(UserIndex).CustomSound(0).Play()
-            SendMauSignal(UserIndex)
+            If SpielerIndex = UserIndex Then CurrentMauDepressed = True
         End Sub
 
         Private Sub MenuButton() Handles HUDBtnB.Clicked
