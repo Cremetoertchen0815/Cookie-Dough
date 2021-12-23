@@ -126,7 +126,7 @@ Namespace Game.BetretenVerboten
 
                         'Select map
                         If New Rectangle(560, 200, 800, 100).Contains(mpos) And OneshotPressed Then
-                            Map = (Map + 1) Mod 4
+                            Map = (Map + 1) Mod 3
                             ReDim NewGamePlayers(GetMapSize(Map) - 1)
                             ReDim Whitelist(GetMapSize(Map) - 1)
                             SFX(2).Play()
