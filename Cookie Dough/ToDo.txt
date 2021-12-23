@@ -6,7 +6,10 @@ CC:
 -Implement SFX and bgm
 
 BV:
--Snek map reduce god field spawn rate & fix fields not despawning when stepping on it
+-Sacrificing 1 field in front of house is still buggy for host(slave seems to be fine)
+-CPU sees you as friend, even in PvP map
+-Figures don't duck on snek map(and no kick sounds)
+-Remove highscores & points from snek map
 -Add god feature "swapping chrs"(speen)
 -Fix cam intro for snek
 
@@ -14,6 +17,7 @@ CR:
 -Johannes soll seinen Arsch bewegen
 
 DC:
+-Remove highscore from slave
 -Leaving round as slave shows "0 humans online" bug
 -Fix "Mau and Mau Mau" for slave and also check for host
 -Remove score and replace with "bla has won"
