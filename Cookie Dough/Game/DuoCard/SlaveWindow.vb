@@ -551,6 +551,7 @@ Namespace Game.DuoCard
             MsgBoxer.OpenMsgbox("Do you really want to leave?", Sub(x)
                                                                     If x = 1 Then Return
                                                                     SFX(2).Play()
+                                                                    LocalClient.blastmode = False
                                                                     SendGameClosed()
                                                                     NetworkMode = False
                                                                     Core.StartSceneTransition(New FadeTransition(Function() New Menu.MainMenu.MainMenuScene))
