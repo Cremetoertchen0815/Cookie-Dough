@@ -338,38 +338,6 @@ Namespace Game.DuoCard
                         End If
                         MediaPlayer.IsRepeating = False
 
-                        'Berechne Rankings
-                        Core.Schedule(1, Sub()
-                                             Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
-                                             For i As Integer = 0 To PlCount - 1
-                                                 ranks.Add((i, GetScore(i)))
-                                             Next
-                                             ranks = ranks.OrderBy(Function(x) x.Item2).ToList()
-                                             ranks.Reverse()
-
-                                             For i As Integer = 0 To ranks.Count - 1
-                                                 Dim ia As Integer = i
-
-                                                 Select Case i
-                                                     Case 0
-                                                         Core.Schedule(i, Sub() PostChat("1st place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                     Case 1
-                                                         Core.Schedule(i, Sub() PostChat("2nd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                     Case 2
-                                                         Core.Schedule(i, Sub() PostChat("3rd place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                     Case Else
-                                                         Core.Schedule(i, Sub() PostChat((ia + 1) & "th place: " & Spielers(ranks(ia).Item1).Name & "(" & ranks(ia).Item2 & ")", playcolor(ranks(ia).Item1)))
-                                                 End Select
-                                             Next
-
-                                             'Update K/D
-                                             If ranks(0).Item1 = UserIndex Then
-                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesWon += 1
-                                             Else
-                                                 If GameMode = GameMode.Competetive Then My.Settings.GamesLost += 1
-                                             End If
-                                             My.Settings.Save()
-                                         End Sub)
                         'Set flags
                         Status = CardGameState.SpielZuEnde
                         FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(5000), GetCamPos, New Keyframe3D(-90, -240, 0, Math.PI / 4 * 5, Math.PI / 2, 0, False), Nothing) : Automator.Add(FigurFaderCamera)
