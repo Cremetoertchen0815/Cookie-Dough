@@ -9,6 +9,7 @@ Namespace Game.BetretenVerboten.Rendering
         Private WürfelMask As Texture2D
         Private WürfelAugen As Texture2D
         Private WürfelRahmen As Texture2D
+        Public Trigger As Action
 
         Public Overrides ReadOnly Property InnerBounds As Rectangle
             Get
@@ -19,8 +20,13 @@ Namespace Game.BetretenVerboten.Rendering
         Public Sub New(window As IGameWindow)
             MyBase.New()
             Me.window = window
-            Me.GamepadInteractable = False
+            GamepadInteractable = True
+            Location = New Vector2(1570, 700)
+            Size = New Vector2(300, 300)
+            Active = False
+            DrawDespiteInactive = True
         End Sub
+        Public Overrides ReadOnly Property OuterBounds As Rectangle = New Rectangle(1570, 700, 300, 300)
 
         Public Overrides Sub Init(system As Framework.UI.IParent)
             WürfelMask = Core.Content.Load(Of Texture2D)("games/BV/würfel_mask")
@@ -39,7 +45,7 @@ Namespace Game.BetretenVerboten.Rendering
             batcher.Draw(window.GameTexture, New Rectangle(0, 0, 1920, 1080), Nothing, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0)
 
             'Zeichne Haupt-Würfel
-            If window.ShowDice And window.SpielerIndex = window.UserIndex Then
+            If Active And window.SpielerIndex = window.UserIndex Then
                 Dim rect = New Rectangle(1570, 700, 300, 300)
                 If RedrawBackground AndAlso BackgroundImage IsNot Nothing Then
                     DrawBlur(batcher, rect, rect.Size.ToVector2 / 5)
@@ -84,7 +90,7 @@ Namespace Game.BetretenVerboten.Rendering
         End Function
 
         Public Overrides Sub Activate()
-            Throw New NotImplementedException()
+            Trigger()
         End Sub
     End Class
 End Namespace

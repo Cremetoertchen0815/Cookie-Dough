@@ -77,7 +77,6 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDmotdLabel As Label
         Private WithEvents HUDScores As CustomControl
         Private InstructionFader As PropertyTransition
-        Private ShowDice As Boolean = False
         Private Chat As List(Of (String, Color))
 
         'Keystack
@@ -218,7 +217,7 @@ Namespace Game.BetretenVerboten
             'Lade HUD
             Dim glass = New Color(0, 0, 0, 125)
             HUD = New GuiSystem
-            HUDDiceBtn = New GameRenderable(Me) With {.RedrawBackground = True, .BackgroundColor = glass} : HUD.Add(HUDDiceBtn)
+            HUDDiceBtn = New GameRenderable(Me) With {.RedrawBackground = True, .BackgroundColor = glass, .Trigger = AddressOf RollDiceTrigger} : HUD.Add(HUDDiceBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDBtnB)
             HUDBtnC = New Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDBtnC)
             HUDBtnD = New Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDBtnD)
@@ -624,7 +623,7 @@ Namespace Game.BetretenVerboten
                         'Animiere wie die Figur sich nach vorne bewegt, anschließend kehre zurück zum nichts tun
                         StartMoverSub(destination)
                     Case "w"c 'Spieler hat gewonnen
-                        ShowDice = False
+                        HUDDiceBtn.Active = False
                         HUDInstructions.Text = "Game over!"
                         If MediaPlayer.IsRepeating Then
                             MediaPlayer.Play(DamDamDaaaam)
@@ -827,7 +826,7 @@ Namespace Game.BetretenVerboten
         Private Sub CalcMoves()
             Dim homebase As Integer = GetHomebaseIndex(SpielerIndex) 'Eine Spielfigur-ID, die sich in der Homebase befindet(-1, falls Homebase leer ist)
             Dim startfd As Boolean = IsFieldCoveredByOwnFigure(SpielerIndex, 0) 'Ob das Start-Feld blockiert ist
-            ShowDice = False
+            HUDDiceBtn.Active = False
             Fahrzahl = GetNormalDiceSum() 'Setzt die Anzahl der zu fahrenden Felder im voraus(kann im Fall einer vollen Homebase überschrieben werden)
 
             If Is6InDiceList() And homebase > -1 And Not startfd Then 'Falls Homebase noch eine Figur enthält und 6 gewürfelt wurde, setze Figur auf Feld 0 und fahre anschließend x Felder nach vorne
@@ -1120,12 +1119,17 @@ Namespace Game.BetretenVerboten
             Chat.Add((txt, color))
             HUDChat.ScrollDown = True
         End Sub
+        Private Sub RollDiceTrigger()
+            WürfelTriggered = True
+            WürfelTimer = 0
+            WürfelAnimationTimer = -1
+        End Sub
 
         Private Sub PrepareMove()
             'Set HUD flags
             SpielerIndex = UserIndex
             Status = SpielStatus.Würfel
-            ShowDice = True
+            HUDDiceBtn.Active = True
             StopDiceWhenFinished = False
             HUDInstructions.Text = "Roll the Dice!"
             HUDBtnD.Text = If(Spielers(SpielerIndex).SacrificeCounter <= 0, "Sacrifice", "(" & Spielers(SpielerIndex).SacrificeCounter & ")")
@@ -1296,12 +1300,6 @@ Namespace Game.BetretenVerboten
             If FigurFaderCamera IsNot Nothing Then Return FigurFaderCamera.Value
             Return New Keyframe3D
         End Function
-
-        Private ReadOnly Property IGameWindow_ShowDice As Boolean Implements IGameWindow.ShowDice
-            Get
-                Return ShowDice
-            End Get
-        End Property
 
         Private ReadOnly Property IGameWindow_WürfelAktuelleZahl As Integer Implements IGameWindow.WürfelAktuelleZahl
             Get

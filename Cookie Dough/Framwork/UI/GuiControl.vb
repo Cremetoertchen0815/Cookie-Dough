@@ -8,12 +8,13 @@ Namespace Framework.UI
 
         Public Property Active As Boolean = True
         Public Property Location As Vector2
+        Public Property DrawDespiteInactive As Boolean = False
         Public Overridable Property Size As Vector2
         Public Property BackgroundColor As Color
         Public Property Border As New ControlBorder With {.Color = Color.White, .Width = 0}
         Public Property Color As Color
         Public Property Font As NezSpriteFont Implements IParent.Font
-        Public Property GamepadInteractable As Boolean = True
+        Public Property GamepadInteractable As Boolean = False
         Public Property Children As New List(Of GuiControl)
         Public Property RedrawBackground As Boolean = False
         Public Shared BackgroundImage As Texture2D = Nothing

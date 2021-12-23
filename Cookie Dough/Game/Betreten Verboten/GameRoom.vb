@@ -84,7 +84,6 @@ Namespace Game.BetretenVerboten
         Private WithEvents HUDDiceBtn As GameRenderable
         Private WithEvents HUDScores As CustomControl
         Private InstructionFader As ITween(Of Color)
-        Private ShowDice As Boolean = False
         Private Chat As List(Of (String, Color))
 
         'Debug shit
@@ -206,7 +205,7 @@ Namespace Game.BetretenVerboten
             'Lade HUD
             Dim glass = New Color(5, 5, 5, 185)
             HUD = New GuiSystem
-            HUDDiceBtn = New GameRenderable(Me) With {.RedrawBackground = True, .BackgroundColor = glass} : HUD.Add(HUDDiceBtn)
+            HUDDiceBtn = New GameRenderable(Me) With {.RedrawBackground = True, .BackgroundColor = glass, .Trigger = AddressOf RollDiceTrigger} : HUD.Add(HUDDiceBtn)
             HUDBtnB = New Button("Main Menu", New Vector2(1500, 50), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDBtnB)
             HUDBtnC = New Button("Anger", New Vector2(1500, 200), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDBtnC)
             HUDBtnD = New Button("Sacrifice", New Vector2(1500, 350), New Vector2(370, 120)) With {.Font = ButtonFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDBtnD)
@@ -216,7 +215,7 @@ Namespace Game.BetretenVerboten
             HUDdbgLabel = New Label(Function() FigurFaderCamera.Value.ToString, New Vector2(500, 120)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond, .Active = False} : HUD.Add(HUDdbgLabel)
             HUDmotdLabel = New Label("", New Vector2(400, 750)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/InstructionText")), .Color = Color.BlanchedAlmond, .Active = False} : HUD.Add(HUDmotdLabel)
             InstructionFader = HUDInstructions.Tween("Color", Color.Lerp(Color.BlanchedAlmond, Color.Black, 0.5), 0.7).SetLoops(LoopType.PingPong, -1).SetEaseType(EaseType.QuadInOut) : InstructionFader.Start()
-            HUDNameBtn = New Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent} : HUD.Add(HUDNameBtn)
+            HUDNameBtn = New Button("", New Vector2(500, 20), New Vector2(950, 30)) With {.Font = New NezSpriteFont(Content.Load(Of SpriteFont)("font/MenuTitle")), .BackgroundColor = Color.Transparent, .Border = New ControlBorder(Color.Black, 0), .Color = Color.Transparent, .GamepadInteractable = False} : HUD.Add(HUDNameBtn)
             HUDFullscrBtn = New Button("Fullscreen", New Vector2(220, 870), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDFullscrBtn)
             HUDMusicBtn = New Button("Toggle Music", New Vector2(50, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDMusicBtn)
             HUDAfkBtn = New Button("AFK", New Vector2(220, 920), New Vector2(150, 30)) With {.Font = ChatFont, .BackgroundColor = glass, .Border = New ControlBorder(Color.Yellow, 3), .Color = Color.Transparent, .RedrawBackground = True} : HUD.Add(HUDAfkBtn)
@@ -368,7 +367,7 @@ Namespace Game.BetretenVerboten
                     End If
                     MediaPlayer.IsRepeating = False
                     StopUpdating = True
-                    ShowDice = False
+                    HUDDiceBtn.Active = False
                     dbgEnd = False
                     HUDInstructions.Text = "Game over!"
 
@@ -462,11 +461,7 @@ Namespace Game.BetretenVerboten
                             Case SpielerTyp.Local
                                 'Manuelles Würfeln für lokalen Spieler
                                 'Prüft und speichert, ob der Würfel-Knopf gedrückt wurde
-                                If (New Rectangle(1570, 700, 300, 300).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) Or (kstate.IsKeyDown(Keys.Space) And lastkstate.IsKeyUp(Keys.Space)) Then
-                                    WürfelTriggered = True
-                                    WürfelTimer = 0
-                                    WürfelAnimationTimer = -1
-                                End If
+                                If (New Rectangle(1570, 700, 300, 300).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) Or (kstate.IsKeyDown(Keys.Space) And lastkstate.IsKeyUp(Keys.Space)) Then RollDiceTrigger()
 
                                 'Solange Knopf gedrückt, generiere zufällige Zahl in einem Intervall von 50ms
                                 If WürfelTriggered Then
@@ -1164,7 +1159,7 @@ Namespace Game.BetretenVerboten
         Private Sub CalcMoves()
             Dim homebase As Integer = GetHomebaseIndex(SpielerIndex) 'Eine Spielfigur-ID, die sich in der Homebase befindet(-1, falls Homebase leer ist)
             Dim startfd As Boolean = IsFieldCoveredByOwnFigure(SpielerIndex, 0) 'Ob das Start-Feld blockiert ist
-            ShowDice = False
+            HUDDiceBtn.Active = False
             Fahrzahl = GetNormalDiceSum() 'Setzt die Anzahl der zu fahrenden Felder im voraus(kann im Fall einer vollen Homebase überschrieben werden)
 
             If Is6InDiceList() And homebase > -1 And Not startfd Then 'Falls Homebase noch eine Figur enthält und 6 gewürfelt wurde, setze Figur auf Feld 0 und fahre anschließend x Felder nach vorne
@@ -1777,6 +1772,11 @@ Namespace Game.BetretenVerboten
         Private Sub Log(text As String)
             IO.File.AppendAllText(LogPath, text & Environment.NewLine)
         End Sub
+        Private Sub RollDiceTrigger()
+            WürfelTriggered = True
+            WürfelTimer = 0
+            WürfelAnimationTimer = -1
+        End Sub
 
         Private Sub Sacrifice(pl As Integer, figur As Integer)
             StopUpdating = True
@@ -2027,7 +2027,7 @@ Namespace Game.BetretenVerboten
             Status = If(Spielers(SpielerIndex).Typ <> SpielerTyp.Online, SpielStatus.Würfel, SpielStatus.Waitn)
             SendNewPlayerActive(SpielerIndex) 'Transmit to slaves that new player is active
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
-            ShowDice = True
+            HUDDiceBtn.Active = True
             StopUpdating = False
             SendGameActive()
             DreifachWürfeln = CanRollThrice(SpielerIndex) 'Falls noch alle Figuren un der Homebase sind
@@ -2271,12 +2271,6 @@ Namespace Game.BetretenVerboten
         Private ReadOnly Property IGameWindow_SaucerFields As List(Of Integer) Implements IGameWindow.SaucerFields
             Get
                 Return SaucerFields
-            End Get
-        End Property
-
-        Private ReadOnly Property IGameWindow_ShowDice As Boolean Implements IGameWindow.ShowDice
-            Get
-                Return ShowDice
             End Get
         End Property
 

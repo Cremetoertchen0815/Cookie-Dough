@@ -1,5 +1,6 @@
 ﻿-Test BR and DT!
 -Add controller support
+-Convert menu to UI man & MsgBoxMan to controller support 
 
 CC:
 -Implement difficulty setting in selection menu
