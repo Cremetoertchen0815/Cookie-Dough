@@ -37,6 +37,7 @@ Namespace Game.CarCrash
         'Assets
         Private Fanfare As Song
         Private DamDamDaaaam As Song
+        Private ExplodeSound As SoundEffect
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
         Private DataTransmissionThread As Threading.Thread
@@ -95,6 +96,7 @@ Namespace Game.CarCrash
             Global.Carcrash.Shared.Username = My.Settings.Username
             Global.Carcrash.Shared.ID = My.Settings.UniqueIdentifier
             Global.Carcrash.Shared.WriteData = AddressOf SendGeneralPurposeData
+            Global.Carcrash.Shared.TriggerExplosionSound = AddressOf PlayExplosion
             Global.Carcrash.Shared.RequestLeaderboardUpdate = Sub(x)
                                                                   Spielers(0).Score = x
                                                                   Status = SpielStatus.SpielZuEnde
@@ -110,6 +112,7 @@ Namespace Game.CarCrash
             ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
             Fanfare = Content.Load(Of Song)("bgm/fanfare")
             DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
+            ExplodeSound = Content.LoadSoundEffect("games/CC/explosion")
 
             'Create emulation renderer
             EmulationRenderer = AddRenderer(New RenderLayerRenderer(0, -3) With {.RenderTexture = New Textures.RenderTexture(1920, 1080)})
@@ -144,7 +147,6 @@ Namespace Game.CarCrash
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
             'Screen content renderable
-
             AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
             ClearColor = Color.Black
             GuiControl.BackgroundImage = Renderer.BlurredContents
@@ -382,8 +384,6 @@ Namespace Game.CarCrash
             If NetworkMode Then LocalClient.WriteStream(message)
         End Sub
 #End Region
-
-
 #Region "Hilfsfunktionen"
 
         Private Sub LaunchGame()
@@ -403,6 +403,23 @@ Namespace Game.CarCrash
                 Return SoundEffect.FromFile("Cache/client/sound" & If(IsSoundB, "B", "A") & ".audio")
             End If
         End Function
+
+        Private Sub PlayExplosion()
+            Dim volume_buffer = Volume
+            MediaPlayer.Volume = 0
+            Dim inst = ExplodeSound.CreateInstance()
+            inst.Play()
+            Core.Schedule(5, Sub() Tween("Volume", volume_buffer, 2.0F).Start())
+        End Sub
+
+        Private Property Volume As Single
+            Get
+                Return MediaPlayer.Volume
+            End Get
+            Set(value As Single)
+                MediaPlayer.Volume = value
+            End Set
+        End Property
 
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))

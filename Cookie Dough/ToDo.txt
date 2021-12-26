@@ -4,7 +4,6 @@
 
 CC:
 -Implement difficulty setting in selection menu
--Implement SFX and bgm
 
 BV:
 -Figures don't duck on snek map(and no kick sounds)

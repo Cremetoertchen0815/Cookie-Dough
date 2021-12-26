@@ -42,6 +42,7 @@ Namespace Game.CarCrash
         'Assets
         Private Fanfare As Song
         Private DamDamDaaaam As Song
+        Private ExplodeSound As SoundEffect
         Private ButtonFont As NezSpriteFont
         Private ChatFont As NezSpriteFont
         Private DataTransmissionThread As Threading.Thread
@@ -113,6 +114,7 @@ Namespace Game.CarCrash
             NetworkMode = True
             Global.Carcrash.Shared.WriteData = AddressOf SendData
             Global.Carcrash.Shared.RequestLeaderboardUpdate = AddressOf SendScore
+            Global.Carcrash.Shared.TriggerExplosionSound = AddressOf PlayExplosion
 
             Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
 
@@ -126,6 +128,7 @@ Namespace Game.CarCrash
             ChatFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/ChatText"))
             Fanfare = Content.Load(Of Song)("bgm/fanfare")
             DamDamDaaaam = Content.Load(Of Song)("sfx/DamDamDaaam")
+            ExplodeSound = Content.LoadSoundEffect("games/CC/explosion")
 
             'Create emulation renderer
             EmulationRenderer = AddRenderer(New RenderLayerRenderer(0, -3) With {.RenderTexture = New Textures.RenderTexture(1920, 1080)})
@@ -363,8 +366,6 @@ Namespace Game.CarCrash
             If NetworkMode Then LocalClient.WriteStream(message)
         End Sub
 #End Region
-
-
 #Region "Hilfsfunktionen"
 
         Private Sub LaunchGame()
@@ -379,6 +380,10 @@ Namespace Game.CarCrash
                 Return SoundEffect.FromFile("Cache/client/sound" & If(IsSoundB, "B", "A") & ".audio")
             End If
         End Function
+
+        Private Sub PlayExplosion()
+            ExplodeSound.Play()
+        End Sub
 
         Private Sub PostChat(txt As String, color As Color)
             Chat.Add((txt, color))

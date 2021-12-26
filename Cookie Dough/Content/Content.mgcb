@@ -1038,6 +1038,12 @@
 /processorParam:TextureFormat=Color
 /build:games/CC/color_bars.jpg
 
+#begin games/CC/explosion.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:games/CC/explosion.wav
+
 #begin games/CC/stool.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -2078,44 +2084,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:intro/mononez/nez.png
-
-#begin mesh/Cowboy_Checkers_V1.fbx
-/importer:FbxImporter
-/processor:ModelProcessor
-/processorParam:ColorKeyColor=0,0,0,0
-/processorParam:ColorKeyEnabled=True
-/processorParam:DefaultEffect=BasicEffect
-/processorParam:GenerateMipmaps=True
-/processorParam:GenerateTangentFrames=False
-/processorParam:PremultiplyTextureAlpha=True
-/processorParam:PremultiplyVertexColors=True
-/processorParam:ResizeTexturesToPowerOfTwo=False
-/processorParam:RotationX=0
-/processorParam:RotationY=0
-/processorParam:RotationZ=0
-/processorParam:Scale=1
-/processorParam:SwapWindingOrder=False
-/processorParam:TextureFormat=Compressed
-/build:mesh/Cowboy_Checkers_V1.fbx
-
-#begin mesh/Cowboy_Checkers_V2.fbx
-/importer:FbxImporter
-/processor:ModelProcessor
-/processorParam:ColorKeyColor=0,0,0,0
-/processorParam:ColorKeyEnabled=True
-/processorParam:DefaultEffect=BasicEffect
-/processorParam:GenerateMipmaps=True
-/processorParam:GenerateTangentFrames=False
-/processorParam:PremultiplyTextureAlpha=True
-/processorParam:PremultiplyVertexColors=True
-/processorParam:ResizeTexturesToPowerOfTwo=False
-/processorParam:RotationX=0
-/processorParam:RotationY=0
-/processorParam:RotationZ=0
-/processorParam:Scale=1
-/processorParam:SwapWindingOrder=False
-/processorParam:TextureFormat=Compressed
-/build:mesh/Cowboy_Checkers_V2.fbx
 
 #begin mesh/debug_cube.fbx
 /importer:FbxImporter
