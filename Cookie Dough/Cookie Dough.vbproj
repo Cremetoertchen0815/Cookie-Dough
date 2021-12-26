@@ -98,7 +98,8 @@
     <Compile Include="Framwork\Physics\TiledMapCollisionResolver.vb" />
     <Compile Include="Framwork\UI\Controls\ProgressBar.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
-    <Compile Include="Framwork\UI\GuiGpadController.vb" />
+    <Compile Include="Framwork\UI\Gamepad\GpadController.vb" />
+    <Compile Include="Framwork\UI\Gamepad\ISelectableControl.vb" />
     <Compile Include="Framwork\UI\MessageBoxer.vb" />
     <Compile Include="Game\Barrelled\CreatorMenu.vb" />
     <Compile Include="Game\Barrelled\IGameWindow.vb" />

@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.UI.Gamepad
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
@@ -9,7 +10,7 @@ Namespace Framework.UI
         Implements IParent, IUpdatable
 
         Private _controls As New List(Of GuiControl)
-        Private _gpadcontrol As New GuiGpadController
+        Private _gpadcontrol As GpadController
         Public Property GlobalFont As NezSpriteFont Implements IParent.Font
         Public Overrides ReadOnly Property Bounds As RectangleF
             Get
@@ -37,6 +38,7 @@ Namespace Framework.UI
         Public Overrides Sub OnAddedToEntity()
             GlobalFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/fnt_HKG_17_M"))
             Material = New Material(DepthStencilState.None) With {.SamplerState = SamplerState.LinearClamp}
+            _gpadcontrol = Entity.AddComponent(New GpadController)
 
             For Each element In _controls
                 element.Init(Me)
@@ -68,7 +70,6 @@ Namespace Framework.UI
             For Each element In _controls
                 If element.Active Or element.DrawDespiteInactive Then element.Render(batcher, color)
             Next
-            _gpadcontrol.Render(batcher)
 
         End Sub
 

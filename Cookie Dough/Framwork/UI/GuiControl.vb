@@ -1,12 +1,13 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.UI.Gamepad
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 
 Namespace Framework.UI
     Public MustInherit Class GuiControl
-        Implements IParent
+        Implements IParent, ISelectableControl
 
-        Public Property Active As Boolean = True
+        Public Property Active As Boolean = True Implements ISelectableControl.Active
         Public Property Location As Vector2
         Public Property DrawDespiteInactive As Boolean = False
         Public Overridable Property Size As Vector2
@@ -19,7 +20,7 @@ Namespace Framework.UI
         Public Property RedrawBackground As Boolean = False
         Public Shared BackgroundImage As Texture2D = Nothing
         Public MustOverride ReadOnly Property InnerBounds As Rectangle Implements IParent.Bounds
-        Public Overridable ReadOnly Property OuterBounds As Rectangle
+        Public Overridable ReadOnly Property OuterBounds As Rectangle Implements ISelectableControl.Bounds
             Get
                 Return InnerBounds
             End Get
@@ -31,7 +32,7 @@ Namespace Framework.UI
 
         End Sub
 
-        Public MustOverride Sub Activate()
+        Public MustOverride Sub Activate() Implements ISelectableControl.Activate
         Public MustOverride Sub Update(cstate As GuiInput, offset As Vector2) Implements IParent.Update
         Public MustOverride Sub Render(batcher As Batcher, color As Color) Implements IParent.Render
     End Class
