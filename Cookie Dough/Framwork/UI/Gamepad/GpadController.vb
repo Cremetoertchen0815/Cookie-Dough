@@ -13,7 +13,13 @@ Namespace Framework.UI.Gamepad
 
         Private lastDir As Vector2
         Private _controls As New List(Of ISelectableControl)
-        Public SelectedIndex As Integer
+        Public SelectedIndex As Integer = 0
+
+        Private Shared ControllerActivated As Boolean = False
+
+        Sub New()
+            Enabled = False
+        End Sub
 
         Private ReadOnly Property IUpdatable_Enabled As Boolean Implements IUpdatable.Enabled
             Get
@@ -24,9 +30,10 @@ Namespace Framework.UI.Gamepad
         Private ReadOnly Property IUpdatable_UpdateOrder As Integer = 0 Implements IUpdatable.UpdateOrder
 
         Public Overrides Sub OnAddedToEntity()
-            _btnAcc = New VirtualButton(New VirtualButton.GamePadButton(0, Microsoft.Xna.Framework.Input.Buttons.A))
-            _btnBack = New VirtualButton(New VirtualButton.GamePadButton(0, Microsoft.Xna.Framework.Input.Buttons.B))
+            _btnAcc = New VirtualButton(New VirtualButton.GamePadButton(0, Input.Buttons.A))
+            _btnBack = New VirtualButton(New VirtualButton.GamePadButton(0, Input.Buttons.B))
             _btnDir = New VirtualJoystick(True, New VirtualJoystick.GamePadDpad(0, True), New VirtualJoystick.GamePadLeftStick(0, 0.4F))
+            Enabled = True
         End Sub
 
         Public Overrides Sub OnRemovedFromEntity()
@@ -44,7 +51,9 @@ Namespace Framework.UI.Gamepad
         End Sub
 
         Public Sub Update() Implements IUpdatable.Update
-            If 0 > _controls.Count Then Return
+            'Activate controller stuff
+            If _btnAcc.IsDown Or _btnBack.IsDown Or _btnDir.Value <> Vector2.Zero Then ControllerActivated = True
+            If Not ControllerActivated Or _controls.Count < 1 Then Return
 
             'Hozizontal shit
             Dim curr = _controls(SelectedIndex)
@@ -82,7 +91,7 @@ Namespace Framework.UI.Gamepad
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, camera As Camera)
-            If SelectedIndex > -1 And SelectedIndex < _controls.Count Then
+            If SelectedIndex > -1 And SelectedIndex < _controls.Count And ControllerActivated Then
                 Dim bounds = _controls(SelectedIndex).Bounds
                 bounds.Inflate(5, 5)
                 batcher.DrawHollowRect(bounds, Color.White, 7)

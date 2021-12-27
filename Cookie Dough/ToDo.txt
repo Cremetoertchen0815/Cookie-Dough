@@ -1,7 +1,6 @@
 ﻿-Test BR and DT!
 -Add controller support
 -Convert menu to UI man & MsgBoxMan to controller support 
--Only activate controller support when a controller is plugged in
 
 CC:
 -Implement difficulty setting(by using the CPU difficulty)

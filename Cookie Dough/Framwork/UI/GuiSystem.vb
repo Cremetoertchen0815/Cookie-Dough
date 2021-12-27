@@ -10,7 +10,7 @@ Namespace Framework.UI
         Implements IParent, IUpdatable
 
         Private _controls As New List(Of GuiControl)
-        Private _gpadcontrol As GpadController
+        Private _gpadcontrol As New GpadController
         Public Property GlobalFont As NezSpriteFont Implements IParent.Font
         Public Overrides ReadOnly Property Bounds As RectangleF
             Get
@@ -38,7 +38,7 @@ Namespace Framework.UI
         Public Overrides Sub OnAddedToEntity()
             GlobalFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/fnt_HKG_17_M"))
             Material = New Material(DepthStencilState.None) With {.SamplerState = SamplerState.LinearClamp}
-            _gpadcontrol = Entity.AddComponent(New GpadController)
+            Entity.AddComponent(_gpadcontrol)
 
             For Each element In _controls
                 element.Init(Me)
@@ -114,8 +114,6 @@ Namespace Framework.UI
             For Each element In _controls
                 If element.Active Then element.Update(cstate, Vector2.Zero)
             Next
-
-            _gpadcontrol.Update()
 
             lastmstate = mstate
         End Sub
