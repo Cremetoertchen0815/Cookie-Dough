@@ -20,9 +20,6 @@ Namespace Menu.MainMenu
         Private ChangeNameButtonPressed As Boolean = False
         Friend Blocked As Boolean = False
         Friend Submenu As Integer = 0
-        Friend SM1Scroll As Single = 0
-        Friend SM2Scroll As Single = 0
-        Friend SM4Scroll As Single = 0
 
         'Networking
         Friend Const ServerAutoRefresh As Integer = 500
@@ -52,7 +49,7 @@ Namespace Menu.MainMenu
             'Generate visuals and gpad controller
             Dim rentity = CreateEntity("Renderer")
             rend = rentity.AddComponent(New MainMenuRenderer(Me)).SetLayerDepth(0.5F)
-            _vcontroller = rentity.AddComponent(New GpadController).SetLayerDepth(0F)
+            _vcontroller = rentity.AddComponent(New GpadController).SetLayerDepth(1.0F)
 
             'Register vcontroller controlls
             _refresh = New Refreshinator(Of Boolean)
@@ -74,28 +71,15 @@ Namespace Menu.MainMenu
             _vcontroller.LocalOffset = Vector2.Zero
 
             Select Case Submenu
-                Case 0, 3
-                    If mstate.LeftButton = ButtonState.Pressed Then _vcontroller.SimulateMousePress(mpos)
-                Case 1, 4
-                    'Scroll game list
-                    Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
-                    If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
-                    If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
-                    SM1Scroll = Mathf.Clamp(SM1Scroll - scrollval * 30, 0, 375 + GameList.Length * 150 - 1050)
-
-                    If mstate.LeftButton = ButtonState.Pressed Then _vcontroller.SimulateMousePress(mpos + New Point(0, SM1Scroll))
-
-                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
-                    _vcontroller.LocalOffset = New Vector2(0, -SM1Scroll)
                 Case 2
                     'Scroll online game list
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
                     If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
                     If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
-                    SM2Scroll = Mathf.Clamp(SM2Scroll - scrollval * 30, 0, Math.Max(375 + OnlineGameInstances.Length * 150 - 1050, 0))
+                    ScrollValue = Mathf.Clamp(ScrollValue - scrollval * 30, 0, Math.Max(375 + OnlineGameInstances.Length * 150 - 1050, 0))
 
                     For i As Integer = 0 To OnlineGameInstances.Length
-                        If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(560, 275 + i * 150 - CInt(SM2Scroll), 800, 100).Contains(mpos) Then
+                        If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(560, 275 + i * 150 - CInt(ScrollValue), 800, 100).Contains(mpos) Then
                             Select Case i
                                 Case OnlineGameInstances.Length 'Back button
                                     SwitchToSubmenu(0)
@@ -275,6 +259,17 @@ Namespace Menu.MainMenu
                     'Navigation
                     If New Rectangle(30, 950, 300, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0) 'Back
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4) 'Server settings
+                Case Else
+                    'Scroll game list
+                    Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
+                    If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
+                    If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
+                    ScrollValue = Mathf.Clamp(ScrollValue - scrollval * 30, 0, 375 + GameList.Length * 150 - 1050)
+
+                    If mstate.LeftButton = ButtonState.Pressed Then _vcontroller.SimulateMousePress(mpos + New Point(0, ScrollValue))
+
+                    If Submenu > 0 And New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
+                    _vcontroller.LocalOffset = New Vector2(0, -ScrollValue)
             End Select
 
             _refresh.Update()
@@ -308,20 +303,13 @@ Namespace Menu.MainMenu
             SFX(2).Play()
             Blocked = True
             _vcontroller.Enabled = False
-            Select Case submenu
-                Case 1
-                    SM1Scroll = 0
-                Case 2
-                    SM2Scroll = 0
-                Case 4
-                    SM4Scroll = 0
-                    UpdateServerList()
-            End Select
+            If submenu = 4 Then UpdateServerList()
 
             'Blende über
             Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(500), Schwarzblende.Value, 1.0F, Sub()
                                                                                                                                      If InBetweenOperation IsNot Nothing Then InBetweenOperation()
                                                                                                                                      Me.Submenu = submenu
+                                                                                                                                     ScrollValue = 0
                                                                                                                                      GenerateVirtualControls()
                                                                                                                                      _vcontroller.Enabled = True
                                                                                                                                      Blocked = False
@@ -371,11 +359,11 @@ Namespace Menu.MainMenu
                             Case Else
                                 aa = Sub() Return
                         End Select
-                        _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + i * 150 - CInt(SM1Scroll), 800, 100), aa))
+                        _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + i * 150 - CInt(ScrollValue), 800, 100), aa))
                     Next
 
                     _vcontroller.ActionGoBack = Sub() SwitchToSubmenu(0)
-                    _vcontroller.ActionScroll = Sub(x) SM1Scroll = Mathf.Clamp(SM1Scroll - x * 5, 0, 375 + GameList.Length * 150 - 1050)
+                    _vcontroller.ActionScroll = Sub(x) ScrollValue = Mathf.Clamp(ScrollValue - x * 5, 0, 375 + GameList.Length * 150 - 1050)
 
                 Case 3
                     'Settings
@@ -410,59 +398,69 @@ Namespace Menu.MainMenu
                     For i As Integer = -2 To ln
                         Select Case i
                             Case ln
-                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + (i + 2) * 150 - CInt(SM4Scroll), 800, 100), Sub() SwitchToSubmenu(0)))
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + (i + 2) * 150, 800, 100), Sub() SwitchToSubmenu(0)))
                             Case -2 'Dual button
 
                                 'Left button
-                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 - CInt(SM4Scroll), 400, 100), Sub()
-                                                                                                                                     If Not IsConnectedToServer Then LaunchInputBox(Sub(x)
-                                                                                                                                                                                        My.Settings.Servers.Add(x)
-                                                                                                                                                                                        UpdateServerList()
-                                                                                                                                                                                    End Sub, rend.MediumFont, "Enter IP-adress:", "Add server", My.Settings.IP) : SFX(2).Play() Else SFX(0).Play()
-                                                                                                                                 End Sub))
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275, 400, 100), Sub()
+                                                                                                                   If Not IsConnectedToServer Then LaunchInputBox(Sub(x)
+                                                                                                                                                                      My.Settings.Servers.Add(x)
+                                                                                                                                                                      UpdateServerList()
+                                                                                                                                                                  End Sub, rend.MediumFont, "Enter IP-adress:", "Add server", My.Settings.IP) : SFX(2).Play() Else SFX(0).Play()
+                                                                                                               End Sub))
 
                                 'Right button
-                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(960, 275 - CInt(SM4Scroll), 400, 100), Sub()
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(960, 275, 400, 100), Sub()
 
-                                                                                                                                     If IsConnectedToServer Then
-                                                                                                                                         LocalClient.Disconnect()
-                                                                                                                                         SFX(2).Play()
-                                                                                                                                     Else
-                                                                                                                                         If Not ServerActive Then
-                                                                                                                                             'If LocalClient.Connected Then LocalClient.Disconnect()
-                                                                                                                                             If LocalClient.TryConnect Then
-                                                                                                                                                 MsgBoxer.EnqueueMsgbox("Other server already active on this port")
-                                                                                                                                             Else
-                                                                                                                                                 StartServer()
-                                                                                                                                                 LocalClient.Connect("127.0.0.1", My.Settings.Username)
-                                                                                                                                             End If
-                                                                                                                                             SFX(2).Play()
-                                                                                                                                         Else
-                                                                                                                                             SFX(0).Play()
-                                                                                                                                         End If
-                                                                                                                                     End If
-                                                                                                                                 End Sub))
+                                                                                                                   If IsConnectedToServer Then
+                                                                                                                       LocalClient.Disconnect()
+                                                                                                                       SFX(2).Play()
+                                                                                                                   Else
+                                                                                                                       If Not ServerActive Then
+                                                                                                                           'If LocalClient.Connected Then LocalClient.Disconnect()
+                                                                                                                           If LocalClient.TryConnect Then
+                                                                                                                               MsgBoxer.EnqueueMsgbox("Other server already active on this port")
+                                                                                                                           Else
+                                                                                                                               StartServer()
+                                                                                                                               LocalClient.Connect("127.0.0.1", My.Settings.Username)
+                                                                                                                           End If
+                                                                                                                           SFX(2).Play()
+                                                                                                                       Else
+                                                                                                                           SFX(0).Play()
+                                                                                                                       End If
+                                                                                                                   End If
+                                                                                                               End Sub))
                             Case -1 'Leave one empty row
                             Case Else
                                 Dim ii = i
-                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + (i + 2) * 150 - CInt(SM4Scroll), 800, 100), Sub()
-                                                                                                                                                     If Not (IsConnectedToServer And ServerActive) Then
-                                                                                                                                                         LocalClient.Connect(AvailableServerList(ii), My.Settings.Username)
-                                                                                                                                                         lasthostname = AvailableServerList(ii)
-                                                                                                                                                         SFX(2).Play()
-                                                                                                                                                     End If
-                                                                                                                                                 End Sub))
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + (i + 2) * 150, 800, 100), Sub()
+                                                                                                                                   If Not (IsConnectedToServer And ServerActive) Then
+                                                                                                                                       LocalClient.Connect(AvailableServerList(ii), My.Settings.Username)
+                                                                                                                                       lasthostname = AvailableServerList(ii)
+                                                                                                                                       SFX(2).Play()
+                                                                                                                                   End If
+                                                                                                                               End Sub))
                         End Select
                     Next
 
                     _vcontroller.ActionGoBack = Sub() SwitchToSubmenu(0)
-                    _vcontroller.ActionScroll = Sub(x) SM1Scroll = Mathf.Clamp(SM1Scroll - x * 5, 0, 375 + GameList.Length * 150 - 1050)
+                    _vcontroller.ActionScroll = Sub(x) ScrollValue = Mathf.Clamp(ScrollValue - x * 5, 0, 375 + GameList.Length * 150 - 1050)
 
                     'Add refresh conditions
                     _refresh.AddCondition(Function() IsConnectedToServer)
                     _refresh.AddCondition(Function() ServerActive)
             End Select
         End Sub
+
+        Private _scrolls = {0, 0, 0, 0, 0, 0, 0}
+        Friend Property ScrollValue As Integer
+            Get
+                Return _scrolls(Submenu)
+            End Get
+            Set(value As Integer)
+                If Submenu = 1 Or Submenu = 2 Or Submenu = 4 Then _scrolls(Submenu) = value
+            End Set
+        End Property
 
         Private Sub PlayAudio(ident As IdentType, Optional SoundB As Boolean = False)
             If ident <> IdentType.Custom Then
@@ -597,13 +595,13 @@ Namespace Menu.MainMenu
                             Dim gameNameA As String = CounterScene.GameList(i).Item1
                             Dim gameNameB As String = "(" & CounterScene.GameList(i).Item2 & ")"
                             Dim color As Color = If(CounterScene.GameList(i).Item3, FgColor, Color.Red)
-                            batcher.DrawHollowRect(New Rectangle(560, 275 + i * 150 - CounterScene.SM1Scroll, 800, 100), color)
-                            batcher.DrawString(MediumFont, gameNameA, New Vector2(560, 300 + i * 150 - CounterScene.SM1Scroll), color)
-                            batcher.DrawString(SmolFont, gameNameB, New Vector2(1360 - SmolFont.MeasureString(gameNameB).X, 310 + i * 150 - CounterScene.SM1Scroll), color)
+                            batcher.DrawHollowRect(New Rectangle(560, 275 + i * 150 - CounterScene.ScrollValue, 800, 100), color)
+                            batcher.DrawString(MediumFont, gameNameA, New Vector2(560, 300 + i * 150 - CounterScene.ScrollValue), color)
+                            batcher.DrawString(SmolFont, gameNameB, New Vector2(1360 - SmolFont.MeasureString(gameNameB).X, 310 + i * 150 - CounterScene.ScrollValue), color)
                         Next
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.SM1Scroll), 800, 100), FgColor)
-                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.SM1Scroll), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.ScrollValue), 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.ScrollValue), FgColor)
 
                         'Draw heading
                         batcher.DrawRect(New Rectangle(0, 0, 1920, 220), Color.Black)
@@ -618,13 +616,13 @@ Namespace Menu.MainMenu
                             Dim gameNameA As String = If(CounterScene.OnlineGameInstances(i).Name.Length > 16, CounterScene.OnlineGameInstances(i).Name.Substring(0, 13) & "...", CounterScene.OnlineGameInstances(i).Name)
                             Dim gameNameB As String = "(" & GetGameTitle(CounterScene.OnlineGameInstances(i).Type) & ")"
                             Dim color As Color = If(CounterScene.GameList(i).Item3, FgColor, Color.Red)
-                            batcher.DrawHollowRect(New Rectangle(560, 275 + i * 150 - CounterScene.SM2Scroll, 800, 100), color)
-                            batcher.DrawString(MediumFont, gameNameA, New Vector2(560, 300 + i * 150 - CounterScene.SM2Scroll), color)
-                            batcher.DrawString(SmolFont, gameNameB, New Vector2(1360 - SmolFont.MeasureString(gameNameB).X, 310 + i * 150 - CounterScene.SM2Scroll), color)
+                            batcher.DrawHollowRect(New Rectangle(560, 275 + i * 150 - CounterScene.ScrollValue, 800, 100), color)
+                            batcher.DrawString(MediumFont, gameNameA, New Vector2(560, 300 + i * 150 - CounterScene.ScrollValue), color)
+                            batcher.DrawString(SmolFont, gameNameB, New Vector2(1360 - SmolFont.MeasureString(gameNameB).X, 310 + i * 150 - CounterScene.ScrollValue), color)
                         Next
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.SM2Scroll), 800, 100), FgColor)
-                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.SM2Scroll), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 + len * 150 - CInt(CounterScene.ScrollValue), 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Back", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back").X / 2, 300 + len * 150 - CounterScene.ScrollValue), FgColor)
 
                         'Draw heading
                         batcher.DrawRect(New Rectangle(0, 0, 1920, 220), Color.Black)
@@ -650,11 +648,11 @@ Namespace Menu.MainMenu
                         batcher.Draw(Arrow, New Rectangle(1420, 320, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.None, 0)
                         batcher.Draw(Arrow, New Rectangle(1420, 930, 50, 50), Nothing, Color.Orange, 0.5 * Math.PI, New Vector2(8), SpriteEffects.FlipHorizontally, 0)
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 - CInt(CounterScene.SM4Scroll), 800, 100), FgColor)
-                        batcher.DrawLine(New Vector2(960, 275 - CInt(CounterScene.SM4Scroll)), New Vector2(960, 375 - CInt(CounterScene.SM4Scroll)), FgColor)
-                        batcher.DrawString(MediumFont, "Add Server", New Vector2(760 - MediumFont.MeasureString("Add Server").X / 2, 300 - CounterScene.SM4Scroll), If(CounterScene.IsConnectedToServer, Color.Red, FgColor))
-                        batcher.DrawString(MediumFont, If(CounterScene.IsConnectedToServer, "Disconnect", "Start server"), New Vector2(1160 - MediumFont.MeasureString(If(CounterScene.IsConnectedToServer, "Disconnect", "Start server")).X / 2, 300 - CounterScene.SM4Scroll), If(Not CounterScene.IsConnectedToServer And ServerActive, Color.Red, FgColor))
-                        batcher.DrawString(SmolFont, If(ServerActive And CounterScene.IsConnectedToServer, "Connected players:", "Available servers:"), New Vector2(560, 300 - CounterScene.SM4Scroll + 170), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 - CInt(CounterScene.ScrollValue), 800, 100), FgColor)
+                        batcher.DrawLine(New Vector2(960, 275 - CInt(CounterScene.ScrollValue)), New Vector2(960, 375 - CInt(CounterScene.ScrollValue)), FgColor)
+                        batcher.DrawString(MediumFont, "Add Server", New Vector2(760 - MediumFont.MeasureString("Add Server").X / 2, 300 - CounterScene.ScrollValue), If(CounterScene.IsConnectedToServer, Color.Red, FgColor))
+                        batcher.DrawString(MediumFont, If(CounterScene.IsConnectedToServer, "Disconnect", "Start server"), New Vector2(1160 - MediumFont.MeasureString(If(CounterScene.IsConnectedToServer, "Disconnect", "Start server")).X / 2, 300 - CounterScene.ScrollValue), If(Not CounterScene.IsConnectedToServer And ServerActive, Color.Red, FgColor))
+                        batcher.DrawString(SmolFont, If(ServerActive And CounterScene.IsConnectedToServer, "Connected players:", "Available servers:"), New Vector2(560, 300 - CounterScene.ScrollValue + 170), FgColor)
                         Dim len As Integer
                         If ServerActive And CounterScene.IsConnectedToServer Then
                             'Draw servers
@@ -663,8 +661,8 @@ Namespace Menu.MainMenu
                                 Dim ireal As Integer = i + 2
                                 Dim gameNameA As String = CounterScene.ConnectedUsers(i)
                                 Dim color As Color = If(My.Settings.Username = gameNameA, Color.Cyan, FgColor)
-                                batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.SM4Scroll, 800, 100), color)
-                                If gameNameA IsNot Nothing Then batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.SM4Scroll), color)
+                                batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.ScrollValue, 800, 100), color)
+                                If gameNameA IsNot Nothing Then batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.ScrollValue), color)
                             Next
                         Else
                             'Draw servers
@@ -673,13 +671,13 @@ Namespace Menu.MainMenu
                                 Dim ireal As Integer = i + 2
                                 Dim gameNameA As String = CounterScene.AvailableServerList(i)
                                 Dim color As Color = If(LocalClient.Hostname = gameNameA, Color.Cyan, FgColor)
-                                batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.SM4Scroll, 800, 100), FgColor)
-                                batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.SM4Scroll), FgColor)
+                                batcher.DrawHollowRect(New Rectangle(560, 275 + ireal * 150 - CounterScene.ScrollValue, 800, 100), FgColor)
+                                batcher.DrawString(SmolFont, gameNameA, New Vector2(560, 300 + ireal * 150 - CounterScene.ScrollValue), FgColor)
                             Next
                         End If
                         'Draw back button
-                        batcher.DrawHollowRect(New Rectangle(560, 275 + (len + 2) * 150 - CInt(CounterScene.SM4Scroll), 800, 100), FgColor)
-                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 300 + (len + 2) * 150 - CounterScene.SM4Scroll), FgColor)
+                        batcher.DrawHollowRect(New Rectangle(560, 275 + (len + 2) * 150 - CInt(CounterScene.ScrollValue), 800, 100), FgColor)
+                        batcher.DrawString(MediumFont, "Back to Main Menu", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Back to Main Menu").X / 2, 300 + (len + 2) * 150 - CounterScene.ScrollValue), FgColor)
 
                         'Draw heading
                         batcher.DrawRect(New Rectangle(0, 0, 1920, 220), Color.Black)
