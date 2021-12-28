@@ -15,7 +15,8 @@ Namespace Menu.MainMenu
         Private rend As MainMenuRenderer
         Private lastmstate As MouseState
         Private _vcontroller As GpadController
-        Private _refresh As Refreshinator(Of Boolean)
+        Private _refresh As Refreshinator(Of Integer)
+        Private _lastFrameCounter As Integer
 
         Private ChangeNameButtonPressed As Boolean = False
         Friend Blocked As Boolean = False
@@ -52,7 +53,7 @@ Namespace Menu.MainMenu
             _vcontroller = rentity.AddComponent(New GpadController).SetLayerDepth(1.0F)
 
             'Register vcontroller controlls
-            _refresh = New Refreshinator(Of Boolean)
+            _refresh = New Refreshinator(Of Integer)
             _refresh.EqualityComparerer = Function(a, b) a = b
             _refresh.RefreshAction = AddressOf GenerateVirtualControls
             GenerateVirtualControls()
@@ -273,6 +274,7 @@ Namespace Menu.MainMenu
             End Select
 
             _refresh.Update()
+            _lastFrameCounter = ConnectedUsers.Count
 
             'Wechsel Benutzername
             If New Rectangle(New Point(20, 40), rend.MediumFont.MeasureString("Username: " & My.Settings.Username).ToPoint).Contains(mpos) And OneshotPressed Then SwitchToSubmenu(5)
@@ -449,6 +451,8 @@ Namespace Menu.MainMenu
                     'Add refresh conditions
                     _refresh.AddCondition(Function() IsConnectedToServer)
                     _refresh.AddCondition(Function() ServerActive)
+                    _refresh.AddCondition(Function() ConnectedUsers.Count)
+                    _refresh.AddCondition(Function() AvailableServerList.Count)
             End Select
         End Sub
 

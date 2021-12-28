@@ -1,7 +1,9 @@
 ﻿-Test DT!
+-Reimplement pressing enter to confirm Msg/Inputboxes
 -Convert menu to fully utilize vcontrolls
 
-CC: Replace Thread.Sleep() with custom sleeping algo, using Application.DoEvents() und Nez's DeltaTime
+CC: 
+-Replace Thread.Sleep() with custom sleeping algo, using Application.DoEvents() und Nez's DeltaTime
 
 BV:
 -Replace seperate ending fields in snek map with one big "throne"
