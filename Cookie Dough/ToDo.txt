@@ -1,5 +1,5 @@
 ﻿-Test BR and DT!
--Convert menu to UI man & MsgBoxMan to controller support 
+-Convert menu to fully utilize vcontrolls
 
 BV:
 -Figures don't duck on snek map(and no kick sounds)

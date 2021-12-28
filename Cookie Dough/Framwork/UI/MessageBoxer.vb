@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Generic
+Imports Cookie_Dough.Framework.UI.Gamepad
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
@@ -10,7 +11,7 @@ Namespace Framework.UI
 
         'IDrabable implementation
         Public ReadOnly Property DrawOrder As Integer = 0 Implements IDrawable.DrawOrder
-        Public Property Visible As Boolean = True Implements IDrawable.Visible
+        Public Property Visible As Boolean = False Implements IDrawable.Visible
         Public Event DrawOrderChanged As EventHandler(Of EventArgs) Implements IDrawable.DrawOrderChanged
         Public Event VisibleChanged As EventHandler(Of EventArgs) Implements IDrawable.VisibleChanged
 
@@ -23,19 +24,23 @@ Namespace Framework.UI
         'Layout & data
         Private MsgBoxArea As New Rectangle(710, 440, 500, 170)
         Private CurrentMessage As Message
-        Private ShowMessageBox As Boolean = False
         Private WasEnabled As Boolean
         Private MessageStack As New List(Of Message)
         Private InputBoxData As String
+        Private _gpad As GpadController
+        Private _deactivateNextFrame As Integer = 0
 
         Sub New()
             batcher = New Batcher(Core.GraphicsDevice)
             ButtonBase = Core.Content.LoadTexture("btn_base_blali")
             DispFont = New NezSpriteFont(Core.Content.Load(Of SpriteFont)("font/MsgText"))
+
+            _gpad = New GpadController
+            _gpad.OnAddedToEntity()
         End Sub
 
         Public Sub Draw(gameTime As GameTime) Implements IDrawable.Draw
-            If Not ShowMessageBox Then Return
+            If Not Visible Then Return
 
             batcher.Begin(Material, ScaleMatrix)
 
@@ -45,6 +50,10 @@ Namespace Framework.UI
             batcher.DrawLine(New Vector2(MsgBoxArea.Left, MsgBoxArea.Top), New Vector2(MsgBoxArea.Right, MsgBoxArea.Top), New Color(20, 20, 20), 3)
             batcher.DrawLine(New Vector2(MsgBoxArea.Right, MsgBoxArea.Top), New Vector2(MsgBoxArea.Right, MsgBoxArea.Bottom), New Color(180, 180, 180), 4)
             batcher.DrawLine(New Vector2(MsgBoxArea.Left, MsgBoxArea.Bottom), New Vector2(MsgBoxArea.Right, MsgBoxArea.Bottom), New Color(180, 180, 180), 3)
+
+            'Draw controlls
+            _gpad.Render(batcher, Nothing)
+
 
             If CurrentMessage.IsInputbox Then
                 'Draw text
@@ -92,29 +101,27 @@ Namespace Framework.UI
         Dim lastmstate As MouseState
         Dim lastkstate As KeyboardState
         Public Overrides Sub Update()
-            If MessageStack.Count > 0 And Not ShowMessageBox Then
+            If MessageStack.Count > 0 And Not Visible Then
                 WasEnabled = Core.Scene.Enabled
                 Core.Scene.Enabled = False
-                ShowMessageBox = True
+                Visible = True
                 CurrentMessage = MessageStack(0)
                 If CurrentMessage.IsInputbox Then InputBoxData = CurrentMessage.DefaultResponse
                 MessageStack.RemoveAt(0)
-                End If
 
-                If Not ShowMessageBox Then Return
+                'Register buttons
+                RecalcVbuttons()
+            End If
+
+            If Not Visible Then Return
 
             Dim mstate As MouseState = Mouse.GetState()
             Dim kstate = Keyboard.GetState()
             Dim mpos As Vector2 = Vector2.Transform(mstate.Position.ToVector2, Matrix.Invert(ScaleMatrix))
 
-            If CurrentMessage.IsInputbox Then
+            _gpad.Update()
 
-                If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(MsgBoxArea.Right - 100, MsgBoxArea.Top + 10, 80, 30).Contains(mpos)) Or (kstate.IsKeyDown(Keys.Enter) And lastkstate.IsKeyUp(Keys.Enter)) Then
-                    If CurrentMessage.FinalActionInputBox IsNot Nothing Then CurrentMessage.FinalActionInputBox(InputBoxData, 0) : CloseMsgBox() Else CloseMsgBox()
-                End If
-                If (mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And New Rectangle(MsgBoxArea.Right - 100, MsgBoxArea.Top + 50, 80, 30).Contains(mpos)) Or (kstate.IsKeyDown(Keys.Escape) And lastkstate.IsKeyUp(Keys.Escape)) Then
-                    If CurrentMessage.FinalActionInputBox IsNot Nothing Then CurrentMessage.FinalActionInputBox(CurrentMessage.DefaultResponse, 1) : CloseMsgBox() Else CloseMsgBox()
-                End If
+            If CurrentMessage.IsInputbox Then
 
                 Dim UpperCase As Boolean = kstate.IsKeyDown(Keys.LeftShift) Or kstate.IsKeyDown(Keys.RightShift) Or kstate.IsKeyDown(Keys.CapsLock)
                 For Each key In kstate.GetPressedKeys
@@ -155,26 +162,13 @@ Namespace Framework.UI
                             If UpperCase Then InputBoxData &= "="
                     End Select
                 Next
-            Else
-                Dim tot_len As Single = 0F
-                Dim padding As Single = 25.0F
-                Dim margin As Single = 30.0F
-                For i As Integer = 0 To CurrentMessage.Buttons.Length - 1
-                    tot_len += DispFont.MeasureString(CurrentMessage.Buttons(i)).X + padding 'width + padding
-                Next
-                tot_len += (CurrentMessage.Buttons.Length - 1) * margin 'Add margin
+            End If
 
-                'Draw buttons
-                Dim x_offset As Single = 0F
-                For i As Integer = 0 To CurrentMessage.Buttons.Length - 1
-                    Dim txt_width As Single = DispFont.MeasureString(CurrentMessage.Buttons(i)).X + padding
-                    If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(MsgBoxArea.Center.X - tot_len / 2 + x_offset, MsgBoxArea.Y + MsgBoxArea.Height * 0.7, txt_width, 30).Contains(mpos) Then
-                        If CurrentMessage.FinalActionMsgBox IsNot Nothing Then CurrentMessage.FinalActionMsgBox(i)
-                        CloseMsgBox()
-                    End If
-                    'Update offset
-                    x_offset += txt_width + margin
-                Next
+            If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then _gpad.SimulateMousePress(mpos.ToPoint)
+
+            If _deactivateNextFrame > 0 Then
+                _deactivateNextFrame -= 1
+                If _deactivateNextFrame = 0 Then Visible = False
             End If
 
             lastmstate = mstate
@@ -189,7 +183,7 @@ Namespace Framework.UI
         End Sub
 
         Public Function OpenMsgbox(Prompt As String, finalaction As FinalMsgAction, buttons As String()) As Boolean
-            If ShowMessageBox Then Return False
+            If Visible Then Return False
             MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = False, .Buttons = buttons, .FinalActionMsgBox = finalaction})
             Return True
         End Function
@@ -199,20 +193,65 @@ Namespace Framework.UI
         End Sub
 
         Public Function OpenInputbox(Prompt As String, finalaction As FinalInputAction, Optional def As String = "") As Boolean
-            If ShowMessageBox Then Return False
+            If Visible Then Return False
             MessageStack.Add(New Message With {.Message = Prompt, .IsInputbox = True, .Buttons = {"OK", "Cancel"}, .FinalActionInputBox = finalaction, .DefaultResponse = def})
             Return True
         End Function
 
+        Private Sub RecalcVbuttons()
+            _gpad.DeregisterAll()
+            If CurrentMessage.IsInputbox Then
+
+                _gpad.RegisterControl(New IDPControl(New Rectangle(MsgBoxArea.Right - 100, MsgBoxArea.Top + 10, 80, 30), Sub()
+                                                                                                                             If CurrentMessage.FinalActionInputBox IsNot Nothing Then
+                                                                                                                                 CurrentMessage.FinalActionInputBox(InputBoxData, 0)
+                                                                                                                                 CloseMsgBox()
+                                                                                                                             Else
+                                                                                                                                 CloseMsgBox()
+                                                                                                                             End If
+                                                                                                                         End Sub))
+                _gpad.RegisterControl(New IDPControl(New Rectangle(MsgBoxArea.Right - 100, MsgBoxArea.Top + 50, 80, 30), Sub()
+                                                                                                                             If CurrentMessage.FinalActionInputBox IsNot Nothing Then
+                                                                                                                                 CurrentMessage.FinalActionInputBox(CurrentMessage.DefaultResponse, 1)
+                                                                                                                                 CloseMsgBox()
+                                                                                                                             Else
+                                                                                                                                 CloseMsgBox()
+                                                                                                                             End If
+                                                                                                                         End Sub))
+            Else
+
+                Dim tot_len As Single = 0F
+                Dim padding As Single = 25.0F
+                Dim margin As Single = 30.0F
+                For i As Integer = 0 To CurrentMessage.Buttons.Length - 1
+                    tot_len += DispFont.MeasureString(CurrentMessage.Buttons(i)).X + padding 'width + padding
+                Next
+                tot_len += (CurrentMessage.Buttons.Length - 1) * margin 'Add margin
+
+                'Draw buttons
+                Dim x_offset As Single = 0F
+                For i As Integer = 0 To CurrentMessage.Buttons.Length - 1
+                    Dim txt_width As Single = DispFont.MeasureString(CurrentMessage.Buttons(i)).X + padding
+                    Dim ii = i
+                    _gpad.RegisterControl(New IDPControl(New Rectangle(MsgBoxArea.Center.X - tot_len / 2 + x_offset, MsgBoxArea.Y + MsgBoxArea.Height * 0.7, txt_width, 30), Sub()
+                                                                                                                                                                                 If CurrentMessage.FinalActionMsgBox IsNot Nothing Then CurrentMessage.FinalActionMsgBox(ii)
+                                                                                                                                                                                 CloseMsgBox()
+                                                                                                                                                                             End Sub))
+                    'Update offset
+                    x_offset += txt_width + margin
+                Next
+            End If
+        End Sub
 
         Private Sub CloseMsgBox()
             If MessageStack.Count > 0 Then
                 CurrentMessage = MessageStack(0)
                 If CurrentMessage.IsInputbox Then InputBoxData = CurrentMessage.DefaultResponse
                 MessageStack.RemoveAt(0)
+                RecalcVbuttons()
             Else
                 Core.Scene.Enabled = WasEnabled
-                ShowMessageBox = False
+                _deactivateNextFrame = 3
             End If
         End Sub
 

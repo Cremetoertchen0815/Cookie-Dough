@@ -53,7 +53,7 @@ Namespace Framework.UI.Controls
         End Sub
 
         Public Overrides Sub Activate()
-            RaiseEvent Clicked(Me, New EventArgs())
+            If Not MsgBoxer.Visible Then RaiseEvent Clicked(Me, New EventArgs())
         End Sub
     End Class
 End Namespace
