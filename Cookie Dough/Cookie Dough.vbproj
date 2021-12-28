@@ -99,6 +99,7 @@
     <Compile Include="Framwork\UI\Controls\ProgressBar.vb" />
     <Compile Include="Framwork\UI\Controls\TextureButton.vb" />
     <Compile Include="Framwork\UI\Gamepad\GpadController.vb" />
+    <Compile Include="Framwork\UI\Gamepad\IDPControl.vb" />
     <Compile Include="Framwork\UI\Gamepad\ISelectableControl.vb" />
     <Compile Include="Framwork\UI\MessageBoxer.vb" />
     <Compile Include="Game\Barrelled\CreatorMenu.vb" />

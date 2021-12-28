@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
+Imports Cookie_Dough.Framework.UI.Gamepad
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Graphics
@@ -13,6 +14,7 @@ Namespace Menu.MainMenu
 
         Private rend As MainMenuRenderer
         Private lastmstate As MouseState
+        Private _vcontroller As GpadController
 
         Private ChangeNameButtonPressed As Boolean = False
         Friend Blocked As Boolean = False
@@ -45,7 +47,12 @@ Namespace Menu.MainMenu
             AddPostProcessor(New QualityBloomPostProcessor(1)).SetPreset(QualityBloomPostProcessor.BloomPresets.SuperWide).SetStrengthMultiplayer(0.6).SetThreshold(0)
             ClearColor = Color.Black
             Core.Instance.IsMouseVisible = True
-            rend = CreateEntity("Renderer").AddComponent(New MainMenuRenderer(Me))
+
+            'Generate visuals and gpad controller
+            Dim rentity = CreateEntity("Renderer")
+            rend = rentity.AddComponent(New MainMenuRenderer(Me)).SetLayerDepth(0.5F)
+            _vcontroller = rentity.AddComponent(New GpadController).SetLayerDepth(0F)
+            GenerateVirtualControls(Submenu)
 
             GameList = {("Betreten Verboten", "Lido", True), ("Car Crash", "Wheel speen sim", True), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
                         ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Error 404", True)}
@@ -58,13 +65,11 @@ Namespace Menu.MainMenu
 
             If Blocked Then Return
 
+            _vcontroller.LocalOffset = Vector2.Zero
+
             Select Case Submenu
-                Case 0
-                    If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(1)
-                    If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(2)
-                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(6, Sub() LdbData = LocalClient.GetLeaderboard(LdbSelectedGame, LdbSelectedMap, LdbSelectedTeam))
-                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
-                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(3)
+                Case 0, 3
+                    If mstate.LeftButton = ButtonState.Pressed Then _vcontroller.SimulateMousePress(mpos)
                 Case 1
                     'Scroll game list
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
@@ -72,29 +77,10 @@ Namespace Menu.MainMenu
                     If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
                     SM1Scroll = Mathf.Clamp(SM1Scroll - scrollval * 30, 0, 375 + GameList.Length * 150 - 1050)
 
-                    For i As Integer = 0 To GameList.Length
-                        If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released AndAlso New Rectangle(560, 275 + i * 150 - CInt(SM1Scroll), 800, 100).Contains(mpos) Then
-                            Select Case i
-                                Case GameType.BetretenVerboten
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.BetretenVerboten.CreatorMenu))
-                                Case GameType.Megäa
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Megäa.GameRoom))
-                                Case GameType.DuoCard
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.CreatorMenu))
-                                Case GameType.DropTrop
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.CreatorMenu))
-                                Case GameType.Barrelled
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.CreatorMenu))
-                                Case GameType.Corridor
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.Corridor.GameRoom))
-                                Case GameType.CarCrash
-                                    Core.StartSceneTransition(New FadeTransition(Function() New Game.CarCrash.CreatorMenu))
-                                Case GameList.Length
-                                    SwitchToSubmenu(0)
-                            End Select
-                        End If
-                    Next
+                    If mstate.LeftButton = ButtonState.Pressed Then _vcontroller.SimulateMousePress(mpos + New Point(0, SM1Scroll))
+
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
+                    _vcontroller.LocalOffset = New Vector2(0, -SM1Scroll)
                 Case 2
                     'Scroll online game list
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
@@ -112,23 +98,6 @@ Namespace Menu.MainMenu
                             End Select
                         End If
                     Next
-                    If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
-                Case 3
-                    'Settings
-                    If New Rectangle(560, 275, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then My.Settings.Schwierigkeitsgrad = (My.Settings.Schwierigkeitsgrad + 1) Mod 2 : My.Settings.Save()
-                    If New Rectangle(560, 425, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(5)
-                    If New Rectangle(560, 575, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
-                    If New Rectangle(560, 725, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
-                        Dim r As Single = Nez.Random.NextFloat()
-                        Dim g As Single = Nez.Random.NextFloat()
-                        Dim b As Single = Nez.Random.NextFloat()
-                        FgColor = New Color(r, g, b)
-                        My.Settings.colorR = r * 255
-                        My.Settings.colorG = g * 255
-                        My.Settings.colorB = b * 255
-                        My.Settings.Save()
-                    End If
-                    If New Rectangle(560, 875, 800, 100).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(0)
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                 Case 4
                     'Scroll online game list
@@ -263,7 +232,7 @@ Namespace Menu.MainMenu
                             MsgBoxer.EnqueueMsgbox("File too big!")
                         End If
 
-                            Try
+                        Try
                             PlayAudio(IdentType.Custom)
                         Catch ex As Exception
                             MsgBoxer.EnqueueMsgbox("Invalid sound file!")
@@ -387,6 +356,7 @@ Namespace Menu.MainMenu
             'Spiele Sound
             SFX(2).Play()
             Blocked = True
+            _vcontroller.Enabled = False
             Select Case submenu
                 Case 1
                     SM1Scroll = 0
@@ -399,6 +369,8 @@ Namespace Menu.MainMenu
 
             'Blende über
             Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(500), Schwarzblende.Value, 1.0F, Sub()
+                                                                                                                                     GenerateVirtualControls(submenu)
+                                                                                                                                     _vcontroller.Enabled = True
                                                                                                                                      If InBetweenOperation IsNot Nothing Then InBetweenOperation()
                                                                                                                                      Me.Submenu = submenu
                                                                                                                                      Blocked = False
@@ -406,6 +378,81 @@ Namespace Menu.MainMenu
                                                                                                                                      Automator.Add(Schwarzblende)
                                                                                                                                  End Sub)
             Automator.Add(Schwarzblende)
+        End Sub
+
+        Private Sub GenerateVirtualControls(submenu As Integer)
+            _vcontroller.DeregisterAll()
+
+            Select Case submenu
+                Case 0
+                    'Main Menu
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275, 800, 100), Sub() SwitchToSubmenu(1)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 425, 800, 100), Sub() SwitchToSubmenu(2)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 575, 800, 100), Sub() SwitchToSubmenu(6, Sub() LdbData = LocalClient.GetLeaderboard(LdbSelectedGame, LdbSelectedMap, LdbSelectedTeam))))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 725, 800, 100), Sub() SwitchToSubmenu(3)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(1920 - 380, 45, 380, 100), Sub() SwitchToSubmenu(4)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(20, 40, 400, 50), Sub() SwitchToSubmenu(5)))
+                    _vcontroller.ActionGoBack = Sub() Return
+                    _vcontroller.ActionScroll = Sub(x) Return
+
+                Case 1
+                    'Create game
+                    For i As Integer = 0 To GameList.Length
+                        Dim aa As Action
+                        Select Case i
+                            Case GameType.BetretenVerboten
+                                aa = Sub() Core.StartSceneTransition(New FadeTransition(Function() New Game.BetretenVerboten.CreatorMenu))
+                            Case GameType.Megäa
+                                aa = Sub() Core.StartSceneTransition(New FadeTransition(Function() New Game.Megäa.GameRoom))
+                            Case GameType.DuoCard
+                                aa = Sub() Core.StartSceneTransition(New FadeTransition(Function() New Game.DuoCard.CreatorMenu))
+                            Case GameType.DropTrop
+                                aa = Sub() Core.StartSceneTransition(New FadeTransition(Function() New Game.DropTrop.CreatorMenu))
+                            Case GameType.Barrelled
+                                aa = Sub() Core.StartSceneTransition(New FadeTransition(Function() New Game.Barrelled.CreatorMenu))
+                            Case GameType.Corridor
+                                aa = Sub() Core.StartSceneTransition(New FadeTransition(Function() New Game.Corridor.GameRoom))
+                            Case GameType.CarCrash
+                                aa = Sub() Core.StartSceneTransition(New FadeTransition(Function() New Game.CarCrash.CreatorMenu))
+                            Case GameList.Length
+                                aa = Sub() SwitchToSubmenu(0)
+                            Case Else
+                                aa = Sub() Return
+                        End Select
+                        _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + i * 150 - CInt(SM1Scroll), 800, 100), aa))
+                    Next
+
+                    _vcontroller.ActionGoBack = Sub() SwitchToSubmenu(0)
+                    _vcontroller.ActionScroll = Sub(x) SM1Scroll = Mathf.Clamp(SM1Scroll - x * 5, 0, 375 + GameList.Length * 150 - 1050)
+
+                Case 3
+                    'Settings
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275, 800, 100), Sub()
+                                                                                                       My.Settings.Schwierigkeitsgrad = (My.Settings.Schwierigkeitsgrad + 1) Mod 2
+                                                                                                       My.Settings.Save()
+                                                                                                   End Sub))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 425, 800, 100), Sub() SwitchToSubmenu(5)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(20, 40, 400, 50), Sub() SwitchToSubmenu(5)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 575, 800, 100), Sub() SwitchToSubmenu(4)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 725, 800, 100), Sub()
+                                                                                                       Dim r As Single = Nez.Random.NextFloat()
+                                                                                                       Dim g As Single = Nez.Random.NextFloat()
+                                                                                                       Dim b As Single = Nez.Random.NextFloat()
+                                                                                                       FgColor = New Color(r, g, b)
+                                                                                                       My.Settings.colorR = r * 255
+                                                                                                       My.Settings.colorG = g * 255
+                                                                                                       My.Settings.colorB = b * 255
+                                                                                                       My.Settings.Save()
+                                                                                                   End Sub))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 875, 800, 100), Sub() SwitchToSubmenu(0)))
+
+                    'Top Controls
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(1920 - 380, 45, 380, 100), Sub() SwitchToSubmenu(4)))
+                    _vcontroller.RegisterControl(New IDPControl(New Rectangle(20, 40, 400, 50), Sub() SwitchToSubmenu(5)))
+
+                    _vcontroller.ActionGoBack = Sub() SwitchToSubmenu(0)
+                    _vcontroller.ActionScroll = Sub(x) Return
+            End Select
         End Sub
 
         Private Sub PlayAudio(ident As IdentType, Optional SoundB As Boolean = False)

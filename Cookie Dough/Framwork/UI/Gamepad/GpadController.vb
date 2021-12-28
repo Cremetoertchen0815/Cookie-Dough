@@ -4,16 +4,20 @@ Imports System.Linq
 
 Namespace Framework.UI.Gamepad
     Public Class GpadController
-        Inherits Renderable3D
+        Inherits RenderableComponent
         Implements IUpdatable
 
         Private _btnAcc As VirtualButton
         Private _btnBack As VirtualButton
         Private _btnDir As VirtualJoystick
+        Private _btnScroll As VirtualAxis
 
         Private lastDir As Vector2
         Private _controls As New List(Of ISelectableControl)
         Public SelectedIndex As Integer = 0
+
+        Public Property ActionGoBack As Action = Sub() Return
+        Public Property ActionScroll As Action(Of Single) = Sub(x) Return
 
         Private Shared ControllerActivated As Boolean = False
 
@@ -32,7 +36,8 @@ Namespace Framework.UI.Gamepad
         Public Overrides Sub OnAddedToEntity()
             _btnAcc = New VirtualButton(New VirtualButton.GamePadButton(0, Input.Buttons.A))
             _btnBack = New VirtualButton(New VirtualButton.GamePadButton(0, Input.Buttons.B))
-            _btnDir = New VirtualJoystick(True, New VirtualJoystick.GamePadDpad(0, True), New VirtualJoystick.GamePadLeftStick(0, 0.4F))
+            _btnDir = New VirtualJoystick(True, New VirtualJoystick.GamePadDpad(0, True), New VirtualJoystick.GamePadLeftStick(0, 0.75F))
+            _btnScroll = New VirtualAxis(New VirtualAxis.GamePadRightStickY(0))
             Enabled = True
         End Sub
 
@@ -48,6 +53,25 @@ Namespace Framework.UI.Gamepad
 
         Public Sub DeregisterControl(c As ISelectableControl)
             If _controls.Contains(c) Then _controls.Remove(c)
+        End Sub
+        Public Sub DeregisterAll(Optional reset_cursor As Boolean = True)
+            While _controls.Count > 0
+                _controls.RemoveAt(0)
+            End While
+            If reset_cursor Then SelectedIndex = 0
+        End Sub
+
+        Public Sub ClampCursor()
+            SelectedIndex = Mathf.Clamp(SelectedIndex, 0, _controls.Count - 1)
+        End Sub
+        Public Sub SimulateMousePress(coord As Point)
+            If Not Enabled Then Return
+            For Each element In _controls
+                If element.Bounds.Contains(coord) Then
+                    element.Activate()
+                    Return
+                End If
+            Next
         End Sub
 
         Public Sub Update() Implements IUpdatable.Update
@@ -88,14 +112,29 @@ Namespace Framework.UI.Gamepad
             If SelectedIndex > -1 And SelectedIndex < _controls.Count AndAlso _btnAcc.IsPressed Then
                 _controls(SelectedIndex).Activate()
             End If
+
+            'Check for general controlls
+            If _btnBack.IsPressed Then ActionGoBack.Invoke()
+            If _btnScroll.Value <> 0 Then ActionScroll.Invoke(_btnScroll.Value)
         End Sub
 
         Public Overrides Sub Render(batcher As Batcher, camera As Camera)
             If SelectedIndex > -1 And SelectedIndex < _controls.Count And ControllerActivated Then
                 Dim bounds = _controls(SelectedIndex).Bounds
                 bounds.Inflate(5, 5)
-                batcher.DrawHollowRect(bounds, Color.White, 7)
+                bounds.Offset(LocalOffset)
+                batcher.DrawHollowRect(bounds, Color.White * (Color.A / 255), 7)
             End If
         End Sub
+
+        Public Overrides ReadOnly Property Bounds As RectangleF
+            Get
+                Return New RectangleF(0, 0, 1920, 1080)
+            End Get
+        End Property
+
+        Public Overrides Function IsVisibleFromCamera(camera As Camera) As Boolean
+            Return True
+        End Function
     End Class
 End Namespace
