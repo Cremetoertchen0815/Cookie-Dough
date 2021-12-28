@@ -85,6 +85,17 @@ Namespace Game.BetretenVerboten
                         Case 7
                             If Not ending Then Return New Keyframe3D(424, -37, -802, 5.1, 1.54, 0.17, False) Else Return New Keyframe3D(424, -37, -802, 5.5, 1.54, 0.17, False)
                     End Select
+                Case GaemMap.Snakes
+                    Select Case player
+                        Case 0
+                            If Not ending Then Return New Keyframe3D(-380, -12, -374, -1.6, 1.3, 0, False) Else Return New Keyframe3D(-500, -50, -680, -0.9, 1.3, 0, False)
+                        Case 1
+                            If Not ending Then Return New Keyframe3D(-500, -240, -870, -0.28, 0.51, 0, False) Else Return New Keyframe3D(440, -380, -960, 1.55, 0.51, 0, False)
+                        Case 2
+                            If Not ending Then Return New Keyframe3D(-360, -140, -1340, 0.08, 1.29, 0, False) Else Return New Keyframe3D(-360, -30, -1115, 0.08, 1.58, 0, False)
+                        Case 3
+                            If Not ending Then Return New Keyframe3D(-320, -460, -650, 0.22, 0, 0, False) Else Return New Keyframe3D(0, -560, -960, 0.79, 0, 0, False)
+                    End Select
                 Case Else
                     Return New Keyframe3D
             End Select
