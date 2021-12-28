@@ -630,7 +630,7 @@ Namespace Menu.MainMenu
                         batcher.DrawHollowRect(New Rectangle(560, 725, 800, 100), FgColor)
                         batcher.DrawHollowRect(New Rectangle(560, 875, 800, 100), FgColor)
                         'Draw text
-                        Dim txtA As String = "CPU Difficulty: " & CType(My.Settings.Schwierigkeitsgrad, Difficulty).ToString
+                        Dim txtA As String = "Difficulty: " & CType(My.Settings.Schwierigkeitsgrad, Difficulty).ToString
                         batcher.DrawString(MediumFont, txtA, New Vector2(1920.0F / 2 - MediumFont.MeasureString(txtA).X / 2, 300), FgColor)
                         batcher.DrawString(MediumFont, "User Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("User Settings").X / 2, 450), FgColor) 'If(IsConnectedToServer, FgColor, Color.Red)
                         batcher.DrawString(MediumFont, "Server Settings", New Vector2(1920.0F / 2 - MediumFont.MeasureString("Server Settings").X / 2, 600), FgColor)
