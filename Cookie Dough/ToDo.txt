@@ -1,8 +1,8 @@
-﻿-Test BR and DT!
+﻿-Test DT!
 -Convert menu to fully utilize vcontrolls
 
 BV:
--Figures don't duck on snek map(and no kick sounds)
+-Replace seperate ending fields in snek map with one big "throne"
 -Add god feature "swapping chrs"(speen)
 -Fix cam intro for snek
 

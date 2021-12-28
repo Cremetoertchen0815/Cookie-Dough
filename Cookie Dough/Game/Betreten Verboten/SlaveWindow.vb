@@ -295,21 +295,24 @@ Namespace Game.BetretenVerboten
                 End If
                 If IsFieldCovered(FigurFaderZiel.Item1, FigurFaderZiel.Item2, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1) Then
                     Dim key As (Integer, Integer) = GetFieldID(FigurFaderZiel.Item1, Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) + 1)
+                    Dim trans As Transition(Of Single)
                     If Spielers(FigurFaderZiel.Item1).Spielfiguren(FigurFaderZiel.Item2) = FigurFaderEnd - 1 Then
                         Dim kickID As Integer = CheckKick(1)
-                        Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
-                                                                                                                                      Spielers(FigurFaderZiel.Item1).CustomSound(1).Play()
-                                                                                                                                      If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1
-                                                                                                                                      If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
-                                                                                                                                      Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
-                                                                                                                                      Automator.Add(transB)
-                                                                                                                                      FigurFaderScales.Add(key, transB)
-                                                                                                                                  End Sub)
-                        If key.Item1 >= 0 And key.Item2 >= 0 Then Automator.Add(trans) : FigurFaderScales.Add(key, trans)
+                        'Make the figure duck
+                        trans = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
+                                                                                                                                 Spielers(FigurFaderZiel.Item1).CustomSound(1).Play() 'Play kick sound
+                                                                                                                                 If kickID = key.Item2 Then Spielers(key.Item1).Spielfiguren(key.Item2) = -1 'Reset piece position
+                                                                                                                                 If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
+                                                                                                                                 'Make it appear again
+                                                                                                                                 Dim transB As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 0, 1, Nothing)
+                                                                                                                                 Automator.Add(transB)
+                                                                                                                                 FigurFaderScales.Add(key, transB)
+                                                                                                                             End Sub)
                     Else
-                        Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Bounce(FigurSpeed * 2), 1, 0, Nothing)
-                        If key.Item1 >= 0 And key.Item2 >= 0 Then Automator.Add(trans) : FigurFaderScales.Add(key, trans)
+                        'Make the figure duck
+                        trans = New Transition(Of Single)(New TransitionTypes.TransitionType_Bounce(FigurSpeed * 2), 1, 0, Nothing)
                     End If
+                    If key.Item1 >= 0 And key.Item2 >= 0 Then Automator.Add(trans) : FigurFaderScales.Add(key, trans)
                 End If
                 FigurFaderXY = New Transition(Of Vector2)(New TransitionTypes.TransitionType_Linear(FigurSpeed), FigurFaderVectors.Item1, FigurFaderVectors.Item2, AddressOf MoverSub) : Automator.Add(FigurFaderXY)
                 FigurFaderZ = New Transition(Of Integer)(New TransitionTypes.TransitionType_Parabole(FigurSpeed), 0, DopsHöhe, Nothing) : Automator.Add(FigurFaderZ)
@@ -984,7 +987,7 @@ Namespace Game.BetretenVerboten
                     Dim fieldB As Integer = Spielers(i).Spielfiguren(j)
                     Dim fb As Integer = PlayerFieldToGlobalField(fieldB, i)
                     'Falls globale Spielfeldposition identisch und 
-                    If fieldB > -1 And ((fieldA < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso (player <> i Or figur <> j) And fb = fa) OrElse (fieldB < If(Map > 2, SpceCount, PlCount * SpceCount) + 5 And player = i And figur <> j And fieldA = fieldB)) Then Return True
+                    If fieldB > -1 And ((fieldA < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso player <> i And fb = fa) OrElse (player = i And figur <> j And fieldA = fieldB)) Then Return True
                 Next
             Next
 
@@ -1079,6 +1082,7 @@ Namespace Game.BetretenVerboten
         End Function
 
         Private Function PlayerFieldToGlobalField(field As Integer, player As Integer) As Integer
+            If Map > 2 Then Return field
             Return (field + player * SpceCount) Mod (PlCount * SpceCount)
         End Function
 
