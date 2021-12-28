@@ -266,7 +266,7 @@ Namespace Menu.MainMenu
                     If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
                     ScrollValue = Mathf.Clamp(ScrollValue - scrollval * 30, 0, 375 + GameList.Length * 150 - 1050)
 
-                    If mstate.LeftButton = ButtonState.Pressed Then _vcontroller.SimulateMousePress(mpos + New Point(0, ScrollValue))
+                    If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then _vcontroller.SimulateMousePress(mpos + New Point(0, ScrollValue))
 
                     If Submenu > 0 And New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
                     _vcontroller.LocalOffset = New Vector2(0, -ScrollValue)
