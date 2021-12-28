@@ -15,6 +15,7 @@ Namespace Menu.MainMenu
         Private rend As MainMenuRenderer
         Private lastmstate As MouseState
         Private _vcontroller As GpadController
+        Private _refresh As Refreshinator(Of Boolean)
 
         Private ChangeNameButtonPressed As Boolean = False
         Friend Blocked As Boolean = False
@@ -52,7 +53,12 @@ Namespace Menu.MainMenu
             Dim rentity = CreateEntity("Renderer")
             rend = rentity.AddComponent(New MainMenuRenderer(Me)).SetLayerDepth(0.5F)
             _vcontroller = rentity.AddComponent(New GpadController).SetLayerDepth(0F)
-            GenerateVirtualControls(Submenu)
+
+            'Register vcontroller controlls
+            _refresh = New Refreshinator(Of Boolean)
+            _refresh.EqualityComparerer = Function(a, b) a = b
+            _refresh.RefreshAction = AddressOf GenerateVirtualControls
+            GenerateVirtualControls()
 
             GameList = {("Betreten Verboten", "Lido", True), ("Car Crash", "Wheel speen sim", True), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
                         ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Error 404", True)}
@@ -70,7 +76,7 @@ Namespace Menu.MainMenu
             Select Case Submenu
                 Case 0, 3
                     If mstate.LeftButton = ButtonState.Pressed Then _vcontroller.SimulateMousePress(mpos)
-                Case 1
+                Case 1, 4
                     'Scroll game list
                     Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
                     If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
@@ -99,61 +105,6 @@ Namespace Menu.MainMenu
                         End If
                     Next
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4)
-                Case 4
-                    'Scroll online game list
-                    Dim ln As Integer = If(IsConnectedToServer And ServerActive, ConnectedUsers, AvailableServerList).Count
-                    Dim scrollval = (mstate.ScrollWheelValue - lastmstate.ScrollWheelValue) / 120.0F
-                    If New Rectangle(1396, 296, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = Time.DeltaTime * 20
-                    If New Rectangle(1396, 906, 50, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then scrollval = -Time.DeltaTime * 20
-                    SM4Scroll = Mathf.Clamp(SM4Scroll - scrollval * 30, 0, Math.Max(375 + (ln + 2) * 150 - 1050, 0))
-
-                    For i As Integer = -2 To ln
-                        If ((mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) Or (mstate.RightButton = ButtonState.Pressed And lastmstate.RightButton = ButtonState.Released)) AndAlso New Rectangle(560, 275 + (i + 2) * 150 - CInt(SM4Scroll), 800, 100).Contains(mpos) Then
-                            Select Case i
-                                Case ln
-                                    SwitchToSubmenu(0)
-                                Case -2 'Dual button
-                                    If mpos.X <= 960 Then
-                                        'Left button
-                                        If Not IsConnectedToServer Then LaunchInputBox(Sub(x)
-                                                                                           My.Settings.Servers.Add(x)
-                                                                                           UpdateServerList()
-                                                                                       End Sub, rend.MediumFont, "Enter IP-adress:", "Add server", My.Settings.IP) : SFX(2).Play() Else SFX(0).Play()
-                                    Else
-                                        'Right button
-                                        If IsConnectedToServer Then
-                                            LocalClient.Disconnect()
-                                            SFX(2).Play()
-                                        Else
-                                            If Not ServerActive Then
-                                                'If LocalClient.Connected Then LocalClient.Disconnect()
-                                                If LocalClient.TryConnect Then
-                                                    MsgBoxer.EnqueueMsgbox("Other server already active on this port")
-                                                Else
-                                                    StartServer()
-                                                    LocalClient.Connect("127.0.0.1", My.Settings.Username)
-                                                End If
-                                                SFX(2).Play()
-                                            Else
-                                                SFX(0).Play()
-                                            End If
-                                        End If
-                                    End If
-                                Case -1
-                                Case Else
-                                    If Not (IsConnectedToServer And ServerActive) And mstate.LeftButton = ButtonState.Pressed Then
-                                        LocalClient.Connect(AvailableServerList(i), My.Settings.Username)
-                                        lasthostname = AvailableServerList(i)
-                                        SFX(2).Play()
-                                    ElseIf Not IsConnectedToServer And mstate.RightButton = ButtonState.Pressed Then
-                                        My.Settings.Reload()
-                                        If My.Settings.Servers.Contains(AvailableServerList(i)) Then My.Settings.Servers.Remove(AvailableServerList(i))
-                                        My.Settings.Save()
-                                        UpdateServerList()
-                                    End If
-                            End Select
-                        End If
-                    Next
 
                 Case 5
 
@@ -326,7 +277,7 @@ Namespace Menu.MainMenu
                     If New Rectangle(1920 - 450, 0, 450, 200).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed Then SwitchToSubmenu(4) 'Server settings
             End Select
 
-
+            _refresh.Update()
 
             'Wechsel Benutzername
             If New Rectangle(New Point(20, 40), rend.MediumFont.MeasureString("Username: " & My.Settings.Username).ToPoint).Contains(mpos) And OneshotPressed Then SwitchToSubmenu(5)
@@ -369,10 +320,10 @@ Namespace Menu.MainMenu
 
             'Blende über
             Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(500), Schwarzblende.Value, 1.0F, Sub()
-                                                                                                                                     GenerateVirtualControls(submenu)
-                                                                                                                                     _vcontroller.Enabled = True
                                                                                                                                      If InBetweenOperation IsNot Nothing Then InBetweenOperation()
                                                                                                                                      Me.Submenu = submenu
+                                                                                                                                     GenerateVirtualControls()
+                                                                                                                                     _vcontroller.Enabled = True
                                                                                                                                      Blocked = False
                                                                                                                                      Schwarzblende = New Transition(Of Single)(New TransitionTypes.TransitionType_Linear(1000), 1.0F, 0.0F, Nothing)
                                                                                                                                      Automator.Add(Schwarzblende)
@@ -380,10 +331,11 @@ Namespace Menu.MainMenu
             Automator.Add(Schwarzblende)
         End Sub
 
-        Private Sub GenerateVirtualControls(submenu As Integer)
+        Private Sub GenerateVirtualControls()
             _vcontroller.DeregisterAll()
+            _refresh.ClearConditions()
 
-            Select Case submenu
+            Select Case Submenu
                 Case 0
                     'Main Menu
                     _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275, 800, 100), Sub() SwitchToSubmenu(1)))
@@ -452,6 +404,63 @@ Namespace Menu.MainMenu
 
                     _vcontroller.ActionGoBack = Sub() SwitchToSubmenu(0)
                     _vcontroller.ActionScroll = Sub(x) Return
+                Case 4
+                    'Server settings
+                    Dim ln As Integer = If(IsConnectedToServer And ServerActive, ConnectedUsers, AvailableServerList).Count
+                    For i As Integer = -2 To ln
+                        Select Case i
+                            Case ln
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + (i + 2) * 150 - CInt(SM4Scroll), 800, 100), Sub() SwitchToSubmenu(0)))
+                            Case -2 'Dual button
+
+                                'Left button
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 - CInt(SM4Scroll), 400, 100), Sub()
+                                                                                                                                     If Not IsConnectedToServer Then LaunchInputBox(Sub(x)
+                                                                                                                                                                                        My.Settings.Servers.Add(x)
+                                                                                                                                                                                        UpdateServerList()
+                                                                                                                                                                                    End Sub, rend.MediumFont, "Enter IP-adress:", "Add server", My.Settings.IP) : SFX(2).Play() Else SFX(0).Play()
+                                                                                                                                 End Sub))
+
+                                'Right button
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(960, 275 - CInt(SM4Scroll), 400, 100), Sub()
+
+                                                                                                                                     If IsConnectedToServer Then
+                                                                                                                                         LocalClient.Disconnect()
+                                                                                                                                         SFX(2).Play()
+                                                                                                                                     Else
+                                                                                                                                         If Not ServerActive Then
+                                                                                                                                             'If LocalClient.Connected Then LocalClient.Disconnect()
+                                                                                                                                             If LocalClient.TryConnect Then
+                                                                                                                                                 MsgBoxer.EnqueueMsgbox("Other server already active on this port")
+                                                                                                                                             Else
+                                                                                                                                                 StartServer()
+                                                                                                                                                 LocalClient.Connect("127.0.0.1", My.Settings.Username)
+                                                                                                                                             End If
+                                                                                                                                             SFX(2).Play()
+                                                                                                                                         Else
+                                                                                                                                             SFX(0).Play()
+                                                                                                                                         End If
+                                                                                                                                     End If
+                                                                                                                                 End Sub))
+                            Case -1 'Leave one empty row
+                            Case Else
+                                Dim ii = i
+                                _vcontroller.RegisterControl(New IDPControl(New Rectangle(560, 275 + (i + 2) * 150 - CInt(SM4Scroll), 800, 100), Sub()
+                                                                                                                                                     If Not (IsConnectedToServer And ServerActive) Then
+                                                                                                                                                         LocalClient.Connect(AvailableServerList(ii), My.Settings.Username)
+                                                                                                                                                         lasthostname = AvailableServerList(ii)
+                                                                                                                                                         SFX(2).Play()
+                                                                                                                                                     End If
+                                                                                                                                                 End Sub))
+                        End Select
+                    Next
+
+                    _vcontroller.ActionGoBack = Sub() SwitchToSubmenu(0)
+                    _vcontroller.ActionScroll = Sub(x) SM1Scroll = Mathf.Clamp(SM1Scroll - x * 5, 0, 375 + GameList.Length * 150 - 1050)
+
+                    'Add refresh conditions
+                    _refresh.AddCondition(Function() IsConnectedToServer)
+                    _refresh.AddCondition(Function() ServerActive)
             End Select
         End Sub
 

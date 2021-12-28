@@ -82,20 +82,20 @@ Namespace Framework.UI.Gamepad
             'Hozizontal shit
             Dim curr = _controls(SelectedIndex)
             If _btnDir.Value.X < 0 And lastDir.X >= 0 Then
-                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Right < curr.Bounds.Left).OrderByDescending(Function(x) x.Bounds.X).ThenBy(Function(x) Math.Abs(x.Bounds.Y - curr.Bounds.Y))(0)
+                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Right <= curr.Bounds.Left).OrderByDescending(Function(x) x.Bounds.X).ThenBy(Function(x) Math.Abs(x.Bounds.Y - curr.Bounds.Y))(0)
                 If lst IsNot Nothing Then SelectedIndex = _controls.IndexOf(lst)
             ElseIf _btnDir.Value.X > 0 And lastDir.X <= 0 Then
-                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Left > curr.Bounds.Right).OrderBy(Function(x) x.Bounds.X).ThenBy(Function(x) Math.Abs(x.Bounds.Y - curr.Bounds.Y))(0)
+                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Left >= curr.Bounds.Right).OrderBy(Function(x) x.Bounds.X).ThenBy(Function(x) Math.Abs(x.Bounds.Y - curr.Bounds.Y))(0)
                 If lst IsNot Nothing Then SelectedIndex = _controls.IndexOf(lst)
             End If
 
             'Vertical shit
             curr = _controls(SelectedIndex)
             If _btnDir.Value.Y > 0 And lastDir.Y <= 0 Then
-                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Bottom < curr.Bounds.Top).OrderByDescending(Function(x) x.Bounds.Y).ThenBy(Function(x) Math.Abs(x.Bounds.X - curr.Bounds.X))(0)
+                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Bottom <= curr.Bounds.Top).OrderByDescending(Function(x) x.Bounds.Y).ThenBy(Function(x) Math.Abs(x.Bounds.X - curr.Bounds.X))(0)
                 If lst IsNot Nothing Then SelectedIndex = _controls.IndexOf(lst)
             ElseIf _btnDir.Value.Y < 0 And lastDir.Y >= 0 Then
-                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Top > curr.Bounds.Bottom).OrderBy(Function(x) x.Bounds.Y).ThenBy(Function(x) Math.Abs(x.Bounds.X - curr.Bounds.X))(0)
+                Dim lst = _controls.Where(Function(x) x.Active And x.Bounds.Top >= curr.Bounds.Bottom).OrderBy(Function(x) x.Bounds.Y).ThenBy(Function(x) Math.Abs(x.Bounds.X - curr.Bounds.X))(0)
                 If lst IsNot Nothing Then SelectedIndex = _controls.IndexOf(lst)
             End If
 
