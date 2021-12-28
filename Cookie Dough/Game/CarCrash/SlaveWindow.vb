@@ -73,17 +73,6 @@ Namespace Game.CarCrash
         'Buttons
         Private BtnColorChange As VirtualButton
 
-        'Konstanten
-        Private Const WürfelDauer As Integer = 320
-        Private Const WürfelAnimationCooldown As Integer = 4
-        Private Const FigurSpeed As Integer = 450
-        Private Const ErrorCooldown As Integer = 1
-        Private Const RollDiceCooldown As Single = 0.5
-        Private Const CPUThinkingTime As Single = 0.6
-        Private Const DopsHöhe As Integer = 150
-        Private Const CamSpeed As Integer = 1300
-        Private Const SacrificeWait As Integer = 5
-        Private SaucerChance As Integer = 18
         Sub New(ins As OnlineGameInstance)
             LocalClient.AutomaticRefresh = False
             NetworkMode = False
