@@ -1080,11 +1080,14 @@ Namespace Game.BetretenVerboten
             SendNetworkMessageToAll("n" & who.ToString)
             SendSync()
         End Sub
+        Private Sub SendSlide(pl As Integer, figur As Integer, aim As Integer)
+            SendNetworkMessageToAll("o" & pl.ToString & figur.ToString & aim.ToString)
+        End Sub
         Private Sub SendAngered(who As Integer)
             SendNetworkMessageToAll("p" & who.ToString)
         End Sub
-        Private Sub SendSlide(pl As Integer, figur As Integer, aim As Integer)
-            SendNetworkMessageToAll("o" & pl.ToString & figur.ToString & aim.ToString)
+        Private Sub SendSwap(plA As Integer, plB As Integer)
+            SendNetworkMessageToAll("q" & plA.ToString & plB.ToString)
         End Sub
         Private Sub SendPlayerBack(index As Integer)
             SendNetworkMessageToAll("r" & index.ToString)
@@ -1986,7 +1989,37 @@ Namespace Game.BetretenVerboten
                                              'Swap places with figure
                                              PostChat("You swap place with another figure!", Color.White)
                                              SendMessage("You swap place with another figure!")
-                                             Exit Do
+
+                                             'Get swap player
+                                             Status = SpielStatus.Waitn
+                                     Dim aim_pl As Integer = -1
+                                     Dim counter As Integer
+                                     While aim_pl < 0 And counter < 10
+                                         aim_pl = Nez.Random.Range(0, PlCount)
+                                         If aim_pl = pl Or Spielers(aim_pl).Typ = SpielerTyp.None Then aim_pl = -1
+                                         counter += 1
+                                     End While
+
+                                     'If is ok, swap
+                                     If aim_pl > -1 Then
+                                         'Let figures duck
+                                         Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Bounce(FigurSpeed * 2), 1, 0, Nothing)
+                                         Automator.Add(trans) : FigurFaderScales.Add((pl, 0), trans)
+                                         trans = New Transition(Of Single)(New TransitionTypes.TransitionType_Bounce(FigurSpeed * 2), 1, 0, Nothing)
+                                         Automator.Add(trans) : FigurFaderScales.Add((aim_pl, 0), trans)
+
+                                         Core.Schedule(FigurSpeed / 1000, Sub()
+                                                                              Dim buffer As Integer = Spielers(pl).Spielfiguren(0)
+                                                                              Spielers(pl).Spielfiguren(0) = Spielers(aim_pl).Spielfiguren(0)
+                                                                              Spielers(aim_pl).Spielfiguren(0) = buffer
+                                                                          End Sub)
+
+                                         Core.Schedule(FigurSpeed / 1000 * 2.5F, Sub() SwitchPlayer())
+
+                                         SendSwap(pl, aim_pl)
+                                         plsdont = True
+                                         Exit Do
+                                     End If
                                      End Select
                                  Loop
                                  SendSync()

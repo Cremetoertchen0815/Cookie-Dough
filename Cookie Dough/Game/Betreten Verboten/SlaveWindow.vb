@@ -610,6 +610,22 @@ Namespace Game.BetretenVerboten
                     Case "p"c
                         Dim who As Integer = element(1).ToString
                         Spielers(who).AngerCount -= 1
+                    Case "q"c 'Swap players
+                        Dim plA As Integer = element(1).ToString
+                        Dim plB As Integer = element(2).ToString
+
+                        Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Bounce(FigurSpeed * 2), 1, 0, Nothing)
+                        Automator.Add(trans) : FigurFaderScales.Add((plA, 0), trans)
+                        trans = New Transition(Of Single)(New TransitionTypes.TransitionType_Bounce(FigurSpeed * 2), 1, 0, Nothing)
+                        Automator.Add(trans) : FigurFaderScales.Add((plB, 0), trans)
+
+                        Core.Schedule(FigurSpeed / 1000, Sub()
+                                                             Dim buffer As Integer = Spielers(plA).Spielfiguren(0)
+                                                             Spielers(plA).Spielfiguren(0) = Spielers(plB).Spielfiguren(0)
+                                                             Spielers(plB).Spielfiguren(0) = buffer
+                                                         End Sub)
+
+
                     Case "r"c 'Player returned and sync every player
                         Dim source As Integer = element(1).ToString
                         Spielers(source).Bereit = True
