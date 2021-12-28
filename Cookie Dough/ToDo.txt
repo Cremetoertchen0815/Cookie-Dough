@@ -1,9 +1,6 @@
 ﻿-Test BR and DT!
 -Convert menu to UI man & MsgBoxMan to controller support 
 
-CC:
--Implement difficulty setting(by using the CPU difficulty)
-
 BV:
 -Figures don't duck on snek map(and no kick sounds)
 -Add god feature "swapping chrs"(speen)

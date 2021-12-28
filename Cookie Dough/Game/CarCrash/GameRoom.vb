@@ -97,6 +97,7 @@ Namespace Game.CarCrash
             Global.Carcrash.Shared.ID = My.Settings.UniqueIdentifier
             Global.Carcrash.Shared.WriteData = AddressOf SendGeneralPurposeData
             Global.Carcrash.Shared.TriggerExplosionSound = AddressOf PlayExplosion
+            Global.Carcrash.Shared.Difficulty = If(My.Settings.Schwierigkeitsgrad < 1, Global.Carcrash.Game.Difficulty.Easy, Global.Carcrash.Game.Difficulty.Hard)
             Global.Carcrash.Shared.RequestLeaderboardUpdate = Sub(x)
                                                                   Spielers(0).Score = x
                                                                   Status = SpielStatus.SpielZuEnde
