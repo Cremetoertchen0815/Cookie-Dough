@@ -162,6 +162,19 @@ Namespace Framework.UI
                             If UpperCase Then InputBoxData &= "="
                     End Select
                 Next
+
+                If kstate.IsKeyDown(Keys.Enter) And lastkstate.IsKeyUp(Keys.Enter) Then
+                    If CurrentMessage.FinalActionInputBox IsNot Nothing Then
+                        CurrentMessage.FinalActionInputBox(InputBoxData, 0)
+                        CloseMsgBox()
+                    Else
+                        CloseMsgBox()
+                    End If
+                End If
+
+            ElseIf kstate.IsKeyDown(Keys.Enter) And lastkstate.IsKeyUp(Keys.Enter) Then
+                If CurrentMessage.FinalActionMsgBox IsNot Nothing Then CurrentMessage.FinalActionMsgBox(0)
+                CloseMsgBox()
             End If
 
             If mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then _gpad.SimulateMousePress(mpos.ToPoint)

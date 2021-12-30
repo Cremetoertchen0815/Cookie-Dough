@@ -1,5 +1,4 @@
 ﻿-Test DT!
--Reimplement pressing enter to confirm Msg/Inputboxes
 -Convert menu to fully utilize vcontrolls
 
 BV:
