@@ -7,7 +7,7 @@ Public Enum GameType
     Corridor
     Pain
     DuoCard
-    DooDooHead
+    Peng
     Megäa
     Barrelled
     DropTrop

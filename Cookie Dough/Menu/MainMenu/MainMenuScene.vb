@@ -59,7 +59,7 @@ Namespace Menu.MainMenu
             GenerateVirtualControls()
 
             GameList = {("Betreten Verboten", "Lido", True), ("Car Crash", "Wheel speen sim", True), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
-                        ("DooDoo-Head", "Durak", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Error 404", True)}
+                        ("Peng", "Pong on drugs", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Error 404", True)}
         End Sub
 
         Public Overrides Sub Update()
@@ -792,8 +792,8 @@ Namespace Menu.MainMenu
                     Case GameType.Pain
                         Return "PN"
                     Case GameType.DuoCard
-                        Return "DC"
-                    Case GameType.DooDooHead
+                        Return "PE"
+                    Case GameType.Peng
                         Return "DDH"
                     Case GameType.Megäa
                         Return "MG"
@@ -830,8 +830,6 @@ Namespace Menu.MainMenu
                         Return "Betreten Verboten"
                     Case GameType.Pain
                         Return "pain."
-                    Case GameType.DooDooHead
-                        Return "DooDoo-Head"
                     Case GameType.Megäa
                         Return "Megäaaa"
                     Case GameType.DropTrop
