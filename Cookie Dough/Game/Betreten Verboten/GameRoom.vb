@@ -407,7 +407,7 @@ Namespace Game.BetretenVerboten
 
                         If GameMode = GameMode.Competetive Then
                             'Read old team names
-                            Dim team_data = If(IO.File.Exists("Save\teams.dat"), New Dictionary(Of String, List(Of String)), Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, List(Of String)))(IO.File.ReadAllText("Save\teams.dat")))
+                            Dim team_data = If(Not IO.File.Exists("Save\teams.dat"), New Dictionary(Of String, List(Of String)), Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, List(Of String)))(IO.File.ReadAllText("Save\teams.dat")))
                             If team_data.ContainsKey(TeamNameA) Then team_data.Remove(TeamNameA)
                             If team_data.ContainsKey(TeamNameB) Then team_data.Remove(TeamNameB)
 
