@@ -180,8 +180,11 @@ Namespace Game.BetretenVerboten
                 playcolor = hudcolors
                 Farben = {"Kamerad A1", "Kamerad B1", "Kamerad A2", "Kamerad B2", "Kamerad A3", "Kamerad B3", "Kamerad A4", "Kamerad B4"}
             Else
-                hudcolors = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Teal, New Color(85, 120, 20)}
-                playcolor = {Color.Magenta, Color.Lime, Color.Cyan, Color.Yellow, Color.Maroon * 1.5F, New Color(0, 0, 200), New Color(0, 80, 80), New Color(85, 120, 20)}
+                'hudcolors = {Color.Magenta, Color.Lime, Color.Cyan, Color.Orange, New Color(255, 32, 32), New Color(48, 48, 255), Color.Teal, New Color(85, 120, 20)}
+                'playcolor = {Color.Magenta, Color.Lime, Color.Cyan, Color.Yellow, Color.Maroon * 1.5F, New Color(0, 0, 200), New Color(0, 80, 80), New Color(85, 120, 20)}
+                'Farben = {"Magenta", "Lime", "Cyan", "Yellow", "Red", "Blue", "Teal", "Olive"}
+                hudcolors = {Color.White, Color.Black, New Color(40, 0, 75), New Color(0, 255, 100), New Color(255, 32, 32), New Color(48, 48, 255), Color.Teal, New Color(85, 120, 20)}
+                playcolor = {Color.White, Color.Black, New Color(40, 0, 75), New Color(0, 255, 100), Color.Maroon * 1.5F, New Color(0, 0, 200), New Color(0, 80, 80), New Color(85, 120, 20)}
                 Farben = {"Magenta", "Lime", "Cyan", "Yellow", "Red", "Blue", "Teal", "Olive"}
             End If
 
@@ -1807,9 +1810,9 @@ Namespace Game.BetretenVerboten
                 SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
                 If Not DontKickSacrifice Then KickedByGod(pl, figur) 'Kick sacrifice
                 Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
-                pogfactor = progress * 0.4F + 0.2F 'Field 0: Chance of sth good: 20%;  Field max.: Chance of sth good: 50%
-                semipogfactor = 0.2F
-                Core.Schedule(2, Sub() 'Wait a sec
+            pogfactor = progress * 0.55F + 0.15F 'Field 0: Chance of sth good: 20%;  Field max.: Chance of sth good: 50%
+            semipogfactor = 0.15F
+            Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
 
                                  Do
