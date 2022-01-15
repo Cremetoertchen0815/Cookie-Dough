@@ -385,11 +385,16 @@ Namespace Game.BetretenVerboten
                         'Get ranks
                         Dim teamA As Integer = 0
                         Dim teamB As Integer = 0
+                        Dim teamStrA As New List(Of String)
+                        Dim teamStrB As New List(Of String)
                         For i As Integer = 0 To PlCount / 2 - 1
                             teamA += GetScore(i * 2)
                             teamB += GetScore(i * 2 + 1)
+                            teamStrA.Add(Spielers(i * 2).ID)
+                            teamStrB.Add(Spielers(i * 2 + 1).ID)
                         Next
 
+                        'Print results
                         If teamA > teamB Then
                             Core.Schedule(2, Sub() PostChat("Team " & TeamNameA & " won(" & teamA & " points)!", Color.Red))
                             Core.Schedule(3, Sub() PostChat("Team " & TeamNameB & " lost(" & teamB & " points)", Color.Cyan))
@@ -401,13 +406,23 @@ Namespace Game.BetretenVerboten
                         End If
 
                         If GameMode = GameMode.Competetive Then
+                            'Read old team names
+                            Dim team_data = If(IO.File.Exists("Save\teams.dat"), New Dictionary(Of String, List(Of String)), Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, List(Of String)))(IO.File.ReadAllText("Save\teams.dat")))
+                            If team_data.ContainsKey(TeamNameA) Then team_data.Remove(TeamNameA)
+                            If team_data.ContainsKey(TeamNameB) Then team_data.Remove(TeamNameB)
+
+                            'Write new team names
+                            team_data.Add(TeamNameA, teamStrA)
+                            team_data.Add(TeamNameB, teamStrB)
+                            IO.File.WriteAllText("Save\teams.dat", Newtonsoft.Json.JsonConvert.SerializeObject(team_data))
+
                             'Update highscores
                             Core.Schedule(5, AddressOf SendHighscore)
-                            'Update K/D
-                            If (teamA >= teamB And Mathf.IsEven(UserIndex)) Or (teamB >= teamA And Mathf.IsOdd(UserIndex)) Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
-                            My.Settings.Save()
-                        End If
-                    Else
+                                'Update K/D
+                                If (teamA >= teamB And Mathf.IsEven(UserIndex)) Or (teamB >= teamA And Mathf.IsOdd(UserIndex)) Then My.Settings.GamesWon += 1 Else My.Settings.GamesLost += 1
+                                My.Settings.Save()
+                            End If
+                        Else
                         'Berechne Rankings
                         Dim ranks As New List(Of (Integer, Integer)) '(Spieler ID, Score)
                         For i As Integer = 0 To PlCount - 1
