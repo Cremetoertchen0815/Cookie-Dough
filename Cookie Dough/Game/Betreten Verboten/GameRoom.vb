@@ -1911,15 +1911,9 @@ Namespace Game.BetretenVerboten
                                                  Exit Do
                                          End Select
                                      Else
-                                         If figur > -1 Or Nez.Random.Range(0, 3) = 1 Then
-                                             'If on god field there a 2/3 chance of getting spared, if on sacrifice theres a 100% chance
-                                             PostChat("You got spared.", Color.White)
-                                             SendMessage("You got spared.")
-                                         Else
-                                             'Swap places with figure
-                                             PostChat("You swap place with another figure!", Color.White)
-                                             SendMessage("You swap place with another figure!")
-                                         End If
+                                         'If on god field there a 2/3 chance of getting spared, if on sacrifice theres a 100% chance
+                                         PostChat("You got spared.", Color.White)
+                                         SendMessage("You got spared.")
                                          Exit Do
                                      End If
                                  Loop
