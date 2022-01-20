@@ -6,7 +6,6 @@ CC:
 -Implement key in highscores to immediately start new round
 
 BV:
--Implement "2 Runden Aussetzen" as additional negative effect
 -Implement showing team members for teams
 -Fix the darn spamming space bug Johannes is always abusing
 -Implement smooth transition between player header for slave

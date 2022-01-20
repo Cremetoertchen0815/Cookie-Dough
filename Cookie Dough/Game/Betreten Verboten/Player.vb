@@ -52,6 +52,12 @@ Namespace Game.BetretenVerboten
         Public Property AdditionalPoints As Integer = 0
 
         ''' <summary>
+        ''' Gibt an, ob der Spieler die nächste Runde aussetzen muss
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MissingTurn As Boolean = False
+
+        ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server
         ''' </summary>
         <JsonIgnore>

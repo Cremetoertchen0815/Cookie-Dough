@@ -1120,8 +1120,8 @@ Namespace Game.BetretenVerboten
             SendSync()
             SendNetworkMessageToAll("w")
         End Sub
-        Private Sub SendGameActive()
-            SendNetworkMessageToAll("x")
+        Private Sub SendGameActive(Optional inactive As Boolean = True)
+            SendNetworkMessageToAll("x" & CInt(inactive).ToString)
         End Sub
 
         Private Sub SendSync()
@@ -1815,109 +1815,115 @@ Namespace Game.BetretenVerboten
             Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
 
-                                 Do
-                                     Dim RNG = Nez.Random.NextFloat
-                                     If RNG <= pogfactor Then 'Positive effect
-                                         Select Case Nez.Random.Range(0, 5)
-                                             Case 0
-                                                 Try
-                                                     'Boost random figure
-                                                     Dim fig = Nez.Random.Range(0, FigCount)
-                                                     Dim boost = Nez.Random.Range(1, PlCount * 5)
-                                                     Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
-                                                     If futurefield < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
-                                                         Dim txt = If(FigCount <= 1, "You're lucky! Your figure is being boosted!", "You're lucky! A random figure of yours is being boosted!")
-                                                         PostChat(txt, Color.White)
-                                                         SendMessage(txt)
-                                                         plsdont = True
-                                                         FigurFaderZiel = (pl, fig)
-                                                         StartMoverSub(futurefield)
-                                                         SendFigureTransition(pl, fig, futurefield)
-                                                         Exit Do
-                                                     End If
-                                                 Catch ex As Exception
+                                 'Do
+                                 '    Dim RNG = Nez.Random.NextFloat
+                                 '    If RNG <= pogfactor Then 'Positive effect
+                                 '        Select Case Nez.Random.Range(0, 5)
+                                 '            Case 0
+                                 '                Try
+                                 '                    'Boost random figure
+                                 '                    Dim fig = Nez.Random.Range(0, FigCount)
+                                 '                    Dim boost = Nez.Random.Range(1, PlCount * 5)
+                                 '                    Dim futurefield = Spielers(pl).Spielfiguren(fig) + boost
+                                 '                    If futurefield < If(Map > 2, SpceCount, PlCount * SpceCount) AndAlso Not IsFutureFieldCoveredByOwnFigure(pl, futurefield, fig) Then
+                                 '                        Dim txt = If(FigCount <= 1, "You're lucky! Your figure is being boosted!", "You're lucky! A random figure of yours is being boosted!")
+                                 '                        PostChat(txt, Color.White)
+                                 '                        SendMessage(txt)
+                                 '                        plsdont = True
+                                 '                        FigurFaderZiel = (pl, fig)
+                                 '                        StartMoverSub(futurefield)
+                                 '                        SendFigureTransition(pl, fig, futurefield)
+                                 '                        Exit Do
+                                 '                    End If
+                                 '                Catch ex As Exception
 
-                                                 End Try
-                                             Case 1
-                                                 'Kick random enemy figure
-                                                 Dim pla = Nez.Random.Range(0, PlCount)
-                                                 Dim fig = Nez.Random.Range(0, FigCount)
-                                                 Dim dont = False
-                                                 Dim count = 0
-                                                 Do While Spielers(pla).Spielfiguren(fig) < 0 And Spielers(pla).Spielfiguren(fig) >= PlCount * SpceCount
-                                                     pla = Nez.Random.Range(0, PlCount)
-                                                     fig = Nez.Random.Range(0, FigCount)
-                                                     count += 1
-                                                     If count > 20 Then dont = True : Exit Do
-                                                 Loop
-                                                 If (Not TeamMode And pla <> pl) Or (TeamMode And (pla Mod 2) <> (pl Mod 2)) And Not dont Then
-                                                     PostChat("You're lucky! A random enemy figure got kicked!", Color.White)
-                                                     SendMessage("You're lucky! A random enemy figure got kicked!")
-                                                     KickedByGod(pla, fig)
-                                                     Exit Do
-                                                 End If
-                                             Case 2
-                                                 'Reset anger button
-                                                 Dim hasAnger = Spielers(pl).AngerCount > 0
-                                                 If hasAnger Then
-                                                     PostChat("You're lucky! You got another anger button!", Color.White)
-                                                     SendMessage("You're lucky! You got another anger button!")
-                                                 Else
-                                                     PostChat("You're lucky! You got back your anger button!", Color.White)
-                                                     SendMessage("You're lucky! You got back your anger button!")
-                                                 End If
-                                                 Spielers(pl).AngerCount += 1
-                                                 Exit Do
-                                             Case 3
-                                                 'Add points
-                                                 PostChat("You're lucky! You gained 75 points!", Color.White)
-                                                 SendMessage("You're lucky! You gained 75 points!")
-                                                 Spielers(pl).AdditionalPoints += 75
-                                                 Exit Do
-                                         End Select
-                                     ElseIf RNG > pogfactor + semipogfactor Then 'Negative effect
-                                         Select Case Nez.Random.Range(0, 3)
-                                             Case 0
-                                                 'Subtract points
-                                                 PostChat("Oh ooh! You lost 75 points!", Color.White)
-                                                 SendMessage("Oh ooh! You lost 75 points!")
-                                                 Spielers(pl).AdditionalPoints -= 75
-                                                 Exit Do
-                                             Case 1
-                                                 'Kick random figure
-                                                 Dim fig = Nez.Random.Range(0, FigCount)
-                                                 Dim pla = Nez.Random.Range(0, PlCount)
-                                                 Dim dont = False
-                                                 Dim count = 0
-                                                 Do While Spielers(pl).Spielfiguren(fig) < 0 And Spielers(pl).Spielfiguren(fig) >= PlCount * SpceCount
-                                                     fig = Nez.Random.Range(0, FigCount)
-                                                     pla = Nez.Random.Range(0, PlCount)
-                                                     count += 1
-                                                     If count > 20 Then dont = True : Exit Do
-                                                 Loop
-                                                 If Not TeamMode Or (TeamMode And pl Mod 2 = pla Mod 2) And Not dont Then
-                                                     Dim txt = If(FigCount <= 1, "Oh ooh! Your piece died!", "Oh ooh! One of your " & If(TeamMode, "team's ", "") & "pieces died!")
-                                                     PostChat(txt, Color.White)
-                                                     SendMessage(txt)
-                                                     KickedByGod(pl, fig)
-                                                     Exit Do
-                                                 End If
-                                             Case 2
-                                                 'Set anger button
-                                                 If Spielers(pl).AngerCount <= 0 Then Continue Do
-                                                 PostChat("Oh ooh! You've lost an anger button!", Color.White)
-                                                 SendMessage("Oh ooh! You've lost an anger button!")
-                                                 Spielers(pl).AngerCount -= 1
-                                                 Exit Do
-                                         End Select
-                                     Else
-                                         'If on god field there a 2/3 chance of getting spared, if on sacrifice theres a 100% chance
-                                         PostChat("You got spared.", Color.White)
-                                         SendMessage("You got spared.")
-                                         Exit Do
-                                     End If
-                                 Loop
-                                 SendSync()
+                                 '                End Try
+                                 '            Case 1
+                                 '                'Kick random enemy figure
+                                 '                Dim pla = Nez.Random.Range(0, PlCount)
+                                 '                Dim fig = Nez.Random.Range(0, FigCount)
+                                 '                Dim dont = False
+                                 '                Dim count = 0
+                                 '                Do While Spielers(pla).Spielfiguren(fig) < 0 And Spielers(pla).Spielfiguren(fig) >= PlCount * SpceCount
+                                 '                    pla = Nez.Random.Range(0, PlCount)
+                                 '                    fig = Nez.Random.Range(0, FigCount)
+                                 '                    count += 1
+                                 '                    If count > 20 Then dont = True : Exit Do
+                                 '                Loop
+                                 '                If (Not TeamMode And pla <> pl) Or (TeamMode And (pla Mod 2) <> (pl Mod 2)) And Not dont Then
+                                 '                    PostChat("You're lucky! A random enemy figure got kicked!", Color.White)
+                                 '                    SendMessage("You're lucky! A random enemy figure got kicked!")
+                                 '                    KickedByGod(pla, fig)
+                                 '                    Exit Do
+                                 '                End If
+                                 '            Case 2
+                                 '                'Reset anger button
+                                 '                Dim hasAnger = Spielers(pl).AngerCount > 0
+                                 '                If hasAnger Then
+                                 '                    PostChat("You're lucky! You got another anger button!", Color.White)
+                                 '                    SendMessage("You're lucky! You got another anger button!")
+                                 '                Else
+                                 '                    PostChat("You're lucky! You got back your anger button!", Color.White)
+                                 '                    SendMessage("You're lucky! You got back your anger button!")
+                                 '                End If
+                                 '                Spielers(pl).AngerCount += 1
+                                 '                Exit Do
+                                 '            Case 3
+                                 '                'Add points
+                                 '                PostChat("You're lucky! You gained 75 points!", Color.White)
+                                 '                SendMessage("You're lucky! You gained 75 points!")
+                                 '                Spielers(pl).AdditionalPoints += 75
+                                 '                Exit Do
+                                 '        End Select
+                                 '    ElseIf RNG > pogfactor + semipogfactor Then 'Negative effect
+                                 '        Select Case Nez.Random.Range(0, 3)
+                                 '            Case 0
+                                 '                'Subtract points
+                                 '                PostChat("Oh ooh! You lost 75 points!", Color.White)
+                                 '                SendMessage("Oh ooh! You lost 75 points!")
+                                 '                Spielers(pl).AdditionalPoints -= 75
+                                 '                Exit Do
+                                 '            Case 1
+                                 '                'Kick random figure
+                                 '                Dim fig = Nez.Random.Range(0, FigCount)
+                                 '                Dim pla = Nez.Random.Range(0, PlCount)
+                                 '                Dim dont = False
+                                 '                Dim count = 0
+                                 '                Do While Spielers(pl).Spielfiguren(fig) < 0 And Spielers(pl).Spielfiguren(fig) >= PlCount * SpceCount
+                                 '                    fig = Nez.Random.Range(0, FigCount)
+                                 '                    pla = Nez.Random.Range(0, PlCount)
+                                 '                    count += 1
+                                 '                    If count > 20 Then dont = True : Exit Do
+                                 '                Loop
+                                 '                If Not TeamMode Or (TeamMode And pl Mod 2 = pla Mod 2) And Not dont Then
+                                 '                    Dim txt = If(FigCount <= 1, "Oh ooh! Your piece died!", "Oh ooh! One of your " & If(TeamMode, "team's ", "") & "pieces died!")
+                                 '                    PostChat(txt, Color.White)
+                                 '                    SendMessage(txt)
+                                 '                    KickedByGod(pl, fig)
+                                 '                    Exit Do
+                                 '                End If
+                                 '            Case 2
+                                 '                'Set anger button
+                                 '                If Spielers(pl).AngerCount <= 0 Then Continue Do
+                                 '                PostChat("Oh ooh! You've lost an anger button!", Color.White)
+                                 '                SendMessage("Oh ooh! You've lost an anger button!")
+                                 '                Spielers(pl).AngerCount -= 1
+                                 '                Exit Do
+                                 '            Case 3
+                                 'Missing a turn
+                                 PostChat("Oh ooh! You've missing the next turn!", Color.White)
+                                 SendMessage("Oh ooh! You've missing the next turn!")
+                                 Spielers(pl).MissingTurn = True
+                                 '        Exit Do
+                                 '        End Select
+                                 '    Else
+                                 '        'If on god field there a 2/3 chance of getting spared, if on sacrifice theres a 100% chance
+                                 '        PostChat("You got spared.", Color.White)
+                                 '        SendMessage("You got spared.")
+                                 '        Exit Do
+                                 '    End If
+                                 'Loop
+                                 'SendSync()
 
                                  'Switch player
                                  If Not plsdont Then Core.Schedule(2, Sub() SwitchPlayer())
@@ -2053,6 +2059,7 @@ Namespace Game.BetretenVerboten
                     SendFlyingSaucerAdded(nr)
                 End If
             End If
+
             'Generate suicide field
             If SpielerIndex >= 0 AndAlso Spielers(SpielerIndex).SuicideField < 0 AndAlso GetFigureCountInHaus(SpielerIndex) > FigCount - 2 Then
                 Dim indx As Integer = -1
@@ -2062,19 +2069,21 @@ Namespace Game.BetretenVerboten
                 Spielers(SpielerIndex).SuicideField = indx
                 SendSync()
             End If
+
             'Increment Player Index
             SpielerIndex = (SpielerIndex + 1) Mod PlCount
             Do While Spielers(SpielerIndex).Typ = SpielerTyp.None
                 SpielerIndex = (SpielerIndex + 1) Mod PlCount
             Loop
+
             'Set game flags
             If Spielers(SpielerIndex).SacrificeCounter > 0 Then Spielers(SpielerIndex).SacrificeCounter -= 1 'Reduziere Sacrifice counter
             Status = If(Spielers(SpielerIndex).Typ <> SpielerTyp.Online, SpielStatus.Würfel, SpielStatus.Waitn)
             SendNewPlayerActive(SpielerIndex) 'Transmit to slaves that new player is active
             If Spielers(SpielerIndex).Typ = SpielerTyp.Local Then UserIndex = SpielerIndex
-            HUDDiceBtn.Active = True
-            StopUpdating = False
-            SendGameActive()
+            StopUpdating = Spielers(SpielerIndex).MissingTurn 'Only enable the game when the next player isn't missing a turn
+            SendGameActive(StopUpdating) 'Transmit game status to online players
+            HUDDiceBtn.Active = Not StopUpdating
             DreifachWürfeln = CanRollThrice(SpielerIndex) 'Falls noch alle Figuren un der Homebase sind
             WürfelTimer = 0
             WürfelAktuelleZahl = 0
@@ -2082,9 +2091,18 @@ Namespace Game.BetretenVerboten
             For i As Integer = 0 To WürfelWerte.Length - 1
                 WürfelWerte(i) = 0
             Next
+
             'Set HUD flags
             ResetHUD()
-            HUDInstructions.Text = "Roll the Dice!"
+
+            'Check for auto skipping when player is missing a turn
+            If Spielers(SpielerIndex).MissingTurn Then Core.Schedule(2.0F, Sub()
+                                                                               Spielers(SpielerIndex).MissingTurn = False
+                                                                               SwitchPlayer()
+                                                                           End Sub)
+
+            HUDInstructions.Text = If(StopUpdating, "You're being skipped!", "Roll the Dice!")
+
             'Reset camera if not already moving
             FigurFaderCamera = New Transition(Of Keyframe3D)(New TransitionTypes.TransitionType_EaseInEaseOut(CamSpeed), GetCamPos, StdCam, Nothing) : Automator.Add(FigurFaderCamera)
         End Sub

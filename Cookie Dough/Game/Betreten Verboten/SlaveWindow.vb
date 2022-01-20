@@ -718,7 +718,7 @@ Namespace Game.BetretenVerboten
                         Renderer.AdditionalZPos = New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(5000), 0, 1234, Nothing)
                         Automator.Add(Renderer.AdditionalZPos)
                     Case "x"c 'Continue with game
-                        StopUpdating = False
+                        StopUpdating = CInt(element.Substring(1))
                     Case "y"c 'Synchronisiere Daten
                         Dim str As String = element.Substring(1)
                         Dim sp As SyncMessage = Newtonsoft.Json.JsonConvert.DeserializeObject(Of SyncMessage)(str)
@@ -751,7 +751,7 @@ Namespace Game.BetretenVerboten
                                                                          Try
                                                                              'Receive image
                                                                              If IdentSound = IdentType.Custom Then
-                                                                                 File.WriteAllBytes("Cache/client/" & Spielers(source).Name & "_pp.png", Compress.Decompress(Convert.FromBase64String(dat)))
+                                                                                 File.WriteAllBytes("Cache/client/" & Spielers(source).Name & "_pp.png", Decompress(Convert.FromBase64String(dat)))
                                                                                  Spielers(source).Thumbnail = Texture2D.FromFile(Dev, "Cache/client/" & Spielers(source).Name & "_pp.png")
                                                                              End If
                                                                          Catch ex As Exception
