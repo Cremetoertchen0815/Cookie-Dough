@@ -691,16 +691,17 @@ Namespace Menu.MainMenu
                         'Draw heading
                         batcher.DrawString(TitleFont, "User", New Vector2(1920.0F / 2 - TitleFont.MeasureString("User").X / 2, 50), FgColor)
 
-                        batcher.DrawLine(New Vector2(1920 / 2, 230), New Vector2(1920 / 2, 790), Color.Cyan, 4)
-                        batcher.DrawHollowRect(New Rectangle(450, 230, 1920 - 2 * 450, 560), Color.Red, 3)
+                        batcher.DrawLine(New Vector2(1920 / 2, 230), New Vector2(1920 / 2, 870), Color.Cyan, 4)
+                        batcher.DrawHollowRect(New Rectangle(450, 230, 1920 - 2 * 450, 640), New Color(0, 255, 100), 3)
 
                         DrawUserMenuTableString("Name", My.Settings.Username, 0, batcher)
                         DrawUserMenuTableString("MOTD", If(My.Settings.MOTD.Length > 15, My.Settings.MOTD.Substring(0, 13) & "...", My.Settings.MOTD), 1, batcher)
                         DrawUserMenuTableString("Profile Picture", If(My.Settings.Thumbnail, "Custom", "Disabled"), 2, batcher)
                         DrawUserMenuTableString("Spawn Sound", CType(My.Settings.SoundA, IdentType).ToString, 3, batcher)
                         DrawUserMenuTableString("Kick Sound", CType(My.Settings.SoundB, IdentType).ToString, 4, batcher)
-                        DrawUserMenuTableString("Games Played", My.Settings.GamesLost + My.Settings.GamesWon - 2, 5, batcher)
-                        DrawUserMenuTableString("K/D", Math.Round(My.Settings.GamesWon / My.Settings.GamesLost, 3), 6, batcher)
+                        DrawUserMenuTableString("Death Sound", CType(My.Settings.SoundB, IdentType).ToString, 5, batcher)
+                        DrawUserMenuTableString("Games Played", My.Settings.GamesLost + My.Settings.GamesWon - 2, 6, batcher)
+                        DrawUserMenuTableString("K/D", Math.Round(My.Settings.GamesWon / My.Settings.GamesLost, 3), 7, batcher)
 
                         'File dialogue boxes
                         If My.Settings.Thumbnail Then
@@ -777,7 +778,7 @@ Namespace Menu.MainMenu
                 batcher.DrawString(MediumFont, txtA, New Vector2(1920 / 2 - MediumFont.MeasureString(txtA).X - 80, 250 + i * 80), FgColor)
                 batcher.DrawString(MediumFont, txtB, New Vector2(1920 / 2 + 80, 250 + i * 80), If(red, Color.Red, FgColor))
                 If i = 0 Then Return
-                batcher.DrawLine(New Vector2(450, 230 + i * 80), New Vector2(1920 - 450, 230 + i * 80), Color.Yellow, 1)
+                batcher.DrawLine(New Vector2(450, 230 + i * 80), New Vector2(1920 - 450, 230 + i * 80), New Color(30, 0, 80), 2)
             End Sub
 
 
