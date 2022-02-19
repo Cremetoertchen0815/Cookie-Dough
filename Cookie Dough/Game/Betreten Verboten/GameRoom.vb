@@ -1807,7 +1807,7 @@ Namespace Game.BetretenVerboten
             SendMessage(Spielers(pl).Name & " offered one of his pieces to the gods...")
             If Not DontKickSacrifice Then KickedByGod(pl, figur) 'Kick sacrifice
             Dim progress = Spielers(pl).Spielfiguren(figur) / (PlCount * SpceCount)
-            pogfactor = progress * 0.55F + 0.15F 'Field 0: Chance of sth good: 20%;  Field max.: Chance of sth good: 50%
+            pogfactor = progress * 0.55F + 0.15F 'Field 0: Chance of sth good: 15%;  Field max.: Chance of sth good: 50%
             semipogfactor = 0.15F
             Core.Schedule(2, Sub() 'Wait a sec
                                  Dim plsdont As Boolean = False
