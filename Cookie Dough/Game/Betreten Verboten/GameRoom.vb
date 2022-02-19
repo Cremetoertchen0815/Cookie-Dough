@@ -1296,6 +1296,7 @@ Namespace Game.BetretenVerboten
         Private Sub KickedByGod(player As Integer, figur As Integer)
             Dim key = (player, figur)
             Spielers(player).CustomSound(2).Play() 'Play sound
+            SendGodKickSound(player)
             If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
             Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
                                                                                                                           Spielers(player).Spielfiguren(figur) = -1
