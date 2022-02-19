@@ -1,7 +1,6 @@
 ﻿-Test DT!
 -Convert menu to fully utilize vcontrolls
 -Replace durak with Ultra Pong
--Replace standard sounds
 
 CC:
 -Implement key in highscores to immediately start new round

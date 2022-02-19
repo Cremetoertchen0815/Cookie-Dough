@@ -831,8 +831,16 @@ Namespace Game.BetretenVerboten
                                                    HUDInstructions.Text = " "
                                                    'Launch start animation
                                                    Renderer.TriggerStartAnimation(TeamMode, Sub()
-                                                                                                SwitchPlayer()
-                                                                                                If StopWhenRealStart Then StopUpdating = True
+                                                                                                'Decide on starting player
+                                                                                                Dim rnd_pl = Nez.Random.Range(0, PlCount)
+                                                                                                PostChat(Spielers(rnd_pl).Name & " will start!", Color.White)
+                                                                                                SendMessage(Spielers(rnd_pl).Name & " will start!")
+
+                                                                                                Core.Schedule(1.5F, Sub()
+                                                                                                                        SpielerIndex = rnd_pl - 1
+                                                                                                                        SwitchPlayer()
+                                                                                                                        If StopWhenRealStart Then StopUpdating = True
+                                                                                                                    End Sub)
                                                                                             End Sub)
                                                    SendBeginGaem()
                                                End Sub)
