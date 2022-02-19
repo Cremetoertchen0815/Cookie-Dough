@@ -150,9 +150,9 @@ Namespace Game.BetretenVerboten
                                                      Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
                                                      If type = SpielerTyp.CPU Then
                                                          If i > 5 Then
-                                                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), GetLocalAudio(IdentType.TypeF)}
+                                                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), GetLocalAudio(IdentType.None)}
                                                          Else
-                                                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), GetLocalAudio(IdentType.TypeF)}
+                                                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), GetLocalAudio(IdentType.None)}
                                                          End If
                                                      End If
                                                  Next
