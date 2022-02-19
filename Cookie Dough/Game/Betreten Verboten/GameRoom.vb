@@ -236,7 +236,7 @@ Namespace Game.BetretenVerboten
             SelectFader = 0 : Tween("SelectFader", 1.0F, 0.4F).SetLoops(LoopType.PingPong, -1).Start()
 
             'Load sounds and MOTDs
-            Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
+            Dim sf As SoundEffect() = {GetLocalAudio(My.Settings.SoundA, 0), GetLocalAudio(My.Settings.SoundB, 1), GetLocalAudio(My.Settings.SoundC, 2)}
             Dim thumb = Texture2D.FromFile(Dev, "Cache/client/pp.png")
             For i As Integer = 0 To Spielers.Length - 1
                 Dim pl = Spielers(i)
@@ -248,9 +248,9 @@ Namespace Game.BetretenVerboten
                     Case SpielerTyp.CPU
                         Spielers(i).MOTD = CPU_MOTDs(i)
                         If i > 5 Then
-                            Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
+                            Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), GetLocalAudio(IdentType.TypeC)}
                         Else
-                            Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1")}
+                            Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), Content.LoadSoundEffect("prep/cpu_" & i & "_1")}
                         End If
                 End Select
             Next
@@ -1132,13 +1132,18 @@ Namespace Game.BetretenVerboten
                                                            If pl.Typ = SpielerTyp.Local Then
                                                                'Send Sound A
                                                                Dim txt As String = ""
-                                                               Dim snd As IdentType = GetPlayerAudio(i, False, txt)
+                                                               Dim snd As IdentType = GetPlayerAudio(i, 0, txt)
                                                                SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "0" & "_TATA_" & txt) 'Suffix "_TATA_" is to not print out in console
 
                                                                'Send Sound B
                                                                txt = ""
-                                                               snd = GetPlayerAudio(i, True, txt)
+                                                               snd = GetPlayerAudio(i, 1, txt)
                                                                SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "1" & "_TATA_" & txt)
+
+                                                               'Send Sound C
+                                                               txt = ""
+                                                               snd = GetPlayerAudio(i, 2, txt)
+                                                               SendNetworkMessageToAll("z" & i.ToString & CInt(snd).ToString & "2" & "_TATA_" & txt)
 
                                                                'Send Thumbnail
                                                                txt = ""
@@ -1150,18 +1155,22 @@ Namespace Game.BetretenVerboten
             dataSender.Start()
         End Sub
 
-        Private Function GetPlayerAudio(i As Integer, IsB As Boolean, ByRef txt As String) As IdentType
+        Private Function GetPlayerAudio(i As Integer, SoundNr As Integer, ByRef txt As String) As IdentType
             txt = ""
             Dim ret As IdentType
             Select Case Spielers(i).Typ
                 Case SpielerTyp.Local
-                    If IsB Then
-                        ret = My.Settings.SoundB
-                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundB.audio")))
-                    Else
-                        ret = My.Settings.SoundA
-                        If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
-                    End If
+                    Select Case SoundNr
+                        Case 0
+                            ret = My.Settings.SoundA
+                            If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundA.audio")))
+                        Case 1
+                            ret = My.Settings.SoundB
+                            If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundB.audio")))
+                        Case 2
+                            ret = My.Settings.SoundC
+                            If ret = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundC.audio")))
+                    End Select
             End Select
             Return ret
         End Function
@@ -1530,11 +1539,18 @@ Namespace Game.BetretenVerboten
             Next
             Return (-1, -1)
         End Function
-        Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
+        Private Function GetLocalAudio(ident As IdentType, Optional SoundNr As Integer = 0) As SoundEffect
             If ident <> IdentType.Custom Then
                 Return SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache/client/sound" & If(IsSoundB, "B", "A") & ".audio")
+                Select Case SoundNr
+                    Case 1
+                        Return SoundEffect.FromFile("Cache/client/soundB.audio")
+                    Case 2
+                        Return SoundEffect.FromFile("Cache/client/soundC.audio")
+                    Case Else
+                        Return SoundEffect.FromFile("Cache/client/soundA.audio")
+                End Select
             End If
         End Function
 

@@ -150,9 +150,9 @@ Namespace Game.BetretenVerboten
                                                      Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
                                                      If type = SpielerTyp.CPU Then
                                                          If i > 5 Then
-                                                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA)}
+                                                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), GetLocalAudio(IdentType.TypeF)}
                                                          Else
-                                                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1")}
+                                                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), GetLocalAudio(IdentType.TypeF)}
                                                          End If
                                                      End If
                                                  Next
@@ -186,7 +186,7 @@ Namespace Game.BetretenVerboten
             LocalClient.IsHost = False
             Chat = New List(Of (String, Color))
             MoveActive = False
-            If UserIndex > -1 Then Spielers(UserIndex).CustomSound = {GetLocalAudio(My.Settings.SoundA), GetLocalAudio(My.Settings.SoundB, True)}
+            If UserIndex > -1 Then Spielers(UserIndex).CustomSound = {GetLocalAudio(My.Settings.SoundA, 0), GetLocalAudio(My.Settings.SoundB, 1), GetLocalAudio(My.Settings.SoundB, 2)}
             If UserIndex > -1 Then Spielers(UserIndex).Thumbnail = If(My.Settings.Thumbnail, Texture2D.FromFile(Dev, "Cache/client/pp.png"), ReferencePixelTrans)
 
 
@@ -1035,11 +1035,18 @@ Namespace Game.BetretenVerboten
             Next
             Return (-1, -1)
         End Function
-        Private Function GetLocalAudio(ident As IdentType, Optional IsSoundB As Boolean = False) As SoundEffect
+        Private Function GetLocalAudio(ident As IdentType, Optional SoundNr As Integer = 0) As SoundEffect
             If ident <> IdentType.Custom Then
                 Return SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav")
             Else
-                Return SoundEffect.FromFile("Cache/client/sound" & If(IsSoundB, "B", "A") & ".audio")
+                Select Case SoundNr
+                    Case 1
+                        Return SoundEffect.FromFile("Cache/client/soundB.audio")
+                    Case 2
+                        Return SoundEffect.FromFile("Cache/client/soundC.audio")
+                    Case Else
+                        Return SoundEffect.FromFile("Cache/client/soundA.audio")
+                End Select
             End If
         End Function
 
