@@ -243,6 +243,18 @@ Partial Public NotInheritable Class Settings
             Me("colorB") = value
         End Set
     End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+    Public Property SoundC() As Integer
+        Get
+            Return CType(Me("SoundC"),Integer)
+        End Get
+        Set
+            Me("SoundC") = value
+        End Set
+    End Property
 End Class
 
 Namespace My

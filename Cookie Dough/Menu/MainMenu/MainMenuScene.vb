@@ -169,7 +169,7 @@ Namespace Menu.MainMenu
                         End If
 
                         Try
-                            PlayAudio(IdentType.Custom)
+                            PlayAudio(IdentType.Custom, 0)
                         Catch ex As Exception
                             MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
@@ -179,7 +179,7 @@ Namespace Menu.MainMenu
                         My.Settings.Save()
                         If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundA.audio") Then IO.File.Copy("Content/prep/plc.wav", "Cache/client/soundA.audio")
                         Try
-                            PlayAudio(My.Settings.SoundA)
+                            PlayAudio(My.Settings.SoundA, 0)
                         Catch ex As Exception
                             MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
@@ -213,7 +213,7 @@ Namespace Menu.MainMenu
                         End If
 
                         Try
-                            PlayAudio(IdentType.Custom, True)
+                            PlayAudio(IdentType.Custom, 1)
                         Catch ex As Exception
                             MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
@@ -223,7 +223,51 @@ Namespace Menu.MainMenu
                         My.Settings.Save()
                         If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundB.audio") Then IO.File.Copy("Content/prep/plc.wav", "Cache/client/soundB.audio")
                         Try
-                            PlayAudio(My.Settings.SoundB, True)
+                            PlayAudio(My.Settings.SoundB, 1)
+                        Catch ex As Exception
+                            MsgBoxer.EnqueueMsgbox("Invalid sound file!")
+                        End Try
+                    End If
+
+                    'Death Sound
+                    If New Rectangle(1350, 245 + 5 * 80, 100, 50).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released And My.Settings.SoundB = IdentType.Custom Then
+#If MONO Then
+                        If IO.File.Exists("death.wav") Then
+                            If New IO.FileInfo("death.wav").Length <= 5000000 Then
+                                IO.File.Copy("death.wav", "Cache/client/soundC.audio", True)
+                                MsgBoxer.EnqueueMsgbox("File implemented!")
+                                Try
+                                    PlayAudio(IdentType.Custom, True)
+                                Catch ex As Exception
+                                    MsgBoxer.EnqueueMsgbox("Invalid sound file!")
+                                End Try
+                            Else
+                                MsgBoxer.EnqueueMsgbox("File too big!")
+                            End If
+                        Else
+                            MsgBoxer.EnqueueMsgbox("Mono(specifically Mac OS) doesn't support file selection windows! Instead, copy the desired wave file in the root directory, name it ""kick.wav"" and press this button again.")
+                        End If
+#Else
+                        Dim ofd As New Windows.Forms.OpenFileDialog() With {.Filter = "Wavefile|*.wav", .Title = "Select sound effect"}
+                        Dim res = ofd.ShowDialog
+                        If res = Windows.Forms.DialogResult.OK AndAlso New IO.FileInfo(ofd.FileName).Length <= 5000000 Then
+                            IO.File.Copy(ofd.FileName, "Cache/client/soundC.audio", True)
+                        ElseIf res = Windows.Forms.DialogResult.OK Then
+                            MsgBoxer.EnqueueMsgbox("File too big!")
+                        End If
+
+                        Try
+                            PlayAudio(IdentType.Custom, 2)
+                        Catch ex As Exception
+                            MsgBoxer.EnqueueMsgbox("Invalid sound file!")
+                        End Try
+#End If
+                    ElseIf New Rectangle(960, 230 + 5 * 80, 510, 80).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released Then
+                        My.Settings.SoundC = (My.Settings.SoundC + 1) Mod 7
+                        My.Settings.Save()
+                        If My.Settings.SoundC = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundC.audio") Then IO.File.Copy("Content/prep/plc.wav", "Cache/client/soundC.audio")
+                        Try
+                            PlayAudio(My.Settings.SoundC, 2)
                         Catch ex As Exception
                             MsgBoxer.EnqueueMsgbox("Invalid sound file!")
                         End Try
@@ -466,11 +510,18 @@ Namespace Menu.MainMenu
             End Set
         End Property
 
-        Private Sub PlayAudio(ident As IdentType, Optional SoundB As Boolean = False)
+        Private Sub PlayAudio(ident As IdentType, Optional Sound As Integer = 0)
             If ident <> IdentType.Custom Then
                 SoundEffect.FromFile("Content/prep/audio_" & CInt(ident).ToString & ".wav").Play()
             Else
-                SoundEffect.FromFile("Cache/client/sound" & If(SoundB, "B", "A") & ".audio").Play()
+                Select Case Sound
+                    Case 0
+                        SoundEffect.FromFile("Cache/client/soundA.audio").Play()
+                    Case 1
+                        SoundEffect.FromFile("Cache/client/soundB.audio").Play()
+                    Case 2
+                        SoundEffect.FromFile("Cache/client/soundC.audio").Play()
+                End Select
             End If
         End Sub
 
@@ -699,7 +750,7 @@ Namespace Menu.MainMenu
                         DrawUserMenuTableString("Profile Picture", If(My.Settings.Thumbnail, "Custom", "Disabled"), 2, batcher)
                         DrawUserMenuTableString("Spawn Sound", CType(My.Settings.SoundA, IdentType).ToString, 3, batcher)
                         DrawUserMenuTableString("Kick Sound", CType(My.Settings.SoundB, IdentType).ToString, 4, batcher)
-                        DrawUserMenuTableString("Death Sound", CType(My.Settings.SoundB, IdentType).ToString, 5, batcher)
+                        DrawUserMenuTableString("Death Sound", CType(My.Settings.SoundC, IdentType).ToString, 5, batcher)
                         DrawUserMenuTableString("Games Played", My.Settings.GamesLost + My.Settings.GamesWon - 2, 6, batcher)
                         DrawUserMenuTableString("K/D", Math.Round(My.Settings.GamesWon / My.Settings.GamesLost, 3), 7, batcher)
 
@@ -715,6 +766,10 @@ Namespace Menu.MainMenu
                         If My.Settings.SoundB = IdentType.Custom Then
                             batcher.DrawHollowRect(New Rectangle(1350, 245 + 4 * 80, 100, 50), FgColor)
                             batcher.DrawString(MediumFont, "...", New Vector2(1360, 240 + 4 * 80), FgColor)
+                        End If
+                        If My.Settings.SoundC = IdentType.Custom Then
+                            batcher.DrawHollowRect(New Rectangle(1350, 245 + 5 * 80, 100, 50), FgColor)
+                            batcher.DrawString(MediumFont, "...", New Vector2(1360, 240 + 5 * 80), FgColor)
                         End If
 
                         'Draw back button
