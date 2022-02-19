@@ -107,7 +107,7 @@ Namespace Game.BetretenVerboten
         Friend FigurFaderEnd As Single 'Gibt an auf welchem Feld der Zug enden soll
         Friend FigurFaderXY As Transition(Of Vector2) 'Bewegt die zu animierende Figur auf der X- und Y-Achse
         Friend FigurFaderZ As Transition(Of Integer)  'Bewegt die zu animierende Figur auf der Z-Achse
-        Friend FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single)) 'Gibt die Skalierung für einzelne Figuren an Key: (Spieler ID, Figur ID) Value: Transition(Z)
+        Friend Property FigurFaderScales As New Dictionary(Of (Integer, Integer), Transition(Of Single)) 'Gibt die Skalierung für einzelne Figuren an Key: (Spieler ID, Figur ID) Value: Transition(Z)
         Friend FigurFaderCamera As New Transition(Of Keyframe3D) With {.Value = New Keyframe3D(79, -80, 560, 4.24, 1.39, 0.17, False)} 'Bewegt die Kamera 
         Friend CPUTimer As Single 'Timer-Flag um der CPU etwas "Überlegzeit" zu geben
         Friend PlayStompSound As Boolean 'Gibt an, ob der Stampf-Sound beim Landen(Kicken) gespielt werden soll
@@ -1275,6 +1275,7 @@ Namespace Game.BetretenVerboten
         End Function
         Private Sub KickedByGod(player As Integer, figur As Integer)
             Dim key = (player, figur)
+            Spielers(player).CustomSound(2).Play() 'Play sound
             If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
             Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
                                                                                                                           Spielers(player).Spielfiguren(figur) = -1
