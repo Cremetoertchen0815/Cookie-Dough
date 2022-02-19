@@ -582,6 +582,8 @@ Namespace Game.BetretenVerboten
                     Case "g"c 'Generate flying saucer field
                         Dim pos As Integer = element.Substring(1)
                         SaucerFields.Add(pos)
+                    Case "j"c 'Play death sound
+                        Spielers(CInt(element.Substring(1))).CustomSound(2).Play()
                     Case "k"c 'Kick player by god
                         Dim pl As Integer = element(1).ToString
                         Dim fig As Integer = element(2).ToString

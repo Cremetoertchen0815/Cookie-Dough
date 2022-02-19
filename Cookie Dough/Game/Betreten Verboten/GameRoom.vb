@@ -1082,6 +1082,9 @@ Namespace Game.BetretenVerboten
                 SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
             End If
         End Sub
+        Private Sub SendGodKickSound(player As Integer)
+            SendNetworkMessageToAll("j" & player.ToString)
+        End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
         End Sub
