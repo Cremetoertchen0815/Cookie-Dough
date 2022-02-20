@@ -824,6 +824,10 @@ Namespace Game.BetretenVerboten
                                                        LocalClient.WriteStream("z" & My.Settings.SoundB.ToString & "1" & "_TATA_" & txt)
 
                                                        txt = ""
+                                                       If My.Settings.SoundC = IdentType.Custom Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/soundC.audio")))
+                                                       LocalClient.WriteStream("z" & My.Settings.SoundC.ToString & "2" & "_TATA_" & txt)
+
+                                                       txt = ""
                                                        If My.Settings.Thumbnail Then txt = Convert.ToBase64String(Compress.Compress(IO.File.ReadAllBytes("Cache/client/pp.png")))
                                                        LocalClient.WriteStream("z" & If(My.Settings.Thumbnail, IdentType.Custom, 0).ToString & "9" & "_TATA_" & txt)
                                                    End Sub) With {.Priority = Threading.ThreadPriority.BelowNormal}
