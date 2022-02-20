@@ -269,7 +269,7 @@ Namespace Framework.Networking
                                 Dim team_members = JsonConvert.DeserializeObject(Of Dictionary(Of String, String()))(File.ReadAllText("Save\teams.dat"))
                                 For Each element In highscore
                                     Dim name_trimmed = element.Item1.Substring(5)
-                                    ret_data.Add((If(team_members.ContainsKey(name_trimmed), name_trimmed & "(" & String.Join(", ", team_members(name_trimmed).Select(convert_name)) & ")", name_trimmed), String.Empty, element.Item2))
+                                    ret_data.Add((If(team_members.ContainsKey(name_trimmed), name_trimmed & "(" & String.Join(", ", team_members(name_trimmed).Where(Function(x) registered.ContainsKey(x)).Select(Function(x) registered(x))) & ")", name_trimmed), String.Empty, element.Item2))
                                 Next
                             Else
                                 For Each element In highscore
