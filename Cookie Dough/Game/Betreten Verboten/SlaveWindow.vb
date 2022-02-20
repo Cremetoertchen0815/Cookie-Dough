@@ -150,9 +150,9 @@ Namespace Game.BetretenVerboten
                                                      Spielers(i) = New Player(If(type = SpielerTyp.None, type, SpielerTyp.Online)) With {.Name = If(i = UserIndex, My.Settings.Username, name)}
                                                      If type = SpielerTyp.CPU Then
                                                          If i > 5 Then
-                                                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), GetLocalAudio(IdentType.None)}
+                                                             Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), SFX(9)}
                                                          Else
-                                                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), GetLocalAudio(IdentType.None)}
+                                                             Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), SFX(9)}
                                                          End If
                                                      End If
                                                  Next
@@ -582,8 +582,6 @@ Namespace Game.BetretenVerboten
                     Case "g"c 'Generate flying saucer field
                         Dim pos As Integer = element.Substring(1)
                         SaucerFields.Add(pos)
-                    Case "j"c 'Play death sound
-                        Spielers(CInt(element.Substring(1))).CustomSound(2).Play()
                     Case "k"c 'Kick player by god
                         Dim pl As Integer = element(1).ToString
                         Dim fig As Integer = element(2).ToString
@@ -936,7 +934,7 @@ Namespace Game.BetretenVerboten
                             Core.Schedule(1, Sub() PostChat(Spielers(playerA).Name & " kicked " & Spielers(playerB).Name & "!", Color.White))
                             Spielers(playerA).AdditionalPoints += 25 * If(Mathf.IsEven(playerA) = Mathf.IsEven(playerB), -1, 1)
                         End If
-                        If Mathf.IsEven(playerA) = Mathf.IsEven(playerB) Then SFX(9).Play()
+                        If Mathf.IsEven(playerA) = Mathf.IsEven(playerB) Then Spielers(playerB).CustomSound(2).Play()
                         Return j
                     End If
                 Next
@@ -955,7 +953,7 @@ Namespace Game.BetretenVerboten
                                                                                                                       End Sub)
             Automator.Add(trans)
             FigurFaderScales.Add(key, trans)
-            SFX(9).Play()
+            Spielers(player).CustomSound(2).Play()
         End Sub
 
         Private Function GetNormalDiceSum() As Integer

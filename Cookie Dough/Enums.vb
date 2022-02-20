@@ -44,7 +44,7 @@ Public Enum IdentType
     TypeC
     TypeD
     TypeE
-    None
+    TypeF
     Custom
 End Enum
 

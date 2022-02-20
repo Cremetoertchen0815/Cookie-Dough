@@ -246,7 +246,7 @@ Partial Public NotInheritable Class Settings
     
     <Global.System.Configuration.UserScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+     Global.System.Configuration.DefaultSettingValueAttribute("5")>  _
     Public Property SoundC() As Integer
         Get
             Return CType(Me("SoundC"),Integer)

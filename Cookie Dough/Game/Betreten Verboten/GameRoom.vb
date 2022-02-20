@@ -248,9 +248,9 @@ Namespace Game.BetretenVerboten
                     Case SpielerTyp.CPU
                         Spielers(i).MOTD = CPU_MOTDs(i)
                         If i > 5 Then
-                            Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), GetLocalAudio(IdentType.TypeC)}
+                            Spielers(i).CustomSound = {GetLocalAudio(IdentType.TypeB), GetLocalAudio(IdentType.TypeA), SFX(9)}
                         Else
-                            Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), Content.LoadSoundEffect("prep/cpu_" & i & "_1")}
+                            Spielers(i).CustomSound = {Content.LoadSoundEffect("prep/cpu_" & i & "_0"), Content.LoadSoundEffect("prep/cpu_" & i & "_1"), SFX(9)}
                         End If
                 End Select
             Next
@@ -1090,9 +1090,6 @@ Namespace Game.BetretenVerboten
                 SendNetworkMessageToAll("h" & 0.ToString & CInt(Map).ToString & 0.ToString & Newtonsoft.Json.JsonConvert.SerializeObject(pls))
             End If
         End Sub
-        Private Sub SendGodKickSound(player As Integer)
-            SendNetworkMessageToAll("j" & player.ToString)
-        End Sub
         Private Sub SendKick(player As Integer, figur As Integer)
             SendNetworkMessageToAll("k" & player.ToString & figur.ToString)
         End Sub
@@ -1286,7 +1283,7 @@ Namespace Game.BetretenVerboten
                             Spielers(playerA).AdditionalPoints += 25 * If(kickingAlly, -1, 1)
                         End If
 
-                        If kickingAlly Then SFX(9).Play()
+                        If kickingAlly Then Spielers(playerB).CustomSound(2).Play() 'Play sound
                         Return j
                     End If
                 Next
@@ -1295,8 +1292,6 @@ Namespace Game.BetretenVerboten
         End Function
         Private Sub KickedByGod(player As Integer, figur As Integer)
             Dim key = (player, figur)
-            Spielers(player).CustomSound(2).Play() 'Play sound
-            SendGodKickSound(player)
             If FigurFaderScales.ContainsKey(key) Then FigurFaderScales.Remove(key)
             Dim trans As New Transition(Of Single)(New TransitionTypes.TransitionType_Acceleration(FigurSpeed), 1, 0, Sub()
                                                                                                                           Spielers(player).Spielfiguren(figur) = -1
@@ -1307,8 +1302,8 @@ Namespace Game.BetretenVerboten
                                                                                                                       End Sub)
             Automator.Add(trans)
             FigurFaderScales.Add(key, trans)
+            Spielers(player).CustomSound(2).Play() 'Play sound
             SendKick(player, figur)
-            SFX(9).Play()
         End Sub
 
         Private Function GetKickFigur(player As Integer, figur As Integer, Optional Increment As Integer = 0) As (Integer, Integer)
