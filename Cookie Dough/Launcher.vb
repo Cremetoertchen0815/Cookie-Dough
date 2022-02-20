@@ -13,7 +13,7 @@ Public Module Launcher
     ''' <summary>
     ''' Determines the version of the server/client(to check for compatibility)
     ''' </summary>
-    Friend Property VersionString As String = "Cookie Dough V0.40"
+    Friend Property VersionString As String = "Cookie Dough V0.42"
     ''' <summary>
     ''' Old Beacon Tweening system for backwards compatibility with BV
     ''' </summary>
