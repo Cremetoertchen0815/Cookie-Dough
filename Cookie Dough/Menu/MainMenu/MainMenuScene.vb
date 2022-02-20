@@ -784,10 +784,10 @@ Namespace Menu.MainMenu
                         batcher.DrawString(MediumFont, "Map: " & GetMapName(CounterScene.LdbSelectedGame, CounterScene.LdbSelectedMap), New Vector2(30, 300), FgColor)
                         If CounterScene.LdbSelectedGame = GameType.BetretenVerboten Then batcher.DrawString(MediumFont, "Team: " & If(CounterScene.LdbSelectedTeam, "Yes", "No"), New Vector2(30, 400), FgColor)
 
-                        Dim margin_left As Integer = 470
+                        Dim margin_left As Integer = 450
                         Dim margin_top As Integer = 200
                         Dim cell_height As Integer = 70
-                        Dim cell_width_A As Integer = 800
+                        Dim cell_width_A As Integer = 1100
                         Dim cell_width_B As Integer = 300
                         Dim cell_width_index As Integer = 80
                         'Draw table
@@ -801,14 +801,14 @@ Namespace Menu.MainMenu
 
                         'Draw table headers
                         batcher.DrawString(MediumFont, "Name", New Vector2(800, 200), FgColor)
-                        batcher.DrawString(MediumFont, "Score", New Vector2(1350, 200), FgColor)
+                        batcher.DrawString(MediumFont, "Score", New Vector2(1560, 200), FgColor)
                         For i As Integer = 1 To 10
                             batcher.DrawString(MediumFont, i.ToString() & ".", New Vector2(margin_left + 5, margin_top + cell_height * i), FgColor)
                         Next
 
                         'Draw contents
                         For i As Integer = 0 To CounterScene.LdbData.Count - 1
-                            batcher.DrawString(MediumFont, CounterScene.LdbData(i).Item1, New Vector2(margin_left + cell_width_index + 10, 200 + (i + 1) * cell_height), FgColor)
+                            batcher.DrawString(MediumFont, CounterScene.LdbData(i).Item1.Substring(0, Math.Min(37, CounterScene.LdbData(i).Item1.Length)), New Vector2(margin_left + cell_width_index + 10, 200 + (i + 1) * cell_height), FgColor)
                             batcher.DrawString(MediumFont, CounterScene.LdbData(i).Item3.ToString, New Vector2(margin_left + cell_width_A + 10, 200 + (i + 1) * cell_height), FgColor)
                         Next
 
