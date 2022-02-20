@@ -92,6 +92,10 @@ Namespace Game.CarCrash
                                                                   Spielers(0).Score = x
                                                                   Status = SpielStatus.SpielZuEnde
                                                               End Sub
+            Global.Carcrash.Shared.ResetGame = Sub()
+                                                   Status = SpielStatus.SpielAktiv
+                                                   StopUpdating = False
+                                               End Sub
 
             Framework.Networking.Client.OutputDelegate = Sub(x) PostChat(x, Color.DarkGray)
         End Sub
