@@ -259,14 +259,23 @@ Namespace Framework.Networking
                             Dim TeamMode As Boolean = (CInt(ReadString(con)) = 1)
                             Dim path As String = "Save/highsc" & game.ToString & map.ToString & If(TeamMode, "_team.dat", ".dat")
                             Dim highscore As List(Of (String, Double))
+                            Dim convert_name = Function(x As String) If(registered.ContainsKey(x), registered(x), x)
                             'Load and update highscores
                             If File.Exists(path) Then highscore = JsonConvert.DeserializeObject(Of List(Of (String, Double)))(File.ReadAllText(path)) Else highscore = New List(Of (String, Double))
 
 
                             Dim ret_data = New List(Of (String, String, Double))()
-                            For Each element In highscore
-                                ret_data.Add((If(registered.ContainsKey(element.Item1), registered(element.Item1), element.Item1), element.Item1, element.Item2))
-                            Next
+                            If TeamMode Then
+                                Dim team_members = JsonConvert.DeserializeObject(Of Dictionary(Of String, String()))(File.ReadAllText("Save\teams.dat"))
+                                For Each element In highscore
+                                    Dim name_trimmed = element.Item1.Substring(5)
+                                    ret_data.Add((If(team_members.ContainsKey(name_trimmed), name_trimmed & "(" & String.Join(", ", team_members(name_trimmed).Select(convert_name)) & ")", name_trimmed), String.Empty, element.Item2))
+                                Next
+                            Else
+                                For Each element In highscore
+                                    ret_data.Add((convert_name(element.Item1), element.Item1, element.Item2))
+                                Next
+                            End If
                             WriteString(con, JsonConvert.SerializeObject(ret_data))
 
                             'Return data
