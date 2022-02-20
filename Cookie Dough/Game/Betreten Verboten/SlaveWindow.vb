@@ -41,6 +41,7 @@ Namespace Game.BetretenVerboten
         Private Fahrzahl As Integer 'Anzahl der Felder die gefahren werden kann
         Private DontKickSacrifice As Boolean 'Gibt an, ob die zu opfernde Figur nicht gekickt werden soll
         Private DreifachWürfeln As Boolean 'Gibt an(am Anfang des Spiels), dass ma drei Versuche hat um eine 6 zu bekommen
+        Private CanGoAFK As Boolean
         Private lastmstate As MouseState
         Private lastkstate As KeyboardState
         Private MoveActive As Boolean = False
@@ -343,6 +344,7 @@ Namespace Game.BetretenVerboten
                         'Manuelles Würfeln für lokalen Spieler
                         'Prüft und speichert, ob der Würfel-Knopf gedrückt wurde
                         If (New Rectangle(1570, 700, 300, 300).Contains(mpos) And mstate.LeftButton = ButtonState.Pressed And lastmstate.LeftButton = ButtonState.Released) Or (kstate.IsKeyDown(Keys.Space) And lastkstate.IsKeyUp(Keys.Space)) Then
+                            CanGoAFK = False
                             WürfelTriggered = True
                             WürfelTimer = 0
                             WürfelAnimationTimer = -1
@@ -596,6 +598,7 @@ Namespace Game.BetretenVerboten
                         HUDBtnD.Active = SpielerIndex = UserIndex And Not Spielers(UserIndex).IsAFK And Map <> GaemMap.Snakes
                         HUDScores.Active = UserIndex <> SpielerIndex
                         HUDNameBtn.Active = True
+                        CanGoAFK = True
                         If UserIndex < 0 Then Continue For
                         If who = UserIndex Then
                             PrepareMove()
@@ -802,7 +805,7 @@ Namespace Game.BetretenVerboten
             LocalClient.WriteStream("e")
         End Sub
         Private Sub SendAfkSignal() Handles HUDAfkBtn.Clicked
-            LocalClient.WriteStream("i")
+            If CanGoAFK Then LocalClient.WriteStream("i")
         End Sub
         Private Sub SendGod(figur As Integer)
             LocalClient.WriteStream("j" & figur.ToString)
@@ -1227,6 +1230,7 @@ Namespace Game.BetretenVerboten
                 If button <> 0 Then Throw New Exception
                 Dim aim As Integer = CInt(text)
                 If Not (aim < 13 And aim > 0) Then MsgBoxer.EnqueueInputbox("Screw you! I said 1 <= x <= 12 FIELDS!", AddressOf AngerButtonFinal, "") : Return
+                CanGoAFK = False
                 WürfelWerte(0) = If(aim > 6, 6, aim)
                 WürfelWerte(1) = If(aim > 6, aim - 6, 0)
                 CalcMoves()
@@ -1242,6 +1246,7 @@ Namespace Game.BetretenVerboten
                 MsgBoxer.EnqueueMsgbox("You can sacrifice one of your players to the holy BV gods. The further your player is, the higher is the chance to recieve a positive effect.", Nothing, {"OK"})
                 MsgBoxer.EnqueueMsgbox("You really want to sacrifice one of your precious players?", Sub(x)
                                                                                                          If x = 0 Then
+                                                                                                             CanGoAFK = False
                                                                                                              Status = SpielStatus.WähleOpfer
                                                                                                              DontKickSacrifice = Spielers(UserIndex).SacrificeCounter < 0
                                                                                                              Spielers(UserIndex).SacrificeCounter = SacrificeWait
