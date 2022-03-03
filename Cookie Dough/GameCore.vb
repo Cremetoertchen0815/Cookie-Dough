@@ -38,6 +38,7 @@ Public Class GameCore
         ExitOnEscapeKeypress = False
         GraphicsDevice.PresentationParameters.MultiSampleCount = 4
 
+
         'Upgrade settings if necessairy
         If My.Settings.MissingNo Then
             My.Settings.Upgrade()
