@@ -3,7 +3,7 @@
 Namespace Game.BetretenVerboten
     Friend Module Maps
         Friend Function RollDice() As Integer
-            Return Nez.Random.Range(1, 7)
+            Return 7 - Nez.Random.Range(1, 7)
         End Function
 
         Public Function GetMapName(map As GaemMap) As String
