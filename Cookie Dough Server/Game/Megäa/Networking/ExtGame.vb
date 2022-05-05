@@ -1,7 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
-
-Namespace Game.Megäa.Networking
+﻿Namespace Game.Megäa.Networking
     Public Class ExtGame
         Implements IGame
 

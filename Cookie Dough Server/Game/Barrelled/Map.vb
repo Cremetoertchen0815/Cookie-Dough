@@ -1,6 +1,4 @@
-﻿Imports Microsoft.Xna.Framework
-
-Namespace Game.Barrelled
+﻿Namespace Game.Barrelled
     Public Module MapHelper
         Public Function GetMapSize(mp As Map) As Integer
             Return 2

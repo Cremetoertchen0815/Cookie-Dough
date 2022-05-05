@@ -1,6 +1,4 @@
-﻿Imports System.Collections.Generic
-
-Namespace Game.Common
+﻿Namespace Game.Common
     Public Enum CardType
         Ace = 1
         Two = 2

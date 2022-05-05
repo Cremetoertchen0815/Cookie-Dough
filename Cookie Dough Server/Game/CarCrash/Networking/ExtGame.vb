@@ -1,7 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
-
-Namespace Game.CarCrash.Networking
+﻿Namespace Game.CarCrash.Networking
     Public Class ExtGame
         Implements IGame
 
@@ -61,11 +58,11 @@ Namespace Game.CarCrash.Networking
                 Select Case types(i)
                     Case SpielerTyp.Local
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New Player(types(i)) With {.name = name, .Bereit = True, .Connection = con, .ID = con.Identifier}
+                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .Connection = con, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.CPU
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New Player(types(i)) With {.name = name, .Bereit = True, .ID = con.Identifier}
+                        nugaem.Players(i) = New Player(types(i)) With {.Name = name, .Bereit = True, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.None
                         nugaem.Players(i) = New Player(types(i)) With {.Bereit = True}

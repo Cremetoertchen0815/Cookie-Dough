@@ -1,5 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough_Server.Game.Barrelled.Players
+﻿Imports Cookie_Dough_Server.Game.Barrelled.Players
 
 Namespace Game.Barrelled.Networking
     Public Class ExtGame

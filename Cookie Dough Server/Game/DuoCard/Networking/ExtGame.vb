@@ -1,7 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
-Imports Cookie_Dough.Game.Common
-Imports Cookie_Dough_Server.Game.Common
+﻿Imports Cookie_Dough_Server.Game.Common
 
 Namespace Game.DuoCard.Networking
     Public Class ExtGame

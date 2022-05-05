@@ -1,8 +1,6 @@
-﻿Imports Microsoft.Xna.Framework
-
-Namespace Game.BetretenVerboten
+﻿Namespace Game.BetretenVerboten
     Friend Module Maps
-        Dim RNG As New Random
+        Private RNG As New Random
         Friend Function RollDice() As Integer
             Return 7 - RNG.Next(1, 7)
         End Function

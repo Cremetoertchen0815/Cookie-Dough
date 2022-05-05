@@ -1,7 +1,4 @@
-﻿Imports Cookie_Dough.Framework.Networking
-Imports Microsoft.Xna.Framework.Audio
-Imports Microsoft.Xna.Framework.Graphics
-Imports Newtonsoft.Json
+﻿Imports Newtonsoft.Json
 
 Namespace Game.DropTrop
     ''' <summary>

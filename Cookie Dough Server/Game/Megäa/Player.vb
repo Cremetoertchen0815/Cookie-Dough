@@ -1,10 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
-Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Audio
-Imports Microsoft.Xna.Framework.Graphics
-
-Namespace Game.Megäa
+﻿Namespace Game.Megäa
     Public Class Player
         Implements IPlayer
 
