@@ -69,20 +69,6 @@ Namespace Game.Megäa.Networking
             Return Players.Count
         End Function
 
-
-        '-----CLIENT-----
-
-        'Create new game and transmit to server(in this case, no extra data in being sent, only the default header)
-        Public Shared Function CreateGame(client As Client, name As String) As Boolean
-            'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
-            If client.blastmode Or Not client.Connected Then Return False
-
-            client.WriteString("create")
-            client.WriteString(name)
-            client.WriteString(GameType.Megäa.ToString)
-            Return client.CreateGameFinal()
-        End Function
-
         Public Function GetLobbySize() As Integer Implements IGame.GetLobbySize
             Return 10
         End Function

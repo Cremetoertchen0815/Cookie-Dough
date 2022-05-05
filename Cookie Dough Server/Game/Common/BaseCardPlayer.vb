@@ -42,18 +42,6 @@ Namespace Game.Common
 
 
         Public Property HandDeck As New List(Of Card)
-
-        ''' <summary>
-        ''' Der Sound, der abgespielt wird, wenn man gekickt wird
-        ''' </summary>
-        <JsonIgnore>
-        Public Property CustomSound As SoundEffect() = {SFX(3), SFX(4)} Implements IPlayer.CustomSound
-
-        ''' <summary>
-        ''' Das Thumbnail des Spielers
-        ''' </summary>
-        <JsonIgnore>
-        Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
         Public Property ID As String Implements IPlayer.ID
         Public Property MOTD As String Implements IPlayer.MOTD
 

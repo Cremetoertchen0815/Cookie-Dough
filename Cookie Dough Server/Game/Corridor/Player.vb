@@ -1,9 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
-Imports Microsoft.Xna.Framework
-Imports Microsoft.Xna.Framework.Audio
-Imports Microsoft.Xna.Framework.Graphics
-Imports Newtonsoft.Json
+﻿Imports Newtonsoft.Json
 
 Namespace Game.Corridor
     ''' <summary>
@@ -33,8 +28,6 @@ Namespace Game.Corridor
 
         Public Property IsAFK As Boolean = False
 
-        Public Property Figuren As New List(Of Spielfigur)
-
         ''' <summary>
         ''' Repräsentiert die IO-Verbindung des Spielers zum Server
         ''' </summary>
@@ -47,18 +40,6 @@ Namespace Game.Corridor
         Public Property Bereit As Boolean = True Implements IPlayer.Bereit
 
         ''' <summary>
-        ''' Der Sound, der abgespielt wird, wenn man gekickt wird
-        ''' </summary>
-        <JsonIgnore>
-        Public Property CustomSound As SoundEffect() = {SFX(3), SFX(4)} Implements IPlayer.CustomSound
-
-        ''' <summary>
-        ''' Das Thumbnail des Spielers
-        ''' </summary>
-        <JsonIgnore>
-        Public Property Thumbnail As Texture2D = ReferencePixelTrans Implements IPlayer.Thumbnail
-
-        ''' <summary>
         ''' Der Identifikationsstring des Spielers
         ''' </summary>
         Public Property ID As String Implements IPlayer.ID
@@ -66,7 +47,7 @@ Namespace Game.Corridor
         ''' <summary>
         ''' Ein ganz krasser Spruch
         ''' </summary>
-        Public Property MOTD As String = My.Settings.MOTD Implements IPlayer.MOTD
+        Public Property MOTD As String Implements IPlayer.MOTD
 
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ

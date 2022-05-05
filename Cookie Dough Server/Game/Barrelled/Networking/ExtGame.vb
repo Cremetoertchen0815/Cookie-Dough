@@ -35,7 +35,7 @@ Namespace Game.Barrelled.Networking
         End Sub
 
         Public Sub ServerSendJoinNujoinData(index As Integer, con As Connection, writer As Action(Of Connection, String)) Implements IGame.ServerSendJoinNujoinData
-            If index > -1 Then Players(index) = New BaitNSwitchPlayer(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick, .ID = con.Identifier}
+            If index > -1 Then Players(index) = New CommonPlayer(SpielerTyp.Online) With {.Bereit = False, .Connection = con, .Name = con.Nick, .ID = con.Identifier}
             For i As Integer = 0 To Players.Length - 1
                 If Players(i) IsNot Nothing Then
                     writer(con, 1.ToString)
@@ -68,14 +68,14 @@ Namespace Game.Barrelled.Networking
                 Select Case types(i)
                     Case SpielerTyp.Local
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New BaitNSwitchPlayer(types(i)) With {.Name = name, .Bereit = True, .Connection = con, .ID = con.Identifier}
+                        nugaem.Players(i) = New CommonPlayer(types(i)) With {.Name = name, .Bereit = True, .Connection = con, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.CPU
                         Dim name As String = ReadString(con)
-                        nugaem.Players(i) = New BaitNSwitchPlayer(types(i)) With {.Name = name, .Bereit = True, .ID = con.Identifier}
+                        nugaem.Players(i) = New CommonPlayer(types(i)) With {.Name = name, .Bereit = True, .ID = con.Identifier}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.None
-                        nugaem.Players(i) = New BaitNSwitchPlayer(types(i)) With {.Bereit = True}
+                        nugaem.Players(i) = New CommonPlayer(types(i)) With {.Bereit = True}
                         nugaem.WhiteList(i) = con.Identifier
                     Case SpielerTyp.Online
                         nugaem.WhiteList(i) = ReadString(con)

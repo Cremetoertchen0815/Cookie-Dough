@@ -1,7 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports Cookie_Dough.Framework.Networking
-
-Namespace Game.BetretenVerboten.Networking
+﻿Namespace Game.BetretenVerboten.Networking
     Public Class ExtGame
         Implements IGame
 
@@ -82,24 +79,6 @@ Namespace Game.BetretenVerboten.Networking
                 End Select
             Next
             Return nugaem
-        End Function
-
-        Public Shared Function CreateGame(client As Client, name As String, map As GaemMap, types As Player(), whitelist As String(), casual As Boolean, TeamMode As Boolean) As Boolean
-            'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
-            If client.blastmode Or Not client.Connected Then Return False
-
-            client.WriteString("create")
-            client.WriteString(name)
-            client.WriteString(GameType.BetretenVerboten.ToString)
-            client.WriteString(CInt(map).ToString)
-            client.WriteString(casual.ToString)
-            client.WriteString(TeamMode.ToString)
-            For i As Integer = 0 To GetMapSize(map) - 1
-                client.WriteString(CInt(types(i).Typ).ToString) 'Send player type
-                If types(i).Typ = SpielerTyp.Online Then client.WriteString(whitelist(i)) 'Send whitelist slot
-                If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name) : types(i).ID = client.UniqueIdentifier 'Send name
-            Next
-            Return client.CreateGameFinal()
         End Function
 
         Public Function GetReadyPlayerCount() As Integer Implements IGame.GetReadyPlayerCount

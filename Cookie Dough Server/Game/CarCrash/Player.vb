@@ -1,8 +1,4 @@
-﻿Imports Cookie_Dough.Framework.Networking
-Imports Microsoft.Xna.Framework.Audio
-Imports Microsoft.Xna.Framework.Graphics
-
-Namespace Game.CarCrash
+﻿Namespace Game.CarCrash
     Public Class Player
         Implements IPlayer
 
@@ -12,8 +8,6 @@ Namespace Game.CarCrash
         Public Property Name As String Implements IPlayer.Name
         Public Property MOTD As String Implements IPlayer.MOTD
         Public Property ID As String Implements IPlayer.ID
-        Public Property CustomSound As SoundEffect() Implements IPlayer.CustomSound
-        Public Property Thumbnail As Texture2D Implements IPlayer.Thumbnail
         Public Property Score As Double = -1D
         Public Sub New(typ As SpielerTyp)
             Me.Typ = typ

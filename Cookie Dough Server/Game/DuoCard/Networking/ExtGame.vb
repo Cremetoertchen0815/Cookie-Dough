@@ -1,6 +1,7 @@
 ﻿Imports System.Collections.Generic
 Imports Cookie_Dough.Framework.Networking
 Imports Cookie_Dough.Game.Common
+Imports Cookie_Dough_Server.Game.Common
 
 Namespace Game.DuoCard.Networking
     Public Class ExtGame
@@ -80,23 +81,6 @@ Namespace Game.DuoCard.Networking
                 End Select
             Next
             Return nugaem
-        End Function
-
-        Public Shared Function CreateGame(client As Client, name As String, size As Integer, types As BaseCardPlayer(), whitelist As String(), casual As Boolean) As Boolean
-            'Kein Zugriff auf diese Daten wenn in Blastmodus oder Verbindung getrennt
-            If client.blastmode Or Not client.Connected Then Return False
-
-            client.WriteString("create")
-            client.WriteString(name)
-            client.WriteString(GameType.DuoCard.ToString)
-            client.WriteString(size.ToString)
-            client.WriteString(casual.ToString)
-            For i As Integer = 0 To size - 1
-                client.WriteString(CInt(types(i).Typ).ToString) 'Send player type
-                If types(i).Typ = SpielerTyp.Online Then client.WriteString(whitelist(i)) 'Send whitelist slot
-                If types(i).Typ <> SpielerTyp.Online And types(i).Typ <> SpielerTyp.None Then client.WriteString(types(i).Name) : types(i).ID = client.UniqueIdentifier 'Send name
-            Next
-            Return client.CreateGameFinal()
         End Function
 
         Public Function GetReadyPlayerCount() As Integer Implements IGame.GetReadyPlayerCount

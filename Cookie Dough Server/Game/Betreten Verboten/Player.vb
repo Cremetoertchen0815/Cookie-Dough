@@ -88,18 +88,6 @@ Namespace Game.BetretenVerboten
         Public Property SacrificeCounter As Integer = 0
 
         ''' <summary>
-        ''' Der Sound, der abgespielt wird, wenn man gekickt wird
-        ''' </summary>
-        <JsonIgnore>
-        Public Property CustomSound As SoundEffect() = {SFX(3), SFX(4), SFX(4)} Implements IPlayer.CustomSound
-
-        ''' <summary>
-        ''' Das Thumbnail des Spielers
-        ''' </summary>
-        <JsonIgnore>
-        Public Property Thumbnail As Texture2D = ReferencePixelTrans Implements IPlayer.Thumbnail
-
-        ''' <summary>
         ''' Der Identifikationsstring des Spielers
         ''' </summary>
         Public Property ID As String Implements IPlayer.ID
@@ -107,7 +95,7 @@ Namespace Game.BetretenVerboten
         ''' <summary>
         ''' Ein ganz krasser Spruch
         ''' </summary>
-        Public Property MOTD As String = My.Settings.MOTD Implements IPlayer.MOTD
+        Public Property MOTD As String Implements IPlayer.MOTD
 
         Friend TeamNameWish As String
 
