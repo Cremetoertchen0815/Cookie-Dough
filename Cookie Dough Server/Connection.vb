@@ -1,0 +1,15 @@
+﻿Imports System.IO
+Imports System.Net.Sockets
+
+Public Class Connection
+    Public Property Client As TcpClient
+    Public Property Stream As NetworkStream
+    Public Property StreamW As StreamWriter
+    Public Property StreamR As StreamReader
+    Public Property Nick As String
+    Public Property Identifier As String
+    Public Property IdentThumbnail As IdentType
+    Public Property IdentSound As IdentType
+    Public Property IdentThumbnailName As String
+    Public Property IdentSoundName As String
+End Class

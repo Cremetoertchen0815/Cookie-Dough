@@ -2,6 +2,7 @@
 -Replace durak with Ultra Pong
 
 BV:
+-Add 3vs3vs3
 -Fix the darn spamming space bug Johannes is always abusing
 -Replace seperate ending fields in snek map with one big "throne"
 
