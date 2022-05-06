@@ -15,6 +15,10 @@ Public Module Launcher
     ''' </summary>
     Friend Property VersionString As String = "Cookie Dough V0.42"
     ''' <summary>
+    ''' Describes the default server IP
+    ''' </summary>
+    Friend Property DefaultServerIP As String = "weihnachtsaktion.ddns.net"
+    ''' <summary>
     ''' Old Beacon Tweening system for backwards compatibility with BV
     ''' </summary>
     Friend Property Automator As TweenManager

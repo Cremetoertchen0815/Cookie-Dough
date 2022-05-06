@@ -53,7 +53,7 @@ Public Class GameCore
         RegisterGlobalManager(MsgBoxer)
 
         'Load settings
-        If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection From {"weihnachtsaktion.ddns.net"}
+        If My.Settings.Servers Is Nothing Then My.Settings.Servers = New Collections.Specialized.StringCollection From {DefaultServerIP}
         If My.Settings.Username = "" Then My.Settings.Username = Environment.UserName
         If My.Settings.SoundA = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundA.audio") Then My.Settings.SoundA = 0
         If My.Settings.SoundB = IdentType.Custom AndAlso Not IO.File.Exists("Cache/client/soundB.audio") Then My.Settings.SoundB = 0
@@ -64,11 +64,10 @@ Public Class GameCore
 #If DEBUG Then
         Dim arg As String() = Environment.GetCommandLineArgs()
         If (arg.Length > 1 AndAlso arg(1) = "-launchserver") Then
-            StartServer()
-            LocalClient.Connect("127.0.0.1", My.Settings.Username)
+            LocalClient.Connect(DefaultServerIP, My.Settings.Username)
         Else
             LocalClient.SecondaryClient = True
-            LocalClient.Connect("127.0.0.1", My.Settings.Username & "a")
+            LocalClient.Connect(DefaultServerIP, My.Settings.Username & "a")
         End If
 #End If
 
