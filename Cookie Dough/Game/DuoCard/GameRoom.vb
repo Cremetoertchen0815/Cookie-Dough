@@ -530,8 +530,8 @@ Namespace Game.DuoCard
             'Check if card has to be drawn
             If (Spielers(SpielerIndex).HandDeck.Count = 1 Or Spielers(SpielerIndex).HandDeck.Count = 2) And Not CurrentMauDepressed And ret Then
                 StopUpdating = True
-                If Spielers(SpielerIndex).HandDeck.Count = 2 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau Mau!")
-                If Spielers(SpielerIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau!")
+                If Spielers(SpielerIndex).HandDeck.Count = 2 Then PostChat("You forgot to Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau!")
+                If Spielers(SpielerIndex).HandDeck.Count = 1 Then PostChat("You forgot to Mau Mau!", Color.White) : SendChatMessage(UserIndex, "You forgot to Mau Mau!")
                 Renderer.TriggerDeckPullAnimation(Sub()
                                                       Dim res As Card = DrawRandomCard()
                                                       Spielers(SpielerIndex).HandDeck.Add(res)
