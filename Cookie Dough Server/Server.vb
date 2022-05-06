@@ -17,13 +17,19 @@ Friend Module Server
     Private registered As Dictionary(Of String, String) '(ID, Username)
     Private games As New Dictionary(Of Integer, IGame)
     Private RNG As New Random
-    Private LogPath As String = "Log/server/" & Date.Now.ToShortDateString & ".log"
+    Private LogPath As String = "Log/server/" & Date.Now.ToShortDateString.Replace("/"c, "-"c) & ".log"
     Private HostSendLockObj As New Object
     Friend streamw As StreamWriter
     Friend Property VersionString As String = "Cookie Dough V0.42"
 
     Public Sub Main()
         Console.WriteLine(VersionString & "(Server)")
+        Directory.CreateDirectory("Cache/server/")
+        IO.Directory.CreateDirectory("Log/server")
+        IO.Directory.CreateDirectory("Log/chat")
+        IO.Directory.CreateDirectory("Save/")
+
+
         MainThread = New Thread(AddressOf ServerMainSub)
         MainThread.Start()
         ServerActive = True
