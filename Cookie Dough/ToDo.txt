@@ -1,14 +1,13 @@
 ﻿-Convert menu to fully utilize vcontrolls
 -Replace durak with Ultra Pong
+-Refactor code with Nez in mind
 
 BV:
 -Add 2vs2vs2
 -Fix the darn spamming space bug Johannes is always abusing
--Replace seperate ending fields in snek map with one big "throne"
 
 DC:
 -Implement rejoining
--Fix running out of cards
 -Add CPUs (JOHANNES)
 
 BR:
