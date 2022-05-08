@@ -25,8 +25,8 @@ Namespace Framework.Graphics
             effect.Projection = Projection
             effect.FogEnabled = True
             effect.FogColor = Vector3.Zero
-            effect.FogStart = 0.5F
-            effect.FogEnd = 3
+            effect.FogStart = 0.7F
+            effect.FogEnd = 4
         End Sub
         Friend Sub ApplyDefaultFX(effect As BasicEffect, Projection As Matrix, color As Color)
             effect.LightingEnabled = True

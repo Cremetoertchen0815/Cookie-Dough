@@ -504,6 +504,17 @@ Friend Module Server
                         SendToAllGameClients(gaem, nl)
 
                         If gaem.Players(who) IsNot Nothing Then gaem.Players(who).Bereit = False : gaem.Players(who).Connection = Nothing
+                    Case "v"c
+                        'Register team
+                        Console.WriteLine("Ja")
+                        Dim data = JsonConvert.DeserializeObject(Of (Name As String, Member As String())())(nl.Substring(1))
+                        Dim team_data = If(Not File.Exists("Save/teams.dat"), New Dictionary(Of String, String()), JsonConvert.DeserializeObject(Of Dictionary(Of String, String()))(File.ReadAllText("Save/teams.dat")))
+                        For Each element In data
+                            If team_data.ContainsKey(element.Name) Then team_data.Remove(element.Name)
+                            team_data.Add(element.Name, element.Member)
+                            Console.WriteLine(element.Name)
+                        Next
+                        File.WriteAllText("Save/teams.dat", JsonConvert.SerializeObject(team_data))
                     Case "w"c
                         'Win flag was sent, remove game from server list
                         gaem.Ended = EndingMode.Properly

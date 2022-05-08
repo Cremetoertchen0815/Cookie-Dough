@@ -406,15 +406,8 @@ Namespace Game.BetretenVerboten
                         End If
 
                         If GameMode = GameMode.Competetive Then
-                            'Read old team names
-                            Dim team_data = If(Not IO.File.Exists("Save\teams.dat"), New Dictionary(Of String, List(Of String)), Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, List(Of String)))(IO.File.ReadAllText("Save\teams.dat")))
-                            If team_data.ContainsKey(TeamNameA) Then team_data.Remove(TeamNameA)
-                            If team_data.ContainsKey(TeamNameB) Then team_data.Remove(TeamNameB)
-
-                            'Write new team names
-                            team_data.Add(TeamNameA, teamStrA)
-                            team_data.Add(TeamNameB, teamStrB)
-                            IO.File.WriteAllText("Save\teams.dat", Newtonsoft.Json.JsonConvert.SerializeObject(team_data))
+                            'Register team
+                            SendTeamRegister({(TeamNameA, teamStrA.ToArray()), (TeamNameB, teamStrB.ToArray())})
 
                             'Update highscores
                             Core.Schedule(5, AddressOf SendHighscore)
@@ -1120,6 +1113,9 @@ Namespace Game.BetretenVerboten
 
         Private Sub SendFigureTransition(who As Integer, figur As Integer, destination As Integer)
             SendNetworkMessageToAll("s" & who.ToString & figur.ToString & destination.ToString)
+        End Sub
+        Private Sub SendTeamRegister(data As (String, String())())
+            SendNetworkMessageToAll("v" & Newtonsoft.Json.JsonConvert.SerializeObject(data))
         End Sub
         Private Sub SendWinFlag()
             SendSync()

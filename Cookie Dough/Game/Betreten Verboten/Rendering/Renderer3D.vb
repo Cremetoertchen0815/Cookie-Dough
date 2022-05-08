@@ -19,6 +19,8 @@ Namespace Game.BetretenVerboten.Rendering
         Private MapBuffer As VertexBuffer
         Private TableModel As Model
         Private TableMatrix As Matrix
+        Private BannerModel As Model
+        Private BannerTransform As Matrix
         Private ResolutionMultiplier As Single = 3
 
         'Sliding stuff
@@ -78,6 +80,9 @@ Namespace Game.BetretenVerboten.Rendering
 
             'Load table 
             TableModel = scene.Content.Load(Of Model)("mesh/table")
+            BannerModel = scene.Content.Load(Of Model)("mesh/banner")
+            BannerTransform = Matrix.CreateRotationX(MathHelper.PiOver2 * 3) * Matrix.CreateTranslation(New Vector3(0, 0, -100)) * Matrix.CreateScale(0.8F) * Matrix.CreateRotationZ(0.35F) * Matrix.CreateTranslation(New Vector3(300, -350, 0))
+            ApplyDefaultFX(BannerModel, Projection)
             ApplyDefaultFX(TableModel, Projection)
 
             'Generate quad for map to be projected onto
@@ -276,6 +281,18 @@ Namespace Game.BetretenVerboten.Rendering
                 ApplyFX(element, Color.White, element.ParentBone.ModelTransform * TableMatrix)
                 element.Draw()
             Next
+
+            'Draw banner
+            If Game.Map = GaemMap.Snakes Then
+                For Each element In BannerModel.Meshes
+                    For Each effect As BasicEffect In element.Effects
+                        effect.World = element.ParentBone.Transform * BannerTransform
+                        effect.View = View
+                        effect.Projection = Projection
+                    Next
+                    element.Draw()
+                Next
+            End If
 
             'Zeichne Spielfiguren
 
