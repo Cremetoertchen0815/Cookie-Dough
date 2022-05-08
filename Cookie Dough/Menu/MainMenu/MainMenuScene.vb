@@ -58,6 +58,8 @@ Namespace Menu.MainMenu
             _refresh.RefreshAction = AddressOf GenerateVirtualControls
             GenerateVirtualControls()
 
+
+            SetColors(False) 'Reset player colors
             GameList = {("Betreten Verboten", "Lido", True), ("Car Crash", "Wheel speen sim", True), ("Corridor", "Chess", True), ("pain.", "Schlafmütze", False), ("DuoCard", "Uno", True),
                         ("Peng", "Pong on drugs", False), ("Megäaaa", "Jungle Speed", True), ("Barrelled", "Pac Man/Catch", True), ("Drop Trop", "Error 404", True)}
         End Sub
